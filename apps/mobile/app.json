@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Amar Poribar",
+    "slug": "amar-poribar",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "android": { "package": "com.amarporibar.app" },
+    "ios": { "bundleIdentifier": "com.amarporibar.app" }
+  }
+}

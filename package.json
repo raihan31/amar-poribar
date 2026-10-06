@@ -1,0 +1,26 @@
+{
+  "name": "amar-poribar",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "db:up": "docker compose up -d db",
+    "db:push": "pnpm --filter @amar-poribar/api db:push"
+  },
+  "devDependencies": {
+    "turbo": "^2.11.0",
+    "typescript": "~5.9.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

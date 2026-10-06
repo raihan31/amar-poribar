@@ -1,0 +1,20 @@
+{
+  "name": "@amar-poribar/ai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@amar-poribar/shared": "workspace:*",
+    "@anthropic-ai/sdk": "^0.131.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": { "@amar-poribar/tsconfig": "workspace:*", "typescript": "~5.9.0", "vitest": "^5.0.0" }
+}
