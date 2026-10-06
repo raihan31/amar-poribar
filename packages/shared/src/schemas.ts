@@ -90,3 +90,20 @@ export const MonthSummarySchema = z.object({
   byCategory: z.array(z.object({ categoryId: z.string().nullable(), name: z.string(), totalPaisa: z.number().int() })),
 });
 export type MonthSummary = z.infer<typeof MonthSummarySchema>;
+
+export const LocaleSchema = z.enum(["bn", "en"]);
+
+export const SummaryQuerySchema = z.object({
+  month: MonthSchema.optional(),
+  locale: LocaleSchema.default("bn"),
+});
+
+/** Monthly AI summary (SRS FR-AI-11): `text` for the screen, `speechText` for text-to-speech. */
+export const MonthlyAiSummarySchema = z.object({
+  month: MonthSchema,
+  locale: LocaleSchema,
+  text: z.string(),
+  speechText: z.string(),
+  usedAi: z.boolean(),
+});
+export type MonthlyAiSummary = z.infer<typeof MonthlyAiSummarySchema>;

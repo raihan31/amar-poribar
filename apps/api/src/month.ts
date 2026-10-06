@@ -11,3 +11,9 @@ export function monthRange(month: string): { start: Date; end: Date } {
 export function currentDhakaMonth(now = new Date()): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka", year: "numeric", month: "2-digit" }).format(now);
 }
+
+/** "2026-01" → "2025-12". */
+export function previousMonth(month: string): string {
+  const [y, m] = month.split("-").map(Number) as [number, number];
+  return m === 1 ? `${y - 1}-12` : `${y}-${String(m - 1).padStart(2, "0")}`;
+}

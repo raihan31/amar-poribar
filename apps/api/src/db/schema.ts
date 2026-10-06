@@ -127,3 +127,19 @@ export const aiUsage = pgTable(
   },
   (t) => [primaryKey({ columns: [t.familyId, t.month] })],
 );
+
+/** Cached monthly summaries; regenerated only when the underlying totals change. */
+export const aiSummaries = pgTable(
+  "ai_summaries",
+  {
+    familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),
+    month: text("month").notNull(),
+    locale: text("locale").notNull(),
+    factsHash: text("facts_hash").notNull(),
+    text: text("text").notNull(),
+    speechText: text("speech_text").notNull(),
+    usedAi: boolean("used_ai").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.familyId, t.month, t.locale, t.factsHash] })],
+);

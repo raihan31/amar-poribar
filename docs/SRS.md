@@ -2,9 +2,9 @@
 
 | Item | Value |
 |---|---|
-| Version | 0.1 (draft) |
+| Version | 0.2 (draft) — adds voice entry, spoken summary and low-literacy interaction (§3.11, §4.1.1, §6.3) |
 | Date | 2026-10-06 |
-| Based on | [BRD v0.1](./BRD.md) |
+| Based on | [BRD v0.2](./BRD.md) |
 | Structure | Adapted from IEEE 830 / ISO/IEC/IEEE 29148 |
 
 ---
@@ -155,10 +155,11 @@ Priority: **M** = must, **S** = should, **C** = could.
 | FR-AI-05 | The AI never writes final records. It returns drafts that the user confirms or edits in one step | M | P1 |
 | FR-AI-06 | The family's category list (IDs and names) is passed to the AI so it can only choose valid categories | M | P1 |
 | FR-AI-07 | **Category learning.** User corrections ("Shwapno" → Bazaar) are stored as per-family merchant rules and applied before the AI | S | P2 |
-| FR-AI-08 | **Voice entry.** Bangla speech → text (STT) → FR-AI-01 | S | P2 |
+| FR-AI-08 | **Voice entry.** See §3.11 (FR-VOICE-01..03) | M | P1 |
 | FR-AI-09 | **Receipt/memo photo.** Image → vision model → drafts (supports printed receipts and handwritten Bangla *memos*) | S | P2 |
 | FR-AI-10 | **Ask.** Natural-language questions over family data. The model calls server-side read-only tools (`sum_by_category`, `list_transactions`, `compare_months`) scoped to the user's family and permissions. Answers are given in the question's language | S | P2 |
-| FR-AI-11 | **Monthly insight.** At the start of each month, generate a short Bangla/English summary: top categories, biggest change from last month, budget performance | C | P3 |
+| FR-AI-11 | **Monthly summary.** On request, give a 3–5 sentence plain-language summary of a month in Bangla or English: total spent, change from last month, the biggest areas, and one gentle tip when spending rose. The AI never writes amounts itself (§6.3). Without AI or quota, a fixed template is used | M | P1 |
+| FR-AI-13 | **Offline quick parser.** Short entries with exactly one amount (digits or Bangla number words such as "আটশো পঞ্চাশ", "দেড় হাজার") and a known keyword ("বাজার", "rickshaw", "ওষুধ") are parsed without AI. With an amount but no keyword, it returns a draft without a category for the user to pick | M | P1 |
 | FR-AI-12 | Per-family monthly AI quota, enforced by plan (BRD §8). When the quota is exhausted, users fall back to manual entry | M | P1 |
 
 ### 3.7 Budgets and alerts (FR-BUD)
@@ -195,6 +196,21 @@ Priority: **M** = must, **S** = should, **C** = could.
 | FR-SYNC-02 | Records use client-generated UUIDs; the server treats create as idempotent. Last-write-wins, using `updatedAt` per record | S | P2 |
 | FR-SYNC-03 | AI parsing of text captured offline is queued and run once the device is online | S | P2 |
 
+### 3.11 Voice and low-literacy interaction (FR-VOICE)
+
+| ID | Requirement | Pri | Phase |
+|---|---|---|---|
+| FR-VOICE-01 | A large microphone button on the home screen records Bangla speech (`bn-BD`) and turns it into text with the **device's own** recogniser (Android SpeechRecognizer / Chrome Web Speech API). Audio is not uploaded to our servers | M | P1 |
+| FR-VOICE-02 | The transcript goes through the normal parse pipeline (§6.1). Drafts made by voice are marked `source = voice` | M | P1 |
+| FR-VOICE-03 | After a voice entry the app **reads the draft back aloud**, e.g. *"বাজার ও মুদি খাতে আটশো পঞ্চাশ টাকা খরচ। ঠিক আছে?"*. If the category is unknown it asks *"কিসের জন্য? নিচের ছবিতে চাপ দিন।"* and shows the icon picker | M | P1 |
+| FR-VOICE-04 | The monthly summary has a **Listen** button that reads it aloud with the device's text-to-speech engine (`bn-BD`, rate 0.9). The API returns a separate `speechText` with amounts written as words | M | P1 |
+| FR-VOICE-05 | Spoken amounts use Bangla number words in the South Asian system (হাজার, লাখ, কোটি), e.g. ৳ ১,২৫,০০০ → "এক লাখ পঁচিশ হাজার টাকা" | M | P1 |
+| FR-VOICE-06 | Every draft has a 🔊 button, a large ✓ (save) and ✗ (discard). Category choice is a grid of icons with labels; tapping an icon also speaks its name | M | P1 |
+| FR-VOICE-07 | If the device lacks speech recognition or a Bangla voice, the app says so and keeps the typed flow working; on Android it links to installing Google's Bangla voice | S | P1 |
+| FR-VOICE-08 | **Voice conversation:** the user can ask by voice (*"এই মাসে বাজারে কত খরচ হলো?"*) and hear the answer, using FR-AI-10 | S | P2 |
+| FR-VOICE-09 | **Simple mode** setting: larger text, icons only on the home screen, automatic read-aloud of every result, and the mic as the main action | S | P2 |
+| FR-VOICE-10 | Spoken budget alerts and a voice-guided first-run tutorial | C | P2 |
+
 ---
 
 ## 4. External interface requirements
@@ -204,6 +220,16 @@ Priority: **M** = must, **S** = should, **C** = could.
 - Amounts are shown as `৳ 1,25,000` (lakh grouping) and in Bangla numerals as `৳ ১,২৫,০০০`.
 - **Quick-add bar** on the home screen: a single text field with a mic button (P2), camera (P2) and paste-SMS. Pressing enter shows draft cards; confirming takes one tap.
 - Touch targets ≥ 48 dp. WCAG 2.1 AA colour contrast. Light and dark themes.
+
+#### 4.1.1 Design rules for low-literacy users
+1. **Voice first:** the microphone is the biggest control on the home screen.
+2. **Hear before you save:** every AI or voice result is read back and needs a ✓.
+3. **Pictures with words:** every category has an icon; icons are never the only cue for meaning that matters.
+4. **Few choices per screen:** one main action, large buttons (≥ 52 dp for primary actions).
+5. **Amounts two ways:** digits on screen (৳ ৮৫০), words when spoken.
+6. **Plain language:** short sentences and everyday words in every message; no jargon or percentages.
+7. **Colour is never the only signal:** budget status uses colour, icon and spoken text together.
+8. **Validate with real users:** usability tests with low-literacy participants before each release (BO-8).
 
 ### 4.2 API (REST, JSON, `/v1`)
 
@@ -222,6 +248,7 @@ Priority: **M** = must, **S** = should, **C** = could.
 | POST | `/v1/families/:id/ai/parse` | Text or SMS → drafts |
 | POST | `/v1/families/:id/ai/receipt` | Image → drafts (P2) |
 | POST | `/v1/families/:id/ai/ask` | Question → answer (P2) |
+| GET | `/v1/families/:id/ai/summary?month=YYYY-MM&locale=bn` | Plain-language monthly summary: `{ text, speechText, usedAi }` |
 | GET/PUT | `/v1/families/:id/budgets?month=YYYY-MM` | Budgets |
 | GET | `/v1/families/:id/reports/summary?month=YYYY-MM` | Dashboard data |
 | GET | `/health` | Liveness check |
@@ -250,6 +277,7 @@ Request and response bodies are validated with the Zod schemas in `@amar-poribar
 | `budgets` | id, family_id, category_id? (null = overall), month (`YYYY-MM`), limit_paisa |
 | `merchant_rules` (P2) | family_id, pattern, category_id |
 | `ai_usage` | family_id, month, requests, input_tokens, output_tokens |
+| `ai_summaries` | family_id, month, locale, facts_hash, text, speech_text, used_ai, created_at (cache: same totals → same summary, no new AI call) |
 
 Indexes: `transactions(family_id, occurred_at desc)`, and a unique `(family_id, trx_id)` where `trx_id` is not null.
 
@@ -265,11 +293,12 @@ Indexes: `transactions(family_id, occurred_at desc)`, and a unique `(family_id, 
 ### 6.1 Parse pipeline (FR-AI-01, -02)
 
 ```
-input ──► normalise (Bangla digits, commas, whitespace)
-      ──► is it an MFS SMS? ──yes──► template parser ──match──► draft (confidence 0.99)
-      │                                   └─no match─┐
-      ├──► merchant rules (P2) ──────────────────────┤
-      └──► LLM structured parse (family categories in prompt) ──► validate with Zod ──► drafts
+text / voice transcript / SMS
+  ──► MFS SMS template parser ──match──► draft (confidence 0.99), no AI
+  ──► offline quick parser (one amount + known keyword) ──match──► draft (0.8), no AI
+  ──► merchant rules (P2)
+  ──► LLM structured parse (family categories in prompt) ──► validate with Zod ──► drafts
+  ──► if AI is off or fails: quick parser's amount-only draft (user picks category)
 ```
 
 - **Structured output.** The model must return JSON that matches `ParsedDraftsSchema`. Invalid output gets one retry and then fails gracefully ("couldn't understand, please enter manually").
@@ -278,7 +307,15 @@ input ──► normalise (Bangla digits, commas, whitespace)
 - **Cost.** Keep the system prompt and category list stable so prompt caching works. Use a low effort setting for parsing.
 - **Safety.** If the model refuses or the response is truncated, return a non-fatal `ai_unavailable` error so the client falls back to manual entry.
 
-### 6.2 Ask (FR-AI-10, P2)
+### 6.2 Monthly summary (FR-AI-11, FR-VOICE-04)
+
+- **Input to the AI is aggregates only:** totals for this month and last month, the top 5 categories with last month's figures. No notes, names, phone numbers or transaction details.
+- **No numbers from the AI.** Each amount is given as a placeholder (`{TOTAL}`, `{CHANGE}`, `{C1}`, `{C1_LAST}`, …). The model must write amounts only as placeholders. The server rejects output that has unknown placeholders or any digit outside a placeholder, and falls back to the template.
+- **Two renderings** from the same template: `text` with ৳ and Bangla digits for the screen, `speechText` with amounts in words for text-to-speech.
+- **Tone:** 3–5 short sentences in everyday words, as a caring elder would talk; one practical tip if spending rose; never blames a person.
+- **Cost:** low effort setting, cached system prompt, and the result cached by a hash of the totals. A month whose numbers haven't changed costs nothing to view again.
+
+### 6.3 Ask (FR-AI-10, P2)
 - A tool-use loop with server-defined read-only tools whose SQL is always scoped by `family_id` and the caller's visibility (private transactions are excluded).
 - At most 5 tool calls per question. Answers cite the figures they used.
 
@@ -301,6 +338,9 @@ input ──► normalise (Bangla digits, commas, whitespace)
 | NFR-11 | Maintainability | TypeScript strict mode; shared schemas; ≥ 70% unit-test coverage for `packages/*`; CI runs lint, typecheck and tests |
 | NFR-12 | Observability | Structured JSON logs (pino) without PII; error tracking; AI usage metrics per family |
 | NFR-13 | Cost | AI cost ≤ ৳15 per active family per month (BO-6) |
+| NFR-14 | Voice | Speech recognition and text-to-speech run on the device; voice entry → read-back in ≤ 3 s p95 when the offline parser handles it |
+| NFR-15 | Voice accuracy | ≥ 85% of voice entries saved without editing the amount, measured in pilot testing including Sylheti and Chattogram speakers |
+| NFR-16 | Accessibility | Every interactive element has a Bangla accessibility label (TalkBack); primary buttons ≥ 52 dp |
 
 ---
 
@@ -335,7 +375,7 @@ amar-poribar/
 | BR-07 | FR-BUD-01..03, FR-NOT-01 |
 | BR-08 | FR-REP-01..02 |
 | BR-09 | §4.1, NFR-09 |
-| BR-10 | FR-AI-08 |
+| BR-10 | FR-AI-08, FR-VOICE-01..03, FR-AI-13 |
 | BR-11 | FR-AI-09, FR-TXN-07 |
 | BR-12 | FR-AI-10 |
 | BR-13 | FR-FAM-05 |
@@ -346,6 +386,10 @@ amar-poribar/
 | BR-18 | (P3, to be specified) |
 | BR-19 | FR-REP-04, FR-AI-11 |
 | BR-20 | FR-AUTH-05, §5.2, NFR-07 |
+| BR-21 | FR-AI-11, §6.2 |
+| BR-22 | FR-VOICE-04, FR-VOICE-05 |
+| BR-23 | FR-VOICE-03, FR-VOICE-06, FR-VOICE-07, §4.1.1 |
+| BR-24 | FR-VOICE-08, FR-AI-10 |
 
 ---
 
@@ -358,3 +402,7 @@ amar-poribar/
 5. A Bazaar budget of ৳10,000 triggers an alert when spending passes ৳8,000.
 6. All screens can be switched between Bangla and English, with no untranslated strings.
 7. A Member cannot edit another member's transaction (returns 403), and no endpoint returns another family's data (returns 404).
+8. Saying *"আজ বাজারে আটশো পঞ্চাশ টাকা ক্যাশে"* gives a ৳850 Bazaar draft that is read back aloud, **with no AI call**.
+9. Saying *"পাঁচশো টাকা দিলাম"* gives a ৳500 draft, the app asks which category, and the icon picker appears.
+10. The monthly summary shows ৳ amounts on screen, and the Listen button speaks the same summary with amounts in words.
+11. A tester who can't read comfortably adds an expense and hears the monthly summary without help.

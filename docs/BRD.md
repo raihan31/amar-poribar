@@ -4,7 +4,7 @@
 |---|---|
 | Product | **Amar Poribar** (আমার পরিবার — "My Family"): an AI-assisted family expense tracker for Bangladesh |
 | Document | Business Requirements Document |
-| Version | 0.1 (draft) |
+| Version | 0.2 (draft) — adds voice entry, spoken monthly summary and low-literacy design |
 | Date | 2026-10-06 |
 | Owner | Raihan (product owner) |
 | Status | Draft for review |
@@ -16,6 +16,8 @@
 Bangladeshi households run their money on **cash and mobile financial services (MFS)** like bKash and Nagad. Spending is often handled by **several family members** at once: one person does the daily bazaar, another pays the bills, a third sends money home from abroad. Global budgeting apps assume bank feeds and one user, so they fit Bangladesh poorly. Local apps mostly target **shop-keepers (SME ledgers)**, not families.
 
 Amar Poribar is a **shared family wallet journal**. Any family member can record a spend in seconds in **Bangla, English or Banglish**, by typing, speaking, photographing a receipt or pasting an MFS SMS. An AI assistant turns that input into a structured, categorised expense. The family sees one shared picture of where money goes, gets budget alerts before month-end, and can ask questions such as *"এই মাসে বাজারে কত খরচ হলো?"* ("How much did we spend on bazaar this month?").
+
+Amar Poribar is built **voice-first** so it also works for family members who read little: they can say an expense, hear it read back, confirm with a big ✓, and listen to a plain-language **monthly summary** read aloud.
 
 The first goal is to serve the owner's own family well (dog-fooding). The second is to grow into a freemium product for urban and semi-urban middle-income families in Bangladesh and for Bangladeshi expatriate families.
 
@@ -41,6 +43,8 @@ The first goal is to serve the owner's own family well (dog-fooding). The second
 | P4 | Inflation is high (headline CPI 8–9.4% through 2026, with food the largest contributor) | Families feel squeezed but can't see *which* categories grew |
 | P5 | Little financial planning culture (about 92% of individuals keep no written financial plan) | Overspending is only noticed at month-end |
 | P6 | Expatriate earners can't see household spending | Friction and mistrust inside the family, and remittances are hard to plan |
+| P7 | Many household managers read and write little. Literacy (age 7+) is 77.9%, functional literacy only about 63%, and about 42% of people have less than fifth-grade schooling | Text-heavy apps shut out exactly the person who handles daily spending |
+| P8 | Families see numbers, not meaning | Charts don't say *"bazaar costs went up; buy rice in bulk"*. People want the month explained in plain words |
 
 ---
 
@@ -50,6 +54,7 @@ The first goal is to serve the owner's own family well (dog-fooding). The second
 
 | Indicator | Figure | Implication |
 |---|---|---|
+| Literacy, age 7+ (BBS, Economic Survey 2024/25) | 77.9% (functional literacy about 63%) | Voice, icons and read-aloud are core features, not extras |
 | Mobile subscriptions (Jun 2025, BTRC) | ~188 million | Mobile-first is mandatory |
 | Internet subscriptions (Jun 2025) | ~134 million, of which ~119 million on mobile | Most users are on mobile data, so the app must be light on data |
 | Household internet access (BBS 2025) | 54.8% (up from 43.6% in 2023) | Growing fast, but offline support still matters |
@@ -84,6 +89,7 @@ The first goal is to serve the owner's own family well (dog-fooding). The second
 | **Rahim** (42, salaried earner) | Pays rent, school fees and utilities, uses a bank app and bKash | Monthly overview, category trends, budget vs actual |
 | **Tanvir** (29, expatriate in Riyadh) | Sends monthly remittance home | A read-only view of how the money was used and running balances |
 | **Nusrat** (19, university student) | Has a pocket-money allowance | Simple personal spend logging inside the family plan, with privacy controls |
+| **Amena** (54, grandmother, Narayanganj) | Studied to class 3, reads Bangla slowly, can't type; uses a basic Android phone, mostly for calls and YouTube | Speak to add an expense, hear it read back, confirm with one big button; listen to "how did we do this month?" |
 
 **Primary market:** urban and peri-urban middle-income families (Dhaka, Chattogram, Sylhet, Khulna, Rajshahi), plus expatriate Bangladeshi families.
 
@@ -108,6 +114,8 @@ The first goal is to serve the owner's own family well (dog-fooding). The second
 | BO-5 | Improve budget control | Families that set ≥ 1 budget; months ending under budget | ≥ 60%; ≥ 50% |
 | BO-6 | Keep it sustainable | AI cost per active family per month | ≤ ৳15 |
 | BO-7 | Earn revenue (phase 3) | Conversion from free to paid | ≥ 4% |
+| BO-8 | Include low-literacy members | Share of entries made by voice; task success of low-literacy testers (add an expense, hear the summary) without help | ≥ 25%; ≥ 80% |
+| BO-9 | Make the month understandable | Families who open or listen to the monthly summary each month | ≥ 50% |
 
 ---
 
@@ -119,6 +127,9 @@ The first goal is to serve the owner's own family well (dog-fooding). The second
 - Family workspace with invitations and roles (owner, admin, member, viewer)
 - Accounts/wallets: Cash, bKash, Nagad, Rocket, Upay, bank, card
 - Manual and AI entry from **text** (Bangla, Banglish, English) and **pasted MFS SMS**
+- **Voice entry** in Bangla: speak an expense, hear it read back, confirm with a big ✓ or fix it with a picture-based category picker
+- **Monthly summary** in plain, simple language, and a **"listen" button** that reads it aloud
+- **Low-literacy design:** large buttons, icons for categories, every key screen readable aloud
 - Bangladesh-specific categories (bazaar, utilities, rent, education, medical, transport, remittance-out, zakat/charity, festival and so on)
 - Monthly budgets per category with alerts
 - Dashboard: month total, by category, by member, by account
@@ -126,9 +137,9 @@ The first goal is to serve the owner's own family well (dog-fooding). The second
 - Web app and Android app
 
 **Phase 2: v1 (about 8 weeks later)**
-- Voice entry (Bangla speech-to-text)
 - Receipt or memo photo → expense (vision AI)
-- "Ask Amar Poribar": natural-language questions over the family's own data
+- "Ask Amar Poribar": natural-language questions over the family's own data, typed **or spoken, with spoken answers** (a voice conversation for low-literacy users)
+- Spoken budget alerts and a voice-guided first-time tutorial
 - Income and remittance tracking; expatriate (read-only) view
 - Recurring expenses (rent, salaries, subscriptions), bill reminders
 - Offline-first capture with background sync
@@ -162,7 +173,7 @@ The first goal is to serve the owner's own family well (dog-fooding). The second
 | BR-07 | Families can set monthly budgets per category and get alerts at 80% and 100% | Must | 1 |
 | BR-08 | A dashboard shows spending by category, member, account and over time | Must | 1 |
 | BR-09 | The UI is fully usable in Bangla and English, with BDT formatting | Must | 1 |
-| BR-10 | Users can log expenses by voice in Bangla | Should | 2 |
+| BR-10 | Users can log expenses by voice in Bangla; the app reads the result back before saving | Must | 1 |
 | BR-11 | Users can photograph a receipt or handwritten memo and get an expense draft | Should | 2 |
 | BR-12 | Users can ask questions about family spending in natural language and get answers grounded in their data | Should | 2 |
 | BR-13 | Expatriate members can see a read-only remittance and spending summary | Should | 2 |
@@ -173,6 +184,10 @@ The first goal is to serve the owner's own family well (dog-fooding). The second
 | BR-18 | Loans and *dhar* (money lent or borrowed) tracking | Could | 3 |
 | BR-19 | Data export (PDF, Excel) and a monthly AI summary report | Could | 3 |
 | BR-20 | Comply with Bangladesh's Personal Data Protection Ordinance 2025 | Must | 1 |
+| BR-21 | Each month the app explains the family's spending in a few plain sentences (total, change from last month, biggest areas, one gentle tip) | Must | 1 |
+| BR-22 | Users can listen to the monthly summary (and other key text) read aloud in Bangla | Must | 1 |
+| BR-23 | Someone who can't read comfortably can add an expense, check it and save it using only voice, pictures and large buttons | Must | 1 |
+| BR-24 | Users can ask questions by voice and hear the answer | Should | 2 |
 
 ---
 
@@ -224,7 +239,8 @@ Payment by bKash or Nagad checkout through a licensed payment gateway (for examp
 
 **Dependencies**
 - Claude API (Anthropic) for language understanding, vision and Q&A
-- Speech-to-text with Bangla support (phase 2)
+- Speech-to-text with Bangla support: the phone's own recogniser (Google on most Android phones, Chrome on the web). Free, and audio stays on the device
+- Text-to-speech with a Bangla voice: the phone's own engine (Google TTS has bn-BD)
 - An SMS or OTP gateway in Bangladesh for phone login (for example SSL Wireless or Alpha SMS), or Firebase Auth
 - PostgreSQL hosting; a region close to Bangladesh is preferred (for example Singapore or Mumbai)
 
@@ -241,6 +257,9 @@ Payment by bKash or Nagad checkout through a licensed payment gateway (for examp
 | MFS SMS formats change | Medium | Low | Template-driven parsers with an AI fallback; parser tests |
 | Store policy rejection (SMS) | Medium | Medium | No `READ_SMS`; paste/share flow |
 | Data-protection non-compliance | Low | High | Privacy by design, consent, deletion, DPIA before public launch |
+| Speech recognition misreads dialects (Sylheti, Chattogram) or noisy bazaars | Medium | Medium | Read-back before saving, picture picker, typed fallback, offline keyword parser tuned on real phrases |
+| Phone has no Bangla text-to-speech voice | Medium | Medium | Detect it and guide the user to install Google's Bangla voice; always show the text too |
+| AI summary states a wrong amount | Low | High | AI never writes numbers; amounts come from the database through placeholders and are checked |
 
 ---
 
@@ -271,3 +290,6 @@ Payment by bKash or Nagad checkout through a licensed payment gateway (for examp
 - [The Daily Star — PDPO 2025 key takeaways](https://www.thedailystar.net/tech-startup/news/bangladeshs-personal-data-protection-ordinance-2025-key-takeaways-4015401)
 - [TBS — Govt issues gazettes of data protection ordinances](https://www.tbsnews.net/node/1281356)
 - [Pocketclear — Expense tracking in Bangladesh](https://pocketclear.app/blog/expense-tracker-bangladesh.html)
+- [The Daily Observer — literacy rate 77.9% (Economic Survey)](https://observerbd.com/news/542998)
+- [Dhaka Tribune — BBS functional literacy rate](https://www.dhakatribune.com/bangladesh/education/319301/bbs-functional-literacy-rate-7-above-years-in)
+- [Bonik Barta — 42% below fifth-grade education](https://en.bonikbarta.com/bangladesh/c2Aj8lzZeMef4q32)

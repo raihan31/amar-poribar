@@ -46,3 +46,23 @@ ul { list-style: none; padding: 0; margin: 0; }
 li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
 li:last-child { border-bottom: 0; }
 .big { font-size: 1.75rem; font-weight: 600; }
+
+/* Voice-first, large-target controls for low-literacy users (SRS §4.1.1). */
+button.mic {
+  width: 100%; min-height: 64px; font-size: 1.25rem; margin-bottom: 12px;
+  display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 32px;
+}
+button.mic:disabled { opacity: 0.5; cursor: not-allowed; }
+button.icon { min-width: 48px; min-height: 48px; padding: 0 12px; font-size: 1.25rem; }
+button.danger { background: var(--danger); }
+.draft { align-items: center; gap: 8px; }
+.draft-text { display: flex; align-items: center; gap: 10px; }
+.draft-icon { font-size: 1.75rem; }
+.summary-text { font-size: 1.125rem; line-height: 1.7; margin: 12px 0 0; }
+.draft { flex-wrap: wrap; }
+.picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; width: 100%; margin-top: 8px; }
+.picker-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px;
+  font-size: 1.5rem; font-weight: 400; min-height: 64px; white-space: normal;
+}
+.picker-item small { font-size: 0.7rem; line-height: 1.2; color: var(--text); }

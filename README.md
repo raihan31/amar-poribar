@@ -1,6 +1,6 @@
 # আমার পরিবার · Amar Poribar
 
-A family expense tracker for Bangladesh with AI-assisted entry. Family members log spending in Bangla, Banglish or English, or by pasting a bKash/Nagad/Rocket SMS. Everyone sees one shared monthly picture.
+A family expense tracker for Bangladesh with AI-assisted entry. Family members log spending by **speaking** or typing in Bangla, Banglish or English, or by pasting a bKash/Nagad/Rocket SMS. The app reads each entry back aloud, explains the month in plain words, and can **speak the monthly summary**, so family members who read little can use it too. Everyone sees one shared monthly picture.
 
 - **Business requirements:** [docs/BRD.md](docs/BRD.md) (includes the Bangladesh market analysis)
 - **Software requirements:** [docs/SRS.md](docs/SRS.md)
@@ -34,7 +34,9 @@ pnpm build                    # build shared packages
 pnpm dev                      # api :4000, web :3000, Expo dev server
 ```
 
-Without `ANTHROPIC_API_KEY`, MFS SMS parsing still works. Free-text notes return no drafts, and the user enters them manually.
+Without `ANTHROPIC_API_KEY`, these still work: MFS SMS parsing, the offline quick parser for simple phrases ("আজ বাজারে আটশো পঞ্চাশ টাকা", "rickshaw 40"), and a template monthly summary. Complex sentences need the AI.
+
+**Voice:** speech recognition and text-to-speech run on the device. On the web, use Chrome or Edge. On mobile, `expo-speech-recognition` needs a development build (`npx expo run:android`), not Expo Go. Android phones need Google's Bangla text-to-speech voice for spoken output.
 
 In development, the OTP endpoint returns the code in its response (`devCode`), so no SMS gateway is needed.
 
@@ -49,6 +51,6 @@ In development, the OTP endpoint returns the code in its response (`devCode`), s
 
 ## Status
 
-The MVP skeleton (Phase 1 in the BRD) is in place: OTP login, family workspace with default BD categories and accounts, transactions with duplicate TrxID protection, AI/SMS parse → confirm flow, and a monthly summary on web and mobile.
+The MVP skeleton (Phase 1 in the BRD) is in place: OTP login, family workspace with default BD categories and accounts, transactions with duplicate TrxID protection, AI/SMS parse → confirm flow, a monthly summary on web and mobile, plus voice entry with spoken read-back, an icon category picker, and a plain-language monthly summary with a Listen button.
 
 Main open items for Phase 1: an SMS gateway for OTP, stored and rotatable refresh tokens, invitations and role management UI, budgets and alerts, CSV export, persisting the mobile token in secure storage, and DB-backed integration tests.
