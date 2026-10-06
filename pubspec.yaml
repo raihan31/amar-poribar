@@ -19,7 +19,7 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.18
   path_provider: ^2.1.2
   path: ^1.8.3
-  sqlite_crdt: ^0.1.7 # CRDT implementation for SQLite
+  sqlite_crdt: ^3.0.4 # CRDT implementation for SQLite
   
   # Communication & APIs
   nearby_connections: ^3.1.2 # Peer to peer sync
@@ -28,7 +28,7 @@ dependencies:
   # UI & Utils
   fl_chart: ^0.65.0
   intl: ^0.18.1
-  freezed_annotation: ^2.4.1
+  freezed_annotation: ^3.1.0
   json_annotation: ^4.8.1
 
 dev_dependencies:
@@ -36,9 +36,9 @@ dev_dependencies:
     sdk: flutter
   build_runner: ^2.4.8
   drift_dev: ^2.14.1
-  freezed: ^2.4.1
-  json_serializable: ^4.8.1
-  flutter_lints: ^3.0.1
+  freezed: ^3.2.3
+  json_serializable: ^6.7.1
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
