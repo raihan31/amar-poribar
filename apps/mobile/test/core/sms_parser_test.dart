@@ -11,8 +11,8 @@ void main() {
     });
 
     test('DBBL Parser correctly extracts Debit amount and Expense type', () {
-      const sender = "16216";
-      const rawText = "Tk 500.00 has been debited from A/C **1234 on 03-Oct for POS Purchase at SWAPNO. Available Bal Tk 15,000.00";
+      const sender = '16216';
+      const rawText = 'Tk 500.00 has been debited from A/C **1234 on 03-Oct for POS Purchase at SWAPNO. Available Bal Tk 15,000.00';
 
       final result = parserEngine.tryParse(sender, rawText);
 
@@ -22,8 +22,8 @@ void main() {
     });
 
     test('DBBL Parser correctly extracts Credit amount and Income type', () {
-      const sender = "DBBL";
-      const rawText = "Tk 12,000.00 has been credited to A/C **1234 on 04-Oct from Salary AC. Available Bal Tk 27,000.00";
+      const sender = 'DBBL';
+      const rawText = 'Tk 12,000.00 has been credited to A/C **1234 on 04-Oct from Salary AC. Available Bal Tk 27,000.00';
 
       final result = parserEngine.tryParse(sender, rawText);
 
@@ -33,8 +33,8 @@ void main() {
     });
 
     test('Unregistered Bank Sender returns null gracefully', () {
-      const sender = "RandomBank";
-      const rawText = "Your account was debited Tk 500.";
+      const sender = 'RandomBank';
+      const rawText = 'Your account was debited Tk 500.';
 
       final result = parserEngine.tryParse(sender, rawText);
 
@@ -43,8 +43,8 @@ void main() {
     });
     
     test('Invalid text payload returns null instead of crashing', () {
-      const sender = "DBBL";
-      const rawText = "Dear user, please update your KYC immediately.";
+      const sender = 'DBBL';
+      const rawText = 'Dear user, please update your KYC immediately.';
 
       final result = parserEngine.tryParse(sender, rawText);
 

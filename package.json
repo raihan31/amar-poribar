@@ -12,15 +12,12 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "db:up": "docker compose up -d db",
-    "db:push": "pnpm --filter @amar-poribar/api db:push"
+    "db:push": "pnpm --filter @amar-poribar/api db:push",
+    "mobile:analyze": "cd apps/mobile && flutter analyze",
+    "mobile:test": "cd apps/mobile && flutter test"
   },
   "devDependencies": {
     "turbo": "^2.11.0",
     "typescript": "~5.9.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
   }
 }

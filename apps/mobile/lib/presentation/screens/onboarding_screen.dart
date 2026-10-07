@@ -5,7 +5,7 @@ import '../../domain/models/enums.dart';
 import '../providers/providers.dart';
 
 class OnboardingScreen extends ConsumerWidget {
-  const OnboardingScreen({Key? key}) : super(key: key);
+  const OnboardingScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,7 +20,7 @@ class OnboardingScreen extends ConsumerWidget {
               const Icon(Icons.family_restroom, size: 100, color: Colors.green),
               const SizedBox(height: 40),
               Text(
-                "Welcome to\nAmar Poribar",
+                'Welcome to\nAmar Poribar',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                   fontWeight: FontWeight.bold,
@@ -28,7 +28,7 @@ class OnboardingScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 20),
               const Text(
-                "Your private, offline-first family finance manager. No cloud, no tracking. Just your family.",
+                'Your private, offline-first family finance manager. No cloud, no tracking. Just your family.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey, fontSize: 16),
               ),
@@ -41,7 +41,7 @@ class OnboardingScreen extends ConsumerWidget {
                   foregroundColor: Colors.white,
                 ),
                 icon: const Icon(Icons.add),
-                label: const Text("Create New Family (Father/Mother)"),
+                label: const Text('Create New Family (Father/Mother)'),
                 onPressed: () {
                   ref.read(appStateProvider.notifier).setRole(Role.father);
                   Navigator.pushReplacementNamed(context, '/dashboard');
@@ -54,13 +54,13 @@ class OnboardingScreen extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 icon: const Icon(Icons.qr_code_scanner),
-                label: const Text("Join Existing Family (Scan QR)"),
+                label: const Text('Join Existing Family (Scan QR)'),
                 onPressed: () {
                   // In reality, this opens a QR Scanner to get the Master Key Hash and P2P Connection ID
                   ref.read(appStateProvider.notifier).setRole(Role.child);
                   Navigator.pushReplacementNamed(context, '/dashboard');
                 },
-              )
+              ),
             ],
           ),
         ),

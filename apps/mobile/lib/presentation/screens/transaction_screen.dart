@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/providers.dart';
 
 class TransactionScreen extends ConsumerStatefulWidget {
-  const TransactionScreen({Key? key}) : super(key: key);
+  const TransactionScreen({super.key});
 
   @override
   ConsumerState<TransactionScreen> createState() => _TransactionScreenState();
@@ -33,7 +33,7 @@ class _TransactionScreenState extends ConsumerState<TransactionScreen> {
               children: [
                 Expanded(
                   child: ChoiceChip(
-                    label: const Center(child: Text("Expense")),
+                    label: const Center(child: Text('Expense')),
                     selected: isExpense,
                     onSelected: (val) => setState(() => isExpense = true),
                     selectedColor: Colors.red.shade100,
@@ -42,12 +42,12 @@ class _TransactionScreenState extends ConsumerState<TransactionScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: ChoiceChip(
-                    label: const Center(child: Text("Income")),
+                    label: const Center(child: Text('Income')),
                     selected: !isExpense,
                     onSelected: (val) => setState(() => isExpense = false),
                     selectedColor: Colors.green.shade100,
                   ),
-                )
+                ),
               ],
             ),
             const SizedBox(height: 24),
@@ -94,7 +94,7 @@ class _TransactionScreenState extends ConsumerState<TransactionScreen> {
                 },
                 child: const Text('Save Transaction', style: TextStyle(fontSize: 18)),
               ),
-            )
+            ),
           ],
         ),
       ),

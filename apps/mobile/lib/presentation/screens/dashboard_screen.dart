@@ -6,7 +6,7 @@ import '../providers/providers.dart';
 import '../widgets/glassmorphism_card.dart';
 
 class DashboardScreen extends ConsumerWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -37,7 +37,7 @@ class DashboardScreen extends ConsumerWidget {
             end: Alignment.bottomRight,
             colors: [
               Theme.of(context).colorScheme.primaryContainer,
-              Theme.of(context).colorScheme.background,
+              Theme.of(context).colorScheme.surface,
             ],
           ),
         ),
@@ -51,22 +51,22 @@ class DashboardScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 10),
-                      Text("Welcome back, ${appState.activeRole.name.toUpperCase()}", 
-                           style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey)),
+                      Text('Welcome back, ${appState.activeRole.name.toUpperCase()}', 
+                           style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey),),
                       const SizedBox(height: 20),
                       
                       // Hero Budget Card
                       _buildHeroBudgetCard(context, appState, budgetUsedPercent),
                       
                       const SizedBox(height: 30),
-                      Text("Monthly Analytics", style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                      Text('Monthly Analytics', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 10),
                       
                       // Charts Segment
                       _buildAnalyticsChart(context),
                       
                       const SizedBox(height: 30),
-                      Text("Recent Transactions", style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                      Text('Recent Transactions', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 10),
                     ],
                   ),
@@ -81,10 +81,10 @@ class DashboardScreen extends ConsumerWidget {
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8.0),
                         elevation: 0,
-                        color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+                        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: isExpense ? Colors.red.withOpacity(0.1) : Colors.green.withOpacity(0.1),
+                            backgroundColor: isExpense ? Colors.red.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1),
                             child: Icon(
                               isExpense ? Icons.arrow_outward : Icons.arrow_downward,
                               color: isExpense ? Colors.red : Colors.green,
@@ -132,31 +132,31 @@ class DashboardScreen extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Total Balance", style: TextStyle(color: Colors.grey, fontSize: 14)),
-                  Text("৳${(state.totalIncome - state.totalExpense).toStringAsFixed(2)}", 
-                       style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                  const Text('Total Balance', style: TextStyle(color: Colors.grey, fontSize: 14)),
+                  Text('৳${(state.totalIncome - state.totalExpense).toStringAsFixed(2)}', 
+                       style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),),
                 ],
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: percentUsed > 0.85 ? Colors.red.withOpacity(0.2) : Colors.green.withOpacity(0.2),
+                  color: percentUsed > 0.85 ? Colors.red.withValues(alpha: 0.2) : Colors.green.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  "${(percentUsed * 100).toStringAsFixed(0)}% Used",
+                  '${(percentUsed * 100).toStringAsFixed(0)}% Used',
                   style: TextStyle(
                     color: percentUsed > 0.85 ? Colors.red : Colors.green,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              )
+              ),
             ],
           ),
           const SizedBox(height: 20),
           LinearProgressIndicator(
             value: percentUsed,
-            backgroundColor: Colors.grey.withOpacity(0.2),
+            backgroundColor: Colors.grey.withValues(alpha: 0.2),
             color: percentUsed > 0.85 ? Colors.red : Theme.of(context).colorScheme.primary,
             minHeight: 8,
             borderRadius: BorderRadius.circular(4),
@@ -165,10 +165,10 @@ class DashboardScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Spent: ৳${state.totalExpense.toStringAsFixed(0)}", style: const TextStyle(fontSize: 12)),
-              Text("Budget: ৳${state.monthlyBudget.toStringAsFixed(0)}", style: const TextStyle(fontSize: 12)),
+              Text('Spent: ৳${state.totalExpense.toStringAsFixed(0)}', style: const TextStyle(fontSize: 12)),
+              Text('Budget: ৳${state.monthlyBudget.toStringAsFixed(0)}', style: const TextStyle(fontSize: 12)),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -190,7 +190,7 @@ class DashboardScreen extends ConsumerWidget {
             lineBarsData: [
               LineChartBarData(
                 spots: const [
-                  FlSpot(0, 3), FlSpot(1, 1), FlSpot(2, 4), FlSpot(3, 2), FlSpot(4, 5), FlSpot(5, 1), FlSpot(6, 4)
+                  FlSpot(0, 3), FlSpot(1, 1), FlSpot(2, 4), FlSpot(3, 2), FlSpot(4, 5), FlSpot(5, 1), FlSpot(6, 4),
                 ],
                 isCurved: true,
                 color: Theme.of(context).colorScheme.primary,
@@ -199,7 +199,7 @@ class DashboardScreen extends ConsumerWidget {
                 dotData: FlDotData(show: false),
                 belowBarData: BarAreaData(
                   show: true,
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                 ),
               ),
             ],

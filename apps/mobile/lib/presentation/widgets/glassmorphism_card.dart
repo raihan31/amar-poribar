@@ -8,12 +8,12 @@ class GlassmorphismCard extends StatelessWidget {
   final EdgeInsetsGeometry padding;
 
   const GlassmorphismCard({
-    Key? key,
+    super.key,
     required this.child,
     this.width = double.infinity,
     this.height = double.infinity,
     this.padding = const EdgeInsets.all(16.0),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,21 +30,21 @@ class GlassmorphismCard extends StatelessWidget {
           padding: padding,
           decoration: BoxDecoration(
             color: isDark 
-                ? Colors.white.withOpacity(0.05) 
-                : Colors.white.withOpacity(0.4),
+                ? Colors.white.withValues(alpha: 0.05) 
+                : Colors.white.withValues(alpha: 0.4),
             borderRadius: BorderRadius.circular(20.0),
             border: Border.all(
               color: isDark 
-                  ? Colors.white.withOpacity(0.1) 
-                  : Colors.white.withOpacity(0.4),
+                  ? Colors.white.withValues(alpha: 0.1) 
+                  : Colors.white.withValues(alpha: 0.4),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 20,
                 spreadRadius: -5,
-              )
+              ),
             ],
           ),
           child: child,
