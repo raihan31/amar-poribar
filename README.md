@@ -21,7 +21,19 @@ docs/        BRD, SRS
 
 Tooling: pnpm workspaces + Turborepo, TypeScript throughout.
 
-## Getting started
+## Run everything with one command
+
+Requirements: Docker only.
+
+```bash
+docker compose up --build     # db + schema migration + api :4000 + web :3000
+```
+
+Optional environment (shell or a `.env` file next to `docker-compose.yml`): `ANTHROPIC_API_KEY`, `AI_MODEL`, `JWT_SECRET`, `NEXT_PUBLIC_API_URL` (baked into the web build; the browser calls the API directly), `API_NODE_ENV` (defaults to `development`, which returns the OTP in the response; set `production` for real deployments).
+
+Reset the database with `docker compose down -v`. The Flutter app in `apps/mobile` is not part of the stack.
+
+## Local development (without containers for the apps)
 
 Requirements: Node 22+, pnpm 10, Docker (for PostgreSQL).
 
