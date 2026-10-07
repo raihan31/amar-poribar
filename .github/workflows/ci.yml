@@ -34,8 +34,8 @@ jobs:
         run: docker compose up --build --wait --wait-timeout 300
       - name: Smoke test
         run: |
-          curl -fsS localhost:4000/health
-          curl -fsS -o /dev/null localhost:3000
+          curl -fsS --retry 20 --retry-delay 2 --retry-connrefused localhost:4000/health
+          curl -fsS --retry 20 --retry-delay 2 --retry-connrefused -o /dev/null localhost:3000
       - name: Logs on failure
         if: failure()
         run: docker compose logs
