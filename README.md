@@ -11,7 +11,7 @@ A family expense tracker for Bangladesh with AI-assisted entry. Family members l
 apps/
   api/       Fastify REST API, Drizzle ORM, PostgreSQL
   web/       Next.js web app
-  mobile/    Expo (React Native) Android/iOS app
+  mobile/    Flutter Android/iOS app (offline-first, Drift + CRDT sync)
 packages/
   shared/    Zod schemas, types, BD categories, ৳ formatting, Bangla digits, i18n
   ai/        MFS SMS parser (offline, no AI cost) + Claude-based free-text parser
@@ -31,12 +31,12 @@ cp .env.example .env          # add ANTHROPIC_API_KEY to enable AI parsing of fr
 pnpm db:up                    # start PostgreSQL in Docker
 pnpm db:push                  # create tables
 pnpm build                    # build shared packages
-pnpm dev                      # api :4000, web :3000, Expo dev server
+pnpm dev                      # api :4000, web :3000
 ```
 
 Without `ANTHROPIC_API_KEY`, these still work: MFS SMS parsing, the offline quick parser for simple phrases ("আজ বাজারে আটশো পঞ্চাশ টাকা", "rickshaw 40"), and a template monthly summary. Complex sentences need the AI.
 
-**Voice:** speech recognition and text-to-speech run on the device. On the web, use Chrome or Edge. On mobile, `expo-speech-recognition` needs a development build (`npx expo run:android`), not Expo Go. Android phones need Google's Bangla text-to-speech voice for spoken output.
+**Voice:** speech recognition and text-to-speech run on the device. On the web, use Chrome or Edge. Android phones need Google's Bangla text-to-speech voice for spoken output.
 
 In development, the OTP endpoint returns the code in its response (`devCode`), so no SMS gateway is needed.
 
@@ -47,7 +47,7 @@ In development, the OTP endpoint returns the code in its response (`devCode`), s
 | `pnpm test` | Unit tests (vitest) for all packages |
 | `pnpm typecheck` | Type-check every workspace |
 | `pnpm build` | Build packages, API and web |
-| `pnpm --filter @amar-poribar/mobile android` | Run the mobile app on an Android emulator |
+| `cd apps/mobile && flutter run` | Run the Flutter mobile app (first run `flutter pub get` and `dart run build_runner build`) |
 
 ## Status
 
