@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web-api:
+    name: TypeScript (typecheck, test, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  docker:
+    name: Docker compose stack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # The API and web images come from the Dockerfile added with the Compose stack
+      # (PR #2). Until that lands, Compose only has the database, so skip instead of failing.
+      - name: Check for the app images
+        id: stack
+        run: |
+          if [ -f Dockerfile ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::No Dockerfile yet; skipping the Docker stack smoke test."
+          fi
+      - name: Start the stack
+        if: steps.stack.outputs.present == 'true'
+        run: docker compose up --build --wait --wait-timeout 300
+      - name: Smoke test
+        if: steps.stack.outputs.present == 'true'
+        # Compose reports the API "running" before Node listens; until then Docker's port
+        # proxy accepts and then resets connections, which --retry-connrefused doesn't retry.
+        run: |
+          curl -fsS --retry 20 --retry-delay 2 --retry-all-errors localhost:4000/health
+          curl -fsS --retry 20 --retry-delay 2 --retry-all-errors -o /dev/null localhost:3000
+      - name: Logs on failure
+        if: failure() && steps.stack.outputs.present == 'true'
+        run: docker compose logs
+      - name: Stop
+        if: always() && steps.stack.outputs.present == 'true'
+        run: docker compose down -v
+
+  mobile:
+    name: Flutter (test, analyze)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter test
+      # Known pre-existing errors in the mocked database/sync layer; make this
+      # blocking once they are fixed.
+      - run: flutter analyze
+        continue-on-error: true
