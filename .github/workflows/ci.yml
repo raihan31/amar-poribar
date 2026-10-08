@@ -45,9 +45,11 @@ jobs:
         run: docker compose up --build --wait --wait-timeout 300
       - name: Smoke test
         if: steps.stack.outputs.present == 'true'
+        # Compose reports the API "running" before Node listens; until then Docker's port
+        # proxy accepts and then resets connections, which --retry-connrefused doesn't retry.
         run: |
-          curl -fsS --retry 20 --retry-delay 2 --retry-connrefused localhost:4000/health
-          curl -fsS --retry 20 --retry-delay 2 --retry-connrefused -o /dev/null localhost:3000
+          curl -fsS --retry 20 --retry-delay 2 --retry-all-errors localhost:4000/health
+          curl -fsS --retry 20 --retry-delay 2 --retry-all-errors -o /dev/null localhost:3000
       - name: Logs on failure
         if: failure() && steps.stack.outputs.present == 'true'
         run: docker compose logs
