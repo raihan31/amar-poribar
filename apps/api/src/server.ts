@@ -11,6 +11,7 @@ const app = await buildApp({
   aiModel: env.aiModel,
   jwtSecret: env.jwtSecret,
   isProd: env.isProd,
+  corsOrigins: env.corsOrigins,
 });
 
 await app.listen({ port: env.port, host: "0.0.0.0" });
