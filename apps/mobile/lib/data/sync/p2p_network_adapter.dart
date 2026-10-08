@@ -39,39 +39,39 @@ class NearbyConnectionsAdapter implements P2pNetworkAdapter {
   @override
   Stream<String> get onConnectionLost => _connectionLostController.stream;
 
-  final String serviceId = "com.amar.poribar.sync";
+  final String serviceId = 'com.amar.poribar.sync';
 
   @override
   Future<void> startAdvertising(String localDeviceId) async {
     // Strategy: P2P_STAR or P2P_CLUSTER. 
     // This utilizes Wifi aware + Bluetooth.
-    print("Started Advertising as $localDeviceId");
+    print('Started Advertising as $localDeviceId');
   }
 
   @override
   Future<void> startDiscovering() async {
-    print("Started Discovering nearby peers on $serviceId");
+    print('Started Discovering nearby peers on $serviceId');
   }
 
   @override
   Future<void> requestConnection(String endpointId) async {
-    print("Requesting connection to $endpointId");
+    print('Requesting connection to $endpointId');
   }
 
   @override
   Future<void> acceptConnection(String endpointId) async {
-    print("Accepted connection from $endpointId");
+    print('Accepted connection from $endpointId');
     _connectionEstablishedController.add(endpointId);
   }
 
   @override
   Future<void> sendMessage(String endpointId, String payload) async {
-    print("Sending encrypted payload to $endpointId");
+    print('Sending encrypted payload to $endpointId');
     // Encryption layer wrapper would go here: ChaCha20-Poly1305.
   }
 
   @override
   void stopAll() {
-    print("Stopping all P2P connections");
+    print('Stopping all P2P connections');
   }
 }

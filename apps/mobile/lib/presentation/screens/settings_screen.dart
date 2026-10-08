@@ -5,7 +5,7 @@ import '../../domain/models/enums.dart';
 import '../providers/providers.dart';
 
 class SettingsScreen extends ConsumerWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -43,14 +43,14 @@ class SettingsScreen extends ConsumerWidget {
 }
 
 class PendingSmsScreen extends StatelessWidget {
-  const PendingSmsScreen({Key? key}) : super(key: key);
+  const PendingSmsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Bank Approvals')),
       body: const Center(
-        child: Text("No pending bank transactions detected today."),
+        child: Text('No pending bank transactions detected today.'),
       ),
     );
   }

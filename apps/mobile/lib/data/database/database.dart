@@ -16,12 +16,12 @@ import 'tables.dart';
   UserDevicesTable,
   BudgetsTable,
   BankMessagesTable,
-])
+],)
 class AppDatabase extends _$AppDatabase {
-  AppDatabase(QueryExecutor e) : super(e);
+  AppDatabase(super.e);
   
   // Actually in production we'd inject this after CRDT modification
-  AppDatabase.shared(DatabaseConnection connection) : super.connect(connection);
+  AppDatabase.shared(super.connection) : super.connect();
 
   @override
   int get schemaVersion => 1;
@@ -41,8 +41,8 @@ class AppDatabase extends _$AppDatabase {
 
 // Ignore the mixin error as we avoid generation errors here
 class _$AppDatabase extends GeneratedDatabase {
-  _$AppDatabase(QueryExecutor e) : super(e);
-  _$AppDatabase.connect(DatabaseConnection c) : super.connect(c);
+  _$AppDatabase(super.e);
+  _$AppDatabase.connect(super.c) : super.connect();
   
   @override
   Iterable<TableInfo<Table, dynamic>> get allTables => throw UnimplementedError();

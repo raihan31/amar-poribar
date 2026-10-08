@@ -1,4 +1,3 @@
-import 'enums.dart';
 
 class Budget {
   final String id;
