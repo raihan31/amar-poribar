@@ -33,10 +33,13 @@ services:
     environment:
       DATABASE_URL: postgres://amar:amar@db:5432/amar_poribar
       PORT: "4000"
-      # Non-production returns the OTP in the response (no SMS gateway yet).
-      # Set API_NODE_ENV=production for real deployments (also requires JWT_SECRET).
+      # Development returns the OTP in the response. Production needs an SMS
+      # gateway for OTP delivery, which isn't implemented yet, so login won't work there.
       NODE_ENV: ${API_NODE_ENV:-development}
-      JWT_SECRET: ${JWT_SECRET:-change-me}
+      # No default on purpose: production refuses to start without a strong secret.
+      JWT_SECRET: ${JWT_SECRET:-}
+      # Browser origins allowed to call the API in production (the web app below).
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       AI_MODEL: ${AI_MODEL:-}
     ports:

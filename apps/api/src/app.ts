@@ -19,12 +19,15 @@ export interface AppDeps {
   aiModel?: string;
   jwtSecret: string;
   isProd: boolean;
+  /** Origins allowed by CORS in production. Development allows any origin. */
+  corsOrigins?: string[];
 }
 
 export async function buildApp(deps: AppDeps) {
   const app = Fastify({ logger: { level: deps.isProd ? "info" : "warn" } });
   registerErrorHandler(app);
-  await app.register(cors, { origin: deps.isProd ? false : true });
+  const allowed = deps.corsOrigins ?? [];
+  await app.register(cors, { origin: deps.isProd ? (allowed.length ? allowed : false) : true });
   await registerAuth(app, deps.jwtSecret);
 
   app.get("/health", async () => ({ ok: true }));
