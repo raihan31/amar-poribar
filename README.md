@@ -21,7 +21,21 @@ docs/        BRD, SRS
 
 Tooling: pnpm workspaces + Turborepo, TypeScript throughout.
 
-## Getting started
+## Run everything with one command
+
+Requirements: Docker only.
+
+```bash
+docker compose up --build     # db + schema migration + api :4000 + web :3000
+```
+
+Optional environment (shell or a `.env` file next to `docker-compose.yml`): `ANTHROPIC_API_KEY`, `AI_MODEL`, `NEXT_PUBLIC_API_URL` (baked into the web build; the browser calls the API directly).
+
+The stack runs the API in development mode, which returns the login code (OTP) in the API response. **It isn't ready for real deployment yet:** production mode (`API_NODE_ENV=production`) needs an SMS gateway to deliver OTP codes, which isn't implemented, so nobody could log in. Production mode also requires `JWT_SECRET` (a random value of at least 32 characters; the API refuses to start without it) and `CORS_ORIGIN` set to the web app's URL (defaults to `http://localhost:3000`).
+
+Reset the database with `docker compose down -v`. The Flutter app in `apps/mobile` is not part of the stack.
+
+## Local development (without containers for the apps)
 
 Requirements: Node 22+, pnpm 10, Docker (for PostgreSQL).
 

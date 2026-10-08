@@ -33,6 +33,19 @@ describe("api", () => {
   });
 });
 
+describe("cors in production", () => {
+  it("allows only the configured web origin", async () => {
+    const prod = await buildApp({
+      db: {} as Db, otp: new OtpStore(), jwtSecret: "test", isProd: true, corsOrigins: ["http://localhost:3000"],
+    });
+    const allowed = await prod.inject({ method: "GET", url: "/health", headers: { origin: "http://localhost:3000" } });
+    const other = await prod.inject({ method: "GET", url: "/health", headers: { origin: "https://evil.example" } });
+    expect(allowed.headers["access-control-allow-origin"]).toBe("http://localhost:3000");
+    expect(other.headers["access-control-allow-origin"]).toBeUndefined();
+    await prod.close();
+  });
+});
+
 describe("monthRange", () => {
   it("uses Dhaka month boundaries", () => {
     const { start, end } = monthRange("2026-12");
