@@ -30,17 +30,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # The API and web images come from the Dockerfile added with the Compose stack
+      # (PR #2). Until that lands, Compose only has the database, so skip instead of failing.
+      - name: Check for the app images
+        id: stack
+        run: |
+          if [ -f Dockerfile ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::No Dockerfile yet; skipping the Docker stack smoke test."
+          fi
       - name: Start the stack
+        if: steps.stack.outputs.present == 'true'
         run: docker compose up --build --wait --wait-timeout 300
       - name: Smoke test
+        if: steps.stack.outputs.present == 'true'
         run: |
           curl -fsS --retry 20 --retry-delay 2 --retry-connrefused localhost:4000/health
           curl -fsS --retry 20 --retry-delay 2 --retry-connrefused -o /dev/null localhost:3000
       - name: Logs on failure
-        if: failure()
+        if: failure() && steps.stack.outputs.present == 'true'
         run: docker compose logs
       - name: Stop
-        if: always()
+        if: always() && steps.stack.outputs.present == 'true'
         run: docker compose down -v
 
   mobile:
