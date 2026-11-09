@@ -4,7 +4,7 @@ import { canAssignRole, canManageMember } from "./auth.js";
 import type { Db } from "./db/client.js";
 import { monthRange } from "./month.js";
 import { OtpStore } from "./otp.js";
-import { CreateAccountSchema, UpdateAccountSchema, UpdateCategorySchema } from "@amar-poribar/shared";
+import { UpdateTransactionSchema, CreateAccountSchema, UpdateAccountSchema, UpdateCategorySchema } from "@amar-poribar/shared";
 
 // These tests don't touch the database; DB-backed tests need `pnpm db:up` (TODO).
 const app = await buildApp({ db: {} as Db, otp: new OtpStore(), jwtSecret: "test", isProd: false });
@@ -102,5 +102,22 @@ describe("accounts and categories", () => {
     expect(UpdateAccountSchema.safeParse({ archived: true }).success).toBe(true);
     expect(UpdateCategorySchema.safeParse({ isHidden: true }).success).toBe(true);
     expect(UpdateCategorySchema.safeParse({}).success).toBe(false);
+  });
+});
+
+describe("transaction updates", () => {
+  it("requires auth", async () => {
+    const res = await app.inject({ method: "PATCH", url: "/v1/families/x/transactions/y", payload: { note: "a" } });
+    expect(res.statusCode).toBe(401);
+  });
+
+  it("accepts partial edits and rejects empty or unsafe ones", () => {
+    expect(UpdateTransactionSchema.safeParse({ amountPaisa: 15000 }).success).toBe(true);
+    expect(UpdateTransactionSchema.safeParse({ note: null }).success).toBe(true);
+    expect(UpdateTransactionSchema.safeParse({}).success).toBe(false);
+    expect(UpdateTransactionSchema.safeParse({ amountPaisa: 1.5 }).success).toBe(false);
+    expect(UpdateTransactionSchema.safeParse({ amountPaisa: -5 }).success).toBe(false);
+    // Defaults must not leak into partial updates (would silently zero the fee).
+    expect(UpdateTransactionSchema.parse({ note: "x" })).toEqual({ note: "x" });
   });
 });

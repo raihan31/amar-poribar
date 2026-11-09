@@ -1,7 +1,7 @@
 import { and, desc, eq, gte, isNull, lt, or, sql } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
-import { CreateTransactionSchema, MonthSchema } from "@amar-poribar/shared";
+import { CreateTransactionSchema, MonthSchema, UpdateTransactionSchema } from "@amar-poribar/shared";
 import type { AppDeps } from "../app.js";
 import { canEditAll, requireRole } from "../auth.js";
 import { accounts, categories, transactions } from "../db/schema.js";
@@ -42,22 +42,29 @@ export async function transactionRoutes(app: FastifyInstance, { db }: AppDeps) {
       .limit(200);
   });
 
+  /** Category and account must belong to this family (tenant isolation, NFR-06). */
+  async function assertOwnedRefs(
+    familyId: string,
+    refs: { categoryId?: string | null; accountId?: string | null },
+  ) {
+    if (refs.categoryId) {
+      const [c] = await db.select({ id: categories.id }).from(categories)
+        .where(and(eq(categories.id, refs.categoryId), eq(categories.familyId, familyId)));
+      if (!c) throw new HttpError(400, "invalid_category", "Unknown category");
+    }
+    if (refs.accountId) {
+      const [a] = await db.select({ id: accounts.id }).from(accounts)
+        .where(and(eq(accounts.id, refs.accountId), eq(accounts.familyId, familyId)));
+      if (!a) throw new HttpError(400, "invalid_account", "Unknown account");
+    }
+  }
+
   app.post<FamilyParams>("/v1/families/:familyId/transactions", async (req, reply) => {
     const { familyId } = req.params;
     await requireRole(db, familyId, req.user.sub, "member");
     const input = parseOr400(CreateTransactionSchema, req.body);
 
-    // Category and account must belong to this family (tenant isolation, NFR-06).
-    if (input.categoryId) {
-      const [c] = await db.select({ id: categories.id }).from(categories)
-        .where(and(eq(categories.id, input.categoryId), eq(categories.familyId, familyId)));
-      if (!c) throw new HttpError(400, "invalid_category", "Unknown category");
-    }
-    if (input.accountId) {
-      const [a] = await db.select({ id: accounts.id }).from(accounts)
-        .where(and(eq(accounts.id, input.accountId), eq(accounts.familyId, familyId)));
-      if (!a) throw new HttpError(400, "invalid_account", "Unknown account");
-    }
+    await assertOwnedRefs(familyId, input);
 
     const [row] = await db
       .insert(transactions)
@@ -72,6 +79,31 @@ export async function transactionRoutes(app: FastifyInstance, { db }: AppDeps) {
       .returning();
     if (!row) throw new HttpError(409, "duplicate", "This transaction (TrxID or id) is already recorded");
     return reply.status(201).send(row);
+  });
+
+  // FR-TXN-03: members edit their own entries; admins and owners edit any.
+  app.patch<TxnParams>("/v1/families/:familyId/transactions/:txnId", async (req) => {
+    const { familyId, txnId } = req.params;
+    const role = await requireRole(db, familyId, req.user.sub, "member");
+    const input = parseOr400(UpdateTransactionSchema, req.body);
+    const [txn] = await db.select().from(transactions)
+      .where(and(eq(transactions.id, txnId), visibleTo(familyId, req.user.sub)));
+    if (!txn) throw new HttpError(404, "not_found", "Transaction not found");
+    if (txn.createdBy !== req.user.sub && !canEditAll(role)) {
+      throw new HttpError(403, "forbidden", "You can only edit your own entries");
+    }
+    await assertOwnedRefs(familyId, input);
+    const { occurredAt, ...fields } = input;
+    const [row] = await db
+      .update(transactions)
+      .set({
+        ...fields,
+        ...(occurredAt ? { occurredAt: new Date(occurredAt) } : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(transactions.id, txnId))
+      .returning();
+    return row;
   });
 
   app.delete<TxnParams>("/v1/families/:familyId/transactions/:txnId", async (req, reply) => {

@@ -49,6 +49,23 @@ export const CreateTransactionSchema = z.object({
 });
 export type CreateTransactionInput = z.infer<typeof CreateTransactionSchema>;
 
+/** Editable fields only; TrxID and source are fixed once recorded (FR-TXN-03, FR-TXN-04). */
+export const UpdateTransactionSchema = z
+  .object({
+    type: TransactionTypeSchema,
+    amountPaisa: AmountPaisaSchema,
+    feePaisa: z.number().int().min(0),
+    occurredAt: z.iso.datetime({ offset: true }),
+    categoryId: z.uuid().nullable(),
+    accountId: z.uuid().nullable(),
+    note: z.string().max(500).nullable(),
+    counterparty: z.string().max(120).nullable(),
+    isPrivate: z.boolean(),
+  })
+  .partial()
+  .refine((v) => Object.keys(v).length > 0, "Nothing to update");
+export type UpdateTransactionInput = z.infer<typeof UpdateTransactionSchema>;
+
 /** A transaction proposed by the SMS parser or the AI, awaiting user confirmation (SRS FR-AI-05). */
 export const TransactionDraftSchema = z.object({
   type: TransactionTypeSchema,
