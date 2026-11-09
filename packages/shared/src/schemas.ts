@@ -139,6 +139,15 @@ export const UpdateCategorySchema = z
   .refine((v) => Object.keys(v).length > 0, "Nothing to update");
 export type UpdateCategoryInput = z.infer<typeof UpdateCategorySchema>;
 
+/** Set budgets for a month. `categoryId: null` is the overall family budget; a limit of 0 clears it (FR-BUD-01). */
+export const PutBudgetsSchema = z.object({
+  budgets: z
+    .array(z.object({ categoryId: z.uuid().nullable(), limitPaisa: z.number().int().min(0).max(MAX_AMOUNT_PAISA * 100) }))
+    .min(1)
+    .max(100),
+});
+export type PutBudgetsInput = z.infer<typeof PutBudgetsSchema>;
+
 export const MonthSummarySchema = z.object({
   month: MonthSchema,
   incomePaisa: z.number().int(),

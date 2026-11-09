@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "./app.js";
+import { budgetLevel, effectiveBudgets } from "./budgets.js";
 import { canAssignRole, canManageMember } from "./auth.js";
 import type { Db } from "./db/client.js";
 import { monthRange } from "./month.js";
@@ -119,5 +120,37 @@ describe("transaction updates", () => {
     expect(UpdateTransactionSchema.safeParse({ amountPaisa: -5 }).success).toBe(false);
     // Defaults must not leak into partial updates (would silently zero the fee).
     expect(UpdateTransactionSchema.parse({ note: "x" })).toEqual({ note: "x" });
+  });
+});
+
+describe("budgets", () => {
+  it("requires auth", async () => {
+    expect((await app.inject({ method: "GET", url: "/v1/families/x/budgets" })).statusCode).toBe(401);
+    expect((await app.inject({ method: "PUT", url: "/v1/families/x/budgets", payload: {} })).statusCode).toBe(401);
+  });
+
+  it("alerts at 80% and 100%", () => {
+    expect(budgetLevel(7999, 10000)).toBe("ok");
+    expect(budgetLevel(8000, 10000)).toBe("warning");
+    expect(budgetLevel(9999, 10000)).toBe("warning");
+    expect(budgetLevel(10000, 10000)).toBe("exceeded");
+    expect(budgetLevel(5000, 0)).toBe("ok");
+  });
+
+  it("carries last month's budgets forward unless changed or cleared", () => {
+    const rows = [
+      { categoryId: "bazaar", month: "2026-09", limitPaisa: 800000 },
+      { categoryId: "bazaar", month: "2026-10", limitPaisa: 900000 },
+      { categoryId: "rent", month: "2026-09", limitPaisa: 1500000 },
+      { categoryId: "rent", month: "2026-10", limitPaisa: 0 },
+      { categoryId: null, month: "2026-09", limitPaisa: 4000000 },
+      { categoryId: "future", month: "2026-12", limitPaisa: 1 },
+    ];
+    const got = effectiveBudgets(rows, "2026-11");
+    expect(got.map((b) => [b.categoryId, b.limitPaisa, b.inherited])).toEqual([
+      ["bazaar", 900000, true],
+      [null, 4000000, true],
+    ]);
+    expect(effectiveBudgets(rows, "2026-10").find((b) => b.categoryId === "bazaar")?.inherited).toBe(false);
   });
 });

@@ -7,6 +7,7 @@ import { registerErrorHandler } from "./errors.js";
 import { OtpStore } from "./otp.js";
 import { aiRoutes } from "./routes/ai.js";
 import { authRoutes } from "./routes/auth.js";
+import { budgetRoutes } from "./routes/budgets.js";
 import { familyRoutes } from "./routes/families.js";
 import { inviteRoutes } from "./routes/invites.js";
 import { reportRoutes } from "./routes/reports.js";
@@ -38,6 +39,7 @@ export async function buildApp(deps: AppDeps) {
   await app.register(async (scope) => inviteRoutes(scope, deps));
   await app.register(async (scope) => transactionRoutes(scope, deps));
   await app.register(async (scope) => aiRoutes(scope, deps));
+  await app.register(async (scope) => budgetRoutes(scope, deps));
   await app.register(async (scope) => reportRoutes(scope, deps));
   return app;
 }
