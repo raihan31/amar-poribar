@@ -91,15 +91,16 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
     );
   }
 
-  /// Saves into the app's current state. The local database is not wired yet (see #15 follow-up work).
-  void _confirm(int i) {
+  /// Saves to the on-device database; it reaches other devices and the server by sync.
+  Future<void> _confirm(int i) async {
     final d = _drafts![i];
     final notifier = ref.read(appStateProvider.notifier);
     if (d.type == 'income') {
-      notifier.addIncome(d.amountTaka);
+      await notifier.addIncome(d.amountTaka, note: d.note, source: d.source);
     } else {
-      notifier.addExpense(d.amountTaka);
+      await notifier.addExpense(d.amountTaka, note: d.note, source: d.source);
     }
+    if (!mounted) return;
     setState(() {
       _drafts = [..._drafts!]..removeAt(i);
       if (_drafts!.isEmpty) {

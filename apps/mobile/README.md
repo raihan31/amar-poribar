@@ -5,7 +5,7 @@ A private, offline-first family finance app built with Flutter.
 ## Stack
 
 - Flutter + Riverpod (state management)
-- Drift / SQLite with CRDT-based sync
+- Drift / SQLite with HLC-based last-write-wins sync
 - Peer-to-peer sync via Nearby Connections
 - SMS parsing for bank messages
 

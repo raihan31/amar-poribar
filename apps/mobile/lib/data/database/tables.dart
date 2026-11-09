@@ -1,88 +1,56 @@
 import 'package:drift/drift.dart';
 
-// Drift Table for Transactions
-class TransactionsTable extends Table {
+/// Money entries. Synced between devices and the server by HLC (SRS FR-SYNC-02, §4.3.1).
+/// Amounts are integer paisa. A delete is a tombstone: [deletedAt] set with a newer [hlc].
+class Transactions extends Table {
   TextColumn get id => text()();
-  TextColumn get deviceId => text()();
-  RealColumn get amount => real()();
-  TextColumn get categoryId => text()();
-  TextColumn get type => text()(); // 'income' or 'expense'
-  TextColumn get note => text().withLength(max: 500)();
-  TextColumn get timestamp => text()();
-  TextColumn get bankMessageId => text().nullable()();
-  
-  // CRDT base columns (sqlite_crdt manages these via triggers, but Drift needs to know they exist if we query them directly, usually injected)
-  IntColumn get isDeleted => integer().withDefault(const Constant(0))();
+  TextColumn get type => text()(); // expense | income | transfer
+  IntColumn get amountPaisa => integer()();
+  IntColumn get feePaisa => integer().withDefault(const Constant(0))();
+  TextColumn get occurredAt => text()(); // ISO-8601 with offset
+  TextColumn get categoryId => text().nullable()();
+  TextColumn get accountId => text().nullable()();
+  TextColumn get note => text().nullable()();
+  TextColumn get counterparty => text().nullable()();
+  TextColumn get trxId => text().nullable()();
+  TextColumn get source => text().withDefault(const Constant('manual'))();
+  BoolColumn get isPrivate => boolean().withDefault(const Constant(false))();
+  TextColumn get deletedAt => text().nullable()();
   TextColumn get hlc => text()();
-  TextColumn get modified => text()();
 
   @override
   Set<Column> get primaryKey => {id};
 }
 
-// Drift Table for Categories
-class CategoriesTable extends Table {
+/// Read-only copy of the family's categories, pulled from the API (admins manage them over REST).
+class CachedCategories extends Table {
+  TextColumn get id => text()();
+  TextColumn get key => text()();
+  TextColumn get kind => text()();
+  TextColumn get nameEn => text()();
+  TextColumn get nameBn => text()();
+  TextColumn get icon => text().nullable()();
+  BoolColumn get isHidden => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Read-only copy of the family's accounts, pulled from the API.
+class CachedAccounts extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
-  TextColumn get icon => text()();
-  TextColumn get colorHex => text()();
   TextColumn get type => text()();
 
-  IntColumn get isDeleted => integer().withDefault(const Constant(0))();
-  TextColumn get hlc => text()();
-  TextColumn get modified => text()();
-
   @override
   Set<Column> get primaryKey => {id};
 }
 
-// Drift Table for UserDevices
-class UserDevicesTable extends Table {
-  TextColumn get id => text()();
-  TextColumn get role => text()(); // 'father', 'mother', 'child'
-  TextColumn get name => text()();
-  TextColumn get publicKey => text()();
-  TextColumn get masterKeyHash => text()();
-
-  IntColumn get isDeleted => integer().withDefault(const Constant(0))();
-  TextColumn get hlc => text()();
-  TextColumn get modified => text()();
+/// Small key/value table for local state such as this device's node id and sync high-water marks.
+class Meta extends Table {
+  TextColumn get key => text()();
+  TextColumn get value => text()();
 
   @override
-  Set<Column> get primaryKey => {id};
-}
-
-// Drift Table for Budgets
-class BudgetsTable extends Table {
-  TextColumn get id => text()();
-  TextColumn get roleOwnerId => text()();
-  TextColumn get categoryId => text().nullable()();
-  RealColumn get amount => real()();
-  TextColumn get periodStart => text()();
-  TextColumn get periodEnd => text()();
-
-  IntColumn get isDeleted => integer().withDefault(const Constant(0))();
-  TextColumn get hlc => text()();
-  TextColumn get modified => text()();
-
-  @override
-  Set<Column> get primaryKey => {id};
-}
-
-// Drift Table for BankMessages
-class BankMessagesTable extends Table {
-  TextColumn get id => text()();
-  TextColumn get rawText => text()();
-  TextColumn get sender => text()();
-  TextColumn get status => text()(); // pending, approved, rejected
-  RealColumn get detectedAmount => real().nullable()();
-  TextColumn get detectedType => text().nullable()();
-  TextColumn get receivedAt => text()();
-
-  IntColumn get isDeleted => integer().withDefault(const Constant(0))();
-  TextColumn get hlc => text()();
-  TextColumn get modified => text()();
-
-  @override
-  Set<Column> get primaryKey => {id};
+  Set<Column> get primaryKey => {key};
 }
