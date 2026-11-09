@@ -251,3 +251,10 @@ describe("remittance report", () => {
     expect(monthsBetween("2026-06", "2026-05")).toEqual([]);
   });
 });
+
+describe("ask", () => {
+  it("requires auth", async () => {
+    const res = await app.inject({ method: "POST", url: "/v1/families/x/ai/ask", payload: { question: "hi" } });
+    expect(res.statusCode).toBe(401);
+  });
+});

@@ -208,6 +208,13 @@ export const UpdateRecurringSchema = z
   .refine((v) => Object.keys(v).length > 0, "Nothing to update");
 export type UpdateRecurringInput = z.infer<typeof UpdateRecurringSchema>;
 
+export const AskRequestSchema = z.object({
+  question: z.string().min(1).max(500),
+  /** True when the answer will be read aloud (voice conversation, FR-VOICE-08). */
+  forSpeech: z.boolean().default(false),
+});
+export type AskRequest = z.infer<typeof AskRequestSchema>;
+
 export const MonthSummarySchema = z.object({
   month: MonthSchema,
   incomePaisa: z.number().int(),
