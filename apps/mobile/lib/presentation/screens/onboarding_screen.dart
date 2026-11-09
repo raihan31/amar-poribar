@@ -48,7 +48,13 @@ class OnboardingScreen extends ConsumerWidget {
                 },
               ),
               const SizedBox(height: 16),
-              
+              TextButton.icon(
+                icon: const Icon(Icons.phone_android),
+                label: const Text('Sign in with phone (AI entry)'),
+                onPressed: () => Navigator.pushNamed(context, '/login'),
+              ),
+              const SizedBox(height: 8),
+
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../screens/ai_entry_screen.dart';
+import '../screens/login_screen.dart';
 import '../screens/onboarding_screen.dart';
 import '../screens/dashboard_screen.dart';
 import '../screens/transaction_screen.dart';
@@ -11,6 +13,8 @@ class AppRouter {
   static const String transactionsRoute = '/transactions';
   static const String pendingSmsRoute = '/pending-sms';
   static const String settingsRoute = '/settings';
+  static const String loginRoute = '/login';
+  static const String aiEntryRoute = '/ai-entry';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -22,6 +26,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const TransactionScreen());
       case pendingSmsRoute:
         return MaterialPageRoute(builder: (_) => PendingSmsScreen());
+      case loginRoute:
+        return MaterialPageRoute(builder: (_) => const LoginScreen());
+      case aiEntryRoute:
+        return MaterialPageRoute(builder: (_) => const AiEntryScreen());
       case settingsRoute:
         return MaterialPageRoute(builder: (_) => SettingsScreen());
       default:
