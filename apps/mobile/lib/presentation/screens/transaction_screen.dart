@@ -81,15 +81,15 @@ class _TransactionScreenState extends ConsumerState<TransactionScreen> {
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                onPressed: () {
+                onPressed: () async {
                   final amount = double.tryParse(amountController.text) ?? 0.0;
                   if (amount > 0) {
                     if (isExpense) {
-                      ref.read(appStateProvider.notifier).addExpense(amount);
+                      await ref.read(appStateProvider.notifier).addExpense(amount, note: noteController.text.trim());
                     } else {
-                      ref.read(appStateProvider.notifier).addIncome(amount);
+                      await ref.read(appStateProvider.notifier).addIncome(amount, note: noteController.text.trim());
                     }
-                    Navigator.pop(context);
+                    if (context.mounted) Navigator.pop(context);
                   }
                 },
                 child: const Text('Save Transaction', style: TextStyle(fontSize: 18)),

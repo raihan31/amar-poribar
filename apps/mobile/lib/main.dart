@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'data/database/database.dart';
+import 'data/database/local_store.dart';
 import 'presentation/navigation/app_router.dart';
+import 'presentation/providers/providers.dart';
 
-void main() {
-  // Ensure Flutter engine is initialized before CRDT database or Nearby connections
+Future<void> main() async {
+  // The engine must be ready before opening the database or using platform plugins.
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // App entry point with Riverpod for DI
+  final store = await LocalStore.open(await AppDatabase.open());
+
   runApp(
-    const ProviderScope(
-      child: AmarPoribarApp(),
+    ProviderScope(
+      overrides: [localStoreProvider.overrideWithValue(store)],
+      child: const AmarPoribarApp(),
     ),
   );
 }

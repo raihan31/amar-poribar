@@ -70,6 +70,8 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      # Drift's generated code (*.g.dart) is not committed.
+      - run: dart run build_runner build --delete-conflicting-outputs
       - run: flutter test
       # Known pre-existing errors in the mocked database/sync layer; make this
       # blocking once they are fixed.

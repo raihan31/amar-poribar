@@ -80,7 +80,7 @@ The AI key is held **only by the API**. Clients never call the AI provider direc
 
 ### 2.4 Design and implementation constraints
 - TypeScript for the API, web app and shared packages, using pnpm workspaces and Turborepo. The mobile app is Flutter (Dart 3, SDK ≥ 3.0) and sits outside the pnpm workspace, with its own `pubspec.yaml`.
-- Mobile stack: Riverpod (state), Drift on SQLite (local store), `sqlite_crdt` (conflict-free sync), `nearby_connections` (peer-to-peer sync), `fl_chart` (charts).
+- Mobile stack: Riverpod (state), Drift on SQLite (local store; HLC merge is our own code in `lib/data/sync/hlc.dart` and `local_store.dart`), `nearby_connections` (peer-to-peer sync), `fl_chart` (charts).
 - Money is stored as an integer number of paisa (`bigint`/`integer`), never as a float.
 - All timestamps are stored in UTC and displayed in `Asia/Dhaka`.
 - No `READ_SMS` permission (Google Play policy). SMS comes in through paste or the Android share sheet.
@@ -204,7 +204,7 @@ Consequences: the server schema gains an `hlc` column on synced tables, and the 
 | ID | Requirement | Pri | Phase |
 |---|---|---|---|
 | FR-SYNC-01 | The mobile app (Flutter, Drift/SQLite local store) can capture manual transactions offline and sync when online | S | P2 |
-| FR-SYNC-02 | Records use client-generated UUIDs. Conflicts are resolved per record (last-write-wins) using a **hybrid logical clock (HLC)** timestamp that each device stamps on every change (`sqlite_crdt`). The server treats create as idempotent and stores the HLC; it does not rely on device wall-clock `updatedAt` | S | P2 |
+| FR-SYNC-02 | Records use client-generated UUIDs. Conflicts are resolved per record (last-write-wins) using a **hybrid logical clock (HLC)** timestamp that each device stamps on every change. The format and rules are fixed by shared test vectors (`packages/shared/test-vectors/hlc.json`) that both the Dart and TypeScript code must pass. The server treats create as idempotent and stores the HLC; it does not rely on device wall-clock `updatedAt` | S | P2 |
 | FR-SYNC-04 | **Peer-to-peer sync.** Family devices that are near each other can exchange changesets directly (Android Nearby Connections) with no internet. Each side sends its HLC, receives the changes made after it, and merges them with the same HLC rule as FR-SYNC-02. The transport sits behind an adapter so it can be swapped (for example Wi-Fi Direct) | S | P2 |
 | FR-SYNC-05 | **Server sync.** When online, the app exchanges the same HLC changesets with `apps/api` so that devices that are never near each other still converge. Merge results must be identical whether changes arrive from a peer or from the server. *Not yet built: the mobile app currently implements only FR-SYNC-04* | S | P2 |
 | FR-SYNC-03 | AI parsing of text captured offline is queued and run once the device is online | S | P2 |
@@ -297,7 +297,7 @@ Rules:
 - The server rejects an `hlc` more than 24 hours ahead of server time, so one device with a wrong clock cannot overwrite everyone's data.
 - Private transactions (FR-TXN-05) are returned only to their creator.
 - The same merge function is used for server sync and peer-to-peer sync (FR-SYNC-04). The device may send `changes` to a peer or to the server and gets the same result.
-- Tables synced: `transactions`, `accounts`, `categories`, `budgets`. Family membership and roles are not synced this way and stay on the REST endpoints above.
+- Only `transactions` are synced this way. Accounts, categories, budgets and family membership are managed by admins over the REST endpoints above, and the mobile app keeps a read-only copy that it refreshes when online. This avoids two devices inventing different IDs for the same category.
 - Large syncs are paged: the server may return `"more": true` with a `serverHlc` to continue from.
 
 
