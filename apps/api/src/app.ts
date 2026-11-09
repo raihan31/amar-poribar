@@ -11,6 +11,7 @@ import { budgetRoutes } from "./routes/budgets.js";
 import { festivalRoutes } from "./routes/festivals.js";
 import { familyRoutes } from "./routes/families.js";
 import { inviteRoutes } from "./routes/invites.js";
+import { recurringRoutes } from "./routes/recurring.js";
 import { reportRoutes } from "./routes/reports.js";
 import { transactionRoutes } from "./routes/transactions.js";
 
@@ -42,6 +43,7 @@ export async function buildApp(deps: AppDeps) {
   await app.register(async (scope) => aiRoutes(scope, deps));
   await app.register(async (scope) => budgetRoutes(scope, deps));
   await app.register(async (scope) => festivalRoutes(scope, deps));
+  await app.register(async (scope) => recurringRoutes(scope, deps));
   await app.register(async (scope) => reportRoutes(scope, deps));
   return app;
 }

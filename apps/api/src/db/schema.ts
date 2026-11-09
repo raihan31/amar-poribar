@@ -145,6 +145,26 @@ export const festivalBudgets = pgTable("festival_budgets", {
   ...timestamps,
 });
 
+/** Monthly template that produces a draft each month for the user to confirm (FR-TXN-06). */
+export const recurringTemplates = pgTable("recurring_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  type: txnTypeEnum("type").notNull().default("expense"),
+  amountPaisa: bigint("amount_paisa", { mode: "number" }).notNull(),
+  categoryId: uuid("category_id").references(() => categories.id),
+  accountId: uuid("account_id").references(() => accounts.id),
+  dayOfMonth: integer("day_of_month").notNull(),
+  startsOn: text("starts_on").notNull(),
+  endsOn: text("ends_on"),
+  remindDaysBefore: integer("remind_days_before").notNull().default(2),
+  active: boolean("active").notNull().default(true),
+  /** Last month (YYYY-MM) whose draft was confirmed; stops the same month being recorded twice. */
+  lastConfirmedMonth: text("last_confirmed_month"),
+  createdBy: uuid("created_by").notNull().references(() => users.id),
+  ...timestamps,
+});
+
 export const aiUsage = pgTable(
   "ai_usage",
   {
