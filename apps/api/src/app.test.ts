@@ -4,9 +4,9 @@ import { csvCell, csvRow, dhakaStamp, paisaToDecimal } from "./csv.js";
 import { budgetLevel, effectiveBudgets } from "./budgets.js";
 import { canAssignRole, canManageMember } from "./auth.js";
 import type { Db } from "./db/client.js";
-import { monthRange } from "./month.js";
+import { dayRange, monthRange } from "./month.js";
 import { OtpStore } from "./otp.js";
-import { UpdateTransactionSchema, CreateAccountSchema, UpdateAccountSchema, UpdateCategorySchema } from "@amar-poribar/shared";
+import { CreateFestivalBudgetSchema, UpdateFestivalBudgetSchema, UpdateTransactionSchema, CreateAccountSchema, UpdateAccountSchema, UpdateCategorySchema } from "@amar-poribar/shared";
 
 // These tests don't touch the database; DB-backed tests need `pnpm db:up` (TODO).
 const app = await buildApp({ db: {} as Db, otp: new OtpStore(), jwtSecret: "test", isProd: false });
@@ -175,5 +175,26 @@ describe("csv export", () => {
     expect(paisaToDecimal(5)).toBe("0.05");
     expect(paisaToDecimal(123456)).toBe("1234.56");
     expect(dhakaStamp(new Date("2026-11-30T18:30:00Z"))).toBe("2026-12-01 00:30");
+  });
+});
+
+describe("festival budgets", () => {
+  it("requires auth", async () => {
+    expect((await app.inject({ method: "GET", url: "/v1/families/x/festival-budgets" })).statusCode).toBe(401);
+    expect((await app.inject({ method: "POST", url: "/v1/families/x/festival-budgets", payload: {} })).statusCode).toBe(401);
+  });
+
+  it("validates the date range", () => {
+    const ok = { name: "Eid-ul-Adha", startsOn: "2027-05-20", endsOn: "2027-05-30", limitPaisa: 5_000_000 };
+    expect(CreateFestivalBudgetSchema.safeParse(ok).success).toBe(true);
+    expect(CreateFestivalBudgetSchema.safeParse({ ...ok, endsOn: "2027-05-19" }).success).toBe(false);
+    expect(CreateFestivalBudgetSchema.safeParse({ ...ok, limitPaisa: 0 }).success).toBe(false);
+    expect(UpdateFestivalBudgetSchema.safeParse({}).success).toBe(false);
+  });
+
+  it("covers whole Dhaka days, inclusive of the last day", () => {
+    const { start, end } = dayRange("2027-05-20", "2027-05-21");
+    expect(start.toISOString()).toBe("2027-05-19T18:00:00.000Z");
+    expect(end.toISOString()).toBe("2027-05-21T18:00:00.000Z");
   });
 });
