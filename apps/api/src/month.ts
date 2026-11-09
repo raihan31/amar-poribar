@@ -17,3 +17,10 @@ export function previousMonth(month: string): string {
   const [y, m] = month.split("-").map(Number) as [number, number];
   return m === 1 ? `${y - 1}-12` : `${y}-${String(m - 1).padStart(2, "0")}`;
 }
+
+/** [start, end) covering whole Asia/Dhaka days from `from` to `to` inclusive (YYYY-MM-DD). */
+export function dayRange(from: string, to: string): { start: Date; end: Date } {
+  const start = new Date(`${from}T00:00:00+06:00`);
+  const end = new Date(new Date(`${to}T00:00:00+06:00`).getTime() + 24 * 60 * 60 * 1000);
+  return { start, end };
+}

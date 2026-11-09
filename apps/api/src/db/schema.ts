@@ -134,6 +134,17 @@ export const budgets = pgTable(
   (t) => [uniqueIndex("budget_family_cat_month_uidx").on(t.familyId, t.categoryId, t.month)],
 );
 
+/** One-off budget over a date range, e.g. Eid-ul-Adha (SRS FR-BUD-04). */
+export const festivalBudgets = pgTable("festival_budgets", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  startsOn: text("starts_on").notNull(),
+  endsOn: text("ends_on").notNull(),
+  limitPaisa: bigint("limit_paisa", { mode: "number" }).notNull(),
+  ...timestamps,
+});
+
 export const aiUsage = pgTable(
   "ai_usage",
   {

@@ -151,6 +151,30 @@ export type PutBudgetsInput = z.infer<typeof PutBudgetsSchema>;
 const BreakdownRowSchema = z.object({ id: z.string().nullable(), name: z.string(), totalPaisa: z.number().int() });
 export type BreakdownRow = z.infer<typeof BreakdownRowSchema>;
 
+const DateOnlySchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Expected YYYY-MM-DD");
+
+/** One-off festival budget over a date range, e.g. Eid-ul-Adha (FR-BUD-04). Dates are Asia/Dhaka days, inclusive. */
+export const CreateFestivalBudgetSchema = z
+  .object({
+    name: z.string().min(1).max(80),
+    startsOn: DateOnlySchema,
+    endsOn: DateOnlySchema,
+    limitPaisa: z.number().int().positive().max(MAX_AMOUNT_PAISA * 100),
+  })
+  .refine((v) => v.endsOn >= v.startsOn, "endsOn must not be before startsOn");
+export type CreateFestivalBudgetInput = z.infer<typeof CreateFestivalBudgetSchema>;
+
+export const UpdateFestivalBudgetSchema = z
+  .object({
+    name: z.string().min(1).max(80),
+    startsOn: DateOnlySchema,
+    endsOn: DateOnlySchema,
+    limitPaisa: z.number().int().positive().max(MAX_AMOUNT_PAISA * 100),
+  })
+  .partial()
+  .refine((v) => Object.keys(v).length > 0, "Nothing to update");
+export type UpdateFestivalBudgetInput = z.infer<typeof UpdateFestivalBudgetSchema>;
+
 export const MonthSummarySchema = z.object({
   month: MonthSchema,
   incomePaisa: z.number().int(),
