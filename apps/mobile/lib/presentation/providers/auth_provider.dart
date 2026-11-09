@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/speech/voice_service.dart';
 import '../../data/api/api_client.dart';
+import '../../data/sync/sync_service.dart';
+import 'providers.dart';
 
 const _tokenKey = 'amar-poribar.token';
 
@@ -78,3 +80,7 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
 });
 
 final voiceServiceProvider = Provider<VoiceService>((ref) => DeviceVoiceService());
+
+final syncServiceProvider = Provider<SyncService>((ref) {
+  return SyncService(ref.watch(localStoreProvider), ref.watch(apiClientProvider));
+});

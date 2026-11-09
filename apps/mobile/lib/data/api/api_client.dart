@@ -89,6 +89,15 @@ class MonthlySummary {
   const MonthlySummary(this.text, this.speechText, this.usedAi);
 }
 
+class SyncResponse {
+  final String cursor;
+  final bool more;
+  final int applied;
+  final List<({String? id, String reason})> rejected;
+  final List<Map<String, dynamic>> changes;
+  const SyncResponse(this.cursor, this.more, this.applied, this.rejected, this.changes);
+}
+
 /// Thin client for apps/api. Takes an [http.Client] so tests can inject a mock.
 class ApiClient {
   final http.Client _http;
@@ -155,4 +164,25 @@ class ApiClient {
     final r = await _send('GET', '/v1/families/$familyId/ai/summary?locale=$locale') as Map<String, dynamic>;
     return MonthlySummary(r['text'] as String, r['speechText'] as String, r['usedAi'] as bool);
   }
+
+  /// Exchange transaction changes with the server (SRS §4.3.1). [cursor] is the value from the last response.
+  Future<SyncResponse> sync(String familyId, String nodeId, String? cursor, List<Map<String, dynamic>> changes) async {
+    final r = await _send('POST', '/v1/families/$familyId/sync',
+        body: {'nodeId': nodeId, 'cursor': cursor, 'changes': {'transactions': changes}}) as Map<String, dynamic>;
+    return SyncResponse(
+      r['cursor'] as String,
+      r['more'] as bool,
+      (r['applied'] as num).toInt(),
+      [for (final x in r['rejected'] as List) (id: x['id'] as String?, reason: x['reason'] as String)],
+      [for (final c in (r['changes'] as Map<String, dynamic>)['transactions'] as List) Map<String, dynamic>.from(c as Map)],
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> categories(String familyId) async => [
+        for (final c in await _send('GET', '/v1/families/$familyId/categories') as List) Map<String, dynamic>.from(c as Map),
+      ];
+
+  Future<List<Map<String, dynamic>>> accounts(String familyId) async => [
+        for (final c in await _send('GET', '/v1/families/$familyId/accounts') as List) Map<String, dynamic>.from(c as Map),
+      ];
 }

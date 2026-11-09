@@ -7,9 +7,18 @@ import 'database.dart';
 const _uuid = Uuid();
 const _nodeKey = 'node_id';
 const _clockKey = 'clock';
+const _seqKey = 'seq';
 
 /// A transaction as exchanged with peers and the server (JSON field names match the API).
 typedef SyncRow = Map<String, dynamic>;
+
+/// A page of local changes. [lastSeq] is the position to continue from.
+class ChangeBatch {
+  final List<SyncRow> rows;
+  final int lastSeq;
+  final bool more;
+  ChangeBatch(this.rows, this.lastSeq, this.more);
+}
 
 /// Local-first store for transactions (SRS §3.10). Every change is stamped with a hybrid logical clock;
 /// merging a change from a peer or the server keeps whichever version has the greater HLC, per record.
@@ -46,6 +55,23 @@ class LocalStore {
     return _clock;
   }
 
+  // ---- change log ---------------------------------------------------------------------------
+
+  Future<String?> getMeta(String key) async =>
+      (await (db.select(db.meta)..where((m) => m.key.equals(key))).getSingleOrNull())?.value;
+
+  Future<void> setMeta(String key, String value) =>
+      db.into(db.meta).insertOnConflictUpdate(MetaCompanion.insert(key: key, value: value));
+
+  /// Highest sequence number handed out so far.
+  Future<int> currentSeq() async => int.parse(await getMeta(_seqKey) ?? '0');
+
+  Future<int> _nextSeq() async {
+    final next = await currentSeq() + 1;
+    await setMeta(_seqKey, '$next');
+    return next;
+  }
+
   // ---- local changes ------------------------------------------------------------------------
 
   Future<String> addTransaction({
@@ -63,6 +89,7 @@ class LocalStore {
     bool isPrivate = false,
   }) async {
     final hlc = await _tick();
+    final seq = await _nextSeq();
     final rowId = id ?? _uuid.v4();
     await db.into(db.transactions).insert(
           TransactionsCompanion.insert(
@@ -79,6 +106,7 @@ class LocalStore {
             source: Value(source),
             isPrivate: Value(isPrivate),
             hlc: hlc.toString(),
+            localSeq: Value(seq),
           ),
         );
     return rowId;
@@ -87,8 +115,10 @@ class LocalStore {
   Future<void> updateTransaction(String id,
       {int? amountPaisa, String? categoryId, String? note}) async {
     final hlc = await _tick();
+    final seq = await _nextSeq();
     await (db.update(db.transactions)..where((t) => t.id.equals(id))).write(
       TransactionsCompanion(
+        localSeq: Value(seq),
         amountPaisa:
             amountPaisa == null ? const Value.absent() : Value(amountPaisa),
         categoryId:
@@ -139,30 +169,22 @@ class LocalStore {
 
   // ---- sync ---------------------------------------------------------------------------------
 
-  /// The highest HLC in this store, sent to peers as "what I have".
-  Future<String?> latestHlc() async {
-    final row = await (db.select(db.transactions)
-          ..orderBy([(t) => OrderingTerm.desc(t.hlc)])
-          ..limit(1))
-        .getSingleOrNull();
-    return row?.hlc;
-  }
-
-  /// Transactions changed after [since] (exclusive), oldest change first, tombstones included.
-  /// Private entries are not shared with other devices unless they created them, so the caller passes
-  /// the viewer's own filter via [includePrivate].
-  Future<List<SyncRow>> changesSince(String? since,
-      {bool includePrivate = false, int limit = 500}) async {
+  /// Changes made after [seq] in this device's change log, oldest first, tombstones included.
+  /// Private entries are only passed on when [includePrivate] is set (for the server, which keeps them
+  /// visible to their creator only); peers never get them.
+  Future<ChangeBatch> changesAfter(int seq, {bool includePrivate = false, int limit = 500}) async {
     final q = db.select(db.transactions)
-      ..orderBy([(t) => OrderingTerm.asc(t.hlc)])
-      ..limit(limit);
+      ..orderBy([(t) => OrderingTerm.asc(t.localSeq)])
+      ..limit(limit + 1);
     q.where((t) {
-      Expression<bool> w = const Constant(true);
-      if (since != null) w = w & t.hlc.isBiggerThanValue(since);
+      Expression<bool> w = t.localSeq.isBiggerThanValue(seq);
       if (!includePrivate) w = w & t.isPrivate.equals(false);
       return w;
     });
-    return (await q.get()).map(rowToJson).toList();
+    final rows = await q.get();
+    final more = rows.length > limit;
+    final page = more ? rows.sublist(0, limit) : rows;
+    return ChangeBatch(page.map(rowToJson).toList(), page.isEmpty ? seq : page.last.localSeq, more);
   }
 
   /// Merge changes from a peer or the server. Per record, the greater HLC wins; applying the same
@@ -179,9 +201,11 @@ class LocalStore {
             .getSingleOrNull();
         if (existing != null && existing.hlc.compareTo(c['hlc'] as String) >= 0)
           continue;
+        // Merged rows get a place in our own change log so peers and the server can fetch them from us.
+        final seq = await _nextSeq();
         await db
             .into(db.transactions)
-            .insertOnConflictUpdate(jsonToCompanion(c));
+            .insertOnConflictUpdate(jsonToCompanion(c, seq));
         changed++;
       }
       await db.into(db.meta).insertOnConflictUpdate(
@@ -225,6 +249,18 @@ class LocalStore {
     });
   }
 
+  Future<String?> categoryIdForKey(String? key) async {
+    if (key == null) return null;
+    return (await (db.select(db.cachedCategories)..where((c) => c.key.equals(key))).getSingleOrNull())?.id;
+  }
+
+  /// First cached account of the given type (cash, bkash, ...), if any.
+  Future<String?> accountIdForType(String? type) async {
+    if (type == null) return null;
+    final rows = await (db.select(db.cachedAccounts)..where((a) => a.type.equals(type))).get();
+    return rows.isEmpty ? null : rows.first.id;
+  }
+
   Future<List<CachedCategory>> categories() =>
       db.select(db.cachedCategories).get();
   Future<List<CachedAccount>> accounts() => db.select(db.cachedAccounts).get();
@@ -247,7 +283,8 @@ SyncRow rowToJson(Transaction t) => {
       'hlc': t.hlc,
     };
 
-TransactionsCompanion jsonToCompanion(SyncRow j) => TransactionsCompanion(
+TransactionsCompanion jsonToCompanion(SyncRow j, int seq) => TransactionsCompanion(
+      localSeq: Value(seq),
       id: Value(j['id'] as String),
       type: Value(j['type'] as String),
       amountPaisa: Value((j['amountPaisa'] as num).toInt()),

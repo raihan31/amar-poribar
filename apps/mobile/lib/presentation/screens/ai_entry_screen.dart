@@ -55,6 +55,25 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
         if (spoken) await _readBack(drafts.isEmpty ? null : drafts.first);
       });
 
+  /// Best-effort background sync after saving; offline is fine, the next manual sync catches up.
+  void _syncQuietly() {
+    final family = ref.read(authProvider).family;
+    if (family == null) return;
+    ref.read(syncServiceProvider).sync(family.id).then((_) {}, onError: (_) {});
+  }
+
+  Future<void> _syncNow(FamilyInfo family) => _guard(() async {
+        final sync = ref.read(syncServiceProvider);
+        await sync.refreshReferenceData(family.id);
+        final r = await sync.sync(family.id);
+        await ref.read(appStateProvider.notifier).reload();
+        if (!mounted) return;
+        final rej = r.rejectedReasons.isEmpty ? '' : ' · ${r.rejectedReasons.length} বাদ';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('সিঙ্ক হয়েছে: ${r.pushed} পাঠানো, ${r.pulled} পাওয়া$rej')),
+        );
+      });
+
   Future<void> _readBack(TransactionDraft? d) {
     final voice = ref.read(voiceServiceProvider);
     if (d == null) return voice.speak('কিছু বোঝা যায়নি। আবার বলুন।');
@@ -94,12 +113,18 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
   /// Saves to the on-device database; it reaches other devices and the server by sync.
   Future<void> _confirm(int i) async {
     final d = _drafts![i];
+    final store = ref.read(localStoreProvider);
     final notifier = ref.read(appStateProvider.notifier);
+    final categoryId = await store.categoryIdForKey(d.categoryKey);
+    final accountId = await store.accountIdForType(d.accountType);
     if (d.type == 'income') {
-      await notifier.addIncome(d.amountTaka, note: d.note, source: d.source);
+      await notifier.addIncome(d.amountTaka,
+          note: d.note, categoryId: categoryId, accountId: accountId, source: d.source);
     } else {
-      await notifier.addExpense(d.amountTaka, note: d.note, source: d.source);
+      await notifier.addExpense(d.amountTaka,
+          note: d.note, categoryId: categoryId, accountId: accountId, source: d.source);
     }
+    _syncQuietly();
     if (!mounted) return;
     setState(() {
       _drafts = [..._drafts!]..removeAt(i);
@@ -115,6 +140,12 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
     final auth = ref.watch(authProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('এআই এন্ট্রি / AI entry'), actions: [
+        if (auth.family != null)
+          IconButton(
+            icon: const Icon(Icons.sync),
+            tooltip: 'সিঙ্ক',
+            onPressed: _busy ? null : () => _syncNow(auth.family!),
+          ),
         IconButton(
           icon: const Icon(Icons.logout),
           tooltip: 'লগআউট',
