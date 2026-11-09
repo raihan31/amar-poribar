@@ -56,6 +56,21 @@ export const familyMembers = pgTable(
   (t) => [primaryKey({ columns: [t.familyId, t.userId] })],
 );
 
+/** Shareable invite link, valid for 7 days (SRS FR-FAM-02). */
+export const familyInvites = pgTable("family_invites", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),
+  token: text("token").notNull().unique(),
+  role: roleEnum("role").notNull().default("member"),
+  /** Optional: when set, only the user with this phone can accept. */
+  phone: text("phone"),
+  createdBy: uuid("created_by").notNull().references(() => users.id),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  acceptedBy: uuid("accepted_by").references(() => users.id),
+  acceptedAt: timestamp("accepted_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const accounts = pgTable("accounts", {
   id: uuid("id").primaryKey().defaultRandom(),
   familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),

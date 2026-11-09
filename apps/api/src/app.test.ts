@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "./app.js";
+import { canAssignRole, canManageMember } from "./auth.js";
 import type { Db } from "./db/client.js";
 import { monthRange } from "./month.js";
 import { OtpStore } from "./otp.js";
@@ -51,5 +52,31 @@ describe("monthRange", () => {
     const { start, end } = monthRange("2026-12");
     expect(start.toISOString()).toBe("2026-11-30T18:00:00.000Z");
     expect(end.toISOString()).toBe("2026-12-31T18:00:00.000Z");
+  });
+});
+
+describe("invites and roles", () => {
+  it("requires auth to create or accept invites", async () => {
+    const create = await app.inject({ method: "POST", url: "/v1/families/x/invites", payload: {} });
+    const accept = await app.inject({ method: "POST", url: "/v1/invites/abc/accept" });
+    expect(create.statusCode).toBe(401);
+    expect(accept.statusCode).toBe(401);
+  });
+
+  it("only owners can grant admin, and nobody can grant owner", () => {
+    expect(canAssignRole("owner", "admin")).toBe(true);
+    expect(canAssignRole("admin", "admin")).toBe(false);
+    expect(canAssignRole("admin", "member")).toBe(true);
+    expect(canAssignRole("member", "viewer")).toBe(false);
+    expect(canAssignRole("owner", "owner")).toBe(false);
+  });
+
+  it("protects the owner and lets only owners manage admins", () => {
+    expect(canManageMember("admin", "owner")).toBe(false);
+    expect(canManageMember("owner", "owner")).toBe(false);
+    expect(canManageMember("admin", "admin")).toBe(false);
+    expect(canManageMember("owner", "admin")).toBe(true);
+    expect(canManageMember("admin", "viewer")).toBe(true);
+    expect(canManageMember("member", "viewer")).toBe(false);
   });
 });
