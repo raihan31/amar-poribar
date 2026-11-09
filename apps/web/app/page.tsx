@@ -5,6 +5,7 @@ import {
   draftToSpeech,
   formatBDT,
   t,
+  type BreakdownRow,
   type MonthlyAiSummary,
   type MonthSummary,
   type ParseResponse,
@@ -92,21 +93,23 @@ function FamilyHome({ token, onLogout }: { token: string; onLogout: () => void }
   const [summary, setSummary] = useState<MonthSummary | null>(null);
   const [aiSummary, setAiSummary] = useState<MonthlyAiSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [month, setMonth] = useState<string | null>(null);
 
   const handle = useCallback((e: unknown) => {
     if (e instanceof ApiError && e.status === 401) onLogout();
     else setError((e as Error).message);
   }, [onLogout]);
 
-  const refresh = useCallback(async (fam: Family) => {
+  const refresh = useCallback(async (fam: Family, m: string | null = month) => {
+    const q = m ? `month=${m}` : "";
     const [cats, accs, sum, ai] = await Promise.all([
       api<Category[]>(`/v1/families/${fam.id}/categories`, { token }),
       api<Account[]>(`/v1/families/${fam.id}/accounts`, { token }),
-      api<MonthSummary>(`/v1/families/${fam.id}/reports/summary`, { token }),
-      api<MonthlyAiSummary>(`/v1/families/${fam.id}/ai/summary?locale=bn`, { token }),
+      api<MonthSummary>(`/v1/families/${fam.id}/reports/summary?${q}`, { token }),
+      api<MonthlyAiSummary>(`/v1/families/${fam.id}/ai/summary?locale=bn${q ? `&${q}` : ""}`, { token }),
     ]);
     setCategories(cats); setAccounts(accs); setSummary(sum); setAiSummary(ai);
-  }, [token]);
+  }, [token, month]);
 
   useEffect(() => {
     api<{ families: Family[] }>("/v1/me", { token })
@@ -127,7 +130,10 @@ function FamilyHome({ token, onLogout }: { token: string; onLogout: () => void }
       <QuickAdd token={token} family={family} categories={categories} accounts={accounts}
         onSaved={() => refresh(family).catch(handle)} onError={handle} />
       {aiSummary && <SpokenSummary summary={aiSummary} />}
-      {summary && <Summary summary={summary} />}
+      {summary && (
+        <Dashboard summary={summary}
+          onMonth={(m) => { setMonth(m); refresh(family, m).catch(handle); }} />
+      )}
       {error && <p className="error">{error}</p>}
       <button className="secondary" onClick={onLogout}>লগআউট</button>
     </>
@@ -260,19 +266,84 @@ function QuickAdd(props: {
   );
 }
 
-function Summary({ summary }: { summary: MonthSummary }) {
+function shiftMonth(month: string, delta: number): string {
+  const [y, m] = month.split("-").map(Number) as [number, number];
+  const d = new Date(Date.UTC(y, m - 1 + delta, 1));
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+/** Percent change vs last month, or null when there is nothing to compare against. */
+function delta(now: number, before: number): { pct: number; dir: "up" | "down" | "flat" } | null {
+  if (before <= 0) return null;
+  const pct = Math.round(((now - before) / before) * 100);
+  return { pct: Math.abs(pct), dir: pct > 0 ? "up" : pct < 0 ? "down" : "flat" };
+}
+
+function Delta({ now, before, moreIsBad }: { now: number; before: number; moreIsBad: boolean }) {
+  const d = delta(now, before);
+  if (!d || d.dir === "flat") return <span className="delta">{t("vsLastMonth")}: –</span>;
+  const bad = (d.dir === "up") === moreIsBad;
+  return (
+    <span className={`delta ${bad ? "up" : "down"}`}>
+      {t("vsLastMonth")}: {d.pct.toLocaleString("bn-BD")}% {d.dir === "up" ? t("more") : t("less")}
+    </span>
+  );
+}
+
+/** Month totals, comparison with last month, and breakdowns by category, member and account. */
+function Dashboard({ summary, onMonth }: { summary: MonthSummary; onMonth: (m: string) => void }) {
+  const [view, setView] = useState<"category" | "member" | "account">("category");
+  const rows: BreakdownRow[] =
+    view === "category"
+      ? summary.byCategory.map((c) => ({ id: c.categoryId, name: c.name, totalPaisa: c.totalPaisa }))
+      : view === "member" ? summary.byMember : summary.byAccount;
+  const max = Math.max(1, ...rows.map((r) => r.totalPaisa));
+  const net = summary.incomePaisa - summary.expensePaisa;
+  const prevNet = summary.previous.incomePaisa - summary.previous.expensePaisa;
+  const money = (p: number) => formatBDT(p, { bnDigits: true });
+  const label = new Date(`${summary.month}-01T00:00:00+06:00`).toLocaleDateString("bn-BD", { month: "long", year: "numeric" });
+
   return (
     <div className="card">
-      <p className="muted">{t("thisMonth")} · {t("totalExpense")}</p>
-      <p className="big">{formatBDT(summary.expensePaisa, { bnDigits: true })}</p>
-      <ul>
-        {summary.byCategory.map((c) => (
-          <li key={c.categoryId ?? "none"}>
-            <span>{c.name}</span>
-            <span>{formatBDT(c.totalPaisa, { bnDigits: true })}</span>
-          </li>
+      <div className="month-nav">
+        <button className="secondary" aria-label={t("prevMonth")} onClick={() => onMonth(shiftMonth(summary.month, -1))}>‹</button>
+        <strong>{label}</strong>
+        <button className="secondary" aria-label={t("nextMonth")} onClick={() => onMonth(shiftMonth(summary.month, 1))}>›</button>
+      </div>
+      <div className="stats">
+        <div className="stat">
+          <span className="muted">{t("totalIncome")}</span>
+          <strong>{money(summary.incomePaisa)}</strong>
+          <Delta now={summary.incomePaisa} before={summary.previous.incomePaisa} moreIsBad={false} />
+        </div>
+        <div className="stat">
+          <span className="muted">{t("totalExpense")}</span>
+          <strong>{money(summary.expensePaisa)}</strong>
+          <Delta now={summary.expensePaisa} before={summary.previous.expensePaisa} moreIsBad />
+        </div>
+        <div className="stat">
+          <span className="muted">{t("netSaving")}</span>
+          <strong>{money(net)}</strong>
+          <span className="delta">{t("vsLastMonth")}: {money(prevNet)}</span>
+        </div>
+      </div>
+      <div className="tabs" role="group">
+        {(["category", "member", "account"] as const).map((v) => (
+          <button key={v} aria-pressed={view === v} onClick={() => setView(v)}>
+            {t(v === "category" ? "byCategory" : v === "member" ? "byMember" : "byAccount")}
+          </button>
         ))}
-      </ul>
+      </div>
+      {rows.length === 0 ? <p className="muted">{t("noData")}</p> : (
+        <ul>
+          {rows.map((r) => (
+            <li key={r.id ?? "none"} className="bar-row">
+              <span className="bar-label"><span>{r.name}</span><span>{money(r.totalPaisa)}</span></span>
+              <span className="bar" aria-hidden="true"><span style={{ width: `${(r.totalPaisa / max) * 100}%` }} /></span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
