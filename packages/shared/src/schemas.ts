@@ -83,6 +83,45 @@ export const CreateFamilySchema = z.object({
 });
 export type CreateFamilyInput = z.infer<typeof CreateFamilySchema>;
 
+export const CreateAccountSchema = z.object({
+  name: z.string().min(1).max(80),
+  type: AccountTypeSchema,
+  /** Member who owns the account, e.g. "Ammu's bKash". Null/omitted means shared (FR-ACC-02). */
+  ownerUserId: z.uuid().nullable().optional(),
+  openingBalancePaisa: z.number().int().default(0),
+});
+export type CreateAccountInput = z.infer<typeof CreateAccountSchema>;
+
+export const UpdateAccountSchema = z
+  .object({
+    name: z.string().min(1).max(80),
+    ownerUserId: z.uuid().nullable(),
+    openingBalancePaisa: z.number().int(),
+    archived: z.boolean(),
+  })
+  .partial()
+  .refine((v) => Object.keys(v).length > 0, "Nothing to update");
+export type UpdateAccountInput = z.infer<typeof UpdateAccountSchema>;
+
+export const CreateCategorySchema = z.object({
+  kind: z.enum(["expense", "income"]),
+  nameEn: z.string().min(1).max(60),
+  nameBn: z.string().min(1).max(60),
+  icon: z.string().max(16).optional(),
+});
+export type CreateCategoryInput = z.infer<typeof CreateCategorySchema>;
+
+export const UpdateCategorySchema = z
+  .object({
+    nameEn: z.string().min(1).max(60),
+    nameBn: z.string().min(1).max(60),
+    icon: z.string().max(16).nullable(),
+    isHidden: z.boolean(),
+  })
+  .partial()
+  .refine((v) => Object.keys(v).length > 0, "Nothing to update");
+export type UpdateCategoryInput = z.infer<typeof UpdateCategorySchema>;
+
 export const MonthSummarySchema = z.object({
   month: MonthSchema,
   incomePaisa: z.number().int(),
