@@ -18,6 +18,11 @@ class Transactions extends Table {
   TextColumn get deletedAt => text().nullable()();
   TextColumn get hlc => text()();
 
+  /// Position in this device's own change log, bumped on every local write and every merge. Sync
+  /// cursors (per peer, and for the server) page by this, not by HLC, because HLCs are assigned by
+  /// different devices and an entry made offline can carry an HLC older than what a peer already holds.
+  IntColumn get localSeq => integer().withDefault(const Constant(0))();
+
   @override
   Set<Column> get primaryKey => {id};
 }

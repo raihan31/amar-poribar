@@ -9,14 +9,14 @@ Future<LocalStore> device(DateTime Function() now) =>
 
 /// Exchange everything both ways, like a sync with a peer or the server.
 Future<void> sync(LocalStore a, LocalStore b) async {
-  final fromA = await a.changesSince(null, includePrivate: true);
-  final fromB = await b.changesSince(null, includePrivate: true);
-  await b.applyChanges(fromA);
-  await a.applyChanges(fromB);
+  final fromA = await a.changesAfter(0, includePrivate: true);
+  final fromB = await b.changesAfter(0, includePrivate: true);
+  await b.applyChanges(fromA.rows);
+  await a.applyChanges(fromB.rows);
 }
 
 Future<Map<String, String?>> snapshot(LocalStore s) async {
-  final all = await s.changesSince(null, includePrivate: true);
+  final all = (await s.changesAfter(0, includePrivate: true)).rows;
   return {
     for (final r in all)
       r['id'] as String:
@@ -77,26 +77,52 @@ void main() {
     final a = await device(() => clockA);
     final b = await device(() => clockB);
     await a.addTransaction(id: 'i', type: 'expense', amountPaisa: 1);
-    final changes = await a.changesSince(null);
+    final changes = (await a.changesAfter(0)).rows;
     expect(await b.applyChanges(changes), 1);
     expect(await b.applyChanges(changes), 0);
   });
 
-  test('changesSince returns only newer changes, oldest first', () async {
+  test('changesAfter returns only newer changes, oldest first', () async {
     final a = await device(() => clockA);
     await a.addTransaction(id: '1', type: 'expense', amountPaisa: 1);
-    final mark = await a.latestHlc();
+    final mark = (await a.changesAfter(0)).lastSeq;
     await a.addTransaction(id: '2', type: 'expense', amountPaisa: 2);
-    final later = await a.changesSince(mark);
-    expect(later.map((r) => r['id']), ['2']);
+    await a.updateTransaction('1', note: 'edited');
+    final later = await a.changesAfter(mark);
+    expect(later.rows.map((r) => r['id']), ['2', '1']);
+  });
+
+  test('an entry made offline with an old HLC is still delivered after the cursor', () async {
+    // The flaw an HLC cursor has: B's entry carries an older HLC than what A already holds.
+    final a = await device(() => DateTime.utc(2026, 11, 9, 12));
+    final b = await device(() => DateTime.utc(2026, 11, 9, 8));
+    await a.addTransaction(id: 'new', type: 'expense', amountPaisa: 1);
+    final seen = (await a.changesAfter(0)).lastSeq;
+    await b.addTransaction(id: 'old-hlc', type: 'expense', amountPaisa: 2);
+    await a.applyChanges((await b.changesAfter(0)).rows);
+    final delivered = await a.changesAfter(seen);
+    expect(delivered.rows.map((r) => r['id']), ['old-hlc']);
+  });
+
+  test('paging: more is set when a page is full', () async {
+    final a = await device(() => clockA);
+    for (var i = 0; i < 3; i++) {
+      await a.addTransaction(id: 'p$i', type: 'expense', amountPaisa: 1);
+    }
+    final first = await a.changesAfter(0, limit: 2);
+    expect(first.rows, hasLength(2));
+    expect(first.more, isTrue);
+    final rest = await a.changesAfter(first.lastSeq, limit: 2);
+    expect(rest.rows.map((r) => r['id']), ['p2']);
+    expect(rest.more, isFalse);
   });
 
   test('private entries are not shared unless asked', () async {
     final a = await device(() => clockA);
     await a.addTransaction(
         id: 'p', type: 'expense', amountPaisa: 1, isPrivate: true);
-    expect(await a.changesSince(null), isEmpty);
-    expect(await a.changesSince(null, includePrivate: true), hasLength(1));
+    expect((await a.changesAfter(0)).rows, isEmpty);
+    expect((await a.changesAfter(0, includePrivate: true)).rows, hasLength(1));
   });
 
   test('a clock set far in the future is rejected, not merged', () async {
@@ -112,7 +138,7 @@ void main() {
       'hlc': '2030-01-01T00:00:00.000Z-0000-evil',
     };
     expect(() => a.applyChanges([far]), throwsA(isA<Exception>()));
-    expect(await a.changesSince(null, includePrivate: true), isEmpty);
+    expect((await a.changesAfter(0, includePrivate: true)).rows, isEmpty);
   });
 
   test('totals add up income and expense including fees for a month', () async {
@@ -142,7 +168,7 @@ void main() {
     final second = await LocalStore.open(db, now: () => clockA);
     expect(second.nodeId, first.nodeId);
     await second.addTransaction(id: 'k2', type: 'expense', amountPaisa: 1);
-    final rows = await second.changesSince(null);
+    final rows = (await second.changesAfter(0)).rows;
     expect(rows[1]['hlc'].compareTo(rows[0]['hlc']), greaterThan(0));
   });
 }

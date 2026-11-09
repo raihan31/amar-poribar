@@ -56,24 +56,32 @@ class AppStateNotifier extends StateNotifier<AppState> {
   }
 
   Future<void> addExpense(double taka,
-      {String? note, String? categoryId, String source = 'manual'}) async {
+      {String? note,
+      String? categoryId,
+      String? accountId,
+      String source = 'manual'}) async {
     await store.addTransaction(
       type: 'expense',
       amountPaisa: (taka * 100).round(),
       note: note,
       categoryId: categoryId,
+      accountId: accountId,
       source: source,
     );
     await reload();
   }
 
   Future<void> addIncome(double taka,
-      {String? note, String? categoryId, String source = 'manual'}) async {
+      {String? note,
+      String? categoryId,
+      String? accountId,
+      String source = 'manual'}) async {
     await store.addTransaction(
       type: 'income',
       amountPaisa: (taka * 100).round(),
       note: note,
       categoryId: categoryId,
+      accountId: accountId,
       source: source,
     );
     await reload();
