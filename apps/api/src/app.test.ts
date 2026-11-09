@@ -8,7 +8,7 @@ import { canAssignRole, canManageMember } from "./auth.js";
 import type { Db } from "./db/client.js";
 import { dayRange, monthRange, monthsBetween } from "./month.js";
 import { OtpStore } from "./otp.js";
-import { CreateFestivalBudgetSchema, UpdateFestivalBudgetSchema, UpdateTransactionSchema, CreateAccountSchema, UpdateAccountSchema, UpdateCategorySchema } from "@amar-poribar/shared";
+import { ReceiptRequestSchema, CreateFestivalBudgetSchema, UpdateFestivalBudgetSchema, UpdateTransactionSchema, CreateAccountSchema, UpdateAccountSchema, UpdateCategorySchema } from "@amar-poribar/shared";
 
 // These tests don't touch the database; DB-backed tests need `pnpm db:up` (TODO).
 const app = await buildApp({ db: {} as Db, otp: new OtpStore(), jwtSecret: "test", isProd: false });
@@ -256,5 +256,20 @@ describe("ask", () => {
   it("requires auth", async () => {
     const res = await app.inject({ method: "POST", url: "/v1/families/x/ai/ask", payload: { question: "hi" } });
     expect(res.statusCode).toBe(401);
+  });
+});
+
+describe("receipt", () => {
+  it("requires auth", async () => {
+    const res = await app.inject({ method: "POST", url: "/v1/families/x/ai/receipt", payload: {} });
+    expect(res.statusCode).toBe(401);
+  });
+
+  it("accepts only supported, reasonably sized base64 images", () => {
+    const b64 = "A".repeat(200);
+    expect(ReceiptRequestSchema.safeParse({ mediaType: "image/jpeg", imageBase64: b64 }).success).toBe(true);
+    expect(ReceiptRequestSchema.safeParse({ mediaType: "image/gif", imageBase64: b64 }).success).toBe(false);
+    expect(ReceiptRequestSchema.safeParse({ mediaType: "image/png", imageBase64: "not base64!" + b64 }).success).toBe(false);
+    expect(ReceiptRequestSchema.safeParse({ mediaType: "image/png", imageBase64: "A".repeat(7_000_001) }).success).toBe(false);
   });
 });

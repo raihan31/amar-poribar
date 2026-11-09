@@ -19,7 +19,7 @@ export interface CategoryOption {
 }
 
 /** Shape the model must return (structured outputs). Amounts are in taka; we convert to paisa. */
-const LlmDraftsSchema = z.object({
+export const LlmDraftsSchema = z.object({
   drafts: z.array(
     z.object({
       type: z.enum(["expense", "income", "transfer"]),
@@ -58,7 +58,7 @@ export interface LlmParseOptions {
   model?: string;
 }
 
-function dhakaDate(now: Date): string {
+export function dhakaDate(now: Date): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(now);
 }
 
@@ -97,8 +97,17 @@ export async function parseWithLlm(text: string, opts: LlmParseOptions): Promise
   const parsed = response.parsed_output;
   if (!parsed) throw new AiUnavailableError("AI returned no structured output");
 
+  return llmDraftsToTransactions(parsed.drafts, { validKeys, now, today, source: "ai_text" });
+}
+
+/** Validate and convert model output into drafts: bad amounts are dropped, unknown categories become null. */
+export function llmDraftsToTransactions(
+  items: z.infer<typeof LlmDraftsSchema>["drafts"],
+  ctx: { validKeys: Set<string>; now: Date; today: string; source: TransactionDraft["source"] },
+): TransactionDraft[] {
+  const { validKeys, now, today, source } = ctx;
   const drafts: TransactionDraft[] = [];
-  for (const d of parsed.drafts) {
+  for (const d of items) {
     const amountPaisa = takaToPaisa(d.amountTaka);
     if (amountPaisa <= 0 || amountPaisa > MAX_AMOUNT_PAISA) continue;
     const date = /^\d{4}-\d{2}-\d{2}$/.test(d.date) ? d.date : today;
@@ -113,7 +122,7 @@ export async function parseWithLlm(text: string, opts: LlmParseOptions): Promise
       note: d.note,
       counterparty: d.counterparty,
       trxId: null,
-      source: "ai_text",
+      source,
       confidence: Math.min(1, Math.max(0, d.confidence)),
     });
   }
