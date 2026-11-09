@@ -148,11 +148,20 @@ export const PutBudgetsSchema = z.object({
 });
 export type PutBudgetsInput = z.infer<typeof PutBudgetsSchema>;
 
+const BreakdownRowSchema = z.object({ id: z.string().nullable(), name: z.string(), totalPaisa: z.number().int() });
+export type BreakdownRow = z.infer<typeof BreakdownRowSchema>;
+
 export const MonthSummarySchema = z.object({
   month: MonthSchema,
   incomePaisa: z.number().int(),
   expensePaisa: z.number().int(),
+  /** Totals for the month before, for the comparison in FR-REP-01. */
+  previous: z.object({ month: MonthSchema, incomePaisa: z.number().int(), expensePaisa: z.number().int() }),
   byCategory: z.array(z.object({ categoryId: z.string().nullable(), name: z.string(), totalPaisa: z.number().int() })),
+  /** Expense by who paid (FR-REP-02). */
+  byMember: z.array(BreakdownRowSchema),
+  /** Expense by account (FR-REP-02). */
+  byAccount: z.array(BreakdownRowSchema),
 });
 export type MonthSummary = z.infer<typeof MonthSummarySchema>;
 

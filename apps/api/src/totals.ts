@@ -1,12 +1,14 @@
 import { and, eq, gte, isNull, lt, or, sql } from "drizzle-orm";
 import type { Db } from "./db/client.js";
-import { categories, transactions } from "./db/schema.js";
+import { accounts, categories, transactions, users } from "./db/schema.js";
 import { monthRange } from "./month.js";
 
 export interface MonthTotals {
   incomePaisa: number;
   expensePaisa: number;
   byCategory: { categoryId: string | null; name: string; nameEn: string; totalPaisa: number }[];
+  byMember: { id: string | null; name: string; totalPaisa: number }[];
+  byAccount: { id: string | null; name: string; totalPaisa: number }[];
 }
 
 /** Income, expense and per-category expense for a month, as visible to `userId` (FR-TXN-05). */
@@ -42,6 +44,30 @@ export async function monthTotals(db: Db, familyId: string, userId: string, mont
     .groupBy(transactions.categoryId, categories.nameBn, categories.nameEn)
     .orderBy(sql`4 desc`);
 
+  const byMember = await db
+    .select({
+      id: transactions.paidByUserId,
+      name: sql<string>`coalesce(${users.name}, ${users.phone}, 'অজানা')`,
+      total: sql<string>`sum(${transactions.amountPaisa} + ${transactions.feePaisa})`,
+    })
+    .from(transactions)
+    .leftJoin(users, eq(users.id, transactions.paidByUserId))
+    .where(and(where, eq(transactions.type, "expense")))
+    .groupBy(transactions.paidByUserId, users.name, users.phone)
+    .orderBy(sql`3 desc`);
+
+  const byAccount = await db
+    .select({
+      id: transactions.accountId,
+      name: sql<string>`coalesce(${accounts.name}, 'অন্যান্য')`,
+      total: sql<string>`sum(${transactions.amountPaisa} + ${transactions.feePaisa})`,
+    })
+    .from(transactions)
+    .leftJoin(accounts, eq(accounts.id, transactions.accountId))
+    .where(and(where, eq(transactions.type, "expense")))
+    .groupBy(transactions.accountId, accounts.name)
+    .orderBy(sql`3 desc`);
+
   const totalOf = (type: string) => Number(totals.find((t) => t.type === type)?.total ?? 0);
   return {
     incomePaisa: totalOf("income"),
@@ -52,5 +78,7 @@ export async function monthTotals(db: Db, familyId: string, userId: string, mont
       nameEn: c.nameEn,
       totalPaisa: Number(c.total),
     })),
+    byMember: byMember.map((m) => ({ id: m.id, name: m.name, totalPaisa: Number(m.total) })),
+    byAccount: byAccount.map((a) => ({ id: a.id, name: a.name, totalPaisa: Number(a.total) })),
   };
 }

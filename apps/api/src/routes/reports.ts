@@ -7,7 +7,7 @@ import { requireRole } from "../auth.js";
 import { csvRow, dhakaStamp, paisaToDecimal } from "../csv.js";
 import { accounts, categories, transactions } from "../db/schema.js";
 import { HttpError, parseOr400 } from "../errors.js";
-import { currentDhakaMonth, monthRange } from "../month.js";
+import { currentDhakaMonth, monthRange, previousMonth } from "../month.js";
 import { monthTotals } from "../totals.js";
 
 type FamilyParams = { Params: { familyId: string } };
@@ -19,12 +19,19 @@ export async function reportRoutes(app: FastifyInstance, { db }: AppDeps) {
     const { familyId } = req.params;
     await requireRole(db, familyId, req.user.sub, "viewer");
     const { month = currentDhakaMonth() } = parseOr400(z.object({ month: MonthSchema.optional() }), req.query);
-    const totals = await monthTotals(db, familyId, req.user.sub, month);
+    const prevMonth = previousMonth(month);
+    const [totals, prev] = await Promise.all([
+      monthTotals(db, familyId, req.user.sub, month),
+      monthTotals(db, familyId, req.user.sub, prevMonth),
+    ]);
     return {
       month,
       incomePaisa: totals.incomePaisa,
       expensePaisa: totals.expensePaisa,
+      previous: { month: prevMonth, incomePaisa: prev.incomePaisa, expensePaisa: prev.expensePaisa },
       byCategory: totals.byCategory.map(({ categoryId, name, totalPaisa }) => ({ categoryId, name, totalPaisa })),
+      byMember: totals.byMember,
+      byAccount: totals.byAccount,
     };
   });
 

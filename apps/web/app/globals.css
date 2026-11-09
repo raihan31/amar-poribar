@@ -66,3 +66,22 @@ button.danger { background: var(--danger); }
   font-size: 1.5rem; font-weight: 400; min-height: 64px; white-space: normal;
 }
 .picker-item small { font-size: 0.7rem; line-height: 1.2; color: var(--text); }
+
+/* Dashboard (FR-REP-01, FR-REP-02) */
+.month-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.month-nav button { min-width: 48px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
+.stat { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+.stat strong { display: block; font-size: 1.05rem; }
+.delta { font-size: 0.8rem; color: var(--muted); }
+.delta.up { color: var(--danger); }
+.delta.down { color: var(--accent); }
+.tabs { display: flex; gap: 6px; margin: 8px 0; }
+.tabs button { flex: 1; }
+.tabs button[aria-pressed="false"] { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+.bar-row { display: block; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.bar-row:last-child { border-bottom: 0; }
+.bar-label { display: flex; justify-content: space-between; gap: 8px; }
+.bar { height: 6px; border-radius: 3px; background: var(--border); margin-top: 6px; overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--accent); }
+@media (max-width: 420px) { .stats { grid-template-columns: 1fr; } }
