@@ -4,6 +4,7 @@ import { canAssignRole, canManageMember } from "./auth.js";
 import type { Db } from "./db/client.js";
 import { monthRange } from "./month.js";
 import { OtpStore } from "./otp.js";
+import { CreateAccountSchema, UpdateAccountSchema, UpdateCategorySchema } from "@amar-poribar/shared";
 
 // These tests don't touch the database; DB-backed tests need `pnpm db:up` (TODO).
 const app = await buildApp({ db: {} as Db, otp: new OtpStore(), jwtSecret: "test", isProd: false });
@@ -78,5 +79,28 @@ describe("invites and roles", () => {
     expect(canManageMember("owner", "admin")).toBe(true);
     expect(canManageMember("admin", "viewer")).toBe(true);
     expect(canManageMember("member", "viewer")).toBe(false);
+  });
+});
+
+describe("accounts and categories", () => {
+  it("requires auth to create or edit them", async () => {
+    for (const [method, url] of [
+      ["POST", "/v1/families/x/accounts"],
+      ["PATCH", "/v1/families/x/accounts/y"],
+      ["POST", "/v1/families/x/categories"],
+      ["PATCH", "/v1/families/x/categories/y"],
+    ] as const) {
+      const res = await app.inject({ method, url, payload: {} });
+      expect(res.statusCode, `${method} ${url}`).toBe(401);
+    }
+  });
+
+  it("validates account and category input", () => {
+    expect(CreateAccountSchema.safeParse({ name: "bKash", type: "bkash" }).success).toBe(true);
+    expect(CreateAccountSchema.safeParse({ name: "x", type: "paypal" }).success).toBe(false);
+    expect(UpdateAccountSchema.safeParse({}).success).toBe(false);
+    expect(UpdateAccountSchema.safeParse({ archived: true }).success).toBe(true);
+    expect(UpdateCategorySchema.safeParse({ isHidden: true }).success).toBe(true);
+    expect(UpdateCategorySchema.safeParse({}).success).toBe(false);
   });
 });

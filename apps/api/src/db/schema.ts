@@ -78,6 +78,7 @@ export const accounts = pgTable("accounts", {
   type: accountTypeEnum("type").notNull(),
   ownerUserId: uuid("owner_user_id").references(() => users.id),
   openingBalancePaisa: bigint("opening_balance_paisa", { mode: "number" }).notNull().default(0),
+  archivedAt: timestamp("archived_at", { withTimezone: true }),
   ...timestamps,
 });
 
