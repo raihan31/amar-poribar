@@ -5,7 +5,8 @@ import '../screens/login_screen.dart';
 import '../screens/onboarding_screen.dart';
 import '../screens/dashboard_screen.dart';
 import '../screens/transaction_screen.dart';
-import '../screens/settings_screen.dart'; // contains PendingSmsScreen too
+import '../screens/settings_screen.dart';
+import '../screens/tutorial_screen.dart'; // contains PendingSmsScreen too
 
 class AppRouter {
   static const String onboardingRoute = '/';
@@ -15,6 +16,7 @@ class AppRouter {
   static const String settingsRoute = '/settings';
   static const String loginRoute = '/login';
   static const String aiEntryRoute = '/ai-entry';
+  static const String tutorialRoute = '/tutorial';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -28,6 +30,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => PendingSmsScreen());
       case loginRoute:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
+      case tutorialRoute:
+        return MaterialPageRoute(builder: (_) => const TutorialScreen());
       case aiEntryRoute:
         return MaterialPageRoute(builder: (_) => const AiEntryScreen());
       case settingsRoute:
