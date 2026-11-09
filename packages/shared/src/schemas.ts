@@ -175,6 +175,39 @@ export const UpdateFestivalBudgetSchema = z
   .refine((v) => Object.keys(v).length > 0, "Nothing to update");
 export type UpdateFestivalBudgetInput = z.infer<typeof UpdateFestivalBudgetSchema>;
 
+/** Monthly recurring entry such as rent or a helper's salary (FR-TXN-06, FR-NOT-03). */
+export const CreateRecurringSchema = z
+  .object({
+    name: z.string().min(1).max(80),
+    type: z.enum(["expense", "income"]).default("expense"),
+    amountPaisa: AmountPaisaSchema,
+    categoryId: z.uuid().nullable().optional(),
+    accountId: z.uuid().nullable().optional(),
+    /** Day of month, 1..31. Shorter months use their last day. */
+    dayOfMonth: z.number().int().min(1).max(31),
+    startsOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    endsOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+    /** Remind this many days before the due date. */
+    remindDaysBefore: z.number().int().min(0).max(14).default(2),
+  })
+  .refine((v) => !v.endsOn || v.endsOn >= v.startsOn, "endsOn must not be before startsOn");
+export type CreateRecurringInput = z.infer<typeof CreateRecurringSchema>;
+
+export const UpdateRecurringSchema = z
+  .object({
+    name: z.string().min(1).max(80),
+    amountPaisa: AmountPaisaSchema,
+    categoryId: z.uuid().nullable(),
+    accountId: z.uuid().nullable(),
+    dayOfMonth: z.number().int().min(1).max(31),
+    endsOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
+    remindDaysBefore: z.number().int().min(0).max(14),
+    active: z.boolean(),
+  })
+  .partial()
+  .refine((v) => Object.keys(v).length > 0, "Nothing to update");
+export type UpdateRecurringInput = z.infer<typeof UpdateRecurringSchema>;
+
 export const MonthSummarySchema = z.object({
   month: MonthSchema,
   incomePaisa: z.number().int(),
