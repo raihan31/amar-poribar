@@ -48,3 +48,4 @@ export async function parseInput(
   return { drafts: quick ? [quick.draft] : [], usedAi: false };
 }
 export * from "./summary.js";
+export * from "./ask.js";
