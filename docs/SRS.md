@@ -254,9 +254,42 @@ Priority: **M** = must, **S** = should, **C** = could.
 | GET | `/v1/families/:id/ai/summary?month=YYYY-MM&locale=bn` | Plain-language monthly summary: `{ text, speechText, usedAi }` |
 | GET/PUT | `/v1/families/:id/budgets?month=YYYY-MM` | Budgets |
 | GET | `/v1/families/:id/reports/summary?month=YYYY-MM` | Dashboard data |
+| POST | `/v1/families/:id/sync` | Exchange HLC changesets with a device (FR-SYNC-05) |
 | GET | `/health` | Liveness check |
 
 Request and response bodies are validated with the Zod schemas in `@amar-poribar/shared`. Errors use the format `{ error: { code, message } }` (RFC 7807-inspired).
+
+#### 4.3.1 Sync endpoint (FR-SYNC-05)
+
+`POST /v1/families/:id/sync` (role: member or above; viewers receive changes but cannot push).
+
+Request:
+
+```json
+{
+  "nodeId": "device-uuid",
+  "since": "<hlc string or null>",
+  "changes": { "transactions": [ { "id": "uuid", "hlc": "<hlc>", "...": "row fields" } ] }
+}
+```
+
+Response:
+
+```json
+{ "serverHlc": "<hlc>", "changes": { "transactions": [ ... ] } }
+```
+
+Rules:
+- `since` is the highest server HLC the device has already seen. `null` means a first sync, and the server returns everything.
+- Each row carries its own `hlc`. The server keeps a row only when the incoming `hlc` is greater than the stored one (per record, last-write-wins). Ties are broken by `nodeId`, so every device reaches the same result.
+- Deletes are tombstones: a row with `deletedAt` set and a newer `hlc`. They are kept for at least 30 days (FR-TXN-03).
+- Pushes are idempotent. Sending the same changes twice leaves the same state, so a retry after a dropped connection is safe.
+- The server rejects an `hlc` more than 24 hours ahead of server time, so one device with a wrong clock cannot overwrite everyone's data.
+- Private transactions (FR-TXN-05) are returned only to their creator.
+- The same merge function is used for server sync and peer-to-peer sync (FR-SYNC-04). The device may send `changes` to a peer or to the server and gets the same result.
+- Tables synced: `transactions`, `accounts`, `categories`, `budgets`. Family membership and roles are not synced this way and stay on the REST endpoints above.
+- Large syncs are paged: the server may return `"more": true` with a `serverHlc` to continue from.
+
 
 ### 4.3 Software interfaces
 - **Claude API** (`@anthropic-ai/sdk`): structured outputs for parsing (JSON schema), vision for receipts, tool use for Ask. The model ID is configurable through `AI_MODEL`.
