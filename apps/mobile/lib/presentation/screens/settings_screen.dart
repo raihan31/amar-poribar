@@ -126,6 +126,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const Divider(),
           ],
           ListTile(
+            leading: const Icon(Icons.record_voice_over),
+            title: const Text('কীভাবে ব্যবহার করবেন (শুনুন)'),
+            onTap: () => Navigator.pushNamed(context, '/tutorial'),
+          ),
+          ListTile(
             leading: const Icon(Icons.cloud_sync),
             title: const Text('সার্ভারের সাথে সিঙ্ক'),
             subtitle: const Text('ইন্টারনেট থাকলে চাপুন'),

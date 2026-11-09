@@ -256,4 +256,10 @@ class ApiClient {
             in await _send('GET', '/v1/families/$familyId/accounts') as List)
           Map<String, dynamic>.from(c as Map),
       ];
+
+  /// This month's budgets with spend and 80%/100% level.
+  Future<List<Map<String, dynamic>>> budgets(String familyId) async {
+    final r = await _send('GET', '/v1/families/$familyId/budgets') as Map<String, dynamic>;
+    return [for (final b in r['budgets'] as List) Map<String, dynamic>.from(b as Map)];
+  }
 }

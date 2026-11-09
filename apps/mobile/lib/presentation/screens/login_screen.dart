@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/api/api_client.dart';
 import '../providers/auth_provider.dart';
+import '../providers/providers.dart';
 
 /// Phone + OTP sign-in (SRS FR-AUTH-01).
 class LoginScreen extends ConsumerStatefulWidget {
@@ -44,7 +45,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _verify() => _run(() async {
         await ref.read(authProvider.notifier).signIn(_phone.text.trim(), _code.text.trim());
-        if (mounted) Navigator.pushReplacementNamed(context, '/ai-entry');
+        if (!mounted) return;
+        // First time signed in: walk through how to use it, spoken aloud.
+        final seen = await ref.read(localStoreProvider).getMeta('tutorial_done');
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, seen == null ? '/tutorial' : '/ai-entry');
+        }
       });
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/speech/bangla_words.dart';
+import '../../core/speech/budget_alerts.dart';
 import '../../core/speech/categories.dart';
 import '../../data/api/api_client.dart';
 import '../../data/database/database.dart';
@@ -133,7 +134,37 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
   void _syncQuietly() {
     final family = ref.read(authProvider).family;
     if (family == null) return;
-    ref.read(syncServiceProvider).sync(family.id).then((_) {}, onError: (_) {});
+    ref
+        .read(syncServiceProvider)
+        .sync(family.id)
+        // Once the server has the entry it can say whether a budget is nearly used up.
+        .then((_) => _speakBudgetAlerts(family.id), onError: (_) {});
+  }
+
+  /// Say "budget nearly used" / "over budget" when a budget crosses 80% or 100% (FR-BUD-02).
+  Future<void> _speakBudgetAlerts(String familyId) async {
+    try {
+      final store = ref.read(localStoreProvider);
+      final month = DateTime.now().toUtc().add(const Duration(hours: 6)).toIso8601String().substring(0, 7);
+      final raw = await ref.read(apiClientProvider).budgets(familyId);
+      final budgets = [
+        for (final b in raw)
+          BudgetStatus(b['categoryId'] as String?, (b['nameBn'] ?? '') as String, (b['limitPaisa'] as num).toInt(),
+              (b['spentPaisa'] as num).toInt(), b['level'] as String),
+      ];
+      final last = <String, String>{};
+      for (final b in budgets) {
+        final key = b.categoryId ?? 'overall';
+        final v = await store.getMeta('budget_alert:$month:$key');
+        if (v != null) last[key] = v;
+      }
+      for (final a in alertsToSpeak(budgets, last)) {
+        await ref.read(voiceServiceProvider).speak(a.text);
+        await store.setMeta('budget_alert:$month:${a.key}', a.level);
+      }
+    } catch (_) {
+      // Alerts are a nicety; offline or any error just means no announcement.
+    }
   }
 
   Future<void> _syncNow(FamilyInfo family) => _guard(() async {
