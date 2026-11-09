@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "./app.js";
+import { csvCell, csvRow, dhakaStamp, paisaToDecimal } from "./csv.js";
 import { budgetLevel, effectiveBudgets } from "./budgets.js";
 import { canAssignRole, canManageMember } from "./auth.js";
 import type { Db } from "./db/client.js";
@@ -152,5 +153,27 @@ describe("budgets", () => {
       [null, 4000000, true],
     ]);
     expect(effectiveBudgets(rows, "2026-10").find((b) => b.categoryId === "bazaar")?.inherited).toBe(false);
+  });
+});
+
+describe("csv export", () => {
+  it("requires auth", async () => {
+    expect((await app.inject({ method: "GET", url: "/v1/families/x/reports/export.csv" })).statusCode).toBe(401);
+  });
+
+  it("quotes cells and blocks spreadsheet formulas", () => {
+    expect(csvCell('say "hi", ok')).toBe('"say ""hi"", ok"');
+    expect(csvCell("বাজার")).toBe("বাজার");
+    expect(csvCell("=HYPERLINK(\"http://evil\")")).toBe('"\'=HYPERLINK(""http://evil"")"');
+    expect(csvCell("-5 note")).toBe("'-5 note");
+    expect(csvCell(-500)).toBe("-500");
+    expect(csvRow(["a", null, 3])).toBe("a,,3");
+  });
+
+  it("formats paisa exactly and dates in Dhaka time", () => {
+    expect(paisaToDecimal(0)).toBe("0.00");
+    expect(paisaToDecimal(5)).toBe("0.05");
+    expect(paisaToDecimal(123456)).toBe("1234.56");
+    expect(dhakaStamp(new Date("2026-11-30T18:30:00Z"))).toBe("2026-12-01 00:30");
   });
 });
