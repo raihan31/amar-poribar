@@ -26,7 +26,8 @@ export async function transactionRoutes(app: FastifyInstance, { db }: AppDeps) {
 
   app.get<FamilyParams>("/v1/families/:familyId/transactions", async (req) => {
     const { familyId } = req.params;
-    await requireRole(db, familyId, req.user.sub, "viewer");
+    // Viewers get summaries only, not individual entries (FR-FAM-05).
+    await requireRole(db, familyId, req.user.sub, "member");
     const { month } = parseOr400(ListQuerySchema, req.query);
     const conditions = [visibleTo(familyId, req.user.sub)];
     if (month) {

@@ -6,7 +6,7 @@ import { csvCell, csvRow, dhakaStamp, paisaToDecimal } from "./csv.js";
 import { budgetLevel, effectiveBudgets } from "./budgets.js";
 import { canAssignRole, canManageMember } from "./auth.js";
 import type { Db } from "./db/client.js";
-import { dayRange, monthRange } from "./month.js";
+import { dayRange, monthRange, monthsBetween } from "./month.js";
 import { OtpStore } from "./otp.js";
 import { CreateFestivalBudgetSchema, UpdateFestivalBudgetSchema, UpdateTransactionSchema, CreateAccountSchema, UpdateAccountSchema, UpdateCategorySchema } from "@amar-poribar/shared";
 
@@ -237,5 +237,17 @@ describe("recurring entries", () => {
     expect(CreateRecurringSchema.safeParse(ok).success).toBe(true);
     expect(CreateRecurringSchema.safeParse({ ...ok, dayOfMonth: 32 }).success).toBe(false);
     expect(CreateRecurringSchema.safeParse({ ...ok, endsOn: "2025-12-31" }).success).toBe(false);
+  });
+});
+
+describe("remittance report", () => {
+  it("requires auth", async () => {
+    expect((await app.inject({ method: "GET", url: "/v1/families/x/reports/remittances" })).statusCode).toBe(401);
+  });
+
+  it("lists months across a year boundary", () => {
+    expect(monthsBetween("2026-11", "2027-02")).toEqual(["2026-11", "2026-12", "2027-01", "2027-02"]);
+    expect(monthsBetween("2026-05", "2026-05")).toEqual(["2026-05"]);
+    expect(monthsBetween("2026-06", "2026-05")).toEqual([]);
   });
 });

@@ -24,3 +24,15 @@ export function dayRange(from: string, to: string): { start: Date; end: Date } {
   const end = new Date(new Date(`${to}T00:00:00+06:00`).getTime() + 24 * 60 * 60 * 1000);
   return { start, end };
 }
+
+/** Every YYYY-MM from `from` to `to` inclusive, oldest first. */
+export function monthsBetween(from: string, to: string): string[] {
+  const out: string[] = [];
+  let m = from;
+  while (m <= to && out.length < 120) {
+    out.push(m);
+    const [y, mo] = m.split("-").map(Number) as [number, number];
+    m = mo === 12 ? `${y + 1}-01` : `${y}-${String(mo + 1).padStart(2, "0")}`;
+  }
+  return out;
+}
