@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/speech/voice_service.dart';
 import '../../data/api/api_client.dart';
 
 const _tokenKey = 'amar-poribar.token';
@@ -75,3 +76,5 @@ final apiClientProvider = Provider<ApiClient>((ref) => ApiClient());
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(ref.watch(apiClientProvider));
 });
+
+final voiceServiceProvider = Provider<VoiceService>((ref) => DeviceVoiceService());
