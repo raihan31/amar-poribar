@@ -13,6 +13,7 @@ import { familyRoutes } from "./routes/families.js";
 import { inviteRoutes } from "./routes/invites.js";
 import { recurringRoutes } from "./routes/recurring.js";
 import { reportRoutes } from "./routes/reports.js";
+import { syncRoutes } from "./routes/sync.js";
 import { transactionRoutes } from "./routes/transactions.js";
 
 export interface AppDeps {
@@ -39,6 +40,7 @@ export async function buildApp(deps: AppDeps) {
   await app.register(async (scope) => authRoutes(scope, deps));
   await app.register(async (scope) => familyRoutes(scope, deps));
   await app.register(async (scope) => inviteRoutes(scope, deps));
+  await app.register(async (scope) => syncRoutes(scope, deps));
   await app.register(async (scope) => transactionRoutes(scope, deps));
   await app.register(async (scope) => aiRoutes(scope, deps));
   await app.register(async (scope) => budgetRoutes(scope, deps));

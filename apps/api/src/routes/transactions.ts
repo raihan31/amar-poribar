@@ -4,8 +4,9 @@ import { z } from "zod";
 import { CreateTransactionSchema, MonthSchema, UpdateTransactionSchema } from "@amar-poribar/shared";
 import type { AppDeps } from "../app.js";
 import { canEditAll, requireRole } from "../auth.js";
-import { accounts, categories, transactions } from "../db/schema.js";
+import { accounts, bumpSyncSeq, categories, transactions } from "../db/schema.js";
 import { HttpError, parseOr400 } from "../errors.js";
+import { nextHlc } from "../hlc.js";
 import { monthRange } from "../month.js";
 
 type FamilyParams = { Params: { familyId: string } };
@@ -75,6 +76,7 @@ export async function transactionRoutes(app: FastifyInstance, { db }: AppDeps) {
         familyId,
         paidByUserId: req.user.sub,
         createdBy: req.user.sub,
+        hlc: nextHlc(),
       })
       .onConflictDoNothing()
       .returning();
@@ -100,6 +102,8 @@ export async function transactionRoutes(app: FastifyInstance, { db }: AppDeps) {
       .set({
         ...fields,
         ...(occurredAt ? { occurredAt: new Date(occurredAt) } : {}),
+        hlc: nextHlc(txn.hlc),
+        syncSeq: bumpSyncSeq,
         updatedAt: new Date(),
       })
       .where(eq(transactions.id, txnId))
@@ -116,7 +120,7 @@ export async function transactionRoutes(app: FastifyInstance, { db }: AppDeps) {
     if (txn.createdBy !== req.user.sub && !canEditAll(role)) {
       throw new HttpError(403, "forbidden", "You can only delete your own entries");
     }
-    await db.update(transactions).set({ deletedAt: sql`now()` }).where(eq(transactions.id, txnId));
+    await db.update(transactions).set({ deletedAt: sql`now()`, hlc: nextHlc(txn.hlc), syncSeq: bumpSyncSeq, updatedAt: new Date() }).where(eq(transactions.id, txnId));
     return reply.status(204).send();
   });
 }
