@@ -26,6 +26,8 @@ dependencies:
   uuid: ^4.3.3
   http: ^1.2.2 # REST API client (auth, AI parsing)
   shared_preferences: ^2.3.2 # Keeps the sign-in token
+  speech_to_text: ^7.0.0 # Device Bangla speech recognition (FR-VOICE-01)
+  flutter_tts: ^4.2.0 # Reads drafts and the monthly summary aloud (FR-VOICE-03/04)
   
   # UI & Utils
   fl_chart: ^0.65.0
