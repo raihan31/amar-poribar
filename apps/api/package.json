@@ -9,6 +9,7 @@
     "start": "node --env-file-if-exists=../../.env dist/server.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
+    "e2e": "node scripts/e2e.mjs",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate"
   },

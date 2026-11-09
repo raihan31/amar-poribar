@@ -278,7 +278,7 @@ Request:
 ```json
 {
   "nodeId": "device-uuid",
-  "since": "<hlc string or null>",
+  "cursor": "<opaque string or null>",
   "changes": { "transactions": [ { "id": "uuid", "hlc": "<hlc>", "...": "row fields" } ] }
 }
 ```
@@ -286,11 +286,11 @@ Request:
 Response:
 
 ```json
-{ "serverHlc": "<hlc>", "changes": { "transactions": [ ... ] } }
+{ "cursor": "<opaque string>", "more": false, "applied": 3, "rejected": [ { "id": "uuid", "reason": "duplicate_trx_id" } ], "changes": { "transactions": [ ... ] } }
 ```
 
 Rules:
-- `since` is the highest server HLC the device has already seen. `null` means a first sync, and the server returns everything.
+- `cursor` is the value the server returned last time; `null` means a first sync and the server returns everything. The cursor is a delivery position, **not** an HLC: devices assign their own HLCs, so an entry made offline can arrive with an HLC older than data the server already holds, and an HLC-based cursor would skip it. The HLC decides which version of a record wins; the cursor decides what a device still has to download.
 - Each row carries its own `hlc`. The server keeps a row only when the incoming `hlc` is greater than the stored one (per record, last-write-wins). Ties are broken by `nodeId`, so every device reaches the same result.
 - Deletes are tombstones: a row with `deletedAt` set and a newer `hlc`. They are kept for at least 30 days (FR-TXN-03).
 - Pushes are idempotent. Sending the same changes twice leaves the same state, so a retry after a dropped connection is safe.
@@ -298,7 +298,8 @@ Rules:
 - Private transactions (FR-TXN-05) are returned only to their creator.
 - The same merge function is used for server sync and peer-to-peer sync (FR-SYNC-04). The device may send `changes` to a peer or to the server and gets the same result.
 - Only `transactions` are synced this way. Accounts, categories, budgets and family membership are managed by admins over the REST endpoints above, and the mobile app keeps a read-only copy that it refreshes when online. This avoids two devices inventing different IDs for the same category.
-- Large syncs are paged: the server may return `"more": true` with a `serverHlc` to continue from.
+- Large syncs are paged: when `more` is true, call again with the returned `cursor`.
+- Rows the server cannot accept are listed in `rejected` with a reason (`invalid`, `unknown_reference`, `duplicate_trx_id`, `forbidden`, `id_taken`); the rest of the batch still applies.
 
 
 ### 4.3 Software interfaces

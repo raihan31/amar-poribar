@@ -226,6 +226,38 @@ export const ReceiptRequestSchema = z.object({
 });
 export type ReceiptRequest = z.infer<typeof ReceiptRequestSchema>;
 
+const HlcSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z-[0-9A-F]{4}-.+$/, "Not an HLC");
+
+/** A transaction as exchanged by sync (SRS §4.3.1). The same JSON the mobile app stores. */
+export const SyncTransactionSchema = z.object({
+  id: z.uuid(),
+  type: TransactionTypeSchema,
+  amountPaisa: AmountPaisaSchema,
+  feePaisa: z.number().int().min(0).default(0),
+  occurredAt: z.iso.datetime({ offset: true }),
+  categoryId: z.uuid().nullable().optional(),
+  accountId: z.uuid().nullable().optional(),
+  note: z.string().max(500).nullable().optional(),
+  counterparty: z.string().max(120).nullable().optional(),
+  trxId: z.string().max(40).nullable().optional(),
+  source: TransactionSourceSchema.default("manual"),
+  isPrivate: z.boolean().default(false),
+  /** Set when the record was deleted; the row stays as a tombstone with a newer `hlc`. */
+  deletedAt: z.iso.datetime({ offset: true }).nullable().optional(),
+  hlc: HlcSchema,
+});
+export type SyncTransaction = z.infer<typeof SyncTransactionSchema>;
+
+export const SyncRequestSchema = z.object({
+  nodeId: z.string().min(1).max(64),
+  /** Opaque cursor from the previous response; null on a first sync. */
+  cursor: z.string().regex(/^\d{1,18}$/).nullable().default(null),
+  changes: z.object({ transactions: z.array(z.unknown()).max(500).default([]) }).default({ transactions: [] }),
+});
+export type SyncRequest = z.infer<typeof SyncRequestSchema>;
+
 export const MonthSummarySchema = z.object({
   month: MonthSchema,
   incomePaisa: z.number().int(),

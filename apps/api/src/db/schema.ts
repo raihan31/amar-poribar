@@ -5,6 +5,7 @@ import {
   index,
   integer,
   pgEnum,
+  pgSequence,
   pgTable,
   primaryKey,
   real,
@@ -14,6 +15,13 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { ACCOUNT_TYPES, ROLES } from "@amar-poribar/shared";
+
+/**
+ * Delivery order for sync. HLC decides which version of a record wins; this sequence decides what a device
+ * still has to download. Devices assign their own HLCs, so an offline entry can arrive with an HLC older than
+ * what the server already holds, and an HLC cursor would skip it.
+ */
+export const txnSyncSeq = pgSequence("txn_sync_seq");
 
 export const roleEnum = pgEnum("role", ROLES);
 export const accountTypeEnum = pgEnum("account_type", ACCOUNT_TYPES);
@@ -113,9 +121,14 @@ export const transactions = pgTable(
     isPrivate: boolean("is_private").notNull().default(false),
     createdBy: uuid("created_by").notNull().references(() => users.id),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
+    /** Hybrid logical clock of the last change (SRS FR-SYNC-02). Empty for rows that predate sync. */
+    hlc: text("hlc").notNull().default(""),
+    /** Bumped on every insert/update (see `bumpSyncSeq`); the cursor sync clients page by. */
+    syncSeq: bigint("sync_seq", { mode: "number" }).notNull().default(sql`nextval('txn_sync_seq')`),
     ...timestamps,
   },
   (t) => [
+    index("txn_family_seq_idx").on(t.familyId, t.syncSeq),
     index("txn_family_time_idx").on(t.familyId, t.occurredAt.desc()),
     // SRS FR-TXN-04: no duplicate MFS transactions.
     uniqueIndex("txn_family_trx_uidx").on(t.familyId, t.trxId).where(sql`${t.trxId} is not null`),
@@ -190,3 +203,6 @@ export const aiSummaries = pgTable(
   },
   (t) => [primaryKey({ columns: [t.familyId, t.month, t.locale, t.factsHash] })],
 );
+
+/** Use in every UPDATE of `transactions` so sync clients see the change. */
+export const bumpSyncSeq = sql`nextval('txn_sync_seq')`;

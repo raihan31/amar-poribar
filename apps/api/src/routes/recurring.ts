@@ -6,6 +6,7 @@ import type { AppDeps } from "../app.js";
 import { requireRole } from "../auth.js";
 import { accounts, categories, recurringTemplates, transactions } from "../db/schema.js";
 import { HttpError, parseOr400 } from "../errors.js";
+import { nextHlc } from "../hlc.js";
 import { currentDhakaMonth } from "../month.js";
 import { dueDateIn, isDueIn, reminderState } from "../recurring.js";
 
@@ -96,7 +97,7 @@ export async function recurringRoutes(app: FastifyInstance, { db }: AppDeps) {
         familyId, type: t.type, amountPaisa: t.amountPaisa,
         occurredAt: new Date(`${dueDateIn(month, t.dayOfMonth)}T12:00:00+06:00`),
         categoryId: t.categoryId, accountId: t.accountId, note: t.name,
-        source: "manual", paidByUserId: req.user.sub, createdBy: req.user.sub,
+        source: "manual", paidByUserId: req.user.sub, createdBy: req.user.sub, hlc: nextHlc(),
       }).returning();
       await tx.update(recurringTemplates).set({ lastConfirmedMonth: month }).where(eq(recurringTemplates.id, recurringId));
       return row;
