@@ -18,9 +18,9 @@ This SRS specifies the software requirements for Amar Poribar, a family expense 
 The system has three parts:
 - a **REST API** backend,
 - a **web app** (dashboard and entry),
-- an **Android mobile app** (React Native / Expo; iOS later).
+- an **Android mobile app** (Flutter / Dart, offline-first; iOS later).
 
-All three share TypeScript packages for domain types, validation and AI logic in **one monorepo**. Requirements are tagged with their phase (P1 = MVP, P2 = v1, P3 = growth) as defined in BRD §5.
+The API and web app share TypeScript packages for domain types, validation and AI logic. All three live in **one monorepo**. The Flutter mobile app cannot import the TypeScript packages, so it keeps its own Dart models and mirrors the API contract (§4.3) and the shared rules (categories, money and Bangla formatting, SMS templates). Requirements are tagged with their phase (P1 = MVP, P2 = v1, P3 = growth) as defined in BRD §5.
 
 ### 1.3 Definitions
 See BRD §12. In addition:
@@ -43,7 +43,7 @@ See BRD §12. In addition:
 ```
 ┌──────────────┐   ┌──────────────┐
 │  apps/mobile │   │   apps/web   │      clients (Bangla/English UI)
-│  Expo / RN   │   │   Next.js    │
+│  Flutter     │   │   Next.js    │
 └──────┬───────┘   └──────┬───────┘
        │  HTTPS + JSON (JWT)  │
        └──────────┬───────────┘
@@ -79,7 +79,8 @@ The AI key is held **only by the API**. Clients never call the AI provider direc
 - Server: Node.js 22 LTS, PostgreSQL 16+, Linux containers.
 
 ### 2.4 Design and implementation constraints
-- TypeScript everywhere. pnpm workspaces and Turborepo.
+- TypeScript for the API, web app and shared packages, using pnpm workspaces and Turborepo. The mobile app is Flutter (Dart 3, SDK ≥ 3.0) and sits outside the pnpm workspace, with its own `pubspec.yaml`.
+- Mobile stack: Riverpod (state), Drift on SQLite (local store), `sqlite_crdt` (conflict-free sync), `nearby_connections` (peer-to-peer sync), `fl_chart` (charts).
 - Money is stored as an integer number of paisa (`bigint`/`integer`), never as a float.
 - All timestamps are stored in UTC and displayed in `Asia/Dhaka`.
 - No `READ_SMS` permission (Google Play policy). SMS comes in through paste or the Android share sheet.
@@ -192,8 +193,10 @@ Priority: **M** = must, **S** = should, **C** = could.
 
 | ID | Requirement | Pri | Phase |
 |---|---|---|---|
-| FR-SYNC-01 | The mobile app can capture manual transactions offline in a local store and sync when online | S | P2 |
-| FR-SYNC-02 | Records use client-generated UUIDs; the server treats create as idempotent. Last-write-wins, using `updatedAt` per record | S | P2 |
+| FR-SYNC-01 | The mobile app (Flutter, Drift/SQLite local store) can capture manual transactions offline and sync when online | S | P2 |
+| FR-SYNC-02 | Records use client-generated UUIDs. Conflicts are resolved per record (last-write-wins) using a **hybrid logical clock (HLC)** timestamp that each device stamps on every change (`sqlite_crdt`). The server treats create as idempotent and stores the HLC; it does not rely on device wall-clock `updatedAt` | S | P2 |
+| FR-SYNC-04 | **Peer-to-peer sync.** Family devices that are near each other can exchange changesets directly (Android Nearby Connections) with no internet. Each side sends its HLC, receives the changes made after it, and merges them with the same HLC rule as FR-SYNC-02. The transport sits behind an adapter so it can be swapped (for example Wi-Fi Direct) | S | P2 |
+| FR-SYNC-05 | **Server sync.** When online, the app exchanges the same HLC changesets with `apps/api` so that devices that are never near each other still converge. Merge results must be identical whether changes arrive from a peer or from the server. *Not yet built: the mobile app currently implements only FR-SYNC-04* | S | P2 |
 | FR-SYNC-03 | AI parsing of text captured offline is queued and run once the device is online | S | P2 |
 
 ### 3.11 Voice and low-literacy interaction (FR-VOICE)
@@ -335,7 +338,7 @@ text / voice transcript / SMS
 | NFR-08 | Reliability | Daily database backups kept 14 days; restore tested quarterly |
 | NFR-09 | Localisation | 100% UI string coverage in bn and en; Bangla fonts (Noto Sans Bengali / Hind Siliguri) bundled |
 | NFR-10 | Accessibility | WCAG 2.1 AA; screen-reader labels on all actions |
-| NFR-11 | Maintainability | TypeScript strict mode; shared schemas; ≥ 70% unit-test coverage for `packages/*`; CI runs lint, typecheck and tests |
+| NFR-11 | Maintainability | TypeScript strict mode; shared schemas; ≥ 70% unit-test coverage for `packages/*`; the mobile app passes `flutter analyze` and has `flutter test` coverage of its domain logic; CI runs lint, typecheck and tests for both toolchains |
 | NFR-12 | Observability | Structured JSON logs (pino) without PII; error tracking; AI usage metrics per family |
 | NFR-13 | Cost | AI cost ≤ ৳15 per active family per month (BO-6) |
 | NFR-14 | Voice | Speech recognition and text-to-speech run on the device; voice entry → read-back in ≤ 3 s p95 when the offline parser handles it |
@@ -351,9 +354,9 @@ amar-poribar/
 ├── apps/
 │   ├── api/        Fastify REST API + Drizzle (PostgreSQL)
 │   ├── web/        Next.js web app
-│   └── mobile/     Expo (React Native) Android/iOS app
+│   └── mobile/     Flutter (Dart) Android/iOS app, offline-first
 ├── packages/
-│   ├── shared/     Zod schemas, types, categories, money + Bangla formatting, i18n
+│   ├── shared/     Zod schemas, types, categories, money + Bangla formatting, i18n (API and web only)
 │   ├── ai/         MFS SMS parser + Claude-based expense parser
 │   └── tsconfig/   Shared TypeScript configs
 ├── docs/           BRD, SRS
@@ -379,7 +382,7 @@ amar-poribar/
 | BR-11 | FR-AI-09, FR-TXN-07 |
 | BR-12 | FR-AI-10 |
 | BR-13 | FR-FAM-05 |
-| BR-14 | FR-SYNC-01..03 |
+| BR-14 | FR-SYNC-01..05 |
 | BR-15 | FR-TXN-06, FR-NOT-03 |
 | BR-16 | FR-TXN-05 |
 | BR-17 | (P3, payment gateway, to be specified) |
