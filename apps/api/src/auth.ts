@@ -55,3 +55,17 @@ export async function requireRole(db: Db, familyId: string, userId: string, minR
 export function canEditAll(role: Role): boolean {
   return ROLE_RANK[role] >= ROLE_RANK.admin;
 }
+
+/** Roles that `actor` may assign to others. Only owners can create admins; nobody assigns owner. */
+export function canAssignRole(actor: Role, target: Role): boolean {
+  if (target === "owner") return false;
+  if (target === "admin") return actor === "owner";
+  return ROLE_RANK[actor] >= ROLE_RANK.admin;
+}
+
+/** Whether `actor` may change or remove a member currently holding `current`. */
+export function canManageMember(actor: Role, current: Role): boolean {
+  if (current === "owner") return false;
+  if (current === "admin") return actor === "owner";
+  return ROLE_RANK[actor] >= ROLE_RANK.admin;
+}
