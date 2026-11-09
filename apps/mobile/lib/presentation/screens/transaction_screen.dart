@@ -20,8 +20,7 @@ class _TransactionScreenState extends ConsumerState<TransactionScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(isExpense ? 'Add Expense' : 'Add Income'),
-        backgroundColor:
-            isExpense ? Colors.red.shade800 : Colors.green.shade800,
+        backgroundColor: isExpense ? Colors.red.shade800 : Colors.green.shade800,
         foregroundColor: Colors.white,
       ),
       body: Padding(
@@ -52,58 +51,48 @@ class _TransactionScreenState extends ConsumerState<TransactionScreen> {
               ],
             ),
             const SizedBox(height: 24),
-
+            
             TextField(
               controller: amountController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
               style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               decoration: InputDecoration(
                 prefixText: '৳ ',
                 labelText: 'Amount',
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
             const SizedBox(height: 16),
-
+            
             TextField(
               controller: noteController,
               decoration: InputDecoration(
                 labelText: 'Note or Category',
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
             const Spacer(),
-
+            
             SizedBox(
               height: 56,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isExpense ? Colors.red.shade800 : Colors.green.shade800,
+                  backgroundColor: isExpense ? Colors.red.shade800 : Colors.green.shade800,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: () async {
                   final amount = double.tryParse(amountController.text) ?? 0.0;
                   if (amount > 0) {
                     if (isExpense) {
-                      await ref
-                          .read(appStateProvider.notifier)
-                          .addExpense(amount, note: noteController.text.trim());
+                      await ref.read(appStateProvider.notifier).addExpense(amount, note: noteController.text.trim());
                     } else {
-                      await ref
-                          .read(appStateProvider.notifier)
-                          .addIncome(amount, note: noteController.text.trim());
+                      await ref.read(appStateProvider.notifier).addIncome(amount, note: noteController.text.trim());
                     }
                     if (context.mounted) Navigator.pop(context);
                   }
                 },
-                child: const Text('Save Transaction',
-                    style: TextStyle(fontSize: 18)),
+                child: const Text('Save Transaction', style: TextStyle(fontSize: 18)),
               ),
             ),
           ],

@@ -16,13 +16,7 @@ void main() {
           return http.Response(jsonEncode({'accessToken': 'tok'}), 200);
         }
         seenAuth = req.headers['authorization'];
-        return http.Response(
-            jsonEncode({
-              'families': [
-                {'id': 'f1', 'name': 'Rahman', 'role': 'owner'}
-              ]
-            }),
-            200);
+        return http.Response(jsonEncode({'families': [{'id': 'f1', 'name': 'Rahman', 'role': 'owner'}]}), 200);
       }),
     );
     await client.verifyOtp('01712345678', '123456');
@@ -42,17 +36,9 @@ void main() {
           utf8.encode(jsonEncode({
             'drafts': [
               {
-                'type': 'expense',
-                'amountPaisa': 85000,
-                'feePaisa': 0,
-                'occurredAt': '2026-11-09T10:00:00Z',
-                'categoryKey': 'bazaar',
-                'accountType': 'cash',
-                'note': 'বাজার',
-                'counterparty': null,
-                'trxId': null,
-                'source': 'ai_text',
-                'confidence': 0.9,
+                'type': 'expense', 'amountPaisa': 85000, 'feePaisa': 0, 'occurredAt': '2026-11-09T10:00:00Z',
+                'categoryKey': 'bazaar', 'accountType': 'cash', 'note': 'বাজার', 'counterparty': null,
+                'trxId': null, 'source': 'ai_text', 'confidence': 0.9,
               }
             ],
             'usedAi': true,
@@ -71,28 +57,16 @@ void main() {
   test('API errors surface the server message and flag 401', () async {
     final client = ApiClient(
       baseUrl: 'http://x',
-      client: MockClient((_) async => http.Response(
-          jsonEncode({
-            'error': {
-              'code': 'invalid_otp',
-              'message': 'Invalid or expired code'
-            }
-          }),
-          401)),
+      client: MockClient((_) async => http.Response(jsonEncode({'error': {'code': 'invalid_otp', 'message': 'Invalid or expired code'}}), 401)),
     );
     expect(
       () => client.verifyOtp('01712345678', '000000'),
-      throwsA(isA<ApiException>()
-          .having((e) => e.isUnauthorized, 'isUnauthorized', true)
-          .having((e) => e.message, 'message', 'Invalid or expired code')),
+      throwsA(isA<ApiException>().having((e) => e.isUnauthorized, 'isUnauthorized', true).having((e) => e.message, 'message', 'Invalid or expired code')),
     );
   });
 
   test('network failure becomes a friendly ApiException', () async {
-    final client = ApiClient(
-        baseUrl: 'http://x',
-        client: MockClient((_) async => throw Exception('socket')));
-    expect(() => client.requestOtp('01712345678'),
-        throwsA(isA<ApiException>().having((e) => e.status, 'status', 0)));
+    final client = ApiClient(baseUrl: 'http://x', client: MockClient((_) async => throw Exception('socket')));
+    expect(() => client.requestOtp('01712345678'), throwsA(isA<ApiException>().having((e) => e.status, 'status', 0)));
   });
 }

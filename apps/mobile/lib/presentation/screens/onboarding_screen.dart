@@ -23,8 +23,8 @@ class OnboardingScreen extends ConsumerWidget {
                 'Welcome to\nAmar Poribar',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -33,6 +33,7 @@ class OnboardingScreen extends ConsumerWidget {
                 style: TextStyle(color: Colors.grey, fontSize: 16),
               ),
               const SizedBox(height: 60),
+              
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -53,6 +54,7 @@ class OnboardingScreen extends ConsumerWidget {
                 onPressed: () => Navigator.pushNamed(context, '/login'),
               ),
               const SizedBox(height: 8),
+
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),

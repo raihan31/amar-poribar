@@ -92,9 +92,7 @@ void main() {
     expect(later.rows.map((r) => r['id']), ['2', '1']);
   });
 
-  test(
-      'an entry made offline with an old HLC is still delivered after the cursor',
-      () async {
+  test('an entry made offline with an old HLC is still delivered after the cursor', () async {
     // The flaw an HLC cursor has: B's entry carries an older HLC than what A already holds.
     final a = await device(() => DateTime.utc(2026, 11, 9, 12));
     final b = await device(() => DateTime.utc(2026, 11, 9, 8));
