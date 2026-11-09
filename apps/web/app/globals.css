@@ -85,3 +85,11 @@ button.danger { background: var(--danger); }
 .bar { height: 6px; border-radius: 3px; background: var(--border); margin-top: 6px; overflow: hidden; }
 .bar > span { display: block; height: 100%; background: var(--accent); }
 @media (max-width: 420px) { .stats { grid-template-columns: 1fr; } }
+
+/* Budgets (FR-BUD) */
+.budget-status { font-size: 0.8rem; padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border); }
+.budget-status.warning { color: #8a5a00; border-color: #8a5a00; }
+.budget-status.exceeded { color: var(--danger); border-color: var(--danger); }
+.bar.warning > span { background: #c98a00; }
+.bar.exceeded > span { background: var(--danger); }
+.budget-edit { display: grid; grid-template-columns: 1fr 120px; gap: 8px; align-items: center; margin: 6px 0; }
