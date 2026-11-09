@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
 import { and, desc, eq, gte, isNull, lt, or, sql } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
-import { AiUnavailableError, askQuestion, monthlySummary, parseInput, type AskTools, type SummaryInput } from "@amar-poribar/ai";
+import { AiUnavailableError, askQuestion, monthlySummary, parseInput, parseReceipt, type AskTools, type SummaryInput } from "@amar-poribar/ai";
 import {
   AskRequestSchema,
   ParseRequestSchema,
+  ReceiptRequestSchema,
   SummaryQuerySchema,
   type MonthlyAiSummary,
   type ParseResponse,
@@ -170,4 +171,30 @@ export async function aiRoutes(app: FastifyInstance, { db, anthropic, aiModel }:
       throw err;
     }
   });
+  /** Receipt or memo photo → drafts to confirm (FR-AI-09). The image is read once and not stored. */
+  app.post<FamilyParams>(
+    "/v1/families/:familyId/ai/receipt",
+    // Base64 inflates ~33%, so a 5 MB photo needs a larger body limit than Fastify's 1 MB default.
+    { bodyLimit: 8 * 1024 * 1024 },
+    async (req): Promise<ParseResponse> => {
+      const { familyId } = req.params;
+      await requireRole(db, familyId, req.user.sub, "member");
+      const { imageBase64, mediaType } = parseOr400(ReceiptRequestSchema, req.body);
+      if (!anthropic) throw new HttpError(503, "ai_unavailable", "Receipt reading is not available right now");
+      if (!(await hasAiQuota(db, familyId))) throw new HttpError(429, "ai_quota", "This month's AI limit has been reached");
+
+      const cats = await db
+        .select({ key: categories.key, nameEn: categories.nameEn, nameBn: categories.nameBn, kind: categories.kind })
+        .from(categories)
+        .where(and(eq(categories.familyId, familyId), eq(categories.isHidden, false)));
+      try {
+        const drafts = await parseReceipt({ base64: imageBase64, mediaType }, { client: anthropic, categories: cats, model: aiModel });
+        await recordAiUse(db, familyId);
+        return { drafts, usedAi: true };
+      } catch (err) {
+        if (err instanceof AiUnavailableError) throw new HttpError(503, "ai_unavailable", "Couldn't read that photo; please enter it manually");
+        throw err;
+      }
+    },
+  );
 }

@@ -215,6 +215,17 @@ export const AskRequestSchema = z.object({
 });
 export type AskRequest = z.infer<typeof AskRequestSchema>;
 
+/** Receipt photo as base64 (about 5 MB of image, FR-TXN-07). */
+export const ReceiptRequestSchema = z.object({
+  mediaType: z.enum(["image/jpeg", "image/png", "image/webp"]),
+  imageBase64: z
+    .string()
+    .min(100, "Image is empty")
+    .max(7_000_000, "Image is too large (limit about 5 MB)")
+    .regex(/^[A-Za-z0-9+/]+={0,2}$/, "Expected base64 image data"),
+});
+export type ReceiptRequest = z.infer<typeof ReceiptRequestSchema>;
+
 export const MonthSummarySchema = z.object({
   month: MonthSchema,
   incomePaisa: z.number().int(),
