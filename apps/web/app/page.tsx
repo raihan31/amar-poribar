@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   draftToSpeech,
   formatBDT,
@@ -15,7 +15,12 @@ import {
 import { api, ApiError } from "../lib/api";
 import { speak, stopSpeaking, useSpeechRecognition } from "../lib/voice";
 
-interface Family { id: string; name: string; role: string }
+type RoleName = "owner" | "admin" | "member" | "viewer";
+interface Family { id: string; name: string; role: RoleName }
+interface Member { userId: string; role: RoleName; name: string | null; phone: string }
+const ROLE_LABEL: Record<RoleName, "roleOwner" | "roleAdmin" | "roleMember" | "roleViewer"> = {
+  owner: "roleOwner", admin: "roleAdmin", member: "roleMember", viewer: "roleViewer",
+};
 interface Category { id: string; key: string; kind: string; nameBn: string; nameEn: string; icon: string | null }
 interface BudgetRow {
   categoryId: string | null; nameBn: string; nameEn: string;
@@ -98,14 +103,17 @@ function FamilyHome({ token, onLogout }: { token: string; onLogout: () => void }
   const [summary, setSummary] = useState<MonthSummary | null>(null);
   const [aiSummary, setAiSummary] = useState<MonthlyAiSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [month, setMonth] = useState<string | null>(null);
+  // Selected month lives in a ref so changing it does not re-run the initial load below.
+  const monthRef = useRef<string | null>(null);
+  const [meId, setMeId] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const handle = useCallback((e: unknown) => {
     if (e instanceof ApiError && e.status === 401) onLogout();
     else setError((e as Error).message);
   }, [onLogout]);
 
-  const refresh = useCallback(async (fam: Family, m: string | null = month) => {
+  const refresh = useCallback(async (fam: Family, m: string | null = monthRef.current) => {
     const q = m ? `month=${m}` : "";
     const [cats, accs, sum, ai] = await Promise.all([
       api<Category[]>(`/v1/families/${fam.id}/categories`, { token }),
@@ -114,15 +122,27 @@ function FamilyHome({ token, onLogout }: { token: string; onLogout: () => void }
       api<MonthlyAiSummary>(`/v1/families/${fam.id}/ai/summary?locale=bn${q ? `&${q}` : ""}`, { token }),
     ]);
     setCategories(cats); setAccounts(accs); setSummary(sum); setAiSummary(ai);
-  }, [token, month]);
+  }, [token]);
 
   useEffect(() => {
-    api<{ families: Family[] }>("/v1/me", { token })
-      .then(async (me) => {
-        const fam = me.families[0] ?? null;
-        setFamily(fam);
-        if (fam) await refresh(fam);
-      })
+    (async () => {
+      // An invite link looks like /?invite=TOKEN; accept it once the user is signed in.
+      let joinedId: string | null = null;
+      const inviteToken = new URLSearchParams(window.location.search).get("invite");
+      if (inviteToken) {
+        try {
+          const res = await api<{ familyId: string }>(`/v1/invites/${encodeURIComponent(inviteToken)}/accept`, { method: "POST", token, body: {} });
+          joinedId = res.familyId;
+          setNotice(t("joined"));
+        } catch (e) { setError((e as Error).message); }
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+      const me = await api<{ user: { id: string }; families: Family[] }>("/v1/me", { token });
+      setMeId(me.user.id);
+      const fam = me.families.find((f) => f.id === joinedId) ?? me.families[0] ?? null;
+      setFamily(fam);
+      if (fam) await refresh(fam);
+    })()
       .catch(handle)
       .finally(() => setLoaded(true));
   }, [token, refresh, handle]);
@@ -137,12 +157,17 @@ function FamilyHome({ token, onLogout }: { token: string; onLogout: () => void }
       {aiSummary && <SpokenSummary summary={aiSummary} />}
       {summary && (
         <Dashboard summary={summary}
-          onMonth={(m) => { setMonth(m); refresh(family, m).catch(handle); }} />
+          onMonth={(m) => { monthRef.current = m; refresh(family, m).catch(handle); }} />
       )}
       {summary && (
         <Budgets token={token} family={family} month={summary.month} categories={categories}
           spentKey={summary.expensePaisa} onError={handle} />
       )}
+      {meId && (
+        <Members token={token} family={family} meId={meId} onError={handle}
+          onLeft={() => { setFamily(null); setLoaded(false); window.location.reload(); }} />
+      )}
+      {notice && <p className="notice">{notice}</p>}
       {error && <p className="error">{error}</p>}
       <button className="secondary" onClick={onLogout}>লগআউট</button>
     </>
@@ -352,6 +377,87 @@ function Dashboard({ summary, onMonth }: { summary: MonthSummary; onMonth: (m: s
             </li>
           ))}
         </ul>
+      )}
+    </div>
+  );
+}
+
+/** Members, roles and invite links (FR-FAM-02, FR-FAM-03). */
+function Members(props: {
+  token: string; family: Family; meId: string; onError: (e: unknown) => void; onLeft: () => void;
+}) {
+  const { token, family, meId, onError, onLeft } = props;
+  const [members, setMembers] = useState<Member[]>([]);
+  const [role, setRole] = useState<RoleName>("member");
+  const [link, setLink] = useState<string | null>(null);
+  const isOwner = family.role === "owner";
+  const isAdmin = isOwner || family.role === "admin";
+  const base = `/v1/families/${family.id}`;
+
+  const load = useCallback(() => {
+    api<Member[]>(`${base}/members`, { token }).then(setMembers).catch(onError);
+  }, [base, token, onError]);
+  useEffect(load, [load]);
+
+  /** Mirrors the server rules: only the owner manages admins; the owner is never changed. */
+  const canManage = (m: Member) => m.role !== "owner" && m.userId !== meId && (m.role !== "admin" || isOwner);
+  const assignable: RoleName[] = isOwner ? ["admin", "member", "viewer"] : ["member", "viewer"];
+
+  async function invite() {
+    try {
+      const res = await api<{ token: string }>(`${base}/invites`, { token, body: { role } });
+      setLink(`${window.location.origin}/?invite=${res.token}`);
+    } catch (e) { onError(e); }
+  }
+  async function changeRole(m: Member, next: RoleName) {
+    try { await api(`${base}/members/${m.userId}`, { method: "PATCH", token, body: { role: next } }); load(); } catch (e) { onError(e); }
+  }
+  async function remove(m: Member) {
+    try {
+      await api(`${base}/members/${m.userId}`, { method: "DELETE", token });
+      if (m.userId === meId) onLeft(); else load();
+    } catch (e) { onError(e); }
+  }
+
+  return (
+    <div className="card">
+      <strong>{t("family")}: {family.name}</strong>
+      <ul>
+        {members.map((m) => (
+          <li key={m.userId} className="member">
+            <span>
+              {m.name ?? m.phone}{m.userId === meId && <span className="muted"> · {t("you")}</span>}
+              <br /><span className="muted">{m.phone}</span>
+            </span>
+            {isAdmin && canManage(m) ? (
+              <select value={m.role} aria-label={t("members")} onChange={(e) => changeRole(m, e.target.value as RoleName)}>
+                {[...new Set([m.role, ...assignable])].map((r) => <option key={r} value={r}>{t(ROLE_LABEL[r])}</option>)}
+              </select>
+            ) : <span className="muted">{t(ROLE_LABEL[m.role])}</span>}
+            {(isAdmin && canManage(m)) ? (
+              <button className="icon danger" aria-label={t("remove")} onClick={() => remove(m)}>✗</button>
+            ) : m.userId === meId && m.role !== "owner" ? (
+              <button className="secondary" onClick={() => remove(m)}>{t("leave")}</button>
+            ) : <span />}
+          </li>
+        ))}
+      </ul>
+      {isAdmin && (
+        <div style={{ marginTop: 12 }}>
+          <div className="row">
+            <select value={role} aria-label={t("inviteMember")} onChange={(e) => setRole(e.target.value as RoleName)}>
+              {assignable.map((r) => <option key={r} value={r}>{t(ROLE_LABEL[r])}</option>)}
+            </select>
+            <button onClick={invite}>{t("inviteMember")}</button>
+          </div>
+          {link && (
+            <>
+              <p className="muted" style={{ marginBottom: 0 }}>{t("inviteLink")}</p>
+              <div className="invite-link">{link}</div>
+              <button className="secondary" onClick={() => navigator.clipboard?.writeText(link).catch(() => {})}>{t("copy")}</button>
+            </>
+          )}
+        </div>
       )}
     </div>
   );

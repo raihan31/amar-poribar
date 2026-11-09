@@ -93,3 +93,10 @@ button.danger { background: var(--danger); }
 .bar.warning > span { background: #c98a00; }
 .bar.exceeded > span { background: var(--danger); }
 .budget-edit { display: grid; grid-template-columns: 1fr 120px; gap: 8px; align-items: center; margin: 6px 0; }
+
+/* Family and members (FR-FAM) */
+.member { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.member:last-child { border-bottom: 0; }
+.member select { min-height: 44px; }
+.invite-link { word-break: break-all; font-size: 0.85rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px; margin: 8px 0; }
+.notice { color: var(--accent); }
