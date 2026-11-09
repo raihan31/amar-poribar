@@ -191,6 +191,16 @@ Priority: **M** = must, **S** = should, **C** = could.
 
 ### 3.10 Offline and sync (FR-SYNC)
 
+**Architecture decision (mobile data).** The Flutter app is local-first. Every device keeps a full copy of the family's data in its own SQLite database and works fully offline. The server (`apps/api`) is one more replica of that data that is always online, not a gatekeeper. All replicas merge with the same HLC rule (FR-SYNC-02), so the result is the same whether changes come from a nearby phone (FR-SYNC-04) or from the server (FR-SYNC-05).
+
+- **Mobile reads and writes** transactions, accounts, categories and budgets in its local database. It never calls the REST create/update/delete endpoints for them; those changes travel through sync.
+- **Mobile still calls REST** for things that need the server: OTP login, family membership and invites, AI parsing (`ai/parse`, `ai/summary`) and the sync endpoint itself.
+- **The web app** has no local database. It is an online client of the REST API, and the server stamps an HLC on every web change so mobile devices receive it on their next sync.
+- **Same-family devices that are online** sync through the server. Peer sync is for the no-internet case, such as a shared phone in a village or a family meeting.
+- **The server is not trusted blindly by devices, and devices are not trusted blindly by the server.** The server checks roles and the clock limit (§4.3.1) before accepting changes.
+
+Consequences: the server schema gains an `hlc` column on synced tables, and the REST create/update endpoints must stamp it. Deletions are tombstones.
+
 | ID | Requirement | Pri | Phase |
 |---|---|---|---|
 | FR-SYNC-01 | The mobile app (Flutter, Drift/SQLite local store) can capture manual transactions offline and sync when online | S | P2 |
