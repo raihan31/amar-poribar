@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/speech/bangla_words.dart';
 import '../../core/speech/categories.dart';
 import '../../data/api/api_client.dart';
+import '../../data/database/database.dart';
 import '../providers/auth_provider.dart';
 import '../providers/providers.dart';
 
@@ -23,6 +24,8 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
   bool _listening = false;
   MonthlySummary? _summary;
   String? _error;
+  String? _notice;
+  List<PendingEntry> _queued = [];
 
   Future<void> _guard(Future<void> Function() fn) async {
     setState(() {
@@ -45,15 +48,86 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
 
   Future<void> _parse(String familyId, {bool spoken = false}) =>
       _guard(() async {
-        var drafts =
-            await ref.read(apiClientProvider).parse(familyId, _text.text);
-        // Voice entries are marked so reports can tell them apart (FR-VOICE-02).
-        if (spoken)
-          drafts = [for (final d in drafts) d.copyWith(source: 'voice')];
-        setState(() => _drafts = drafts);
-        // Read the first draft back so it can be checked by ear (FR-VOICE-03).
-        if (spoken) await _readBack(drafts.isEmpty ? null : drafts.first);
+        try {
+          var drafts =
+              await ref.read(apiClientProvider).parse(familyId, _text.text);
+          // Voice entries are marked so reports can tell them apart (FR-VOICE-02).
+          if (spoken) {
+            drafts = [for (final d in drafts) d.copyWith(source: 'voice')];
+          }
+          setState(() {
+            _drafts = drafts;
+            _notice = null;
+          });
+          // Read the first draft back so it can be checked by ear (FR-VOICE-03).
+          if (spoken) await _readBack(drafts.isEmpty ? null : drafts.first);
+        } on ApiException catch (e) {
+          if (e.status != 0) rethrow;
+          // No connection: keep the text and understand it later (FR-SYNC-03).
+          await ref
+              .read(localStoreProvider)
+              .queueText(_text.text, source: spoken ? 'voice' : 'ai_text');
+          _text.clear();
+          await _loadPending();
+          const msg =
+              'ইন্টারনেট নেই। লেখাটি রাখা হয়েছে; নেটওয়ার্ক পেলে নিজে থেকে বুঝে নেওয়া হবে।';
+          setState(() => _notice = msg);
+          if (spoken) await ref.read(voiceServiceProvider).speak(msg);
+        }
       });
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _processQueue());
+  }
+
+  /// Show items waiting for the AI and entries it has already understood while offline.
+  Future<void> _loadPending() async {
+    final store = ref.read(localStoreProvider);
+    final all = await store.pending();
+    final ready = await ref.read(pendingQueueProvider).readyDrafts();
+    if (!mounted) return;
+    setState(() {
+      _queued = [
+        for (final p in all)
+          if (p.status != 'ready') p
+      ];
+      // Keep drafts from this session, replace the queue-backed ones with the latest.
+      final session = [
+        for (final d in _drafts ?? <TransactionDraft>[])
+          if (d.pendingId == null) d
+      ];
+      final merged = [...session, ...ready];
+      _drafts = merged.isEmpty && _drafts == null ? null : merged;
+    });
+  }
+
+  /// When online, understand what was typed offline. Quiet if there is no connection.
+  Future<void> _processQueue() async {
+    final family = ref.read(authProvider).family;
+    try {
+      if (family != null)
+        await ref.read(pendingQueueProvider).process(family.id);
+    } on ApiException catch (e) {
+      if (e.isUnauthorized) return; // the normal flow will ask to sign in again
+    } catch (_) {
+      // best effort
+    }
+    await _loadPending();
+  }
+
+  Future<void> _discard(int i) async {
+    final d = _drafts![i];
+    if (d.pendingId != null) {
+      await ref.read(localStoreProvider).deletePending(d.pendingId!);
+    }
+    if (!mounted) return;
+    setState(() {
+      _drafts = [..._drafts!]..removeAt(i);
+      if (_drafts!.isEmpty) _drafts = null;
+    });
+  }
 
   /// Best-effort background sync after saving; offline is fine, the next manual sync catches up.
   void _syncQuietly() {
@@ -67,10 +141,15 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
         await sync.refreshReferenceData(family.id);
         final r = await sync.sync(family.id);
         await ref.read(appStateProvider.notifier).reload();
+        await _processQueue();
         if (!mounted) return;
-        final rej = r.rejectedReasons.isEmpty ? '' : ' · ${r.rejectedReasons.length} বাদ';
+        final rej = r.rejectedReasons.isEmpty
+            ? ''
+            : ' · ${r.rejectedReasons.length} বাদ';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('সিঙ্ক হয়েছে: ${r.pushed} পাঠানো, ${r.pulled} পাওয়া$rej')),
+          SnackBar(
+              content: Text(
+                  'সিঙ্ক হয়েছে: ${r.pushed} পাঠানো, ${r.pulled} পাওয়া$rej')),
         );
       });
 
@@ -119,11 +198,18 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
     final accountId = await store.accountIdForType(d.accountType);
     if (d.type == 'income') {
       await notifier.addIncome(d.amountTaka,
-          note: d.note, categoryId: categoryId, accountId: accountId, source: d.source);
+          note: d.note,
+          categoryId: categoryId,
+          accountId: accountId,
+          source: d.source);
     } else {
       await notifier.addExpense(d.amountTaka,
-          note: d.note, categoryId: categoryId, accountId: accountId, source: d.source);
+          note: d.note,
+          categoryId: categoryId,
+          accountId: accountId,
+          source: d.source);
     }
+    if (d.pendingId != null) await store.deletePending(d.pendingId!);
     _syncQuietly();
     if (!mounted) return;
     setState(() {
@@ -234,6 +320,30 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
           const Padding(
               padding: EdgeInsets.only(top: 12),
               child: Text('কিছু বোঝা যায়নি')),
+        if (_notice != null)
+          Padding(
+              padding: const EdgeInsets.only(top: 12), child: Text(_notice!)),
+        for (final p in _queued)
+          Card(
+            margin: const EdgeInsets.only(top: 12),
+            child: ListTile(
+              leading: Icon(
+                  p.status == 'failed' ? Icons.error_outline : Icons.schedule),
+              title:
+                  Text(p.rawText, maxLines: 2, overflow: TextOverflow.ellipsis),
+              subtitle: Text(p.status == 'failed'
+                  ? 'বোঝা যায়নি: ${p.error ?? ''} — হাতে লিখুন'
+                  : 'অপেক্ষায় আছে — নেটওয়ার্ক পেলে বুঝে নেওয়া হবে'),
+              trailing: IconButton(
+                icon: const Icon(Icons.close),
+                tooltip: 'বাদ দিন',
+                onPressed: () async {
+                  await ref.read(localStoreProvider).deletePending(p.id);
+                  await _loadPending();
+                },
+              ),
+            ),
+          ),
         for (var i = 0; i < (_drafts?.length ?? 0); i++) _draftCard(i),
       ]);
 
@@ -284,10 +394,7 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
             IconButton(
               icon: const Icon(Icons.close, size: 30),
               tooltip: 'বাদ দিন',
-              onPressed: () => setState(() {
-                _drafts = [..._drafts!]..removeAt(i);
-                if (_drafts!.isEmpty) _drafts = null;
-              }),
+              onPressed: () => _discard(i),
             ),
             IconButton(
                 icon: const Icon(Icons.check_circle, size: 30),

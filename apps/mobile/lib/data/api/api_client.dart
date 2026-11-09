@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 /// Base URL of apps/api. Override with `--dart-define=API_URL=https://...`.
-const String kApiUrl = String.fromEnvironment('API_URL', defaultValue: 'http://10.0.2.2:4000');
+const String kApiUrl =
+    String.fromEnvironment('API_URL', defaultValue: 'http://10.0.2.2:4000');
 
 class ApiException implements Exception {
   final int status;
@@ -30,6 +31,9 @@ class TransactionDraft {
   final String source;
   final double confidence;
 
+  /// Set when this draft came from the offline queue; removing it from the queue is part of confirming it.
+  final String? pendingId;
+
   const TransactionDraft({
     required this.type,
     required this.amountPaisa,
@@ -42,11 +46,13 @@ class TransactionDraft {
     required this.trxId,
     required this.source,
     required this.confidence,
+    this.pendingId,
   });
 
   double get amountTaka => amountPaisa / 100;
 
-  TransactionDraft copyWith({String? categoryKey, String? source}) => TransactionDraft(
+  TransactionDraft copyWith({String? categoryKey, String? source}) =>
+      TransactionDraft(
         type: type,
         amountPaisa: amountPaisa,
         feePaisa: feePaisa,
@@ -58,6 +64,36 @@ class TransactionDraft {
         trxId: trxId,
         source: source ?? this.source,
         confidence: confidence,
+        pendingId: pendingId,
+      );
+
+  Map<String, dynamic> toJson() => {
+        'type': type,
+        'amountPaisa': amountPaisa,
+        'feePaisa': feePaisa,
+        'occurredAt': occurredAt,
+        'categoryKey': categoryKey,
+        'accountType': accountType,
+        'note': note,
+        'counterparty': counterparty,
+        'trxId': trxId,
+        'source': source,
+        'confidence': confidence,
+      };
+
+  TransactionDraft withPendingId(String id) => TransactionDraft(
+        type: type,
+        amountPaisa: amountPaisa,
+        feePaisa: feePaisa,
+        occurredAt: occurredAt,
+        categoryKey: categoryKey,
+        accountType: accountType,
+        note: note,
+        counterparty: counterparty,
+        trxId: trxId,
+        source: source,
+        confidence: confidence,
+        pendingId: id,
       );
 
   factory TransactionDraft.fromJson(Map<String, dynamic> j) => TransactionDraft(
@@ -95,7 +131,8 @@ class SyncResponse {
   final int applied;
   final List<({String? id, String reason})> rejected;
   final List<Map<String, dynamic>> changes;
-  const SyncResponse(this.cursor, this.more, this.applied, this.rejected, this.changes);
+  const SyncResponse(
+      this.cursor, this.more, this.applied, this.rejected, this.changes);
 }
 
 /// Thin client for apps/api. Takes an [http.Client] so tests can inject a mock.
@@ -104,7 +141,8 @@ class ApiClient {
   final String baseUrl;
   String? token;
 
-  ApiClient({http.Client? client, this.baseUrl = kApiUrl, this.token}) : _http = client ?? http.Client();
+  ApiClient({http.Client? client, this.baseUrl = kApiUrl, this.token})
+      : _http = client ?? http.Client();
 
   Future<dynamic> _send(String method, String path, {Object? body}) async {
     final req = http.Request(method, Uri.parse('$baseUrl$path'));
@@ -117,26 +155,33 @@ class ApiClient {
     try {
       res = await http.Response.fromStream(await _http.send(req));
     } catch (_) {
-      throw ApiException(0, 'সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না / Cannot reach the server');
+      throw ApiException(
+          0, 'সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না / Cannot reach the server');
     }
     if (res.statusCode == 204 || res.body.isEmpty) return null;
     final data = jsonDecode(utf8.decode(res.bodyBytes));
     if (res.statusCode >= 400) {
-      final msg = (data is Map && data['error'] is Map) ? data['error']['message'] as String? : null;
-      throw ApiException(res.statusCode, msg ?? 'Request failed (${res.statusCode})');
+      final msg = (data is Map && data['error'] is Map)
+          ? data['error']['message'] as String?
+          : null;
+      throw ApiException(
+          res.statusCode, msg ?? 'Request failed (${res.statusCode})');
     }
     return data;
   }
 
   /// Sends an OTP. Outside production the API also returns the code (`devCode`) for local testing.
   Future<String?> requestOtp(String phone) async {
-    final r = await _send('POST', '/v1/auth/otp/request', body: {'phone': phone}) as Map<String, dynamic>;
+    final r =
+        await _send('POST', '/v1/auth/otp/request', body: {'phone': phone})
+            as Map<String, dynamic>;
     return r['devCode'] as String?;
   }
 
   /// Verifies the OTP and stores the access token on this client.
   Future<String> verifyOtp(String phone, String code) async {
-    final r = await _send('POST', '/v1/auth/otp/verify', body: {'phone': phone, 'code': code}) as Map<String, dynamic>;
+    final r = await _send('POST', '/v1/auth/otp/verify',
+        body: {'phone': phone, 'code': code}) as Map<String, dynamic>;
     token = r['accessToken'] as String;
     return token!;
   }
@@ -144,45 +189,71 @@ class ApiClient {
   Future<List<FamilyInfo>> families() async {
     final r = await _send('GET', '/v1/me') as Map<String, dynamic>;
     return (r['families'] as List)
-        .map((f) => FamilyInfo(f['id'] as String, f['name'] as String, f['role'] as String))
+        .map((f) => FamilyInfo(
+            f['id'] as String, f['name'] as String, f['role'] as String))
         .toList();
   }
 
   Future<FamilyInfo> createFamily(String name) async {
-    final r = await _send('POST', '/v1/families', body: {'name': name}) as Map<String, dynamic>;
+    final r = await _send('POST', '/v1/families', body: {'name': name})
+        as Map<String, dynamic>;
     return FamilyInfo(r['id'] as String, r['name'] as String, 'owner');
   }
 
   /// Text or a pasted MFS SMS to drafts (SRS FR-AI-01, FR-AI-02).
-  Future<List<TransactionDraft>> parse(String familyId, String text, {DateTime? now}) async {
-    final r = await _send('POST', '/v1/families/$familyId/ai/parse',
-        body: {'text': text, 'now': (now ?? DateTime.now()).toUtc().toIso8601String()}) as Map<String, dynamic>;
-    return (r['drafts'] as List).map((d) => TransactionDraft.fromJson(d as Map<String, dynamic>)).toList();
+  Future<List<TransactionDraft>> parse(String familyId, String text,
+      {DateTime? now}) async {
+    final r = await _send('POST', '/v1/families/$familyId/ai/parse', body: {
+      'text': text,
+      'now': (now ?? DateTime.now()).toUtc().toIso8601String()
+    }) as Map<String, dynamic>;
+    return (r['drafts'] as List)
+        .map((d) => TransactionDraft.fromJson(d as Map<String, dynamic>))
+        .toList();
   }
 
-  Future<MonthlySummary> summary(String familyId, {String locale = 'bn'}) async {
-    final r = await _send('GET', '/v1/families/$familyId/ai/summary?locale=$locale') as Map<String, dynamic>;
-    return MonthlySummary(r['text'] as String, r['speechText'] as String, r['usedAi'] as bool);
+  Future<MonthlySummary> summary(String familyId,
+      {String locale = 'bn'}) async {
+    final r =
+        await _send('GET', '/v1/families/$familyId/ai/summary?locale=$locale')
+            as Map<String, dynamic>;
+    return MonthlySummary(
+        r['text'] as String, r['speechText'] as String, r['usedAi'] as bool);
   }
 
   /// Exchange transaction changes with the server (SRS §4.3.1). [cursor] is the value from the last response.
-  Future<SyncResponse> sync(String familyId, String nodeId, String? cursor, List<Map<String, dynamic>> changes) async {
-    final r = await _send('POST', '/v1/families/$familyId/sync',
-        body: {'nodeId': nodeId, 'cursor': cursor, 'changes': {'transactions': changes}}) as Map<String, dynamic>;
+  Future<SyncResponse> sync(String familyId, String nodeId, String? cursor,
+      List<Map<String, dynamic>> changes) async {
+    final r = await _send('POST', '/v1/families/$familyId/sync', body: {
+      'nodeId': nodeId,
+      'cursor': cursor,
+      'changes': {'transactions': changes}
+    }) as Map<String, dynamic>;
     return SyncResponse(
       r['cursor'] as String,
       r['more'] as bool,
       (r['applied'] as num).toInt(),
-      [for (final x in r['rejected'] as List) (id: x['id'] as String?, reason: x['reason'] as String)],
-      [for (final c in (r['changes'] as Map<String, dynamic>)['transactions'] as List) Map<String, dynamic>.from(c as Map)],
+      [
+        for (final x in r['rejected'] as List)
+          (id: x['id'] as String?, reason: x['reason'] as String)
+      ],
+      [
+        for (final c
+            in (r['changes'] as Map<String, dynamic>)['transactions'] as List)
+          Map<String, dynamic>.from(c as Map)
+      ],
     );
   }
 
   Future<List<Map<String, dynamic>>> categories(String familyId) async => [
-        for (final c in await _send('GET', '/v1/families/$familyId/categories') as List) Map<String, dynamic>.from(c as Map),
+        for (final c
+            in await _send('GET', '/v1/families/$familyId/categories') as List)
+          Map<String, dynamic>.from(c as Map),
       ];
 
   Future<List<Map<String, dynamic>>> accounts(String familyId) async => [
-        for (final c in await _send('GET', '/v1/families/$familyId/accounts') as List) Map<String, dynamic>.from(c as Map),
+        for (final c
+            in await _send('GET', '/v1/families/$familyId/accounts') as List)
+          Map<String, dynamic>.from(c as Map),
       ];
 }
