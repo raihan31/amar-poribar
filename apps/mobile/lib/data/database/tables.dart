@@ -59,3 +59,26 @@ class Meta extends Table {
   @override
   Set<Column> get primaryKey => {key};
 }
+
+/// Text typed or spoken while offline, waiting to be understood by the AI once the phone is online (FR-SYNC-03).
+/// A `queued` row holds the raw text; after parsing it becomes one `ready` row per proposed entry, which the
+/// user still has to confirm (FR-AI-05).
+class PendingEntries extends Table {
+  TextColumn get id => text()();
+  TextColumn get rawText => text()();
+
+  /// Order the texts were captured in (a counter, so two entries in the same millisecond keep their order),
+  /// then the position of a proposed entry within one text.
+  IntColumn get queueOrder => integer()();
+  IntColumn get subOrder => integer().withDefault(const Constant(0))();
+  TextColumn get source =>
+      text().withDefault(const Constant('ai_text'))(); // ai_text | voice
+  TextColumn get createdAt => text()();
+  TextColumn get status =>
+      text().withDefault(const Constant('queued'))(); // queued | ready | failed
+  TextColumn get draftJson => text().nullable()();
+  TextColumn get error => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

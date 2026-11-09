@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/speech/voice_service.dart';
 import '../../data/api/api_client.dart';
+import '../../data/sync/pending_queue.dart';
 import '../../data/sync/sync_service.dart';
 import 'providers.dart';
 
@@ -48,7 +49,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> _loadFamily(String token) async {
     try {
       final fams = await api.families();
-      state = AuthState(loaded: true, token: token, family: fams.isEmpty ? null : fams.first);
+      state = AuthState(
+          loaded: true, token: token, family: fams.isEmpty ? null : fams.first);
     } on ApiException catch (e) {
       if (e.isUnauthorized) {
         await signOut();
@@ -79,8 +81,15 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(ref.watch(apiClientProvider));
 });
 
-final voiceServiceProvider = Provider<VoiceService>((ref) => DeviceVoiceService());
+final voiceServiceProvider =
+    Provider<VoiceService>((ref) => DeviceVoiceService());
 
 final syncServiceProvider = Provider<SyncService>((ref) {
-  return SyncService(ref.watch(localStoreProvider), ref.watch(apiClientProvider));
+  return SyncService(
+      ref.watch(localStoreProvider), ref.watch(apiClientProvider));
+});
+
+final pendingQueueProvider = Provider<PendingQueue>((ref) {
+  return PendingQueue(
+      ref.watch(localStoreProvider), ref.watch(apiClientProvider));
 });

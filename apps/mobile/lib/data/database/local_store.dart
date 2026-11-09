@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
@@ -58,10 +60,13 @@ class LocalStore {
   // ---- change log ---------------------------------------------------------------------------
 
   Future<String?> getMeta(String key) async =>
-      (await (db.select(db.meta)..where((m) => m.key.equals(key))).getSingleOrNull())?.value;
+      (await (db.select(db.meta)..where((m) => m.key.equals(key)))
+              .getSingleOrNull())
+          ?.value;
 
-  Future<void> setMeta(String key, String value) =>
-      db.into(db.meta).insertOnConflictUpdate(MetaCompanion.insert(key: key, value: value));
+  Future<void> setMeta(String key, String value) => db
+      .into(db.meta)
+      .insertOnConflictUpdate(MetaCompanion.insert(key: key, value: value));
 
   /// Highest sequence number handed out so far.
   Future<int> currentSeq() async => int.parse(await getMeta(_seqKey) ?? '0');
@@ -172,7 +177,8 @@ class LocalStore {
   /// Changes made after [seq] in this device's change log, oldest first, tombstones included.
   /// Private entries are only passed on when [includePrivate] is set (for the server, which keeps them
   /// visible to their creator only); peers never get them.
-  Future<ChangeBatch> changesAfter(int seq, {bool includePrivate = false, int limit = 500}) async {
+  Future<ChangeBatch> changesAfter(int seq,
+      {bool includePrivate = false, int limit = 500}) async {
     final q = db.select(db.transactions)
       ..orderBy([(t) => OrderingTerm.asc(t.localSeq)])
       ..limit(limit + 1);
@@ -184,7 +190,8 @@ class LocalStore {
     final rows = await q.get();
     final more = rows.length > limit;
     final page = more ? rows.sublist(0, limit) : rows;
-    return ChangeBatch(page.map(rowToJson).toList(), page.isEmpty ? seq : page.last.localSeq, more);
+    return ChangeBatch(page.map(rowToJson).toList(),
+        page.isEmpty ? seq : page.last.localSeq, more);
   }
 
   /// Merge changes from a peer or the server. Per record, the greater HLC wins; applying the same
@@ -213,6 +220,63 @@ class LocalStore {
     });
     return changed;
   }
+
+  // ---- offline AI queue (FR-SYNC-03) -------------------------------------------------------
+
+  Future<String> queueText(String text, {String source = 'ai_text'}) async {
+    final id = _uuid.v4();
+    final order = int.parse(await getMeta('pending_order') ?? '0') + 1;
+    await setMeta('pending_order', '$order');
+    await db.into(db.pendingEntries).insert(PendingEntriesCompanion.insert(
+          id: id,
+          rawText: text,
+          queueOrder: order,
+          source: Value(source),
+          createdAt: _now().toUtc().toIso8601String(),
+        ));
+    return id;
+  }
+
+  /// All waiting items in capture order (and, within one text, the order its entries were proposed in).
+  Future<List<PendingEntry>> pending() => (db.select(db.pendingEntries)
+        ..orderBy([
+          (p) => OrderingTerm.asc(p.queueOrder),
+          (p) => OrderingTerm.asc(p.subOrder),
+        ]))
+      .get();
+
+  /// Replace a queued text by one ready row per proposed entry (or none, if nothing was understood).
+  Future<void> markParsed(String id, List<Map<String, dynamic>> drafts) =>
+      db.transaction(() async {
+        final row = await (db.select(db.pendingEntries)
+              ..where((p) => p.id.equals(id)))
+            .getSingleOrNull();
+        if (row == null) return;
+        await (db.delete(db.pendingEntries)..where((p) => p.id.equals(id)))
+            .go();
+        for (var i = 0; i < drafts.length; i++) {
+          await db
+              .into(db.pendingEntries)
+              .insert(PendingEntriesCompanion.insert(
+                id: _uuid.v4(),
+                rawText: row.rawText,
+                queueOrder: row.queueOrder,
+                subOrder: Value(i),
+                source: Value(row.source),
+                createdAt: row.createdAt,
+                status: const Value('ready'),
+                draftJson: Value(jsonEncode(drafts[i])),
+              ));
+        }
+      });
+
+  Future<void> markFailed(String id, String error) =>
+      (db.update(db.pendingEntries)..where((p) => p.id.equals(id))).write(
+          PendingEntriesCompanion(
+              status: const Value('failed'), error: Value(error)));
+
+  Future<void> deletePending(String id) =>
+      (db.delete(db.pendingEntries)..where((p) => p.id.equals(id))).go();
 
   // ---- reference data (read-only copy of the API's) ----------------------------------------
 
@@ -251,13 +315,18 @@ class LocalStore {
 
   Future<String?> categoryIdForKey(String? key) async {
     if (key == null) return null;
-    return (await (db.select(db.cachedCategories)..where((c) => c.key.equals(key))).getSingleOrNull())?.id;
+    return (await (db.select(db.cachedCategories)
+              ..where((c) => c.key.equals(key)))
+            .getSingleOrNull())
+        ?.id;
   }
 
   /// First cached account of the given type (cash, bkash, ...), if any.
   Future<String?> accountIdForType(String? type) async {
     if (type == null) return null;
-    final rows = await (db.select(db.cachedAccounts)..where((a) => a.type.equals(type))).get();
+    final rows = await (db.select(db.cachedAccounts)
+          ..where((a) => a.type.equals(type)))
+        .get();
     return rows.isEmpty ? null : rows.first.id;
   }
 
@@ -283,7 +352,8 @@ SyncRow rowToJson(Transaction t) => {
       'hlc': t.hlc,
     };
 
-TransactionsCompanion jsonToCompanion(SyncRow j, int seq) => TransactionsCompanion(
+TransactionsCompanion jsonToCompanion(SyncRow j, int seq) =>
+    TransactionsCompanion(
       localSeq: Value(seq),
       id: Value(j['id'] as String),
       type: Value(j['type'] as String),
