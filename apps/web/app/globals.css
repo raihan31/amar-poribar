@@ -100,3 +100,11 @@ button.danger { background: var(--danger); }
 .member select { min-height: 44px; }
 .invite-link { word-break: break-all; font-size: 0.85rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px; margin: 8px 0; }
 .notice { color: var(--accent); }
+
+/* Accounts and categories management */
+details.card summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+.manage-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.manage-row input { min-height: 44px; }
+.manage-row.hidden-item { opacity: 0.55; }
+.add-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.add-row input, .add-row select { flex: 1 1 120px; min-height: 44px; }
