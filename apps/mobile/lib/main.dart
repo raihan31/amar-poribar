@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/l10n/locale_controller.dart';
+import 'core/theme/app_theme.dart';
+import 'core/theme/ui_scale.dart';
 import 'data/database/database.dart';
 import 'data/database/local_store.dart';
 import 'l10n/gen/app_localizations.dart';
@@ -31,21 +33,8 @@ class AmarPoribarApp extends ConsumerWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: const [Locale('bn'), Locale('en')],
       locale: ref.watch(localeProvider),
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1B5E20), // A stable green
-          brightness: Brightness.light,
-        ),
-        // Glassmorphism components and modern UI settings would go here
-      ),
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4CAF50),
-          brightness: Brightness.dark,
-        ),
-      ),
+      theme: lightTheme(UiScale.normal),
+      darkTheme: darkTheme(UiScale.normal),
       themeMode: ThemeMode.system,
       initialRoute: AppRouter.onboardingRoute,
       onGenerateRoute: AppRouter.generateRoute,
