@@ -41,7 +41,12 @@ class BigButton extends ConsumerWidget {
       BigButtonStyle.quiet => (AppTokens.greenTint, AppTokens.deepGreen, null),
     };
     final enabled = onPressed != null;
+    final isPrimary = style == BigButtonStyle.primary ||
+        style == BigButtonStyle.amber ||
+        style == BigButtonStyle.danger;
     return Semantics(
+      container: true,
+      identifier: isPrimary ? 'primary' : null,
       button: true,
       enabled: enabled,
       label: label,
