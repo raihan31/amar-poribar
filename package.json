@@ -38,7 +38,18 @@
     "gen:module": "node tools/gen-module.mjs",
     "arch:negative": "node tools/arch-negative.mjs",
     "i18n:check": "node tools/i18n-keys.mjs",
-    "docs:check": "node tools/check-docs.mjs"
+    "docs:check": "node tools/check-docs.mjs",
+    "no-drizzle-push": "! grep -rn 'drizzle-kit push' docker-compose.yml Dockerfile .github/workflows",
+    "coverage": "pnpm --filter @amar-poribar/shared coverage && pnpm --filter @amar-poribar/ai coverage && pnpm --filter @amar-poribar/api coverage",
+    "verify:m0": "node tools/verify.mjs m0",
+    "verify:m1": "node tools/verify.mjs m1",
+    "verify:m2": "node tools/verify.mjs m2",
+    "verify:m3": "node tools/verify.mjs m3",
+    "verify:m4": "node tools/verify.mjs m4",
+    "verify:m5": "node tools/verify.mjs m5",
+    "verify:m6": "node tools/verify.mjs m6",
+    "verify:m7": "node tools/verify.mjs m7",
+    "verify:m8": "node tools/verify.mjs m8"
   },
   "devDependencies": {
     "dependency-cruiser": "^16.10.4",

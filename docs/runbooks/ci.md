@@ -8,12 +8,18 @@ Defined in `.github/workflows/ci.yml`.
 
 | Job | What it runs | Required |
 |---|---|---|
-| `web-api` (TypeScript) | `pnpm install --frozen-lockfile`, `pnpm typecheck`, `pnpm test`, `pnpm build` | yes |
-| `docs` | `node --test tools/check-docs.test.mjs`, `node tools/check-docs.mjs --warn` | yes |
-| `docker` (Compose stack) | `docker compose up --build --wait`, then `/health` and web smoke checks (skipped until a Dockerfile exists) | yes |
-| `mobile` (Flutter) | build_runner, `flutter gen-l10n`, l10n key check, `dart format`, `flutter analyze --fatal-infos`, `flutter test --coverage`, goldens, 70% coverage on domain, data and core | yes |
-| `mobile-emulator` | integration tests on an Android emulator (runs on main, and on PRs that touch `apps/mobile`) | yes when it runs |
+| `ts-static` | `pnpm install --frozen-lockfile`, `lint`, `format:check`, `typecheck`, `arch`, `arch:negative`, `openapi:check`, `db:check`, `tools/gen-vectors.ts --check`, `node --test tools/eslint-rules/*.test.mjs`, `node --test tools/verify.test.mjs`, `pnpm no-drizzle-push` | yes |
+| `ts-test` | PostgreSQL and MinIO from Compose (`db-test`, `minio-test`), `pnpm test`, `pnpm test:db`, `pnpm coverage` (API module domain/app >= 80%, `packages/*` >= 70%); coverage report uploaded | yes |
+| `build` | `pnpm build` | yes |
+| `stack` | `docker compose up -d --build --wait`, `bash tools/smoke.sh`, logs on failure, `down -v` | yes |
+| `mobile` | build_runner, `flutter gen-l10n`, l10n key check, `dart format`, `flutter analyze --fatal-infos` (blocking), `flutter test --coverage`, goldens, `bash coverage_gate.sh` (70% on domain, data, core), `test/contract` when present | yes |
+| `mobile-emulator` | integration tests on an Android emulator (main, and PRs that touch `apps/mobile`) | yes when it runs |
 | `mobile-size` | release APK size gate (35 MB per ABI) | yes |
+| `e2e-web`, `e2e-admin` | Playwright against the Compose stack; run once `apps/web/e2e` or `apps/admin/e2e` exists | yes when they run |
+| `docs` | `node --test tools/check-docs.test.mjs`, `node tools/check-docs.mjs --warn` | yes |
+| `milestone m0..m8` | `pnpm verify:mN`; non-blocking until `milestones/mN.done` exists, blocking after | m0..mN already tagged done |
+
+Tool versions: `.node-version` (Node), `.flutter-version` (Flutter, also in `apps/mobile/.fvmrc`), `packageManager` in `package.json` (pnpm). Concurrency cancels older runs of the same ref.
 
 Local equivalents, from the repository root:
 
@@ -24,6 +30,8 @@ Local equivalents, from the repository root:
 | Module boundaries | `pnpm arch` |
 | Database tests (need `docker compose up -d db minio`) | `pnpm test:db` |
 | API contract drift | `pnpm openapi:check` |
+| One milestone gate | `pnpm verify:m0` ... `pnpm verify:m8` (`node tools/verify.mjs --list m0` prints the commands) |
+| Coverage | `pnpm coverage` (needs `docker compose --profile test up -d --wait db-test minio-test`) |
 | Docs | `node tools/check-docs.mjs` and `node --test tools/check-docs.test.mjs` |
 | Mobile | `cd apps/mobile && flutter analyze && flutter test` |
 
