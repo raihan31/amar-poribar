@@ -27,9 +27,11 @@ async function withApi<T>(fn: (api: ApiClient) => Promise<T>): Promise<T> {
 // The identity, families and ledger tables are created by the module moves (T-PLAT-23..25); until their
 // migrations exist the fixtures have no API to talk to, exactly like the skipped login test in harness.test.ts.
 const hasAppTables = await withTestDb(async ({ sql }) => {
-  const r = await sql<{ pub: string | null; ident: string | null }[]>`
-    select to_regclass('public.users')::text as pub, to_regclass('identity.users')::text as ident`;
-  return Boolean(r[0]?.pub ?? r[0]?.ident);
+  const r = await sql<{ users: string | null; ident: string | null; fam: string | null }[]>`
+    select to_regclass('public.users')::text as users, to_regclass('identity.users')::text as ident,
+           coalesce(to_regclass('public.family_members')::text, to_regclass('families.family_members')::text) as fam`;
+  // Identity alone is not enough: the fixtures also need the families tables (T-PLAT-24).
+  return Boolean(r[0]?.users ?? r[0]?.ident) && Boolean(r[0]?.fam);
 });
 
 describe.skipIf(!hasAppTables)("fixtures", () => {
