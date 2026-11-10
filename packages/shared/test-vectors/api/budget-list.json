@@ -1,0 +1,28 @@
+{
+  "_kind": "response",
+  "_operation": "GET /v1/families/{familyId}/budgets",
+  "_status": 200,
+  "body": {
+    "budgets": [
+      {
+        "categoryId": null,
+        "inherited": false,
+        "level": "ok",
+        "limitPaisa": 3000000,
+        "nameBn": "মোট",
+        "nameEn": "Overall",
+        "spentPaisa": 235000
+      },
+      {
+        "categoryId": "00000000-0000-4000-8000-0000000000c1",
+        "inherited": true,
+        "level": "warning",
+        "limitPaisa": 100000,
+        "nameBn": "বাজার ও মুদি",
+        "nameEn": "Bazaar & Groceries",
+        "spentPaisa": 85000
+      }
+    ],
+    "month": "2026-10"
+  }
+}

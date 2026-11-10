@@ -1,29 +1,22 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { draftToSpeech } from "./speech.js";
 import { amountInWords, monthName, numberToBanglaWords } from "./words.js";
 
+const vectors = JSON.parse(readFileSync(new URL("../test-vectors/bangla-words.json", import.meta.url), "utf8")) as {
+  numberToBanglaWords: { n: number; words: string }[];
+  amountInWords: { paisa: number; locale: "bn" | "en"; words: string }[];
+};
+
 describe("numberToBanglaWords", () => {
-  it.each([
-    [0, "শূন্য"],
-    [15, "পনেরো"],
-    [99, "নিরানব্বই"],
-    [100, "একশো"],
-    [850, "আটশো পঞ্চাশ"],
-    [2340, "দুই হাজার তিনশো চল্লিশ"],
-    [10_000, "দশ হাজার"],
-    [1_25_000, "এক লাখ পঁচিশ হাজার"],
-    [1_00_00_000, "এক কোটি"],
-    [2_05_03_021, "দুই কোটি পাঁচ লাখ তিন হাজার একুশ"],
-    [150_00_00_000, "একশো পঞ্চাশ কোটি"],
-  ])("%i → %s", (n, words) => {
+  it.each(vectors.numberToBanglaWords)("$n → $words", ({ n, words }) => {
     expect(numberToBanglaWords(n)).toBe(words);
   });
 });
 
 describe("amountInWords", () => {
-  it("includes paisa", () => {
-    expect(amountInWords(234_050)).toBe("দুই হাজার তিনশো চল্লিশ টাকা পঞ্চাশ পয়সা");
-    expect(amountInWords(85_000, "en")).toBe("850 taka");
+  it.each(vectors.amountInWords)("$paisa ($locale) → $words", ({ paisa, locale, words }) => {
+    expect(amountInWords(paisa, locale)).toBe(words);
   });
 });
 

@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@amar-poribar/tsconfig": "workspace:*",
+    "ajv": "^8.20.0",
     "typescript": "~5.9.0",
     "vitest": "^5.0.0"
   }

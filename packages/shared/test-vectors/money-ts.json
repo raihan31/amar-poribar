@@ -1,0 +1,16 @@
+{
+  "_comment": "TypeScript formatting and parsing cases (formatBDT, parseAmountToPaisa, bnToLatinDigits, takaToPaisa). money.json is the Dart-facing display table and uses a different minus sign.",
+  "bnToLatinDigits": [{ "input": "৮৫০ টাকা", "output": "850 টাকা" }],
+  "parseAmountToPaisa": [
+    { "input": "1,00,000", "paisa": 10000000 },
+    { "input": "৳ ২,৩৪০.৫০", "paisa": 234050 },
+    { "input": "no number", "paisa": null }
+  ],
+  "takaToPaisa": [{ "taka": 19.99, "paisa": 1999 }],
+  "formatBDT": [
+    { "paisa": 12500000, "bnDigits": false, "text": "৳ 1,25,000" },
+    { "paisa": 1000000000, "bnDigits": false, "text": "৳ 1,00,00,000" },
+    { "paisa": 85050, "bnDigits": true, "text": "৳ ৮৫০.৫০" },
+    { "paisa": -5000, "bnDigits": false, "text": "৳ -50" }
+  ]
+}
