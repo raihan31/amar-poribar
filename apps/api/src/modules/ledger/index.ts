@@ -2,7 +2,6 @@ import type { CreateTransactionInput, Role, SyncTransaction } from "@amar-poriba
 import type { Tx } from "../../platform/events/bus.js";
 import type { ModuleDefinition } from "../../platform/module.js";
 import { createTransaction } from "./app/create-transaction.js";
-import { assertNoClockDrift } from "./app/clock-drift.js";
 import { getCategoryByKey, listCategories } from "./app/categories.js";
 import type { LedgerDeps } from "./app/deps.js";
 import { applyChange, type ApplyResult } from "./app/apply-sync-change.js";
@@ -13,7 +12,7 @@ import { expenseTotalBetween, monthTotals, type MonthTotals } from "./app/month-
 import { remittanceByMonth, type RemittanceByMonth } from "./app/remittance.js";
 import { seedDefaults } from "./app/seed-defaults.js";
 import { currentDhakaMonth, dayRange, monthRange, monthsBetween, previousMonth } from "../../platform/time/month.js";
-import { nextHlc } from "./domain/hlc.js";
+import { nextHlc } from "../../platform/hlc.js";
 import { accountsRoutes } from "./http/accounts.routes.js";
 import { categoriesRoutes } from "./http/categories.routes.js";
 import { transactionsRoutes } from "./http/transactions.routes.js";
@@ -33,7 +32,7 @@ export type {
   RemittanceByMonth,
   Transaction,
 };
-export { currentDhakaMonth, dayRange, monthRange, monthsBetween, previousMonth, nextHlc, assertNoClockDrift };
+export { currentDhakaMonth, dayRange, monthRange, monthsBetween, previousMonth, nextHlc };
 
 /** Public surface of the ledger module. Other modules may import only this file (SRS R1). */
 export interface LedgerFacade {

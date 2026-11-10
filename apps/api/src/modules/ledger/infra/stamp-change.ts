@@ -1,5 +1,5 @@
 import type { SQL } from "drizzle-orm";
-import { nextHlc } from "../domain/hlc.js";
+import { nextHlc } from "../../../platform/hlc.js";
 import { bumpSyncSeq } from "../schema.js";
 
 export interface ChangeStamp {

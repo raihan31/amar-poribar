@@ -5,7 +5,6 @@ import type { AppDeps } from "./deps.js";
 import { registerErrorHandler } from "./errors.js";
 import { registerComposition } from "./composition/index.js";
 import { EventBus } from "./platform/events/bus.js";
-import { syncRoutes } from "./routes/sync.js";
 import { modules } from "./modules/registry.js";
 import { createLogger, installRequestContext, requestOptions } from "./platform/logger.js";
 import { createJobs } from "./platform/jobs/jobs.js";
@@ -56,6 +55,5 @@ export async function buildApp(deps: AppDeps) {
   // Composition routes join several module facades (SRS §3.1); they register after every module.
   registerComposition(app, ctx);
 
-  await app.register(async (scope) => syncRoutes(scope, deps, ctx));
   return app;
 }
