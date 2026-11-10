@@ -15,6 +15,8 @@ import { recurringRoutes } from "./routes/recurring.js";
 import { reportRoutes } from "./routes/reports.js";
 import { syncRoutes } from "./routes/sync.js";
 import { transactionRoutes } from "./routes/transactions.js";
+import { modules } from "./modules/registry.js";
+import type { ModuleContext } from "./platform/module.js";
 
 export interface AppDeps {
   db: Db;
@@ -34,6 +36,20 @@ export async function buildApp(deps: AppDeps) {
   const allowed = deps.corsOrigins ?? [];
   await app.register(cors, { origin: deps.isProd ? (allowed.length ? allowed : false) : true });
   await registerAuth(app, deps.jwtSecret);
+
+  // Modules register in dependency order (SRS §3.1). Existing routes below move into modules in T-PLAT-23..30.
+  const ctx: ModuleContext = {
+    db: deps.db,
+    config: undefined,
+    logger: app.log,
+    bus: undefined,
+    jobs: undefined,
+    storage: undefined,
+    flags: undefined,
+    clock: () => new Date(),
+    facades: {},
+  };
+  for (const m of modules) (ctx.facades as Record<string, unknown>)[m.name] = await m.register(app, ctx);
 
   app.get("/health", async () => ({ ok: true }));
 

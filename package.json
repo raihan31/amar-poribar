@@ -19,7 +19,8 @@
     "format:check": "prettier --check .",
     "arch": "echo 'added in T-PLAT-03' && exit 0",
     "openapi:check": "echo 'added in T-PLAT-14' && exit 0",
-    "test:db": "echo 'added in T-PLAT-19' && exit 0"
+    "test:db": "echo 'added in T-PLAT-19' && exit 0",
+    "gen:module": "node tools/gen-module.mjs"
   },
   "devDependencies": {
     "eslint": "^9.39.5",
