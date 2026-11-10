@@ -13,7 +13,8 @@ export default defineConfig({
       {
         test: {
           name: "db",
-          include: ["src/**/*.db.test.ts", "tests/**/*.test.ts"],
+          // Fixture builders are tested here because they need the API and a database.
+          include: ["src/**/*.db.test.ts", "tests/**/*.test.ts", "../../tools/fixtures/src/**/*.db.test.ts"],
           fileParallelism: false,
           maxWorkers: 1,
           testTimeout: 30_000,

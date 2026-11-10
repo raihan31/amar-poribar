@@ -23,6 +23,7 @@
     "arch": "depcruise apps/api/src --config .dependency-cruiser.cjs && pnpm --filter @amar-poribar/api exec vitest run src/architecture.test.ts",
     "openapi:check": "turbo run build --filter=@amar-poribar/api^... && pnpm --filter @amar-poribar/api openapi:build -- --check",
     "test:db": "turbo run test:db --filter=@amar-poribar/api --concurrency=1",
+    "seed:dev": "pnpm --filter @amar-poribar/api exec tsx scripts/seed-dev.ts",
     "gen:module": "node tools/gen-module.mjs",
     "arch:negative": "node tools/arch-negative.mjs"
   },
