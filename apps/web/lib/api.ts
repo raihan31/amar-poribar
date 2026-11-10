@@ -19,7 +19,8 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
     body: init.body ? JSON.stringify(init.body) : undefined,
   });
   if (res.status === 204) return undefined as T;
-  const data = await res.json();
-  if (!res.ok) throw new ApiError(res.status, data?.error?.message ?? res.statusText);
+  const data = (await res.json()) as { error?: { message?: string } } | T;
+  if (!res.ok)
+    throw new ApiError(res.status, (data as { error?: { message?: string } })?.error?.message ?? res.statusText);
   return data as T;
 }

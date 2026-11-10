@@ -69,7 +69,8 @@ function loadToken(): string | null {
 }
 function saveToken(token: string | null) {
   try {
-    token ? localStorage.setItem(TOKEN_KEY, token) : localStorage.removeItem(TOKEN_KEY);
+    if (token) localStorage.setItem(TOKEN_KEY, token);
+    else localStorage.removeItem(TOKEN_KEY);
   } catch {
     /* storage unavailable */
   }

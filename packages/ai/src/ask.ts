@@ -8,11 +8,7 @@ const MonthArg = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
 /** Read-only data access the model may call. The API supplies these, already scoped to the user's family and permissions. */
 export interface AskTools {
   sumByCategory(month: string): Promise<{ name: string; totalPaisa: number }[]>;
-  listTransactions(args: {
-    month: string;
-    categoryName?: string;
-    limit: number;
-  }): Promise<
+  listTransactions(args: { month: string; categoryName?: string; limit: number }): Promise<
     {
       date: string;
       type: string;

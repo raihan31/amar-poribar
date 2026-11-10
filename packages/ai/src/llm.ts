@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import type Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
 import { ACCOUNT_TYPES, MAX_AMOUNT_PAISA, takaToPaisa, type TransactionDraft } from "@amar-poribar/shared";

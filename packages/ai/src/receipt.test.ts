@@ -49,14 +49,14 @@ describe("parseReceipt", () => {
       counterparty: "Shwapno",
       trxId: null,
     });
-    expect(out[0]!.occurredAt).toBe("2026-11-08T12:00:00+06:00");
+    expect(out[0].occurredAt).toBe("2026-11-08T12:00:00+06:00");
   });
 
   it("drops unreadable totals and unknown categories", async () => {
     const { c } = client({ drafts: [draft({ amountTaka: 0 }), draft({ categoryKey: "made_up" })] });
     const out = await parseReceipt({ base64: "AAAA", mediaType: "image/png" }, { client: c, categories, now });
     expect(out).toHaveLength(1);
-    expect(out[0]!.categoryKey).toBeNull();
+    expect(out[0].categoryKey).toBeNull();
   });
 
   it("fails cleanly when the model refuses", async () => {

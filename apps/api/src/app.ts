@@ -4,7 +4,7 @@ import Fastify from "fastify";
 import { registerAuth } from "./auth.js";
 import type { Db } from "./db/client.js";
 import { registerErrorHandler } from "./errors.js";
-import { OtpStore } from "./otp.js";
+import type { OtpStore } from "./otp.js";
 import { aiRoutes } from "./routes/ai.js";
 import { authRoutes } from "./routes/auth.js";
 import { budgetRoutes } from "./routes/budgets.js";
