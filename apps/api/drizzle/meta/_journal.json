@@ -36,6 +36,13 @@
       "when": 1794344944523,
       "tag": "0004_identity_users",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794344954132,
+      "tag": "0005_health_checks",
+      "breakpoints": true
     }
   ]
 }

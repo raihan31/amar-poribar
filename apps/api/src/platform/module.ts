@@ -5,7 +5,8 @@ import type { Db } from "../db/client.js";
 // modules can already declare the context shape they will receive.
 export type Config = unknown; // T-PLAT-04
 export type EventBus = unknown; // T-PLAT-08
-export type Jobs = unknown; // T-PLAT-09
+import type { Jobs } from "./jobs/jobs.js";
+export type { Jobs };
 export type ObjectStorage = unknown; // T-PLAT-12
 export type Flags = unknown; // T-PLAT-11
 
