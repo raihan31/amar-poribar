@@ -19,6 +19,11 @@
     "test": {
       "dependsOn": ["^build"]
     },
+    "test:db": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "passThroughEnv": ["TEST_DATABASE_URL", "DATABASE_URL"]
+    },
     "arch": {
       "cache": false
     },

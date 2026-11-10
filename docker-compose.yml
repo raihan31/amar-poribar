@@ -20,6 +20,43 @@ services:
       timeout: 3s
       retries: 20
 
+  # Test services (profile "test"): `docker compose --profile test up -d --wait db-test minio-test`.
+  # Used by `pnpm test:db`; data lives in tmpfs and vanishes with the container.
+  db-test:
+    profiles: ["test"]
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: amar
+      POSTGRES_PASSWORD: amar
+      POSTGRES_DB: amar_test
+    ports:
+      - "${DB_TEST_PORT:-5433}:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U amar -d amar_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  # Placeholder object store for tests; T-PLAT-32 finalises it.
+  minio-test:
+    profiles: ["test"]
+    image: minio/minio:latest
+    command: ["server", "/data"]
+    environment:
+      MINIO_ROOT_USER: amar
+      MINIO_ROOT_PASSWORD: amar-secret
+    ports:
+      - "${MINIO_TEST_PORT:-9100}:9000"
+    tmpfs:
+      - /data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
   # One-shot: applies the Drizzle schema, then exits.
   migrate:
     build: { context: ., target: build }
