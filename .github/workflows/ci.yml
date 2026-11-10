@@ -25,6 +25,17 @@ jobs:
       - run: pnpm test
       - run: pnpm build
 
+  docs:
+    name: Docs (consistency checker)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test tools/check-docs.test.mjs
+      - run: node tools/check-docs.mjs --warn
+
   docker:
     name: Docker compose stack
     runs-on: ubuntu-latest

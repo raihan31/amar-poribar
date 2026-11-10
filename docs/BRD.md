@@ -289,6 +289,7 @@ Payment by bKash or Nagad checkout through a licensed payment gateway (for examp
 | PDPO | Personal Data Protection Ordinance 2025 |
 | Buzz | A vibration nudge with a short phrase, sent between family members |
 | Simple mode | A layout with one big action and spoken results |
+| Facade | The one public entry point of a backend module; other modules may call only this, which keeps the system a modular monolith that can later be split into services |
 
 ---
 
