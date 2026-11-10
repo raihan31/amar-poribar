@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/l10n/l10n_x.dart';
 import '../providers/providers.dart';
 import '../widgets/glassmorphism_card.dart';
 
@@ -19,9 +20,9 @@ class DashboardScreen extends ConsumerWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text(
-          'Amar Poribar',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          context.l10n.common_appName,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -55,7 +56,9 @@ class DashboardScreen extends ConsumerWidget {
                     children: [
                       const SizedBox(height: 10),
                       Text(
-                        'Welcome back, ${appState.activeRole.name.toUpperCase()}',
+                        context.l10n.home_welcome(
+                          appState.activeRole.name.toUpperCase(),
+                        ),
                         style: Theme.of(context)
                             .textTheme
                             .titleMedium
@@ -72,7 +75,7 @@ class DashboardScreen extends ConsumerWidget {
 
                       const SizedBox(height: 30),
                       Text(
-                        'Monthly Analytics',
+                        context.l10n.home_dashboard_analytics,
                         style: Theme.of(context)
                             .textTheme
                             .titleLarge
@@ -85,11 +88,17 @@ class DashboardScreen extends ConsumerWidget {
 
                       const SizedBox(height: 30),
                       Text(
-                        'Recent Transactions',
+                        context.l10n.home_dashboard_recent,
                         style: Theme.of(context)
                             .textTheme
                             .titleLarge
                             ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        context.l10n.txn_dashboard_count(
+                          recentTransactions.length,
+                        ),
+                        style: const TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 10),
                     ],
@@ -150,7 +159,7 @@ class DashboardScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.pushNamed(context, '/transactions'),
-        label: const Text('Add Txn'),
+        label: Text(context.l10n.txn_dashboard_add),
         icon: const Icon(Icons.add),
       ),
     );
@@ -172,9 +181,9 @@ class DashboardScreen extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Total Balance',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  Text(
+                    context.l10n.home_dashboard_totalBalance,
+                    style: const TextStyle(color: Colors.grey, fontSize: 14),
                   ),
                   Text(
                     '৳${(state.totalIncome - state.totalExpense).toStringAsFixed(2)}',
@@ -195,7 +204,9 @@ class DashboardScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  '${(percentUsed * 100).toStringAsFixed(0)}% Used',
+                  context.l10n.home_dashboard_percentUsed(
+                    (percentUsed * 100).toStringAsFixed(0),
+                  ),
                   style: TextStyle(
                     color: percentUsed > 0.85 ? Colors.red : Colors.green,
                     fontWeight: FontWeight.bold,
@@ -219,11 +230,15 @@ class DashboardScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Spent: ৳${state.totalExpense.toStringAsFixed(0)}',
+                context.l10n.home_dashboard_spent(
+                  state.totalExpense.toStringAsFixed(0),
+                ),
                 style: const TextStyle(fontSize: 12),
               ),
               Text(
-                'Budget: ৳${state.monthlyBudget.toStringAsFixed(0)}',
+                context.l10n.home_dashboard_budget(
+                  state.monthlyBudget.toStringAsFixed(0),
+                ),
                 style: const TextStyle(fontSize: 12),
               ),
             ],

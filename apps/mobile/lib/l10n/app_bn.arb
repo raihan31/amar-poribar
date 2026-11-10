@@ -1,0 +1,65 @@
+{
+  "@@locale": "bn",
+  "common_appName": "আমার পরিবার",
+  "common_yes": "হ্যাঁ",
+  "common_no": "না",
+  "auth_login_title": "লগইন",
+  "auth_login_phoneLabel": "মোবাইল নম্বর",
+  "auth_login_phoneHint": "০১৭১২৩৪৫৬৭৮৯",
+  "auth_login_codeLabel": "৬ সংখ্যার কোড",
+  "auth_login_sendOtp": "OTP পাঠান",
+  "auth_login_submit": "লগইন",
+  "auth_login_devOtp": "ডেভ OTP: {code}",
+  "@auth_login_devOtp": {
+    "placeholders": {"code": {"type": "String"}}
+  },
+  "home_welcome": "স্বাগতম, {role}",
+  "@home_welcome": {
+    "placeholders": {"role": {"type": "String"}}
+  },
+  "home_dashboard_totalBalance": "মোট ব্যালেন্স",
+  "home_dashboard_percentUsed": "{percent}% ব্যবহৃত",
+  "@home_dashboard_percentUsed": {
+    "placeholders": {"percent": {"type": "String"}}
+  },
+  "home_dashboard_spent": "খরচ: ৳{amount}",
+  "@home_dashboard_spent": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "home_dashboard_budget": "বাজেট: ৳{amount}",
+  "@home_dashboard_budget": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "home_dashboard_analytics": "মাসের হিসাব",
+  "home_dashboard_recent": "সাম্প্রতিক লেনদেন",
+  "txn_dashboard_add": "লেনদেন যোগ",
+  "settings_title": "সেটিংস",
+  "settings_role_title": "বর্তমান ভূমিকা",
+  "settings_pair_title": "নতুন ফোন যোগ করুন",
+  "settings_pair_subtitle": "সন্তান বা সঙ্গীকে যোগ করতে QR কোড বানান",
+  "settings_tutorial_title": "কীভাবে ব্যবহার করবেন (শুনুন)",
+  "settings_language_title": "ভাষা",
+  "settings_language_switch": "ইংরেজিতে বদলান",
+  "settings_bankApprovals_title": "ব্যাংকের লেনদেন অনুমোদন",
+  "settings_bankApprovals_empty": "আজ কোনো ব্যাংকের লেনদেন অনুমোদনের অপেক্ষায় নেই।",
+  "sync_server_title": "সার্ভারের সাথে সিঙ্ক",
+  "sync_server_subtitle": "ইন্টারনেট থাকলে চাপুন",
+  "sync_server_needLogin": "সিঙ্ক করতে লগইন করুন।",
+  "sync_server_done": "সার্ভারের সাথে সিঙ্ক হয়েছে: {pushed} পাঠানো, {pulled} পাওয়া",
+  "@sync_server_done": {
+    "placeholders": {"pushed": {"type": "int"}, "pulled": {"type": "int"}}
+  },
+  "sync_nearby_title": "কাছের ফোনের সাথে সিঙ্ক",
+  "sync_nearby_subtitle": "ইন্টারনেট ছাড়াই, একই পরিবারের ফোন",
+  "sync_nearby_needLogin": "প্রথমে একবার লগইন করে পরিবারে যোগ দিন (ইন্টারনেট লাগবে)।",
+  "sync_nearby_failed": "কাছের সিঙ্ক চালু করা যায়নি: অনুমতি দিন (ব্লুটুথ, লোকেশন)।",
+  "sync_nearby_askTitle": "কাছের ফোনের সাথে সিঙ্ক?",
+  "sync_nearby_askBody": "ফোন: {name}\nকোড: {code}\n\nদুই ফোনেই একই কোড দেখালে \"হ্যাঁ\" চাপুন।",
+  "@sync_nearby_askBody": {
+    "placeholders": {"name": {"type": "String"}, "code": {"type": "String"}}
+  },
+  "txn_dashboard_count": "{count, plural, =0{কোনো লেনদেন নেই} =1{১টি লেনদেন} other{{count}টি লেনদেন}}",
+  "@txn_dashboard_count": {
+    "placeholders": {"count": {"type": "int"}}
+  }
+}

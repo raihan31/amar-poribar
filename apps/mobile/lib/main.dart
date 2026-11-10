@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/l10n/locale_controller.dart';
 import 'data/database/database.dart';
 import 'data/database/local_store.dart';
+import 'l10n/gen/app_localizations.dart';
 import 'presentation/navigation/app_router.dart';
 import 'presentation/providers/providers.dart';
 
@@ -25,7 +27,10 @@ class AmarPoribarApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
-      title: 'Amar Poribar',
+      onGenerateTitle: (context) => AppLocalizations.of(context).common_appName,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: const [Locale('bn'), Locale('en')],
+      locale: ref.watch(localeProvider),
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
