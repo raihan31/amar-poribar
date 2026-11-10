@@ -1,6 +1,5 @@
 import { buildApp } from "../../src/app.js";
 import type { Db } from "../../src/db/client.js";
-import { OtpStore } from "../../src/otp.js";
 import type { Sql } from "../../src/platform/db.js";
 import { MemoryPush } from "../../src/platform/ports/fakes/memory-push.js";
 import { MemorySms } from "../../src/platform/ports/fakes/memory-sms.js";
@@ -29,7 +28,7 @@ export async function buildTestApp(opts: BuildTestAppOptions) {
     limiter: (opts.dbLimiter ? new DbLimiter(opts.sql) : new MemoryLimiter()) as Limiter,
     clock: opts.clock ?? (() => FIXED_NOW),
   };
-  const app = await buildApp({ db: opts.db, otp: new OtpStore(), jwtSecret: "test-secret", isProd: false });
+  const app = await buildApp({ db: opts.db, jwtSecret: "test-secret", isProd: false });
   await app.ready();
 
   /** OTP flow: request a code (read from the dev response or the fake SMS) and verify it. */

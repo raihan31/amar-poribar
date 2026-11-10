@@ -6,7 +6,6 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { z } from "zod";
 import { buildApp } from "../../app.js";
 import type { Db } from "../../db/client.js";
-import { OtpStore } from "../../otp.js";
 import { route } from "../http/route.js";
 import { apiRoot, buildOpenApiDocument } from "./build.js";
 import { isPublicRoute } from "./plugin.js";
@@ -21,7 +20,6 @@ type Doc = {
 
 const app = await buildApp({
   db: {} as Db,
-  otp: new OtpStore(),
   jwtSecret: "test",
   isProd: false,
   logLevel: "silent",
@@ -76,7 +74,6 @@ describe("openapi", () => {
   it("flags routes without response schemas as x-undocumented and not the ones with schemas", async () => {
     const local = await buildApp({
       db: {} as Db,
-      otp: new OtpStore(),
       jwtSecret: "t",
       isProd: false,
       logLevel: "silent",
@@ -96,7 +93,6 @@ describe("openapi", () => {
   it("hides /v1/openapi.json in production unless OPENAPI_PUBLIC", async () => {
     const prod = await buildApp({
       db: {} as Db,
-      otp: new OtpStore(),
       jwtSecret: "t",
       isProd: true,
       logLevel: "silent",
@@ -105,7 +101,6 @@ describe("openapi", () => {
     await prod.close();
     const pub = await buildApp({
       db: {} as Db,
-      otp: new OtpStore(),
       jwtSecret: "t",
       isProd: true,
       logLevel: "silent",

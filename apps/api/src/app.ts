@@ -1,7 +1,6 @@
 import cors from "@fastify/cors";
 import Fastify from "fastify";
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
-import { registerAuth } from "./auth.js";
 import type { AppDeps } from "./deps.js";
 import { registerErrorHandler } from "./errors.js";
 import { aiRoutes } from "./routes/ai.js";
@@ -31,14 +30,13 @@ export async function buildApp(deps: AppDeps) {
   app.setSerializerCompiler(serializerCompiler);
   const allowed = deps.corsOrigins ?? [];
   await app.register(cors, { origin: deps.isProd ? (allowed.length ? allowed : false) : true });
-  await registerAuth(app, deps.jwtSecret);
   // Swagger must come before any route so its onRoute hook sees them all.
   await registerOpenApi(app, { version: apiVersion(), expose: !deps.isProd || deps.openapiPublic === true });
 
   // Modules register in dependency order (SRS §3.1). Existing routes below move into modules in T-PLAT-23..30.
   const ctx: ModuleContext = {
     db: deps.db,
-    config: undefined,
+    config: { jwtSecret: deps.jwtSecret, isProd: deps.isProd },
     logger: app.log,
     bus: undefined,
     jobs: undefined,

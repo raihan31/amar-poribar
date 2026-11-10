@@ -34,14 +34,9 @@ const timestamps = {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 };
 
-export const users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  phone: text("phone").notNull().unique(),
-  name: text("name"),
-  locale: text("locale").notNull().default("bn"),
-  bnDigits: boolean("bn_digits").notNull().default(true),
-  ...timestamps,
-});
+// `users` is owned by the identity module (T-PLAT-23); re-exported so the legacy tables below keep their foreign keys.
+export { users } from "../modules/identity/schema.js";
+import { users } from "../modules/identity/schema.js";
 
 export const families = pgTable("families", {
   id: uuid("id").primaryKey().defaultRandom(),
