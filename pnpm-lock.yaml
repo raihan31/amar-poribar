@@ -33,6 +33,8 @@ importers:
         specifier: ^8.72.2
         version: 8.72.2(eslint@9.39.5)(typescript@5.9.3)
 
+  apps/admin: {}
+
   apps/api:
     dependencies:
       '@amar-poribar/ai':

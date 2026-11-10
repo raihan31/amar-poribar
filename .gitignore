@@ -20,3 +20,5 @@ coverage/
 
 # Golden diff output
 apps/mobile/test/goldens/failures/
+
+!.env.compose

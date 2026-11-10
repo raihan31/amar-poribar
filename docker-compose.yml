@@ -1,7 +1,10 @@
-# Run the whole stack with: docker compose up --build
-#   web  -> http://localhost:3000   (host port: WEB_PORT)
-#   api  -> http://localhost:4000   (host port: API_PORT)
-#   db   -> localhost:5432          (host port: DB_PORT)
+# Run the whole stack with: pnpm stack:up   (docker compose up -d --build --wait)
+#   web   -> http://localhost:3000   (host port: WEB_PORT)
+#   api   -> http://localhost:4000   (host port: API_PORT)
+#   db    -> localhost:5432          (host port: DB_PORT)
+#   fakes -> http://localhost:4100   (host port: FAKES_PORT)
+#   minio -> :9000 API, :9001 console (MINIO_PORT, MINIO_CONSOLE_PORT); coturn -> :3478
+#   admin -> http://localhost:3100   (profile "admin": docker compose --profile admin up)
 # If a port is taken, pick another, e.g.: API_PORT=4001 WEB_PORT=3001 DB_PORT=5434 docker compose up --build
 services:
   db:
@@ -39,7 +42,7 @@ services:
       timeout: 3s
       retries: 20
 
-  # Placeholder object store for tests; T-PLAT-32 finalises it.
+  # Object store for tests.
   minio-test:
     profiles: ["test"]
     image: minio/minio:latest
@@ -57,34 +60,94 @@ services:
       timeout: 3s
       retries: 20
 
-  # One-shot: applies the Drizzle schema, then exits.
-  migrate:
-    build: { context: ., target: build }
-    working_dir: /repo/apps/api
-    command: ["pnpm", "exec", "drizzle-kit", "push", "--force"]
+  minio:
+    image: ${MINIO_IMAGE:-minio/minio:latest}
+    command: ["server", "/data", "--console-address", ":9001"]
     environment:
-      DATABASE_URL: postgres://amar:amar@db:5432/amar_poribar
-    depends_on:
-      db: { condition: service_healthy }
+      MINIO_ROOT_USER: amar
+      MINIO_ROOT_PASSWORD: amarsecret
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
 
+  # One-shot: creates the bucket the API uses, then exits.
+  minio-init:
+    image: ${MINIO_MC_IMAGE:-minio/mc:latest}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - mc alias set local http://minio:9000 amar amarsecret && mc mb --ignore-existing local/amar
+    depends_on:
+      minio: { condition: service_healthy }
+    restart: "no"
+
+  coturn:
+    image: coturn/coturn:latest
+    # Shared settings come from the config file; the secret comes from the environment.
+    command:
+      - -c
+      - /etc/coturn/turnserver.conf
+      - --static-auth-secret=${TURN_SECRET:-dev-only-turn-secret}
+    volumes:
+      - ./infra/coturn/turnserver.conf:/etc/coturn/turnserver.conf:ro
+    ports:
+      - "3478:3478/udp"
+      - "3478:3478/tcp"
+      - "49160-49200:49160-49200/udp"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/$(hostname -i)/3478'"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  fakes:
+    build: { context: ., target: fakes }
+    ports:
+      - "${FAKES_PORT:-4100}:4100"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4100/health >/dev/null || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  # Migrations run at startup in the api only (MIGRATE_ON_START); the worker waits for the api.
   api:
     build: { context: ., target: api }
+    env_file: .env.compose
     environment:
-      DATABASE_URL: postgres://amar:amar@db:5432/amar_poribar
-      PORT: "4000"
-      # Development returns the OTP in the response. Production needs an SMS
-      # gateway for OTP delivery, which isn't implemented yet, so login won't work there.
-      NODE_ENV: ${API_NODE_ENV:-development}
-      # No default on purpose: production refuses to start without a strong secret.
-      JWT_SECRET: ${JWT_SECRET:-}
-      # Browser origins allowed to call the API in production (the web app below).
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:${WEB_PORT:-3000}}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      AI_MODEL: ${AI_MODEL:-}
+      ROLE: api
+      MIGRATE_ON_START: "true"
     ports:
       - "${API_PORT:-4000}:4000"
     depends_on:
-      migrate: { condition: service_completed_successfully }
+      db: { condition: service_healthy }
+      minio-init: { condition: service_completed_successfully }
+      fakes: { condition: service_started }
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4000/ready >/dev/null || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  worker:
+    build: { context: ., target: worker }
+    env_file: .env.compose
+    environment:
+      ROLE: worker
+      MIGRATE_ON_START: "false"
+    depends_on:
+      api: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4001/health >/dev/null || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
 
   web:
     build:
@@ -96,7 +159,27 @@ services:
     ports:
       - "${WEB_PORT:-3000}:3000"
     depends_on:
-      - api
+      api: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000 >/dev/null || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  # Profile "admin" until the admin console exists (T-ADMUI).
+  admin:
+    profiles: ["admin"]
+    build: { context: ., target: admin }
+    ports:
+      - "${ADMIN_PORT:-3100}:3100"
+    depends_on:
+      api: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3100 >/dev/null || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
 
 volumes:
   db-data:
+  minio-data:
