@@ -1,4 +1,4 @@
-import type { Locale } from "./i18n.js";
+import type { Locale } from "./i18n/index.js";
 import type { TransactionDraft } from "./schemas.js";
 import { amountInWords } from "./words.js";
 
