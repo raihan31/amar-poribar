@@ -22,11 +22,14 @@ export interface UserBasics {
   bnDigits: boolean;
   createdAt: Date;
   updatedAt: Date;
+  simpleMode: boolean;
+  erasedAt: Date | null;
 }
 
 export interface UserRepo {
   upsertByPhone(phone: string): Promise<{ id: string }>;
   findByPhone(phone: string): Promise<{ id: string } | null>;
   getBasics(userId: string): Promise<UserBasics | null>;
+  getManyBasics(ids: readonly string[]): Promise<UserBasics[]>;
   getManyNames(ids: readonly string[]): Promise<Map<string, { id: string; name: string | null }>>;
 }

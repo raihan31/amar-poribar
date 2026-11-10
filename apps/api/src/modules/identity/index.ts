@@ -1,19 +1,29 @@
 import { HttpError } from "../../platform/errors.js";
 import type { ModuleContext, ModuleDefinition } from "../../platform/module.js";
 import type { UserBasics } from "./app/ports.js";
-import { authRoutes } from "./http/auth.routes.js";
+import { registerIdentityRoutes } from "./http/routes.js";
+import * as q from "./app/get-user.js";
+import { maskPhone } from "./domain/phone.js";
 import { MemoryOtpStore } from "./infra/otp-store.memory.js";
 import { registerJwt } from "./infra/jwt.js";
-import { createUserRepo } from "./infra/users.repo.js";
+import { createUserRepo } from "./infra/user-repo.js";
 export * from "./events.js";
 
 export type { UserBasics };
+export type { UserId, UserSummary, UserWithPhone } from "./app/get-user.js";
+export { maskPhone };
 
 /** Public surface of the identity module. Other modules may import only this file (SRS R1). */
 export interface IdentityFacade {
   readonly name: "identity";
   getUserBasics(userId: string): Promise<UserBasics | null>;
-  findUserByPhone(phone: string): Promise<{ id: string } | null>;
+  getUser(id: q.UserId): Promise<q.UserSummary | null>;
+  getUsers(ids: readonly q.UserId[]): Promise<Map<string, q.UserSummary>>;
+  getUserWithPhone(id: q.UserId): Promise<q.UserWithPhone | null>;
+  findUserByPhone(phone: string): Promise<q.UserWithPhone | null>;
+  /** Throws `HttpError(401, "unauthorized")` when the user is missing or erased. */
+  requireUser(id: q.UserId): Promise<q.UserSummary>;
+  maskPhone(phone: string): string;
   getUsersBasics(ids: readonly string[]): Promise<Map<string, { id: string; name: string | null }>>;
   /** Throws `HttpError` 401 for an invalid, expired or non-access token (used by the WebSocket hub). */
   verifyAccessToken(token: string): { userId: string };
@@ -47,11 +57,16 @@ export const identityModule: ModuleDefinition<IdentityFacade> = {
     const tokens = await registerJwt(app, config.jwtSecret);
     const users = createUserRepo(ctx.db);
     // The real DB-backed store arrives in T-ID-01.
-    authRoutes(app, { otp: new MemoryOtpStore(), users, tokens, isProd: config.isProd });
+    registerIdentityRoutes(app, { otp: new MemoryOtpStore(), users, tokens, isProd: config.isProd });
     return {
       name: "identity",
       getUserBasics: (id) => users.getBasics(id),
-      findUserByPhone: (phone) => users.findByPhone(phone),
+      getUser: (id) => q.getUser(users, id),
+      getUsers: (ids) => q.getUsers(users, ids),
+      getUserWithPhone: (id) => q.getUserWithPhone(users, id),
+      findUserByPhone: (phone) => q.findUserByPhone(users, phone),
+      requireUser: (id) => q.requireUser(users, id),
+      maskPhone,
       getUsersBasics: (ids) => users.getManyNames(ids),
       verifyAccessToken(token) {
         let payload;
