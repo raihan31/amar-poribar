@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, lt, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { accounts, categories, transactions } from "../schema.js";
 import type { Executor } from "./catalog.repo.js";
 import { visibleToCaller } from "./visibility.js";
@@ -89,6 +89,23 @@ export const totalsRepo = {
       .from(transactions)
       .where(and(visibleToCaller(familyId, userId), inRange(range), eq(transactions.type, "expense")));
     return Number(row?.total ?? 0);
+  },
+
+  /** Newest first, at most `limit` visible rows in the range, with category names (Ask tool). */
+  async listWithCategory(
+    x: Executor,
+    familyId: string,
+    userId: string,
+    range: { start: Date; end: Date },
+    limit: number,
+  ) {
+    return x
+      .select({ t: transactions, nameEn: categories.nameEn, nameBn: categories.nameBn })
+      .from(transactions)
+      .leftJoin(categories, eq(categories.id, transactions.categoryId))
+      .where(and(visibleToCaller(familyId, userId), inRange(range)))
+      .orderBy(desc(transactions.occurredAt))
+      .limit(limit);
   },
 
   /** Oldest first, read in pages so a two-year export never holds every row at once. */

@@ -1,4 +1,4 @@
-import { bigint, boolean, integer, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { bigint, boolean, integer, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
 // `accounts`, `categories` and `transactions` (and their enums and the sync sequence) are owned by the ledger
 // module (T-PLAT-25). They are re-exported so the legacy tables below and the unmoved routes keep working.
@@ -79,33 +79,3 @@ export const recurringTemplates = pgTable("recurring_templates", {
     .references(() => users.id),
   ...timestamps,
 });
-
-export const aiUsage = pgTable(
-  "ai_usage",
-  {
-    familyId: uuid("family_id")
-      .notNull()
-      .references(() => families.id, { onDelete: "cascade" }),
-    month: text("month").notNull(),
-    requests: integer("requests").notNull().default(0),
-  },
-  (t) => [primaryKey({ columns: [t.familyId, t.month] })],
-);
-
-/** Cached monthly summaries; regenerated only when the underlying totals change. */
-export const aiSummaries = pgTable(
-  "ai_summaries",
-  {
-    familyId: uuid("family_id")
-      .notNull()
-      .references(() => families.id, { onDelete: "cascade" }),
-    month: text("month").notNull(),
-    locale: text("locale").notNull(),
-    factsHash: text("facts_hash").notNull(),
-    text: text("text").notNull(),
-    speechText: text("speech_text").notNull(),
-    usedAi: boolean("used_ai").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  },
-  (t) => [primaryKey({ columns: [t.familyId, t.month, t.locale, t.factsHash] })],
-);

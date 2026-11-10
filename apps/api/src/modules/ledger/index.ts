@@ -7,6 +7,7 @@ import { getCategoryByKey, listCategories } from "./app/categories.js";
 import type { LedgerDeps } from "./app/deps.js";
 import { applyChange, type ApplyResult } from "./app/apply-sync-change.js";
 import { listChangesAfter, type ChangesPage } from "./app/list-for-sync.js";
+import { askQueries, type AskQueries } from "./app/ask-queries.js";
 import { expenseTotalBetween, monthTotals, type MonthTotals } from "./app/month-totals.js";
 import { remittanceByMonth, type RemittanceByMonth } from "./app/remittance.js";
 import { seedDefaults } from "./app/seed-defaults.js";
@@ -20,7 +21,17 @@ import { totalsRepo, type ExportRow } from "./infra/totals.repo.js";
 import type { Transaction } from "./infra/transactions.repo.js";
 export * from "./events.js";
 
-export type { Account, ApplyResult, Category, ChangesPage, ExportRow, MonthTotals, RemittanceByMonth, Transaction };
+export type {
+  Account,
+  ApplyResult,
+  AskQueries,
+  Category,
+  ChangesPage,
+  ExportRow,
+  MonthTotals,
+  RemittanceByMonth,
+  Transaction,
+};
 export { currentDhakaMonth, dayRange, monthRange, monthsBetween, previousMonth, nextHlc, assertNoClockDrift };
 
 /** Public surface of the ledger module. Other modules may import only this file (SRS R1). */
@@ -30,6 +41,8 @@ export interface LedgerFacade {
   monthTotals(familyId: string, userId: string, month: string): Promise<MonthTotals>;
   /** Expense in `[start, end)` as visible to `userId` (festival budgets). */
   expenseTotalBetween(familyId: string, userId: string, start: Date, end: Date): Promise<number>;
+  /** Read-only queries for the Ask feature; other members' private entries are never read (FR-TXN-05). */
+  askQueries(familyId: string, userId: string): AskQueries;
   listCategories(familyId: string): Promise<Category[]>;
   getCategoryByKey(familyId: string, key: string): Promise<Category | null>;
   /** The caller has already checked the member role (for example recurring confirm). */
@@ -68,6 +81,7 @@ export const ledgerModule: ModuleDefinition<LedgerFacade> = {
       name: "ledger",
       monthTotals: (familyId, userId, month) => monthTotals(deps, familyId, userId, month),
       expenseTotalBetween: (familyId, userId, start, end) => expenseTotalBetween(deps, familyId, userId, start, end),
+      askQueries: (familyId, userId) => askQueries(deps, familyId, userId),
       listCategories: (familyId) => listCategories(deps, familyId),
       getCategoryByKey: (familyId, key) => getCategoryByKey(deps, familyId, key),
       createTransaction: (familyId, actor, data) => createTransaction(deps, { familyId, actorId: actor.userId, data }),
