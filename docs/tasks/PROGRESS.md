@@ -14,15 +14,15 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-PLAT-08 | M0 | done | 05e123d | 2026-11-10 |  |
 | T-PLAT-09 | M0 | todo |  |  |  |
 | T-PLAT-10 | M0 | done | a949158 | 2026-11-10 |  |
-| T-PLAT-11 | M0 | todo |  |  |  |
+| T-PLAT-11 | M0 | done | 587e37ed2 | 2026-11-10 |  |
 | T-PLAT-12 | M0 | todo |  |  |  |
 | T-PLAT-13 | M0 | todo |  |  |  |
 | T-PLAT-14 | M0 | done | 2fcc036 | 2026-11-10 |  |
 | T-PLAT-15 | M0 | todo |  |  |  |
-| T-PLAT-16 | M0 | todo |  |  |  |
+| T-PLAT-16 | M0 | done | 70eeebe7c | 2026-11-10 |  |
 | T-PLAT-17 | M0 | done | 00b5293cd | 2026-11-10 |  |
-| T-PLAT-18 | M0 | todo |  |  |  |
-| T-PLAT-19 | M0 | todo |  |  |  |
+| T-PLAT-18 | M0 | done | 32563ef5f | 2026-11-10 |  |
+| T-PLAT-19 | M0 | done | 7a7b93945 | 2026-11-10 |  |
 | T-PLAT-20 | M0 | todo |  |  |  |
 | T-PLAT-21 | M0 | todo |  |  |  |
 | T-PLAT-22 | M0 | done | a04f2bf13 | 2026-11-10 |  |
@@ -159,7 +159,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-MOB-03 | M0 | done | ebca920bf | 2026-11-10 |  |
 | T-MOB-04 | M0 | done | b84374334 | 2026-11-10 |  |
 | T-MOB-05 | M0 | done | 5b4e5d0 | 2026-11-10 |  |
-| T-MOB-06 | M0 | todo |  |  |  |
+| T-MOB-06 | M0 | done | a53008252 | 2026-11-10 |  |
 | T-MOB-07 | M1 | done | a424c93 | 2026-11-10 |  |
 | T-MOB-08 | M1 | todo |  |  |  |
 | T-MOB-09 | M1 | todo |  |  |  |
@@ -224,7 +224,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-MOB-68 | M6 | todo |  |  |  |
 | T-MOB-69 | M6 | todo |  |  |  |
 | T-MOB-70 | M6 | todo |  |  |  |
-| T-MOB-71 | M2 | todo |  |  |  |
+| T-MOB-71 | M2 | done | 85f0b569b | 2026-11-10 |  |
 | T-MOB-72 | M3 | todo |  |  |  |
 | T-MOB-73 | M4 | todo |  |  |  |
 | T-MOB-74 | M3 | todo |  |  |  |
