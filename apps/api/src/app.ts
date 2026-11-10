@@ -8,7 +8,6 @@ import { budgetRoutes } from "./routes/budgets.js";
 import { festivalRoutes } from "./routes/festivals.js";
 import { registerComposition } from "./composition/index.js";
 import { EventBus } from "./platform/events/bus.js";
-import { recurringRoutes } from "./routes/recurring.js";
 import { reportRoutes } from "./routes/reports.js";
 import { syncRoutes } from "./routes/sync.js";
 import { modules } from "./modules/registry.js";
@@ -55,7 +54,6 @@ export async function buildApp(deps: AppDeps) {
   await app.register(async (scope) => aiRoutes(scope, deps, ctx));
   await app.register(async (scope) => budgetRoutes(scope, deps, ctx));
   await app.register(async (scope) => festivalRoutes(scope, deps));
-  await app.register(async (scope) => recurringRoutes(scope, deps));
   await app.register(async (scope) => reportRoutes(scope, deps, ctx));
   return app;
 }

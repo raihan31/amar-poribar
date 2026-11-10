@@ -64,6 +64,13 @@
       "when": 1794347314648,
       "tag": "0008_realtime_payloads",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794347879919,
+      "tag": "0009_recurring_tables",
+      "breakpoints": true
     }
   ]
 }
