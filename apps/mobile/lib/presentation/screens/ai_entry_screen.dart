@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../app/redirects.dart';
 import '../../core/money/money_format.dart';
 import '../../core/speech/bangla_words.dart';
 import '../../core/speech/budget_alerts.dart';
@@ -39,7 +41,7 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
     } on ApiException catch (e) {
       if (e.isUnauthorized) {
         await ref.read(authProvider.notifier).signOut();
-        if (mounted) Navigator.pushReplacementNamed(context, '/login');
+        if (mounted) context.go(Routes.login);
         return;
       }
       setState(() => _error = e.message);
@@ -290,9 +292,7 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
             tooltip: 'লগআউট',
             onPressed: () async {
               await ref.read(authProvider.notifier).signOut();
-              if (context.mounted) {
-                Navigator.pushReplacementNamed(context, '/login');
-              }
+              if (context.mounted) context.go(Routes.login);
             },
           ),
         ],
@@ -302,8 +302,7 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
         child: !auth.signedIn
             ? Center(
                 child: ElevatedButton(
-                  onPressed: () =>
-                      Navigator.pushReplacementNamed(context, '/login'),
+                  onPressed: () => context.go(Routes.login),
                   child: const Text('লগইন করুন'),
                 ),
               )

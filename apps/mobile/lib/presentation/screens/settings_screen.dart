@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../app/redirects.dart';
 import '../../core/l10n/l10n_x.dart';
 import '../../core/l10n/locale_controller.dart';
 import '../../data/sync/nearby_transport.dart';
@@ -133,7 +135,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.record_voice_over),
             title: Text(context.l10n.settings_tutorial_title),
-            onTap: () => Navigator.pushNamed(context, '/tutorial'),
+            onTap: () => context.push(Routes.tutorial),
           ),
           ListTile(
             leading: const Icon(Icons.language),

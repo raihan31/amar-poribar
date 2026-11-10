@@ -1,7 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../app/redirects.dart';
 import '../../core/l10n/l10n_x.dart';
 import '../../core/money/money.dart';
 import '../../core/money/money_format.dart';
@@ -32,7 +34,7 @@ class DashboardScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.pushNamed(context, '/settings'),
+            onPressed: () => context.push(Routes.settings),
           ),
         ],
       ),
@@ -161,7 +163,7 @@ class DashboardScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.pushNamed(context, '/transactions'),
+        onPressed: () => context.push(Routes.transactions),
         label: Text(context.l10n.txn_dashboard_add),
         icon: const Icon(Icons.add),
       ),

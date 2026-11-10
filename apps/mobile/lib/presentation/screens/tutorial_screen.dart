@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../app/redirects.dart';
 import '../../core/speech/tutorial.dart';
 import '../../core/speech/voice_service.dart';
 import '../providers/auth_provider.dart';
@@ -47,7 +49,8 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
   Future<void> _finish() async {
     await _voice.stopSpeaking();
     await ref.read(localStoreProvider).setMeta(tutorialDoneKey, '1');
-    if (mounted) Navigator.pushReplacementNamed(context, '/ai-entry');
+    ref.read(tutorialDoneProvider.notifier).state = true;
+    if (mounted) context.go(Routes.home);
   }
 
   @override
