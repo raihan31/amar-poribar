@@ -8,12 +8,14 @@ import { budgetLevel, effectiveBudgets } from "../budgets.js";
 import { budgets, categories } from "../db/schema.js";
 import { HttpError, parseOr400 } from "../errors.js";
 import { currentDhakaMonth } from "../month.js";
-import { monthTotals } from "../totals.js";
+import type { ModuleContext } from "../platform/module.js";
 
 type FamilyParams = { Params: { familyId: string } };
 const MonthQuery = z.object({ month: MonthSchema.optional() });
 
-export async function budgetRoutes(app: FastifyInstance, { db }: AppDeps) {
+export async function budgetRoutes(app: FastifyInstance, { db }: AppDeps, ctx: ModuleContext) {
+  const ledger = ctx.facades.ledger;
+  if (!ledger) throw new Error("ledger must be registered first");
   app.addHook("preHandler", app.authenticate);
 
   // FR-BUD-01, FR-BUD-02, FR-BUD-03
@@ -28,7 +30,7 @@ export async function budgetRoutes(app: FastifyInstance, { db }: AppDeps) {
       .where(and(eq(budgets.familyId, familyId), lte(budgets.month, month)));
     const effective = effectiveBudgets(rows, month);
 
-    const totals = await monthTotals(db, familyId, req.user.sub, month);
+    const totals = await ledger.monthTotals(familyId, req.user.sub, month);
     const spentBy = new Map(totals.byCategory.map((c) => [c.categoryId, c.totalPaisa]));
     const ids = effective.flatMap((b) => (b.categoryId ? [b.categoryId] : []));
     const cats = ids.length

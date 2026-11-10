@@ -2,7 +2,6 @@ import type { Role } from "@amar-poribar/shared";
 import { HttpError } from "../../platform/errors.js";
 import type { Db } from "../../platform/db.js";
 import type { ModuleDefinition } from "../../platform/module.js";
-import type { SeedDefaults } from "./app/deps.js";
 import { requireRole } from "./app/require-role.js";
 import { canAssignRole, canEditAll, canManageMember } from "./domain/roles.js";
 import { familiesRoutes } from "./http/families.routes.js";
@@ -22,6 +21,8 @@ export interface FamiliesFacade {
   listFamiliesForUser(userId: string): Promise<FamilySummary[]>;
   getMemberIds(familyId: string): Promise<string[]>;
   getMemberRoles(familyId: string): Promise<Map<string, Role>>;
+  /** Display name (else phone) per user id; ids without a user are absent. Ledger uses it for member breakdowns. */
+  getUserLabels(userIds: readonly string[]): Promise<Map<string, string>>;
   /** Temporary home; moves to billing in T-BILL. */
   getAiQuota(familyId: string): Promise<{ quotaMonth: number; plan: string }>;
   canEditAll(role: Role): boolean;
@@ -55,9 +56,7 @@ export const familiesModule: ModuleDefinition<FamiliesFacade> = {
     const identity = ctx.facades.identity;
     if (!identity) throw new Error("families: identity must be registered first");
     const bus = ctx.bus;
-    // `ledger` provides this in T-PLAT-25; until then the legacy inline seeding runs.
-    const seedDefaults = (ctx.facades as { ledger?: { seedDefaults?: SeedDefaults } }).ledger?.seedDefaults;
-    const deps = { db: ctx.db, bus, identity, clock: ctx.clock, ...(seedDefaults ? { seedDefaults } : {}) };
+    const deps = { db: ctx.db, bus, identity, clock: ctx.clock };
     familiesRoutes(app, deps);
     invitesRoutes(app, deps);
     membersRoutes(app, deps);
@@ -70,6 +69,15 @@ export const familiesModule: ModuleDefinition<FamiliesFacade> = {
       },
       async getMemberRoles(familyId) {
         return new Map((await familiesRepo.listMembers(ctx.db, familyId)).map((m) => [m.userId, m.role]));
+      },
+      async getUserLabels(userIds) {
+        const users = await Promise.all([...new Set(userIds)].map((id) => identity.getUserBasics(id)));
+        const labels = new Map<string, string>();
+        for (const u of users) {
+          const label = u?.name ?? u?.phone;
+          if (u && label) labels.set(u.id, label);
+        }
+        return labels;
       },
       async getAiQuota(familyId) {
         const q = await familiesRepo.aiQuota(ctx.db, familyId);

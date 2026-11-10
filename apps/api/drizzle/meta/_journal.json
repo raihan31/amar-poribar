@@ -50,6 +50,13 @@
       "when": 1794345931203,
       "tag": "0006_families_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794347027596,
+      "tag": "0007_ledger_tables",
+      "breakpoints": true
     }
   ]
 }

@@ -1,32 +1,19 @@
-import { sql } from "drizzle-orm";
-import {
-  bigint,
-  boolean,
-  index,
-  integer,
-  pgEnum,
-  pgSequence,
-  pgTable,
-  primaryKey,
-  real,
-  text,
-  timestamp,
-  uniqueIndex,
-  uuid,
-} from "drizzle-orm/pg-core";
-import { ACCOUNT_TYPES } from "@amar-poribar/shared";
+import { bigint, boolean, integer, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
-/**
- * Delivery order for sync. HLC decides which version of a record wins; this sequence decides what a device
- * still has to download. Devices assign their own HLCs, so an offline entry can arrive with an HLC older than
- * what the server already holds, and an HLC cursor would skip it.
- */
-export const txnSyncSeq = pgSequence("txn_sync_seq");
-
-export const accountTypeEnum = pgEnum("account_type", ACCOUNT_TYPES);
-export const txnTypeEnum = pgEnum("txn_type", ["expense", "income", "transfer"]);
-export const txnSourceEnum = pgEnum("txn_source", ["manual", "ai_text", "sms", "voice", "receipt"]);
-export const categoryKindEnum = pgEnum("category_kind", ["expense", "income"]);
+// `accounts`, `categories` and `transactions` (and their enums and the sync sequence) are owned by the ledger
+// module (T-PLAT-25). They are re-exported so the legacy tables below and the unmoved routes keep working.
+export {
+  accounts,
+  accountTypeEnum,
+  bumpSyncSeq,
+  categories,
+  categoryKindEnum,
+  transactions,
+  txnSourceEnum,
+  txnSyncSeq,
+  txnTypeEnum,
+} from "../modules/ledger/schema.js";
+import { accounts, categories, txnTypeEnum } from "../modules/ledger/schema.js";
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -41,74 +28,6 @@ import { users } from "../modules/identity/schema.js";
 // `families` table is re-exported, so the legacy tables below keep their foreign keys and the AI quota lookup.
 export { families } from "../modules/families/schema.js";
 import { families } from "../modules/families/schema.js";
-
-export const accounts = pgTable("accounts", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  familyId: uuid("family_id")
-    .notNull()
-    .references(() => families.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  type: accountTypeEnum("type").notNull(),
-  ownerUserId: uuid("owner_user_id").references(() => users.id),
-  openingBalancePaisa: bigint("opening_balance_paisa", { mode: "number" }).notNull().default(0),
-  archivedAt: timestamp("archived_at", { withTimezone: true }),
-  ...timestamps,
-});
-
-export const categories = pgTable("categories", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  familyId: uuid("family_id")
-    .notNull()
-    .references(() => families.id, { onDelete: "cascade" }),
-  key: text("key").notNull(),
-  kind: categoryKindEnum("kind").notNull(),
-  nameEn: text("name_en").notNull(),
-  nameBn: text("name_bn").notNull(),
-  icon: text("icon"),
-  isHidden: boolean("is_hidden").notNull().default(false),
-});
-
-export const transactions = pgTable(
-  "transactions",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    familyId: uuid("family_id")
-      .notNull()
-      .references(() => families.id, { onDelete: "cascade" }),
-    type: txnTypeEnum("type").notNull(),
-    amountPaisa: bigint("amount_paisa", { mode: "number" }).notNull(),
-    feePaisa: bigint("fee_paisa", { mode: "number" }).notNull().default(0),
-    occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull(),
-    categoryId: uuid("category_id").references(() => categories.id),
-    accountId: uuid("account_id").references(() => accounts.id),
-    paidByUserId: uuid("paid_by_user_id").references(() => users.id),
-    note: text("note"),
-    counterparty: text("counterparty"),
-    trxId: text("trx_id"),
-    source: txnSourceEnum("source").notNull().default("manual"),
-    aiConfidence: real("ai_confidence"),
-    isPrivate: boolean("is_private").notNull().default(false),
-    createdBy: uuid("created_by")
-      .notNull()
-      .references(() => users.id),
-    deletedAt: timestamp("deleted_at", { withTimezone: true }),
-    /** Hybrid logical clock of the last change (SRS FR-SYNC-02). Empty for rows that predate sync. */
-    hlc: text("hlc").notNull().default(""),
-    /** Bumped on every insert/update (see `bumpSyncSeq`); the cursor sync clients page by. */
-    syncSeq: bigint("sync_seq", { mode: "number" })
-      .notNull()
-      .default(sql`nextval('txn_sync_seq')`),
-    ...timestamps,
-  },
-  (t) => [
-    index("txn_family_seq_idx").on(t.familyId, t.syncSeq),
-    index("txn_family_time_idx").on(t.familyId, t.occurredAt.desc()),
-    // SRS FR-TXN-04: no duplicate MFS transactions.
-    uniqueIndex("txn_family_trx_uidx")
-      .on(t.familyId, t.trxId)
-      .where(sql`${t.trxId} is not null`),
-  ],
-);
 
 export const budgets = pgTable(
   "budgets",
@@ -190,6 +109,3 @@ export const aiSummaries = pgTable(
   },
   (t) => [primaryKey({ columns: [t.familyId, t.month, t.locale, t.factsHash] })],
 );
-
-/** Use in every UPDATE of `transactions` so sync clients see the change. */
-export const bumpSyncSeq = sql`nextval('txn_sync_seq')`;

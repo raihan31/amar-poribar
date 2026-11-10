@@ -81,11 +81,16 @@ describe("tenant isolation: coverage", () => {
 // The families and ledger tables are created by the module moves (T-PLAT-24, 25); until their migrations exist
 // there is no family to attack, exactly like fixtures.db.test.ts.
 const hasAppTables = await withTestDb(async ({ sql }) => {
-  const r = await sql<{ ident: string | null; fam: string | null; ledger: string | null }[]>`
+  const r = await sql<{ ident: string | null; fam: string | null; ledger: string | null; rest: boolean }[]>`
     select coalesce(to_regclass('public.users')::text, to_regclass('identity.users')::text) as ident,
            coalesce(to_regclass('public.family_members')::text, to_regclass('families.family_members')::text) as fam,
-           coalesce(to_regclass('public.categories')::text, to_regclass('ledger.categories')::text) as ledger`;
-  return Boolean(r[0]?.ident) && Boolean(r[0]?.fam) && Boolean(r[0]?.ledger);
+           coalesce(to_regclass('public.categories')::text, to_regclass('ledger.categories')::text) as ledger,
+           (coalesce(to_regclass('public.budgets'), to_regclass('budgeting.budgets')) is not null
+            and coalesce(to_regclass('public.festival_budgets'), to_regclass('budgeting.festival_budgets')) is not null
+            and coalesce(to_regclass('public.recurring_templates'), to_regclass('recurring.recurring_templates')) is not null
+            and coalesce(to_regclass('public.ai_usage'), to_regclass('ai.ai_usage')) is not null) as rest`;
+  // Every route is attacked, so the budgets, recurring and AI tables (T-PLAT-26..30) must exist too.
+  return Boolean(r[0]?.ident) && Boolean(r[0]?.fam) && Boolean(r[0]?.ledger) && r[0]?.rest === true;
 });
 
 describe.skipIf(!hasAppTables)("tenant isolation: outsider", () => {

@@ -8,11 +8,13 @@ import { csvRow, dhakaStamp, paisaToDecimal } from "../csv.js";
 import { accounts, categories, transactions } from "../db/schema.js";
 import { HttpError, parseOr400 } from "../errors.js";
 import { currentDhakaMonth, monthRange, monthsBetween, previousMonth } from "../month.js";
-import { monthTotals } from "../totals.js";
+import type { ModuleContext } from "../platform/module.js";
 
 type FamilyParams = { Params: { familyId: string } };
 
-export async function reportRoutes(app: FastifyInstance, { db }: AppDeps) {
+export async function reportRoutes(app: FastifyInstance, { db }: AppDeps, ctx: ModuleContext) {
+  const ledger = ctx.facades.ledger;
+  if (!ledger) throw new Error("ledger must be registered first");
   app.addHook("preHandler", app.authenticate);
 
   app.get<FamilyParams>("/v1/families/:familyId/reports/summary", async (req): Promise<MonthSummary> => {
@@ -21,8 +23,8 @@ export async function reportRoutes(app: FastifyInstance, { db }: AppDeps) {
     const { month = currentDhakaMonth() } = parseOr400(z.object({ month: MonthSchema.optional() }), req.query);
     const prevMonth = previousMonth(month);
     const [totals, prev] = await Promise.all([
-      monthTotals(db, familyId, req.user.sub, month),
-      monthTotals(db, familyId, req.user.sub, prevMonth),
+      ledger.monthTotals(familyId, req.user.sub, month),
+      ledger.monthTotals(familyId, req.user.sub, prevMonth),
     ]);
     return {
       month,
