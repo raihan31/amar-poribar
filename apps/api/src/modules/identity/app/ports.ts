@@ -20,6 +20,8 @@ export interface UserBasics {
   phone: string;
   locale: string;
   bnDigits: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface UserRepo {

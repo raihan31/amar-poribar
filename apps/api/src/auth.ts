@@ -1,39 +1,21 @@
-import { and, eq } from "drizzle-orm";
+// Role rules live in modules/families. Routes that have not moved into a module yet (T-PLAT-25..30) still call
+// these thin wrappers; each moved route uses `ctx.facades.families.requireRole` instead.
 import type { Role } from "@amar-poribar/shared";
 import type { Db } from "./db/client.js";
-import { familyMembers } from "./db/schema.js";
-import { HttpError } from "./errors.js";
+import {
+  canAssignRole,
+  canEditAll,
+  canManageMember,
+  findMemberRoleWithDb,
+  requireRoleWithDb,
+} from "./modules/families/index.js";
 
-const ROLE_RANK: Record<Role, number> = { viewer: 0, member: 1, admin: 2, owner: 3 };
+export { canAssignRole, canEditAll, canManageMember };
 
-/**
- * Ensure the user belongs to the family with at least `minRole`.
- * Non-members get 404 so family IDs can't be probed (SRS acceptance #7).
- */
-export async function requireRole(db: Db, familyId: string, userId: string, minRole: Role): Promise<Role> {
-  const [row] = await db
-    .select({ role: familyMembers.role })
-    .from(familyMembers)
-    .where(and(eq(familyMembers.familyId, familyId), eq(familyMembers.userId, userId)));
-  if (!row) throw new HttpError(404, "not_found", "Family not found");
-  if (ROLE_RANK[row.role] < ROLE_RANK[minRole]) throw new HttpError(403, "forbidden", "Insufficient role");
-  return row.role;
+export function requireRole(db: Db, familyId: string, userId: string, minRole: Role): Promise<Role> {
+  return requireRoleWithDb(db, familyId, userId, minRole);
 }
 
-export function canEditAll(role: Role): boolean {
-  return ROLE_RANK[role] >= ROLE_RANK.admin;
-}
-
-/** Roles that `actor` may assign to others. Only owners can create admins; nobody assigns owner. */
-export function canAssignRole(actor: Role, target: Role): boolean {
-  if (target === "owner") return false;
-  if (target === "admin") return actor === "owner";
-  return ROLE_RANK[actor] >= ROLE_RANK.admin;
-}
-
-/** Whether `actor` may change or remove a member currently holding `current`. */
-export function canManageMember(actor: Role, current: Role): boolean {
-  if (current === "owner") return false;
-  if (current === "admin") return actor === "owner";
-  return ROLE_RANK[actor] >= ROLE_RANK.admin;
+export function findMemberRole(db: Db, familyId: string, userId: string): Promise<Role | null> {
+  return findMemberRoleWithDb(db, familyId, userId);
 }

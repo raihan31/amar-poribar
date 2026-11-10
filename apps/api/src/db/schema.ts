@@ -14,7 +14,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
-import { ACCOUNT_TYPES, ROLES } from "@amar-poribar/shared";
+import { ACCOUNT_TYPES } from "@amar-poribar/shared";
 
 /**
  * Delivery order for sync. HLC decides which version of a record wins; this sequence decides what a device
@@ -23,7 +23,6 @@ import { ACCOUNT_TYPES, ROLES } from "@amar-poribar/shared";
  */
 export const txnSyncSeq = pgSequence("txn_sync_seq");
 
-export const roleEnum = pgEnum("role", ROLES);
 export const accountTypeEnum = pgEnum("account_type", ACCOUNT_TYPES);
 export const txnTypeEnum = pgEnum("txn_type", ["expense", "income", "transfer"]);
 export const txnSourceEnum = pgEnum("txn_source", ["manual", "ai_text", "sms", "voice", "receipt"]);
@@ -38,51 +37,10 @@ const timestamps = {
 export { users } from "../modules/identity/schema.js";
 import { users } from "../modules/identity/schema.js";
 
-export const families = pgTable("families", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-  currency: text("currency").notNull().default("BDT"),
-  plan: text("plan").notNull().default("free"),
-  aiQuotaMonth: integer("ai_quota_month").notNull().default(100),
-  createdBy: uuid("created_by")
-    .notNull()
-    .references(() => users.id),
-  ...timestamps,
-});
-
-export const familyMembers = pgTable(
-  "family_members",
-  {
-    familyId: uuid("family_id")
-      .notNull()
-      .references(() => families.id, { onDelete: "cascade" }),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    role: roleEnum("role").notNull().default("member"),
-    joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
-  },
-  (t) => [primaryKey({ columns: [t.familyId, t.userId] })],
-);
-
-/** Shareable invite link, valid for 7 days (SRS FR-FAM-02). */
-export const familyInvites = pgTable("family_invites", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  familyId: uuid("family_id")
-    .notNull()
-    .references(() => families.id, { onDelete: "cascade" }),
-  token: text("token").notNull().unique(),
-  role: roleEnum("role").notNull().default("member"),
-  /** Optional: when set, only the user with this phone can accept. */
-  phone: text("phone"),
-  createdBy: uuid("created_by")
-    .notNull()
-    .references(() => users.id),
-  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-  acceptedBy: uuid("accepted_by").references(() => users.id),
-  acceptedAt: timestamp("accepted_at", { withTimezone: true }),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+// `families`, `family_members` and `family_invites` are owned by the families module (T-PLAT-24). Only the
+// `families` table is re-exported, so the legacy tables below keep their foreign keys and the AI quota lookup.
+export { families } from "../modules/families/schema.js";
+import { families } from "../modules/families/schema.js";
 
 export const accounts = pgTable("accounts", {
   id: uuid("id").primaryKey().defaultRandom(),
