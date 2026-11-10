@@ -3,16 +3,28 @@
   "common_appName": "আমার পরিবার",
   "common_yes": "হ্যাঁ",
   "common_no": "না",
-  "auth_login_title": "লগইন",
-  "auth_login_phoneLabel": "মোবাইল নম্বর",
-  "auth_login_phoneHint": "০১৭১২৩৪৫৬৭৮৯",
-  "auth_login_codeLabel": "৬ সংখ্যার কোড",
-  "auth_login_sendOtp": "OTP পাঠান",
-  "auth_login_submit": "লগইন",
+  "auth_login_title": "আমার পরিবার",
+  "auth_login_phoneLabel": "আপনার মোবাইল নম্বর দিন",
+  "auth_login_phoneHint": "আমরা একটি ৬ সংখ্যার কোড এসএমএসে পাঠাব।",
+  "auth_login_codeLabel": "কোডটি লিখুন",
+  "auth_login_submit": "ঢুকুন",
   "auth_login_devOtp": "ডেভ OTP: {code}",
   "@auth_login_devOtp": {
     "placeholders": {"code": {"type": "String"}}
   },
+  "auth_login_tagline": "পরিবারের সব হিসাব, এক জায়গায়",
+  "auth_login_resend": "আবার পাঠান ({time})",
+  "@auth_login_resend": {
+    "placeholders": {"time": {"type": "String"}}
+  },
+  "auth_login_resendNow": "আবার পাঠান",
+  "auth_login_resendQuestion": "কোড আসেনি?",
+  "auth_login_helpFooter": "সাহায্য লাগলে বাড়ির কাউকে ফোন দিন।",
+  "auth_login_phoneInvalid": "নম্বরটি ঠিক নয়। ০১ দিয়ে শুরু করে ১১ সংখ্যা লিখুন।",
+  "auth_login_phoneSemantics": "মোবাইল নম্বর",
+  "auth_login_codeSemantics": "৬ সংখ্যার কোড",
+  "auth_login_changeNumber": "নম্বর বদলান",
+  "auth_login_failed": "ঢোকা যায়নি। আবার চেষ্টা করুন।",
   "home_welcome": "স্বাগতম, {role}",
   "@home_welcome": {
     "placeholders": {"role": {"type": "String"}}

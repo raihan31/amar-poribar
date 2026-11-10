@@ -1,4 +1,7 @@
 import 'package:amar_poribar/app/redirects.dart';
+import 'package:amar_poribar/features/auth/data/auth_repository.dart';
+import 'package:amar_poribar/features/auth/data/fake_auth_repository.dart';
+import 'package:amar_poribar/features/auth/ui/login_screen.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -43,6 +46,12 @@ void registerAllScreens() {
   if (_registered) return;
   _registered = true;
   // registerScreen('B1', Routes.list, (c) => TransactionsScreen(), needs: [...]);
+  registerScreen(
+    'A1',
+    Routes.login,
+    (c) => const LoginScreen(),
+    needs: [authRepositoryProvider.overrideWithValue(FakeAuthRepository())],
+  );
 }
 
 /// Routes that exist in the app. Until the `Routes` table of T-MOB-13 lands
@@ -67,7 +76,6 @@ const Set<String> kRoutesAwaitingRegistration = {
   Routes.transactions,
   Routes.pendingSms,
   Routes.settings,
-  Routes.login,
   Routes.add,
   Routes.tutorial,
 };

@@ -82,6 +82,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await _loadFamily();
   }
 
+  /// Called after the tokens are stored (login screen): loads the profile and families.
+  Future<void> completeSignIn() => _loadFamily();
+
   Future<void> _loadFamily() async {
     try {
       final fams = await api.families();
