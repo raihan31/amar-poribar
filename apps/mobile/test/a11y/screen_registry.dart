@@ -1,4 +1,4 @@
-import 'package:amar_poribar/presentation/navigation/app_router.dart';
+import 'package:amar_poribar/app/redirects.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -46,28 +46,28 @@ void registerAllScreens() {
 }
 
 /// Routes that exist in the app. Until the `Routes` table of T-MOB-13 lands
-/// this mirrors [AppRouter]; a new route added there must be added here too.
+/// this mirrors [Routes]; a new route added there must be added here too.
 const List<String> kAllRoutes = [
-  AppRouter.onboardingRoute,
-  AppRouter.dashboardRoute,
-  AppRouter.transactionsRoute,
-  AppRouter.pendingSmsRoute,
-  AppRouter.settingsRoute,
-  AppRouter.loginRoute,
-  AppRouter.aiEntryRoute,
-  AppRouter.tutorialRoute,
+  Routes.welcome,
+  Routes.home,
+  Routes.transactions,
+  Routes.pendingSms,
+  Routes.settings,
+  Routes.login,
+  Routes.add,
+  Routes.tutorial,
 ];
 
 /// Pre-existing screens not yet in the audit. Each screen task removes its
 /// route from this list when it registers the screen. The list may only
 /// shrink: `registry_complete_test.dart` fails if a route is in neither place.
 const Set<String> kRoutesAwaitingRegistration = {
-  AppRouter.onboardingRoute,
-  AppRouter.dashboardRoute,
-  AppRouter.transactionsRoute,
-  AppRouter.pendingSmsRoute,
-  AppRouter.settingsRoute,
-  AppRouter.loginRoute,
-  AppRouter.aiEntryRoute,
-  AppRouter.tutorialRoute,
+  Routes.welcome,
+  Routes.home,
+  Routes.transactions,
+  Routes.pendingSms,
+  Routes.settings,
+  Routes.login,
+  Routes.add,
+  Routes.tutorial,
 };
