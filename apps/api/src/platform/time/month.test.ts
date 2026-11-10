@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dayRange, monthRange } from "./domain/month.js";
+import { dayRange, monthRange } from "./month.js";
 
 describe("monthRange", () => {
   it("uses Dhaka month boundaries", () => {

@@ -10,7 +10,7 @@ import { listChangesAfter, type ChangesPage } from "./app/list-for-sync.js";
 import { expenseTotalBetween, monthTotals, type MonthTotals } from "./app/month-totals.js";
 import { remittanceByMonth, type RemittanceByMonth } from "./app/remittance.js";
 import { seedDefaults } from "./app/seed-defaults.js";
-import { currentDhakaMonth, dayRange, monthRange, monthsBetween, previousMonth } from "./domain/month.js";
+import { currentDhakaMonth, dayRange, monthRange, monthsBetween, previousMonth } from "../../platform/time/month.js";
 import { nextHlc } from "./domain/hlc.js";
 import { accountsRoutes } from "./http/accounts.routes.js";
 import { categoriesRoutes } from "./http/categories.routes.js";

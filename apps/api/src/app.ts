@@ -4,8 +4,6 @@ import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod
 import type { AppDeps } from "./deps.js";
 import { registerErrorHandler } from "./errors.js";
 import { aiRoutes } from "./routes/ai.js";
-import { budgetRoutes } from "./routes/budgets.js";
-import { festivalRoutes } from "./routes/festivals.js";
 import { registerComposition } from "./composition/index.js";
 import { EventBus } from "./platform/events/bus.js";
 import { recurringRoutes } from "./routes/recurring.js";
@@ -40,7 +38,7 @@ export async function buildApp(deps: AppDeps) {
   registerHealth(app, { db: deps.db, jobs, isProd: deps.isProd, metricsToken: deps.metricsToken, metrics });
   jobs.register(healthSampleJob({ db: deps.db, metrics }));
 
-  // Modules register in dependency order (SRS §3.1). Existing routes below move into modules in T-PLAT-26..30.
+  // Modules register in dependency order (SRS §3.1). Existing routes below move into modules in T-PLAT-27..30.
   const ctx: ModuleContext = {
     db: deps.db,
     config: { jwtSecret: deps.jwtSecret, isProd: deps.isProd },
@@ -59,8 +57,6 @@ export async function buildApp(deps: AppDeps) {
 
   await app.register(async (scope) => syncRoutes(scope, deps, ctx));
   await app.register(async (scope) => aiRoutes(scope, deps, ctx));
-  await app.register(async (scope) => budgetRoutes(scope, deps, ctx));
-  await app.register(async (scope) => festivalRoutes(scope, deps));
   await app.register(async (scope) => recurringRoutes(scope, deps));
   await app.register(async (scope) => reportRoutes(scope, deps, ctx));
   return app;

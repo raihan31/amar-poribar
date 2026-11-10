@@ -1,4 +1,4 @@
-import { monthRange } from "../domain/month.js";
+import { monthRange } from "../../../platform/time/month.js";
 import { totalsRepo } from "../infra/totals.repo.js";
 import type { LedgerDeps } from "./deps.js";
 
