@@ -36,6 +36,17 @@ export default tseslint.config(
     },
   },
   {
+    // All configuration is read in one place (SRS 3.6).
+    files: ["apps/api/src/**/*.ts"],
+    ignores: ["apps/api/src/platform/config.ts", "**/*.test.ts"],
+    rules: {
+      "no-restricted-properties": [
+        "error",
+        { object: "process", property: "env", message: "Read configuration through platform/config.ts." },
+      ],
+    },
+  },
+  {
     // Test doubles are loosely typed on purpose.
     files: ["**/*.test.ts", "**/*.test.tsx"],
     rules: {
