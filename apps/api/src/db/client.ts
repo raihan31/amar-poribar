@@ -1,9 +1,7 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
 import { env } from "../env.js";
-import * as schema from "./schema.js";
+import { createDb, schema } from "../platform/db.js";
+export type { Db } from "../platform/db.js";
 
-export const sqlClient = postgres(env.databaseUrl, { max: 10 });
-export const db = drizzle(sqlClient, { schema });
-export type Db = typeof db;
-export { schema };
+const { db, sql } = createDb(env);
+export const sqlClient = sql;
+export { db, schema };
