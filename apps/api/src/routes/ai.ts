@@ -24,7 +24,7 @@ import type { Db } from "../db/client.js";
 import { aiSummaries, aiUsage, categories, families, transactions } from "../db/schema.js";
 import { HttpError, parseOr400 } from "../errors.js";
 import { currentDhakaMonth, monthRange, previousMonth } from "../month.js";
-import { monthTotals } from "../totals.js";
+import type { ModuleContext } from "../platform/module.js";
 
 type FamilyParams = { Params: { familyId: string } };
 
@@ -46,7 +46,9 @@ async function recordAiUse(db: Db, familyId: string): Promise<void> {
     .onConflictDoUpdate({ target: [aiUsage.familyId, aiUsage.month], set: { requests: sql`${aiUsage.requests} + 1` } });
 }
 
-export async function aiRoutes(app: FastifyInstance, { db, anthropic, aiModel }: AppDeps) {
+export async function aiRoutes(app: FastifyInstance, { db, anthropic, aiModel }: AppDeps, ctx: ModuleContext) {
+  const ledger = ctx.facades.ledger;
+  if (!ledger) throw new Error("ledger must be registered first");
   app.addHook("preHandler", app.authenticate);
 
   /** Text, voice transcript or MFS SMS → drafts (FR-AI-01, FR-AI-02, FR-VOICE-02). */
@@ -83,8 +85,8 @@ export async function aiRoutes(app: FastifyInstance, { db, anthropic, aiModel }:
     const { month = currentDhakaMonth(), locale } = parseOr400(SummaryQuerySchema, req.query);
 
     const [current, last] = await Promise.all([
-      monthTotals(db, familyId, req.user.sub, month),
-      monthTotals(db, familyId, req.user.sub, previousMonth(month)),
+      ledger.monthTotals(familyId, req.user.sub, month),
+      ledger.monthTotals(familyId, req.user.sub, previousMonth(month)),
     ]);
     const lastByCategory = new Map(last.byCategory.map((c) => [c.categoryId, c.totalPaisa]));
     const input: SummaryInput = {
@@ -148,14 +150,14 @@ export async function aiRoutes(app: FastifyInstance, { db, anthropic, aiModel }:
     const userId = req.user.sub;
     const tools: AskTools = {
       sumByCategory: async (month) =>
-        (await monthTotals(db, familyId, userId, month)).byCategory.map((c) => ({
+        (await ledger.monthTotals(familyId, userId, month)).byCategory.map((c) => ({
           name: `${c.nameEn} / ${c.name}`,
           totalPaisa: c.totalPaisa,
         })),
       compareMonths: async (a, b) => {
         const [ta, tb] = await Promise.all([
-          monthTotals(db, familyId, userId, a),
-          monthTotals(db, familyId, userId, b),
+          ledger.monthTotals(familyId, userId, a),
+          ledger.monthTotals(familyId, userId, b),
         ]);
         return {
           a: { month: a, incomePaisa: ta.incomePaisa, expensePaisa: ta.expensePaisa },

@@ -6,7 +6,7 @@ import type { AppDeps } from "../deps.js";
 import { requireRole } from "../auth.js";
 import { accounts, categories, recurringTemplates, transactions } from "../db/schema.js";
 import { HttpError, parseOr400 } from "../errors.js";
-import { nextHlc } from "../hlc.js";
+import { nextHlc } from "../modules/ledger/index.js";
 import { currentDhakaMonth } from "../month.js";
 import { dueDateIn, isDueIn, reminderState } from "../recurring.js";
 

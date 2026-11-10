@@ -27,12 +27,19 @@ async function withApi<T>(fn: (api: ApiClient) => Promise<T>): Promise<T> {
 // The identity, families and ledger tables are created by the module moves (T-PLAT-23..25); until their
 // migrations exist the fixtures have no API to talk to, exactly like the skipped login test in harness.test.ts.
 const hasAppTables = await withTestDb(async ({ sql }) => {
-  const r = await sql<{ users: string | null; ident: string | null; fam: string | null; cat: string | null }[]>`
+  const r = await sql<
+    { users: string | null; ident: string | null; fam: string | null; cat: string | null; rest: boolean }[]
+  >`
     select to_regclass('public.users')::text as users, to_regclass('identity.users')::text as ident,
            coalesce(to_regclass('public.family_members')::text, to_regclass('families.family_members')::text) as fam,
-           coalesce(to_regclass('public.categories')::text, to_regclass('ledger.categories')::text) as cat`;
-  // Identity alone is not enough: the fixtures also need the families (T-PLAT-24) and ledger (T-PLAT-25) tables.
-  return Boolean(r[0]?.users ?? r[0]?.ident) && Boolean(r[0]?.fam) && Boolean(r[0]?.cat);
+           coalesce(to_regclass('public.categories')::text, to_regclass('ledger.categories')::text) as cat,
+           (coalesce(to_regclass('public.budgets'), to_regclass('budgeting.budgets')) is not null
+            and coalesce(to_regclass('public.festival_budgets'), to_regclass('budgeting.festival_budgets')) is not null
+            and coalesce(to_regclass('public.recurring_templates'), to_regclass('recurring.recurring_templates')) is not null
+            and coalesce(to_regclass('public.ai_usage'), to_regclass('ai.ai_usage')) is not null) as rest`;
+  // Identity alone is not enough: the fixtures also need the families (T-PLAT-24) and ledger (T-PLAT-25) tables,
+  // and the budgets, recurring and AI tables the remaining moves create (T-PLAT-26..30); seeding calls those routes.
+  return Boolean(r[0]?.users ?? r[0]?.ident) && Boolean(r[0]?.fam) && Boolean(r[0]?.cat) && r[0]?.rest === true;
 });
 
 describe.skipIf(!hasAppTables)("fixtures", () => {

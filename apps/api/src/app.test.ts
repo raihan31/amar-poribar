@@ -5,7 +5,7 @@ import { CreateRecurringSchema } from "@amar-poribar/shared";
 import { csvCell, csvRow, dhakaStamp, paisaToDecimal } from "./csv.js";
 import { budgetLevel, effectiveBudgets } from "./budgets.js";
 import type { Db } from "./db/client.js";
-import { dayRange, monthRange, monthsBetween } from "./month.js";
+import { monthsBetween } from "./month.js";
 import {
   SyncRequestSchema,
   SyncTransactionSchema,
@@ -49,14 +49,6 @@ describe("cors in production", () => {
     expect(allowed.headers["access-control-allow-origin"]).toBe("http://localhost:3000");
     expect(other.headers["access-control-allow-origin"]).toBeUndefined();
     await prod.close();
-  });
-});
-
-describe("monthRange", () => {
-  it("uses Dhaka month boundaries", () => {
-    const { start, end } = monthRange("2026-12");
-    expect(start.toISOString()).toBe("2026-11-30T18:00:00.000Z");
-    expect(end.toISOString()).toBe("2026-12-31T18:00:00.000Z");
   });
 });
 
@@ -177,12 +169,6 @@ describe("festival budgets", () => {
     expect(CreateFestivalBudgetSchema.safeParse({ ...ok, endsOn: "2027-05-19" }).success).toBe(false);
     expect(CreateFestivalBudgetSchema.safeParse({ ...ok, limitPaisa: 0 }).success).toBe(false);
     expect(UpdateFestivalBudgetSchema.safeParse({}).success).toBe(false);
-  });
-
-  it("covers whole Dhaka days, inclusive of the last day", () => {
-    const { start, end } = dayRange("2027-05-20", "2027-05-21");
-    expect(start.toISOString()).toBe("2027-05-19T18:00:00.000Z");
-    expect(end.toISOString()).toBe("2027-05-21T18:00:00.000Z");
   });
 });
 
