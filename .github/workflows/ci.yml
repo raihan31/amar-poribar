@@ -65,9 +65,11 @@ jobs:
         working-directory: apps/mobile
     steps:
       - uses: actions/checkout@v4
+      # Keep in sync with apps/mobile/.fvmrc (golden images depend on the version).
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: "3.47.6"
           cache: true
       - run: flutter pub get
       # Drift's generated code (*.g.dart) is not committed.
@@ -77,6 +79,14 @@ jobs:
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze --fatal-infos
       - run: flutter test --coverage
+      - run: flutter test test/goldens
+      - name: Upload golden failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures
+          path: apps/mobile/test/goldens/failures/**
+          if-no-files-found: ignore
       - run: dart run tool/check_coverage.dart 70 lib/domain lib/data lib/core coverage/lcov.info
 
   mobile-size:

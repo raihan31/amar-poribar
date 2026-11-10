@@ -1,0 +1,508 @@
+[
+  {
+    "code": "1",
+    "file": "screens/Main.dc.html",
+    "title": "1 · Home — money and family in one place",
+    "requirement": "FR-HOME-01",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "2",
+    "file": "screens/Buzz.dc.html",
+    "title": "2 · Buzz (vibration nudge)",
+    "requirement": "FR-NUDGE-01, -05, -06",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "3",
+    "file": "screens/Chat.dc.html",
+    "title": "3 · Family chat (text, voice, video, expenses)",
+    "requirement": "FR-CHAT-01..08",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "4",
+    "file": "screens/VoiceNote.dc.html",
+    "title": "4 · Record a voice note",
+    "requirement": "FR-VNOTE-01..04",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "5",
+    "file": "screens/VideoCall.dc.html",
+    "title": "5 · Video call",
+    "requirement": "FR-VIDEO-01..09",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "6",
+    "file": "screens/Incoming.dc.html",
+    "title": "6 · Incoming buzz (receiver)",
+    "requirement": "FR-NUDGE-02, -03",
+    "platform": [
+      "mobile"
+    ]
+  },
+  {
+    "code": "A1",
+    "file": "screens/Login.dc.html",
+    "title": "A1 · Login with phone + OTP (FR-AUTH-01)",
+    "requirement": "FR-AUTH-01, -02, -07, -08",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "A2",
+    "file": "screens/Consent.dc.html",
+    "title": "A2 · Consent + create family (FR-FAM-01, NFR-07)",
+    "requirement": "FR-AUTH-10, FR-FAM-01",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "A3",
+    "file": "screens/VoiceEntry.dc.html",
+    "title": "A3 · Voice entry read-back (FR-VOICE-01..03)",
+    "requirement": "FR-VOICE-01..03, FR-AI-08",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "A4",
+    "file": "screens/Picker.dc.html",
+    "title": "A4 · Pick a category by picture (FR-VOICE-06)",
+    "requirement": "FR-VOICE-06",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "A5",
+    "file": "screens/Sms.dc.html",
+    "title": "A5 · Paste bKash/Nagad SMS (FR-AI-02)",
+    "requirement": "FR-AI-02, FR-TXN-04",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "A6",
+    "file": "screens/Join.dc.html",
+    "title": "A6 · Join by invite link (FR-FAM-02)",
+    "requirement": "FR-FAM-02",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "A7",
+    "file": "screens/OtpError.dc.html",
+    "title": "A7 · Wrong OTP code state (NFR-05)",
+    "requirement": "FR-AUTH-07",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "B1",
+    "file": "screens/Txns.dc.html",
+    "title": "B1 · তালিকা tab: transactions (FR-TXN-02)",
+    "requirement": "FR-TXN-02, FR-REP-04",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "B2",
+    "file": "screens/Summary.dc.html",
+    "title": "B2 · Monthly summary + Listen (from Home)",
+    "requirement": "FR-AI-11, FR-VOICE-04",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "B3",
+    "file": "screens/Budgets.dc.html",
+    "title": "B3 · বাজেট tab (FR-BUD-01..02)",
+    "requirement": "FR-BUD-01, -02, -06, -07",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "B4",
+    "file": "screens/Members.dc.html",
+    "title": "B4 · পরিবার tab: members, buzz, chat (FR-FAM-02..03)",
+    "requirement": "FR-FAM-02, -03, -07",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "B5",
+    "file": "screens/Ask.dc.html",
+    "title": "B5 · Ask by voice (FR-VOICE-08)",
+    "requirement": "FR-AI-10, FR-VOICE-08",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "B6",
+    "file": "screens/Settings.dc.html",
+    "title": "B6 · Settings (gear on Home)",
+    "requirement": "FR-AUTH-04, FR-NOTIF-05",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "C0",
+    "file": "screens/AdminLogin.dc.html",
+    "title": "C0 · Admin: Staff sign-in + 2FA",
+    "requirement": "FR-ADM-01",
+    "platform": [
+      "admin"
+    ]
+  },
+  {
+    "code": "C1",
+    "file": "screens/AdminOverview.dc.html",
+    "title": "C1 · Admin: Overview",
+    "requirement": "FR-ADM-02",
+    "platform": [
+      "admin"
+    ]
+  },
+  {
+    "code": "C2",
+    "file": "screens/AdminFamilies.dc.html",
+    "title": "C2 · Admin: Families list",
+    "requirement": "FR-ADM-03",
+    "platform": [
+      "admin"
+    ]
+  },
+  {
+    "code": "C3",
+    "file": "screens/AdminFamily.dc.html",
+    "title": "C3 · Admin: Family detail + actions",
+    "requirement": "FR-ADM-04, -06",
+    "platform": [
+      "admin"
+    ]
+  },
+  {
+    "code": "C4",
+    "file": "screens/AdminPrivacy.dc.html",
+    "title": "C4 · Admin: Privacy requests (PDPO)",
+    "requirement": "FR-ADM-05, FR-PRIV-05",
+    "platform": [
+      "admin"
+    ]
+  },
+  {
+    "code": "D1",
+    "file": "screens/Welcome.dc.html",
+    "title": "D1 · Welcome: language, numerals, Simple mode (FR-AUTH-04)",
+    "requirement": "FR-ONB-01, FR-AUTH-04",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "D2",
+    "file": "screens/Tutorial.dc.html",
+    "title": "D2 · Voice-guided tutorial (FR-VOICE-10)",
+    "requirement": "FR-VOICE-10",
+    "platform": [
+      "mobile"
+    ]
+  },
+  {
+    "code": "D3",
+    "file": "screens/SimpleHome.dc.html",
+    "title": "D3 · Simple mode home (FR-VOICE-09)",
+    "requirement": "FR-VOICE-09, FR-HOME-01",
+    "platform": [
+      "mobile"
+    ]
+  },
+  {
+    "code": "D4",
+    "file": "screens/AddExpense.dc.html",
+    "title": "D4 · Add expense by hand (FR-TXN-01, -05)",
+    "requirement": "FR-TXN-09, -05",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "D5",
+    "file": "screens/TxnDetail.dc.html",
+    "title": "D5 · Transaction detail, edit, undo delete (FR-TXN-03)",
+    "requirement": "FR-TXN-03, -10",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "D6",
+    "file": "screens/Receipt.dc.html",
+    "title": "D6 · Receipt photo to draft (FR-AI-09, FR-TXN-07/08)",
+    "requirement": "FR-AI-09, FR-TXN-07, -08",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "D7",
+    "file": "screens/RuleLearn.dc.html",
+    "title": "D7 · Category learning (FR-AI-07)",
+    "requirement": "FR-AI-07",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "D8",
+    "file": "screens/VoiceFallback.dc.html",
+    "title": "D8 · No Bangla voice fallback (FR-VOICE-07)",
+    "requirement": "FR-VOICE-07",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "E1",
+    "file": "screens/Accounts.dc.html",
+    "title": "E1 · Accounts and balances (FR-ACC)",
+    "requirement": "FR-ACC-01..04",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "E2",
+    "file": "screens/Categories.dc.html",
+    "title": "E2 · Categories (FR-CAT)",
+    "requirement": "FR-CAT-01..03",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "E3",
+    "file": "screens/Recurring.dc.html",
+    "title": "E3 · Recurring bills + reminders (FR-TXN-06, FR-NOT-03)",
+    "requirement": "FR-REC-01..03",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "E4",
+    "file": "screens/FestivalNew.dc.html",
+    "title": "E4 · Festival budget (FR-BUD-04)",
+    "requirement": "FR-BUD-04",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "E5",
+    "file": "screens/Reports.dc.html",
+    "title": "E5 · Reports: member, account, trend (FR-REP)",
+    "requirement": "FR-REP-02..04",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "E6",
+    "file": "screens/Remit.dc.html",
+    "title": "E6 · Probashi viewer: remittance (FR-FAM-05)",
+    "requirement": "FR-FAM-05, FR-REP-05",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "E7",
+    "file": "screens/Plans.dc.html",
+    "title": "E7 · Plans + bKash/Nagad pay + quota (BR-17, FR-AI-12)",
+    "requirement": "FR-BILL-01..06, FR-AI-12",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "E8",
+    "file": "screens/Dhar.dc.html",
+    "title": "E8 · Dhar: lent and borrowed (BR-18)",
+    "requirement": "FR-LEND-01..04",
+    "platform": [
+      "mobile"
+    ]
+  },
+  {
+    "code": "F1",
+    "file": "screens/ChatList.dc.html",
+    "title": "F1 · কথা tab: conversations",
+    "requirement": "FR-CHAT-04",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "F2",
+    "file": "screens/FamilySwitch.dc.html",
+    "title": "F2 · Switch family (FR-FAM-04)",
+    "requirement": "FR-FAM-04",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "F3",
+    "file": "screens/Notifications.dc.html",
+    "title": "F3 · Notifications (FR-NOT, FR-BUD-02)",
+    "requirement": "FR-NOTIF-04, -05",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "F4",
+    "file": "screens/SyncStatus.dc.html",
+    "title": "F4 · Offline + nearby sync (FR-SYNC)",
+    "requirement": "FR-SYNC-03..08",
+    "platform": [
+      "mobile"
+    ]
+  },
+  {
+    "code": "F5",
+    "file": "screens/Bazaar.dc.html",
+    "title": "F5 · Shared bazaar list (new idea)",
+    "requirement": "FR-SHOP-01..03",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "F6",
+    "file": "screens/SessionExpired.dc.html",
+    "title": "F6 · Session / invite expired (FR-AUTH-03)",
+    "requirement": "FR-AUTH-09, FR-ONB-03",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "F7",
+    "file": "screens/DeleteAccount.dc.html",
+    "title": "F7 · Delete my data (FR-AUTH-05, PDPO)",
+    "requirement": "FR-AUTH-05, FR-PRIV-03, -04",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "F8",
+    "file": "screens/Profile.dc.html",
+    "title": "F8 · Profile and preferences (FR-AUTH-04)",
+    "requirement": "FR-AUTH-04, FR-PRES-02",
+    "platform": [
+      "mobile",
+      "web"
+    ]
+  },
+  {
+    "code": "G1",
+    "file": "screens/AdminPlans.dc.html",
+    "title": "G1 · Admin: Plans and AI quota",
+    "requirement": "FR-ADM-07",
+    "platform": [
+      "admin"
+    ]
+  },
+  {
+    "code": "G2",
+    "file": "screens/AdminAudit.dc.html",
+    "title": "G2 · Admin: Audit log",
+    "requirement": "FR-ADM-08",
+    "platform": [
+      "admin"
+    ]
+  },
+  {
+    "code": "G3",
+    "file": "screens/AdminStaff.dc.html",
+    "title": "G3 · Admin: Staff accounts and roles",
+    "requirement": "FR-ADM-09",
+    "platform": [
+      "admin"
+    ]
+  },
+  {
+    "code": "G4",
+    "file": "screens/AdminHealth.dc.html",
+    "title": "G4 · Admin: System health (NFR-04, NFR-12)",
+    "requirement": "FR-ADM-10",
+    "platform": [
+      "admin"
+    ]
+  }
+]
