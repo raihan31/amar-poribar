@@ -4,11 +4,11 @@ import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod
 import type { AppDeps } from "./deps.js";
 import { registerErrorHandler } from "./errors.js";
 import { aiRoutes } from "./routes/ai.js";
-import { authRoutes } from "./routes/auth.js";
 import { budgetRoutes } from "./routes/budgets.js";
 import { festivalRoutes } from "./routes/festivals.js";
 import { familyRoutes } from "./routes/families.js";
-import { inviteRoutes } from "./routes/invites.js";
+import { registerComposition } from "./composition/index.js";
+import { EventBus } from "./platform/events/bus.js";
 import { recurringRoutes } from "./routes/recurring.js";
 import { reportRoutes } from "./routes/reports.js";
 import { syncRoutes } from "./routes/sync.js";
@@ -39,7 +39,7 @@ export async function buildApp(deps: AppDeps) {
     db: deps.db,
     config: { jwtSecret: deps.jwtSecret, isProd: deps.isProd },
     logger: app.log,
-    bus: undefined,
+    bus: new EventBus(),
     jobs: deps.jobs ?? createJobs({ inline: true }),
     storage: undefined,
     flags: undefined,
@@ -48,11 +48,12 @@ export async function buildApp(deps: AppDeps) {
   };
   for (const m of modules) (ctx.facades as Record<string, unknown>)[m.name] = await m.register(app, ctx);
 
+  // Composition routes join several module facades (SRS §3.1); they register after every module.
+  registerComposition(app, ctx);
+
   app.get("/health", async () => ({ ok: true }));
 
-  await app.register(async (scope) => authRoutes(scope, deps));
   await app.register(async (scope) => familyRoutes(scope, deps));
-  await app.register(async (scope) => inviteRoutes(scope, deps));
   await app.register(async (scope) => syncRoutes(scope, deps));
   await app.register(async (scope) => transactionRoutes(scope, deps));
   await app.register(async (scope) => aiRoutes(scope, deps));

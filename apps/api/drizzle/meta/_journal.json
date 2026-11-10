@@ -43,6 +43,13 @@
       "when": 1794344954132,
       "tag": "0005_health_checks",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794345931203,
+      "tag": "0006_families_tables",
+      "breakpoints": true
     }
   ]
 }

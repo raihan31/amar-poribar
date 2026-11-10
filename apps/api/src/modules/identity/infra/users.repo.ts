@@ -19,7 +19,15 @@ export function createUserRepo(db: Db): UserRepo {
     },
     async getBasics(userId) {
       const [row] = await db
-        .select({ id: users.id, name: users.name, phone: users.phone, locale: users.locale, bnDigits: users.bnDigits })
+        .select({
+          id: users.id,
+          name: users.name,
+          phone: users.phone,
+          locale: users.locale,
+          bnDigits: users.bnDigits,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        })
         .from(users)
         .where(eq(users.id, userId));
       return row ?? null;

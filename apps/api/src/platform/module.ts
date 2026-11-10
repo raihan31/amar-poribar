@@ -4,9 +4,9 @@ import type { Db } from "../db/client.js";
 // Ports that later platform tasks replace with real interfaces. They are `unknown` until then so
 // modules can already declare the context shape they will receive.
 export type Config = unknown; // T-PLAT-04
-export type EventBus = unknown; // T-PLAT-08
+import type { EventBus } from "./events/bus.js";
 import type { Jobs } from "./jobs/jobs.js";
-export type { Jobs };
+export type { EventBus, Jobs };
 export type ObjectStorage = unknown; // T-PLAT-12
 export type Flags = unknown; // T-PLAT-11
 

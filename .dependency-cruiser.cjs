@@ -46,6 +46,13 @@ module.exports = {
       },
     },
     {
+      name: "composition-allowed",
+      comment: "R2: composition/* may import any module's facade (index.ts) but never its internals",
+      severity: "error",
+      from: { path: `^${R}/composition/` },
+      to: { path: `^${R}/modules/[^/]+/(?!index\\.ts$)` },
+    },
+    {
       name: "domain-pure",
       comment: "R7: domain code does no I/O",
       severity: "error",
