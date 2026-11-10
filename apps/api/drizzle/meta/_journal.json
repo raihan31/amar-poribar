@@ -29,6 +29,13 @@
       "when": 1794344008401,
       "tag": "0003_feature_flags",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794344954132,
+      "tag": "0004_health_checks",
+      "breakpoints": true
     }
   ]
 }

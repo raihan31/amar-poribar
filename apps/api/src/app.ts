@@ -16,6 +16,7 @@ import { syncRoutes } from "./routes/sync.js";
 import { transactionRoutes } from "./routes/transactions.js";
 import { modules } from "./modules/registry.js";
 import { createLogger, installRequestContext, requestOptions } from "./platform/logger.js";
+import { createJobs } from "./platform/jobs/jobs.js";
 import type { ModuleContext } from "./platform/module.js";
 import { registerOpenApi } from "./platform/openapi/plugin.js";
 import { apiVersion } from "./platform/openapi/version.js";
@@ -41,7 +42,7 @@ export async function buildApp(deps: AppDeps) {
     config: undefined,
     logger: app.log,
     bus: undefined,
-    jobs: undefined,
+    jobs: deps.jobs ?? createJobs({ inline: true }),
     storage: undefined,
     flags: undefined,
     clock: () => new Date(),

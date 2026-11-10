@@ -1,6 +1,7 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import type { Db } from "./db/client.js";
 import type { OtpStore } from "./otp.js";
+import type { Jobs } from "./platform/jobs/jobs.js";
 
 export interface AppDeps {
   db: Db;
@@ -15,4 +16,6 @@ export interface AppDeps {
   corsOrigins?: string[];
   /** Serve `/v1/openapi.json` in production too (OPENAPI_PUBLIC=true). */
   openapiPublic?: boolean;
+  /** Job queue; defaults to inline mode until the worker is wired. */
+  jobs?: Jobs;
 }

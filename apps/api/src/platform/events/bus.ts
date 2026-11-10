@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import type { Db } from "../db.js";
 import { outbox } from "./outbox.schema.js";
 import type { DomainEvent, PayloadOf } from "./types.js";
@@ -83,6 +84,7 @@ export class EventBus {
       occurredAt: event.occurredAt,
       familyId: opts.familyId ?? null,
     });
+    await tx.execute(sql`select pg_notify('outbox', '')`); // delivered on commit; wakes the drainer
     for (const h of this.inTx.get(name) ?? []) await h(event, tx);
     return event;
   }
