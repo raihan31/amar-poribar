@@ -17,7 +17,9 @@ describe("env", () => {
     await expect(loadEnv({ NODE_ENV: "production", JWT_SECRET: "" })).rejects.toThrow(/JWT_SECRET/);
     await expect(loadEnv({ NODE_ENV: "production", JWT_SECRET: "change-me" })).rejects.toThrow(/JWT_SECRET/);
     await expect(loadEnv({ NODE_ENV: "production", JWT_SECRET: "x".repeat(31) })).rejects.toThrow(/JWT_SECRET/);
-    expect((await loadEnv({ NODE_ENV: "production", JWT_SECRET: "a".repeat(40) })).jwtSecret).toBe("a".repeat(40));
+    expect(
+      (await loadEnv({ NODE_ENV: "production", JWT_SECRET: "a".repeat(40), SMS_GATEWAY: "sslwireless" })).jwtSecret,
+    ).toBe("a".repeat(40));
   });
 
   it("parses CORS origins", async () => {
