@@ -18,7 +18,7 @@ import {
   type MonthlyAiSummary,
   type ParseResponse,
 } from "@amar-poribar/shared";
-import type { AppDeps } from "../app.js";
+import type { AppDeps } from "../deps.js";
 import { requireRole } from "../auth.js";
 import type { Db } from "../db/client.js";
 import { aiSummaries, aiUsage, categories, families, transactions } from "../db/schema.js";

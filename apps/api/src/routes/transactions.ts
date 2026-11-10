@@ -2,7 +2,7 @@ import { and, desc, eq, gte, isNull, lt, or, sql } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { CreateTransactionSchema, MonthSchema, UpdateTransactionSchema } from "@amar-poribar/shared";
-import type { AppDeps } from "../app.js";
+import type { AppDeps } from "../deps.js";
 import { canEditAll, requireRole } from "../auth.js";
 import { accounts, bumpSyncSeq, categories, transactions } from "../db/schema.js";
 import { HttpError, parseOr400 } from "../errors.js";

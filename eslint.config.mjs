@@ -9,6 +9,7 @@ export default tseslint.config(
       "apps/mobile/**",
       "**/*.g.dart",
       "apps/api/drizzle/**",
+      "apps/api/arch-fixtures/**",
       "**/next-env.d.ts",
       "**/*.mjs",
       "**/*.cjs",

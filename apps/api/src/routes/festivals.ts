@@ -1,7 +1,7 @@
 import { and, eq, gte, isNull, lt, or, sql } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { CreateFestivalBudgetSchema, UpdateFestivalBudgetSchema } from "@amar-poribar/shared";
-import type { AppDeps } from "../app.js";
+import type { AppDeps } from "../deps.js";
 import { requireRole } from "../auth.js";
 import { budgetLevel } from "../budgets.js";
 import { festivalBudgets, transactions } from "../db/schema.js";

@@ -7,3 +7,4 @@ apps/api/drizzle
 docs
 tools/design
 *.md
+apps/api/arch-fixtures

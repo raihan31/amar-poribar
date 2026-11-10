@@ -1,10 +1,8 @@
 import cors from "@fastify/cors";
-import type Anthropic from "@anthropic-ai/sdk";
 import Fastify from "fastify";
 import { registerAuth } from "./auth.js";
-import type { Db } from "./db/client.js";
+import type { AppDeps } from "./deps.js";
 import { registerErrorHandler } from "./errors.js";
-import type { OtpStore } from "./otp.js";
 import { aiRoutes } from "./routes/ai.js";
 import { authRoutes } from "./routes/auth.js";
 import { budgetRoutes } from "./routes/budgets.js";
@@ -17,18 +15,6 @@ import { syncRoutes } from "./routes/sync.js";
 import { transactionRoutes } from "./routes/transactions.js";
 import { modules } from "./modules/registry.js";
 import type { ModuleContext } from "./platform/module.js";
-
-export interface AppDeps {
-  db: Db;
-  otp: OtpStore;
-  /** Undefined when no API key is configured; only the SMS parser runs then. */
-  anthropic?: Anthropic;
-  aiModel?: string;
-  jwtSecret: string;
-  isProd: boolean;
-  /** Origins allowed by CORS in production. Development allows any origin. */
-  corsOrigins?: string[];
-}
 
 export async function buildApp(deps: AppDeps) {
   const app = Fastify({ logger: { level: deps.isProd ? "info" : "warn" } });

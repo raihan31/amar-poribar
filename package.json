@@ -17,12 +17,14 @@
     "mobile:test": "cd apps/mobile && flutter test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "arch": "echo 'added in T-PLAT-03' && exit 0",
+    "arch": "depcruise apps/api/src --config .dependency-cruiser.cjs && pnpm --filter @amar-poribar/api exec vitest run src/architecture.test.ts",
     "openapi:check": "echo 'added in T-PLAT-14' && exit 0",
     "test:db": "echo 'added in T-PLAT-19' && exit 0",
-    "gen:module": "node tools/gen-module.mjs"
+    "gen:module": "node tools/gen-module.mjs",
+    "arch:negative": "node tools/arch-negative.mjs"
   },
   "devDependencies": {
+    "dependency-cruiser": "^16.10.4",
     "eslint": "^9.39.5",
     "eslint-plugin-import": "^2.32.0",
     "prettier": "^3.9.10",

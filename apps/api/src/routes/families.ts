@@ -10,7 +10,7 @@ import {
   UpdateAccountSchema,
   UpdateCategorySchema,
 } from "@amar-poribar/shared";
-import type { AppDeps } from "../app.js";
+import type { AppDeps } from "../deps.js";
 import { requireRole } from "../auth.js";
 import { accounts, categories, familyMembers, families } from "../db/schema.js";
 import { HttpError, parseOr400 } from "../errors.js";

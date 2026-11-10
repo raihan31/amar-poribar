@@ -1,0 +1,17 @@
+{
+  "identity": [],
+  "families": ["identity"],
+  "billing": ["families"],
+  "ledger": ["families"],
+  "budgeting": ["families", "ledger"],
+  "recurring": ["families", "ledger"],
+  "ai": ["families", "ledger", "billing"],
+  "reporting": ["families", "ledger"],
+  "sync": ["families", "ledger"],
+  "notifications": ["identity", "families"],
+  "comms": ["families", "identity", "notifications"],
+  "shopping": ["families", "ledger"],
+  "lending": ["families"],
+  "privacy": ["identity", "families", "ledger", "comms"],
+  "admin": ["families", "billing", "privacy"]
+}

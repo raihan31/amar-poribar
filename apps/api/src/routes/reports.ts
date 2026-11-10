@@ -2,7 +2,7 @@ import { and, asc, eq, gte, isNull, lt, or, sql } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { MonthSchema, type MonthSummary } from "@amar-poribar/shared";
-import type { AppDeps } from "../app.js";
+import type { AppDeps } from "../deps.js";
 import { requireRole } from "../auth.js";
 import { csvRow, dhakaStamp, paisaToDecimal } from "../csv.js";
 import { accounts, categories, transactions } from "../db/schema.js";

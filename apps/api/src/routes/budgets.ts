@@ -2,7 +2,7 @@ import { and, eq, inArray, lte } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { MonthSchema, PutBudgetsSchema } from "@amar-poribar/shared";
-import type { AppDeps } from "../app.js";
+import type { AppDeps } from "../deps.js";
 import { requireRole } from "../auth.js";
 import { budgetLevel, effectiveBudgets } from "../budgets.js";
 import { budgets, categories } from "../db/schema.js";

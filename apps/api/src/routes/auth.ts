@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { BdPhoneSchema, normalizeBdPhone } from "@amar-poribar/shared";
-import type { AppDeps } from "../app.js";
+import type { AppDeps } from "../deps.js";
 import { familyMembers, families, users } from "../db/schema.js";
 import { HttpError, parseOr400 } from "../errors.js";
 import type { FastifyInstance } from "fastify";

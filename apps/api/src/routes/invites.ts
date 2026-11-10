@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { BdPhoneSchema, RoleSchema, normalizeBdPhone } from "@amar-poribar/shared";
-import type { AppDeps } from "../app.js";
+import type { AppDeps } from "../deps.js";
 import { canAssignRole, canManageMember, requireRole } from "../auth.js";
 import { familyInvites, familyMembers, users } from "../db/schema.js";
 import { HttpError, parseOr400 } from "../errors.js";
