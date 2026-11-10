@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 class GlassmorphismCard extends StatelessWidget {
   final Widget child;
   final double width;
-  final double height;
+  final double? height;
   final EdgeInsetsGeometry padding;
 
   const GlassmorphismCard({
     super.key,
     required this.child,
     this.width = double.infinity,
-    this.height = double.infinity,
+    this.height,
     this.padding = const EdgeInsets.all(16.0),
   });
 

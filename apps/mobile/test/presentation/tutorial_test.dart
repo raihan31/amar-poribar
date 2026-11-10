@@ -8,6 +8,7 @@ import 'package:amar_poribar/presentation/screens/tutorial_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 class FakeVoice implements VoiceService {
   final spoken = <String>[];
@@ -40,9 +41,16 @@ void main() {
           voiceServiceProvider.overrideWithValue(voice),
           localStoreProvider.overrideWithValue(store),
         ],
-        child: MaterialApp(
-          routes: {'/ai-entry': (_) => const Scaffold(body: Text('AI ENTRY'))},
-          home: const TutorialScreen(),
+        child: MaterialApp.router(
+          routerConfig: GoRouter(
+            routes: [
+              GoRoute(path: '/', builder: (_, __) => const TutorialScreen()),
+              GoRoute(
+                path: '/home',
+                builder: (_, __) => const Scaffold(body: Text('HOME')),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -70,7 +78,7 @@ void main() {
     await tester.tap(find.text('শুরু করুন'));
     await tester.pumpAndSettle();
 
-    expect(find.text('AI ENTRY'), findsOneWidget);
+    expect(find.text('HOME'), findsOneWidget);
     expect(await store.getMeta(tutorialDoneKey), '1');
   });
 
@@ -82,16 +90,23 @@ void main() {
           voiceServiceProvider.overrideWithValue(FakeVoice()),
           localStoreProvider.overrideWithValue(store),
         ],
-        child: MaterialApp(
-          routes: {'/ai-entry': (_) => const Scaffold(body: Text('AI ENTRY'))},
-          home: const TutorialScreen(),
+        child: MaterialApp.router(
+          routerConfig: GoRouter(
+            routes: [
+              GoRoute(path: '/', builder: (_, __) => const TutorialScreen()),
+              GoRoute(
+                path: '/home',
+                builder: (_, __) => const Scaffold(body: Text('HOME')),
+              ),
+            ],
+          ),
         ),
       ),
     );
     await tester.pump();
     await tester.tap(find.text('বাদ দিন'));
     await tester.pumpAndSettle();
-    expect(find.text('AI ENTRY'), findsOneWidget);
+    expect(find.text('HOME'), findsOneWidget);
     expect(await store.getMeta(tutorialDoneKey), '1');
   });
 }
