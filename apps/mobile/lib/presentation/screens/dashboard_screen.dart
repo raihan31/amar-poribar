@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/l10n/l10n_x.dart';
+import '../../core/money/money.dart';
+import '../../core/money/money_format.dart';
 import '../providers/providers.dart';
 import '../widgets/glassmorphism_card.dart';
 
@@ -15,7 +17,8 @@ class DashboardScreen extends ConsumerWidget {
     final recentTransactions = ref.watch(recentTransactionsProvider);
 
     // Derived state for the UI
-    final budgetUsedPercent = appState.totalExpense / appState.monthlyBudget;
+    final budgetUsedPercent =
+        appState.totalExpense.paisa / appState.monthlyBudget.paisa;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -136,7 +139,7 @@ class DashboardScreen extends ConsumerWidget {
                           ),
                           subtitle: Text(item['date'] as String),
                           trailing: Text(
-                            "${isExpense ? '-' : '+'} ৳${item['amount']}",
+                            '${isExpense ? '−' : '+'}${formatMoney(item['amount'] as Money, style: NumeralStyle.bangla)}',
                             style: TextStyle(
                               color: isExpense ? Colors.red : Colors.green,
                               fontWeight: FontWeight.bold,
@@ -186,7 +189,10 @@ class DashboardScreen extends ConsumerWidget {
                     style: const TextStyle(color: Colors.grey, fontSize: 14),
                   ),
                   Text(
-                    '৳${(state.totalIncome - state.totalExpense).toStringAsFixed(2)}',
+                    formatMoney(
+                      state.totalIncome - state.totalExpense,
+                      style: NumeralStyle.bangla,
+                    ),
                     style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -231,13 +237,13 @@ class DashboardScreen extends ConsumerWidget {
             children: [
               Text(
                 context.l10n.home_dashboard_spent(
-                  state.totalExpense.toStringAsFixed(0),
+                  formatMoney(state.totalExpense, style: NumeralStyle.bangla),
                 ),
                 style: const TextStyle(fontSize: 12),
               ),
               Text(
                 context.l10n.home_dashboard_budget(
-                  state.monthlyBudget.toStringAsFixed(0),
+                  formatMoney(state.monthlyBudget, style: NumeralStyle.bangla),
                 ),
                 style: const TextStyle(fontSize: 12),
               ),

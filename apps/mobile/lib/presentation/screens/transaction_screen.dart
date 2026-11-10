@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/money/parse_taka.dart';
 import '../providers/providers.dart';
 
 class TransactionScreen extends ConsumerStatefulWidget {
@@ -89,8 +90,8 @@ class _TransactionScreenState extends ConsumerState<TransactionScreen> {
                   ),
                 ),
                 onPressed: () async {
-                  final amount = double.tryParse(amountController.text) ?? 0.0;
-                  if (amount > 0) {
+                  final amount = parseTakaInput(amountController.text);
+                  if (amount != null && amount.paisa > 0) {
                     if (isExpense) {
                       await ref
                           .read(appStateProvider.notifier)

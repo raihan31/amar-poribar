@@ -66,7 +66,7 @@ void main() {
     );
     final drafts = await client.parse('f1', 'আজ বাজারে ৮৫০ টাকা');
     expect(sent['text'], 'আজ বাজারে ৮৫০ টাকা');
-    expect(drafts.single.amountTaka, 850.0);
+    expect(drafts.single.amountPaisa, 85000);
     expect(drafts.single.note, 'বাজার');
   });
 
