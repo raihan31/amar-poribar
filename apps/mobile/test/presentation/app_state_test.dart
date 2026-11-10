@@ -5,12 +5,15 @@ import 'package:amar_poribar/presentation/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/fake_voice_service.dart';
+import '../helpers/fakes.dart';
+
 void main() {
   test('dashboard state is read from, and saved to, the local database',
       () async {
     final store = await LocalStore.open(AppDatabase.memory());
     final container = ProviderContainer(
-      overrides: [localStoreProvider.overrideWithValue(store)],
+      overrides: defaultFakes(store: store, voice: FakeVoiceService()),
     );
     addTearDown(container.dispose);
 

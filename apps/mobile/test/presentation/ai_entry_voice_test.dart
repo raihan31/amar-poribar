@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:amar_poribar/core/speech/voice_service.dart';
 import 'package:amar_poribar/data/api/api_client.dart';
 import 'package:amar_poribar/data/auth/session_manager.dart';
 import 'package:amar_poribar/data/auth/token_store.dart';
@@ -10,33 +9,12 @@ import 'package:amar_poribar/presentation/providers/auth_provider.dart';
 import 'package:amar_poribar/presentation/providers/providers.dart';
 import 'package:amar_poribar/presentation/screens/ai_entry_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
-class FakeVoice implements VoiceService {
-  final String heard;
-  final List<String> spoken = [];
-  FakeVoice(this.heard);
-
-  @override
-  Future<bool> init() async => true;
-  @override
-  bool get listening => false;
-  @override
-  Future<void> listen(
-    void Function(String text) onResult, {
-    void Function(String error)? onError,
-  }) async =>
-      onResult(heard);
-  @override
-  Future<void> stopListening() async {}
-  @override
-  Future<void> speak(String text) async => spoken.add(text);
-  @override
-  Future<void> stopSpeaking() async {}
-}
+import '../helpers/fake_voice_service.dart';
+import '../helpers/pump_app.dart';
 
 class SignedIn extends AuthNotifier {
   SignedIn(ApiClient api)
@@ -90,19 +68,18 @@ void main() {
         );
       }),
     );
-    final voice = FakeVoice('আজ বাজারে আটশো পঞ্চাশ টাকা');
+    final voice = FakeVoiceService(listen: ['আজ বাজারে আটশো পঞ্চাশ টাকা']);
     final store = await LocalStore.open(AppDatabase.memory());
 
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          apiClientProvider.overrideWithValue(api),
-          authProvider.overrideWith((ref) => SignedIn(api)),
-          voiceServiceProvider.overrideWithValue(voice),
-          localStoreProvider.overrideWithValue(store),
-        ],
-        child: const MaterialApp(home: AiEntryScreen()),
-      ),
+    await pumpApp(
+      tester,
+      const AiEntryScreen(),
+      overrides: [
+        apiClientProvider.overrideWithValue(api),
+        authProvider.overrideWith((ref) => SignedIn(api)),
+        voiceServiceProvider.overrideWithValue(voice),
+        localStoreProvider.overrideWithValue(store),
+      ],
     );
 
     await tester.tap(find.text('চাপ দিয়ে বলুন'));
@@ -150,18 +127,19 @@ void main() {
       }),
     );
 
-    Widget app() => ProviderScope(
+    Future<void> app() => pumpApp(
+          tester,
+          const AiEntryScreen(),
           overrides: [
             apiClientProvider.overrideWithValue(api),
             authProvider.overrideWith((ref) => SignedIn(api)),
-            voiceServiceProvider.overrideWithValue(FakeVoice('')),
+            voiceServiceProvider.overrideWithValue(FakeVoiceService()),
             localStoreProvider.overrideWithValue(store),
           ],
-          child: const MaterialApp(home: AiEntryScreen()),
         );
 
     // Offline: the text is kept, not lost.
-    await tester.pumpWidget(app());
+    await app();
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField).first, 'আজ বাজারে ৮৫০ টাকা');
     await tester.tap(find.text('বুঝে নাও'));
@@ -172,7 +150,7 @@ void main() {
     // Online again (app reopened): it is understood, and waits for the user's OK.
     online = true;
     await tester.pumpWidget(const SizedBox());
-    await tester.pumpWidget(app());
+    await app();
     await tester.pumpAndSettle();
     expect(find.textContaining('অপেক্ষায় আছে'), findsNothing);
     expect(find.textContaining('বাজার ও মুদি'), findsOneWidget);
