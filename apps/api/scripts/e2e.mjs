@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 // End-to-end smoke test against a running API and a real Postgres.
-//   pnpm db:up && pnpm db:push && PORT=4177 pnpm --filter @amar-poribar/api dev   (in another terminal)
+//   pnpm db:up && pnpm db:migrate && PORT=4177 pnpm --filter @amar-poribar/api dev   (in another terminal)
 //   API_URL=http://localhost:4177 node apps/api/scripts/e2e.mjs
 // Needs NODE_ENV != production (it logs in with the dev OTP). Creates its own users and family each run.
 const BASE = process.env.API_URL ?? "http://localhost:4177";

@@ -10,8 +10,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "e2e": "node scripts/e2e.mjs",
-    "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx --env-file-if-exists=../../.env src/platform/migrate-cli.ts",
+    "db:reset": "tsx --env-file-if-exists=../../.env src/platform/reset-cli.ts",
+    "db:check": "node scripts/check-migrations.mjs",
     "lint": "eslint ."
   },
   "dependencies": {
