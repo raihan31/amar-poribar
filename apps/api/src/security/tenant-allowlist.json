@@ -1,0 +1,4 @@
+{
+  "$comment": "Operations that legitimately answer an outsider with a status other than 404. Each entry: { operation: 'METHOD /path', status: 403, reason: 'why' }. Keep empty unless a route cannot hide the resource.",
+  "allow": []
+}
