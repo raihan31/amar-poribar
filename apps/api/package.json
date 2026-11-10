@@ -33,6 +33,7 @@
     "zod": "^4.1.0"
   },
   "devDependencies": {
+    "@amar-poribar/fixtures": "workspace:*",
     "@amar-poribar/tsconfig": "workspace:*",
     "@types/node": "^22.0.0",
     "drizzle-kit": "^0.31.0",
