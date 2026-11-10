@@ -1,0 +1,15 @@
+{
+  "_kind": "response",
+  "_operation": "POST /v1/families/{familyId}/categories",
+  "_status": 201,
+  "body": {
+    "familyId": "00000000-0000-4000-8000-000000000001",
+    "icon": "🛒",
+    "id": "00000000-0000-4000-8000-0000000000c1",
+    "isHidden": false,
+    "key": "bazaar",
+    "kind": "expense",
+    "nameBn": "বাজার ও মুদি",
+    "nameEn": "Bazaar & Groceries"
+  }
+}

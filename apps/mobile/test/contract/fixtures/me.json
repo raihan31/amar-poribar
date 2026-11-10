@@ -1,0 +1,17 @@
+{
+  "_kind": "response",
+  "_operation": "GET /v1/me",
+  "_status": 200,
+  "body": {
+    "families": [{ "id": "00000000-0000-4000-8000-000000000001", "name": "রহিম পরিবার", "role": "owner" }],
+    "user": {
+      "bnDigits": true,
+      "createdAt": "2026-10-05T08:22:00.000Z",
+      "id": "00000000-0000-4000-8000-0000000000a1",
+      "locale": "bn",
+      "name": "রহিম",
+      "phone": "+8801700000001",
+      "updatedAt": "2026-10-05T08:22:00.000Z"
+    }
+  }
+}

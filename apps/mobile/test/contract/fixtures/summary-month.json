@@ -1,0 +1,16 @@
+{
+  "_kind": "response",
+  "_operation": "GET /v1/families/{familyId}/reports/summary",
+  "_status": 200,
+  "body": {
+    "byAccount": [{ "id": "00000000-0000-4000-8000-0000000000b1", "name": "আম্মুর বিকাশ", "totalPaisa": 150000 }],
+    "byCategory": [
+      { "categoryId": "00000000-0000-4000-8000-0000000000c1", "name": "বাজার ও মুদি", "totalPaisa": 85000 }
+    ],
+    "byMember": [{ "id": "00000000-0000-4000-8000-0000000000a1", "name": "রহিম", "totalPaisa": 235000 }],
+    "expensePaisa": 235000,
+    "incomePaisa": 5000000,
+    "month": "2026-10",
+    "previous": { "expensePaisa": 310000, "incomePaisa": 4800000, "month": "2026-09" }
+  }
+}

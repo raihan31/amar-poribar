@@ -1,0 +1,16 @@
+{
+  "_kind": "response",
+  "_operation": "POST /v1/families/{familyId}/accounts",
+  "_status": 201,
+  "body": {
+    "archivedAt": null,
+    "createdAt": "2026-10-05T08:22:00.000Z",
+    "familyId": "00000000-0000-4000-8000-000000000001",
+    "id": "00000000-0000-4000-8000-0000000000b1",
+    "name": "আম্মুর বিকাশ",
+    "openingBalancePaisa": 500000,
+    "ownerUserId": "00000000-0000-4000-8000-0000000000a2",
+    "type": "bkash",
+    "updatedAt": "2026-10-05T08:22:00.000Z"
+  }
+}

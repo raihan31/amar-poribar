@@ -1,0 +1,28 @@
+{
+  "_kind": "response",
+  "_operation": "POST /v1/families/{familyId}/transactions",
+  "_status": 201,
+  "body": {
+    "accountId": "00000000-0000-4000-8000-0000000000b1",
+    "aiConfidence": null,
+    "amountPaisa": 85000,
+    "categoryId": "00000000-0000-4000-8000-0000000000c1",
+    "counterparty": null,
+    "createdAt": "2026-10-05T08:22:00.000Z",
+    "createdBy": "00000000-0000-4000-8000-0000000000a1",
+    "deletedAt": null,
+    "familyId": "00000000-0000-4000-8000-000000000001",
+    "feePaisa": 0,
+    "hlc": "2026-10-05T08:22:00.000Z-0000-node-1",
+    "id": "00000000-0000-4000-8000-0000000000d1",
+    "isPrivate": false,
+    "note": "বাজার",
+    "occurredAt": "2026-10-05T08:22:00.000Z",
+    "paidByUserId": "00000000-0000-4000-8000-0000000000a1",
+    "source": "manual",
+    "syncSeq": 1,
+    "trxId": null,
+    "type": "expense",
+    "updatedAt": "2026-10-05T08:22:00.000Z"
+  }
+}
