@@ -81,10 +81,11 @@ describe("tenant isolation: coverage", () => {
 // The families and ledger tables are created by the module moves (T-PLAT-24, 25); until their migrations exist
 // there is no family to attack, exactly like fixtures.db.test.ts.
 const hasAppTables = await withTestDb(async ({ sql }) => {
-  const r = await sql<{ ident: string | null; fam: string | null }[]>`
+  const r = await sql<{ ident: string | null; fam: string | null; ledger: string | null }[]>`
     select coalesce(to_regclass('public.users')::text, to_regclass('identity.users')::text) as ident,
-           coalesce(to_regclass('public.family_members')::text, to_regclass('families.family_members')::text) as fam`;
-  return Boolean(r[0]?.ident) && Boolean(r[0]?.fam);
+           coalesce(to_regclass('public.family_members')::text, to_regclass('families.family_members')::text) as fam,
+           coalesce(to_regclass('public.categories')::text, to_regclass('ledger.categories')::text) as ledger`;
+  return Boolean(r[0]?.ident) && Boolean(r[0]?.fam) && Boolean(r[0]?.ledger);
 });
 
 describe.skipIf(!hasAppTables)("tenant isolation: outsider", () => {
