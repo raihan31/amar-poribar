@@ -1,0 +1,10 @@
+{
+  "name": "@amar-poribar/admin",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Placeholder until T-ADMUI-01 creates the admin console; it only serves a status page on port 3100.",
+  "scripts": {
+    "start": "node server.mjs"
+  }
+}
