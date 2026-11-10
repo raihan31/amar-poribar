@@ -330,20 +330,115 @@ class LocalStore {
     });
   }
 
+  /// Replaces the cached accounts. The archived flag is kept for an account the server does not say
+  /// anything about (`archived` / `archivedAt` absent); when it does, the server wins.
   Future<void> replaceAccounts(List<Map<String, dynamic>> rows) async {
     await db.transaction(() async {
+      final wasArchived = {
+        for (final a in await db.select(db.cachedAccounts).get())
+          a.id: a.archived,
+      };
       await db.delete(db.cachedAccounts).go();
       for (final r in rows) {
+        final id = r['id'] as String;
+        final bool archived = r.containsKey('archived')
+            ? r['archived'] as bool
+            : r.containsKey('archivedAt')
+                ? r['archivedAt'] != null
+                : wasArchived[id] ?? false;
         await db.into(db.cachedAccounts).insert(
               CachedAccountsCompanion.insert(
-                id: r['id'] as String,
+                id: id,
                 name: r['name'] as String,
                 type: r['type'] as String,
+                balancePaisa: Value(((r['balancePaisa'] ?? 0) as num).toInt()),
+                ownerUserId: Value(r['ownerUserId'] as String?),
+                archived: Value(archived),
+                openingBalancePaisa:
+                    Value(((r['openingBalancePaisa'] ?? 0) as num).toInt()),
               ),
             );
       }
     });
   }
+
+  Stream<List<CachedAccount>> watchAccounts() =>
+      db.select(db.cachedAccounts).watch();
+
+  /// Replaces all cached budgets of [familyId] in one transaction (a bad row leaves the old ones).
+  Future<void> replaceBudgets(
+    String familyId,
+    List<Map<String, dynamic>> rows,
+  ) async {
+    await db.transaction(() async {
+      await (db.delete(db.cachedBudgets)
+            ..where((b) => b.familyId.equals(familyId)))
+          .go();
+      for (final r in rows) {
+        await db.into(db.cachedBudgets).insert(
+              CachedBudgetsCompanion.insert(
+                id: r['id'] as String,
+                familyId: familyId,
+                categoryId: Value(r['categoryId'] as String?),
+                month: r['month'] as String,
+                limitPaisa: (r['limitPaisa'] as num).toInt(),
+                spentPaisa: Value(((r['spentPaisa'] ?? 0) as num).toInt()),
+                level: Value((r['level'] ?? 'ok') as String),
+              ),
+            );
+      }
+    });
+  }
+
+  Stream<List<CachedBudget>> watchBudgets(String familyId, String month) =>
+      (db.select(db.cachedBudgets)
+            ..where((b) => b.familyId.equals(familyId) & b.month.equals(month)))
+          .watch();
+
+  Future<void> replaceMembers(
+    String familyId,
+    List<Map<String, dynamic>> rows,
+  ) async {
+    await db.transaction(() async {
+      await (db.delete(db.cachedMembers)
+            ..where((m) => m.familyId.equals(familyId)))
+          .go();
+      for (final r in rows) {
+        await db.into(db.cachedMembers).insert(
+              CachedMembersCompanion.insert(
+                userId: r['userId'] as String,
+                familyId: familyId,
+                name: (r['name'] ?? '') as String,
+                role: r['role'] as String,
+                phoneLast3: Value((r['phoneLast3'] ?? '') as String),
+                avatarIndex: Value(((r['avatarIndex'] ?? 0) as num).toInt()),
+              ),
+            );
+      }
+    });
+  }
+
+  Stream<List<CachedMember>> watchMembers(String familyId) =>
+      (db.select(db.cachedMembers)..where((m) => m.familyId.equals(familyId)))
+          .watch();
+
+  Future<void> replaceEntitlements(String familyId, Map<String, dynamic> e) =>
+      db.into(db.cachedEntitlements).insertOnConflictUpdate(
+            CachedEntitlementsCompanion.insert(
+              familyId: familyId,
+              planCode: e['planCode'] as String,
+              memberLimit: (e['memberLimit'] as num).toInt(),
+              aiQuotaMonth: (e['aiQuotaMonth'] as num).toInt(),
+              aiUsedMonth: Value(((e['aiUsedMonth'] ?? 0) as num).toInt()),
+              historyMonths: Value((e['historyMonths'] as num?)?.toInt()),
+              flagsJson: Value(jsonEncode(e['flags'] ?? const {})),
+            ),
+          );
+
+  Future<CachedEntitlement?> entitlements(String familyId) =>
+      (db.select(db.cachedEntitlements)
+            ..where((e) => e.familyId.equals(familyId)))
+          .getSingleOrNull();
 
   Future<String?> categoryIdForKey(String? key) async {
     if (key == null) return null;

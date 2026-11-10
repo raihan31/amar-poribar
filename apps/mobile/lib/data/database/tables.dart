@@ -46,9 +46,55 @@ class CachedAccounts extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
   TextColumn get type => text()();
+  IntColumn get balancePaisa => integer().withDefault(const Constant(0))();
+  TextColumn get ownerUserId => text().nullable()();
+  BoolColumn get archived => boolean().withDefault(const Constant(false))();
+  IntColumn get openingBalancePaisa =>
+      integer().withDefault(const Constant(0))();
 
   @override
   Set<Column> get primaryKey => {id};
+}
+
+/// Read-only copy of GET /budgets for one family and month (FR-SYNC-08). A null [categoryId] is the overall budget.
+class CachedBudgets extends Table {
+  TextColumn get id => text()();
+  TextColumn get familyId => text()();
+  TextColumn get categoryId => text().nullable()();
+  TextColumn get month => text()(); // YYYY-MM
+  IntColumn get limitPaisa => integer()();
+  IntColumn get spentPaisa => integer().withDefault(const Constant(0))();
+  TextColumn get level =>
+      text().withDefault(const Constant('ok'))(); // ok | warning | exceeded
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+class CachedMembers extends Table {
+  TextColumn get userId => text()();
+  TextColumn get familyId => text()();
+  TextColumn get name => text()();
+  TextColumn get role => text()();
+  TextColumn get phoneLast3 => text().withDefault(const Constant(''))();
+  IntColumn get avatarIndex => integer().withDefault(const Constant(0))();
+
+  @override
+  Set<Column> get primaryKey => {userId, familyId};
+}
+
+/// Plan limits and feature flags, one row per family.
+class CachedEntitlements extends Table {
+  TextColumn get familyId => text()();
+  TextColumn get planCode => text()();
+  IntColumn get memberLimit => integer()();
+  IntColumn get aiQuotaMonth => integer()();
+  IntColumn get aiUsedMonth => integer().withDefault(const Constant(0))();
+  IntColumn get historyMonths => integer().nullable()();
+  TextColumn get flagsJson => text().withDefault(const Constant('{}'))();
+
+  @override
+  Set<Column> get primaryKey => {familyId};
 }
 
 /// Small key/value table for local state such as this device's node id and sync high-water marks.
