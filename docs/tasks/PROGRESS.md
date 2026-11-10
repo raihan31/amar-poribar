@@ -35,9 +35,9 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-PLAT-29 | M0 | done | 06b4953b5 | 2026-11-10 |  |
 | T-PLAT-30 | M0 | done | f0c5a9371 | 2026-11-10 |  |
 | T-PLAT-31 | M0 | done | 13c09a38d | 2026-11-10 |  |
-| T-PLAT-32 | M0 | todo |  |  |  |
+| T-PLAT-32 | M0 | done | 5611d9cba | 2026-11-10 |  |
 | T-PLAT-33 | M0 | todo |  |  |  |
-| T-PLAT-34 | M0 | todo |  |  |  |
+| T-PLAT-34 | M0 | done | 7d77cb503 | 2026-11-10 |  |
 | T-PLAT-35 | M0 | done | eae75e302 | 2026-11-10 |  |
 | T-ID-01 | M1 | todo |  |  |  |
 | T-ID-02 | M1 | todo |  |  |  |
