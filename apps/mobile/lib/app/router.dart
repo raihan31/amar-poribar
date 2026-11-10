@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/auth/ui/login_screen.dart';
 import '../features/voice/ui/voice_fallback_screen.dart';
 import '../presentation/providers/auth_provider.dart';
 import '../presentation/screens/ai_entry_screen.dart';
 import '../presentation/screens/dashboard_screen.dart';
-import '../presentation/screens/login_screen.dart';
 import '../presentation/screens/settings_screen.dart';
 import '../presentation/screens/transaction_screen.dart';
 import '../presentation/screens/tutorial_screen.dart'; // contains PendingSmsScreen too
@@ -54,8 +54,17 @@ final routerProvider = Provider<GoRouter>((ref) {
     errorBuilder: (context, state) => const ErrorScreen(),
     routes: [
       simple(Routes.welcome, (_) => const WelcomeScreen()),
-      simple(Routes.login, (_) => const LoginScreen()),
-      stub(Routes.loginCode),
+      simple(
+        Routes.login,
+        (s) => LoginScreen(from: s.uri.queryParameters['from']),
+      ),
+      simple(
+        Routes.loginCode,
+        (s) => LoginScreen(
+          phase: LoginPhase.code,
+          from: s.uri.queryParameters['from'],
+        ),
+      ),
       stub(Routes.consent),
       stub(Routes.join),
       simple(Routes.tutorial, (_) => const TutorialScreen()),
