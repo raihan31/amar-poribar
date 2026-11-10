@@ -1,4 +1,4 @@
-CREATE TABLE "recurring"."recurring_templates" (
+CREATE TABLE IF NOT EXISTS "recurring"."recurring_templates" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"family_id" uuid NOT NULL,
 	"name" text NOT NULL,

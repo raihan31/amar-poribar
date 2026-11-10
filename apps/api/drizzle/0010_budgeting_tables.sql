@@ -1,4 +1,4 @@
-CREATE TABLE "budgeting"."budgets" (
+CREATE TABLE IF NOT EXISTS "budgeting"."budgets" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"family_id" uuid NOT NULL,
 	"category_id" uuid,
@@ -6,7 +6,7 @@ CREATE TABLE "budgeting"."budgets" (
 	"limit_paisa" bigint NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "budgeting"."festival_budgets" (
+CREATE TABLE IF NOT EXISTS "budgeting"."festival_budgets" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"family_id" uuid NOT NULL,
 	"name" text NOT NULL,
@@ -17,4 +17,4 @@ CREATE TABLE "budgeting"."festival_budgets" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX "budget_family_cat_month_uidx" ON "budgeting"."budgets" USING btree ("family_id","category_id","month");
+CREATE UNIQUE INDEX IF NOT EXISTS "budget_family_cat_month_uidx" ON "budgeting"."budgets" USING btree ("family_id","category_id","month");

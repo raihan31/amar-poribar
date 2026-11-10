@@ -1,4 +1,4 @@
-CREATE TABLE "ai"."ai_summaries" (
+CREATE TABLE IF NOT EXISTS "ai"."ai_summaries" (
 	"family_id" uuid NOT NULL,
 	"month" text NOT NULL,
 	"locale" text NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE "ai"."ai_summaries" (
 	CONSTRAINT "ai_summaries_family_id_month_locale_facts_hash_pk" PRIMARY KEY("family_id","month","locale","facts_hash")
 );
 --> statement-breakpoint
-CREATE TABLE "ai"."ai_usage" (
+CREATE TABLE IF NOT EXISTS "ai"."ai_usage" (
 	"family_id" uuid NOT NULL,
 	"month" text NOT NULL,
 	"requests" integer DEFAULT 0 NOT NULL,
