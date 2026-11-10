@@ -61,5 +61,19 @@
   "txn_dashboard_count": "{count, plural, =0{কোনো লেনদেন নেই} =1{১টি লেনদেন} other{{count}টি লেনদেন}}",
   "@txn_dashboard_count": {
     "placeholders": {"count": {"type": "int"}}
-  }
+  },
+  "voice_fallback_title": "কথা বলা যাচ্ছে না",
+  "voice_fallback_heading": "এই ফোনে বাংলা ভয়েস নেই",
+  "voice_fallback_body": "চিন্তা নেই। আপনি লিখেও খরচ রাখতে পারবেন। চাইলে বাংলা ভয়েস নামিয়ে নিন।",
+  "voice_fallback_install": "বাংলা ভয়েস ইনস্টল করুন",
+  "voice_fallback_installNote": "গুগলের পেজ খুলবে। ইনস্টল শেষে ফিরে আসুন।",
+  "voice_fallback_typeTitle": "এখন লিখে রাখুন",
+  "voice_fallback_typeHint": "লিখুন: \"বাজার ৮৫০ ক্যাশ\"",
+  "voice_fallback_send": "পাঠান",
+  "voice_fallback_save": "সংরক্ষণ",
+  "voice_fallback_noTts": "উত্তর পড়ে শোনানোও এই ফোনে বন্ধ। লেখা দেখে নিন।",
+  "voice_fallback_noTtsAction": "ইনস্টল",
+  "voice_fallback_hint": "লিখে দিন",
+  "voice_fallback_back": "পেছনে",
+  "voice_fallback_nothing": "কিছু বোঝা যায়নি"
 }

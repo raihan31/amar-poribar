@@ -9,6 +9,8 @@ import '../../core/speech/budget_alerts.dart';
 import '../../core/speech/categories.dart';
 import '../../data/api/api_client.dart';
 import '../../data/database/database.dart';
+import '../../features/voice/state/voice_capability_provider.dart';
+import '../../features/voice/ui/voice_fallback_screen.dart';
 import '../providers/auth_provider.dart';
 import '../providers/providers.dart';
 
@@ -199,7 +201,10 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
         );
       });
 
-  Future<void> _readBack(TransactionDraft? d) {
+  Future<void> _readBack(TransactionDraft? d) async {
+    // No Bangla voice: show the text only, no auto read-aloud (FR-VOICE-07).
+    final caps = ref.read(voiceCapabilityProvider).value;
+    if (caps != null && caps.ttsMissingBangla) return;
     final voice = ref.read(voiceServiceProvider);
     if (d == null) return voice.speak('কিছু বোঝা যায়নি। আবার বলুন।');
     return voice.speak(
@@ -212,6 +217,7 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
   }
 
   Future<void> _listen(String familyId) async {
+    if (!await micMayListen(context, ref)) return;
     final voice = ref.read(voiceServiceProvider);
     await voice.stopSpeaking();
     setState(() {
@@ -343,6 +349,7 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
 
   Widget _entry(FamilyInfo family) => ListView(
         children: [
+          const VoiceTtsBanner(),
           SizedBox(
             height: 72,
             child: ElevatedButton.icon(

@@ -31,6 +31,7 @@ dependencies:
   shared_preferences: ^2.3.2 # Small non-secret preferences
   flutter_secure_storage: ^9.2.2 # Access and refresh tokens (FR-AUTH-03)
   speech_to_text: ^7.0.0 # Device Bangla speech recognition (FR-VOICE-01)
+  url_launcher: ^6.3.0 # Opens the Play Store page for the Bangla voice (FR-VOICE-07)
   flutter_tts: ^4.2.0 # Reads drafts and the monthly summary aloud (FR-VOICE-03/04)
   
   # UI & Utils

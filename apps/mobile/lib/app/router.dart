@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/voice/ui/voice_fallback_screen.dart';
 import '../presentation/providers/auth_provider.dart';
 import '../presentation/screens/ai_entry_screen.dart';
 import '../presentation/screens/dashboard_screen.dart';
@@ -91,7 +92,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       stub(Routes.txn),
       stub(Routes.receipt),
       stub(Routes.ruleLearn),
-      stub(Routes.voiceFallback),
+      simple(Routes.voiceFallback, (_) => const VoiceFallbackScreen()),
       stub(Routes.summary),
       stub(Routes.ask),
       simple(Routes.settings, (_) => const SettingsScreen()),
