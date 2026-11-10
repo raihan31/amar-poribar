@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../../core/money/money.dart';
+
 /// Base URL of apps/api. Override with `--dart-define=API_URL=https://...`.
 const String kApiUrl =
     String.fromEnvironment('API_URL', defaultValue: 'http://10.0.2.2:4000');
@@ -49,7 +51,7 @@ class TransactionDraft {
     this.pendingId,
   });
 
-  double get amountTaka => amountPaisa / 100;
+  Money get amount => Money(amountPaisa);
 
   TransactionDraft copyWith({String? categoryKey, String? source}) =>
       TransactionDraft(

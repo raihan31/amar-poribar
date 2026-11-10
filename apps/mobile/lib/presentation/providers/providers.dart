@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/money/money.dart';
 import '../../data/database/local_store.dart';
 import '../../domain/models/enums.dart';
 
@@ -13,26 +14,26 @@ final localStoreProvider = Provider<LocalStore>((ref) {
 
 class AppState {
   final Role activeRole;
-  final double monthlyBudget;
-  final double totalIncome;
-  final double totalExpense;
+  final Money monthlyBudget;
+  final Money totalIncome;
+  final Money totalExpense;
 
   /// Latest entries for the dashboard list.
   final List<Map<String, dynamic>> recent;
 
   const AppState({
     this.activeRole = Role.father, // Default admin view
-    this.monthlyBudget = 100000.0,
-    this.totalIncome = 0,
-    this.totalExpense = 0,
+    this.monthlyBudget = const Money(10000000),
+    this.totalIncome = Money.zero,
+    this.totalExpense = Money.zero,
     this.recent = const [],
   });
 
   AppState copyWith({
     Role? activeRole,
-    double? monthlyBudget,
-    double? totalIncome,
-    double? totalExpense,
+    Money? monthlyBudget,
+    Money? totalIncome,
+    Money? totalExpense,
     List<Map<String, dynamic>>? recent,
   }) {
     return AppState(
@@ -57,7 +58,7 @@ class AppStateNotifier extends StateNotifier<AppState> {
   }
 
   Future<void> addExpense(
-    double taka, {
+    Money amount, {
     String? note,
     String? categoryId,
     String? accountId,
@@ -65,7 +66,7 @@ class AppStateNotifier extends StateNotifier<AppState> {
   }) async {
     await store.addTransaction(
       type: 'expense',
-      amountPaisa: (taka * 100).round(),
+      amountPaisa: amount.paisa,
       note: note,
       categoryId: categoryId,
       accountId: accountId,
@@ -75,7 +76,7 @@ class AppStateNotifier extends StateNotifier<AppState> {
   }
 
   Future<void> addIncome(
-    double taka, {
+    Money amount, {
     String? note,
     String? categoryId,
     String? accountId,
@@ -83,7 +84,7 @@ class AppStateNotifier extends StateNotifier<AppState> {
   }) async {
     await store.addTransaction(
       type: 'income',
-      amountPaisa: (taka * 100).round(),
+      amountPaisa: amount.paisa,
       note: note,
       categoryId: categoryId,
       accountId: accountId,
@@ -104,14 +105,14 @@ class AppStateNotifier extends StateNotifier<AppState> {
     final rows = await store.recent(limit: 20);
     if (!mounted) return;
     state = state.copyWith(
-      totalIncome: totals.incomePaisa / 100,
-      totalExpense: totals.expensePaisa / 100,
+      totalIncome: Money(totals.incomePaisa),
+      totalExpense: Money(totals.expensePaisa),
       recent: [
         for (final r in rows)
           {
             'type': r.type,
             'category': cats[r.categoryId] ?? r.note ?? 'অন্যান্য',
-            'amount': r.amountPaisa / 100,
+            'amount': Money(r.amountPaisa),
             'date': r.occurredAt.substring(0, 10),
           },
       ],

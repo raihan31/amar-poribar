@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/money/money_format.dart';
 import '../../core/speech/bangla_words.dart';
 import '../../core/speech/budget_alerts.dart';
 import '../../core/speech/categories.dart';
@@ -244,7 +245,7 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
     final accountId = await store.accountIdForType(d.accountType);
     if (d.type == 'income') {
       await notifier.addIncome(
-        d.amountTaka,
+        d.amount,
         note: d.note,
         categoryId: categoryId,
         accountId: accountId,
@@ -252,7 +253,7 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
       );
     } else {
       await notifier.addExpense(
-        d.amountTaka,
+        d.amount,
         note: d.note,
         categoryId: categoryId,
         accountId: accountId,
@@ -472,7 +473,7 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
             leading:
                 Text(cat?.icon ?? '📦', style: const TextStyle(fontSize: 28)),
             title: Text(
-              '৳ ${d.amountTaka.toStringAsFixed(2)} · ${cat?.nameBn ?? "ক্যাটাগরি বাছাই করুন"}',
+              '${formatMoney(d.amount, style: NumeralStyle.bangla)} · ${cat?.nameBn ?? "ক্যাটাগরি বাছাই করুন"}',
             ),
             subtitle: Text(d.note),
             trailing: Row(
