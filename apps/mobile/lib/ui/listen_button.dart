@@ -40,6 +40,7 @@ class _ListenButtonState extends ConsumerState<ListenButton> {
   Widget build(BuildContext context) {
     final label = _speaking ? ListenButton.stopLabel : ListenButton.listenLabel;
     return Semantics(
+      container: true,
       button: true,
       label: label,
       excludeSemantics: true,

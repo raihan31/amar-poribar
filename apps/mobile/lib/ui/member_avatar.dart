@@ -78,6 +78,8 @@ class MemberAvatar extends StatelessWidget {
     final word = online == true ? onlineWord : offlineWord;
     final withLabel = showLabel && online != null;
     return Semantics(
+      container: true,
+      button: true,
       label: online == null ? m.name : '${m.name}, $word',
       excludeSemantics: true,
       child: withLabel

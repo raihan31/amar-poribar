@@ -27,6 +27,7 @@ class IconTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final simple = ref.watch(uiScaleProvider) == UiScale.simple;
     return Semantics(
+      container: true,
       button: true,
       label: label,
       excludeSemantics: true,

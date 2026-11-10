@@ -37,6 +37,7 @@ class BigMicButton extends StatelessWidget {
     );
     final text = listening ? 'শুনছি…' : label;
     return Semantics(
+      container: true,
       button: true,
       label: text,
       excludeSemantics: true,
