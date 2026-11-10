@@ -150,6 +150,8 @@ const adminImportsOnlyStaffSafe = {
     return {
       ImportDeclaration(node) {
         if (node.importKind === "type") return;
+        // Third-party packages are not "other modules".
+        if (!String(node.source.value).startsWith(".")) return;
         for (const spec of node.specifiers) {
           if (spec.type === "ImportSpecifier" && spec.importKind === "type") continue;
           const sym = checker.getSymbolAtLocation(esTreeNodeToTSNodeMap.get(spec.local));
