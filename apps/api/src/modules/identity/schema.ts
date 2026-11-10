@@ -11,4 +11,7 @@ export const users = identitySchema.table("users", {
   bnDigits: boolean("bn_digits").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  simpleMode: boolean("simple_mode").notNull().default(false),
+  erasureRequestedAt: timestamp("erasure_requested_at", { withTimezone: true }),
+  erasedAt: timestamp("erased_at", { withTimezone: true }),
 });

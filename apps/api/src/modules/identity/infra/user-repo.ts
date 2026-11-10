@@ -3,6 +3,18 @@ import type { Db } from "../../../platform/db.js";
 import type { UserRepo } from "../app/ports.js";
 import { users } from "../schema.js";
 
+const basicsColumns = {
+  id: users.id,
+  name: users.name,
+  phone: users.phone,
+  locale: users.locale,
+  bnDigits: users.bnDigits,
+  createdAt: users.createdAt,
+  updatedAt: users.updatedAt,
+  simpleMode: users.simpleMode,
+  erasedAt: users.erasedAt,
+};
+
 export function createUserRepo(db: Db): UserRepo {
   return {
     async upsertByPhone(phone) {
@@ -18,19 +30,15 @@ export function createUserRepo(db: Db): UserRepo {
       return row ?? null;
     },
     async getBasics(userId) {
-      const [row] = await db
-        .select({
-          id: users.id,
-          name: users.name,
-          phone: users.phone,
-          locale: users.locale,
-          bnDigits: users.bnDigits,
-          createdAt: users.createdAt,
-          updatedAt: users.updatedAt,
-        })
-        .from(users)
-        .where(eq(users.id, userId));
+      const [row] = await db.select(basicsColumns).from(users).where(eq(users.id, userId));
       return row ?? null;
+    },
+    async getManyBasics(ids) {
+      if (ids.length === 0) return [];
+      return db
+        .select(basicsColumns)
+        .from(users)
+        .where(inArray(users.id, [...ids]));
     },
     async getManyNames(ids) {
       if (ids.length === 0) return new Map();
