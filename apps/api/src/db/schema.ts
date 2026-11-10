@@ -1,4 +1,4 @@
-import { bigint, boolean, integer, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { bigint, boolean, integer, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 // `accounts`, `categories` and `transactions` (and their enums and the sync sequence) are owned by the ledger
 // module (T-PLAT-25). They are re-exported so the legacy tables below and the unmoved routes keep working.
@@ -29,32 +29,7 @@ import { users } from "../modules/identity/schema.js";
 export { families } from "../modules/families/schema.js";
 import { families } from "../modules/families/schema.js";
 
-export const budgets = pgTable(
-  "budgets",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    familyId: uuid("family_id")
-      .notNull()
-      .references(() => families.id, { onDelete: "cascade" }),
-    categoryId: uuid("category_id").references(() => categories.id),
-    month: text("month").notNull(),
-    limitPaisa: bigint("limit_paisa", { mode: "number" }).notNull(),
-  },
-  (t) => [uniqueIndex("budget_family_cat_month_uidx").on(t.familyId, t.categoryId, t.month)],
-);
-
-/** One-off budget over a date range, e.g. Eid-ul-Adha (SRS FR-BUD-04). */
-export const festivalBudgets = pgTable("festival_budgets", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  familyId: uuid("family_id")
-    .notNull()
-    .references(() => families.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  startsOn: text("starts_on").notNull(),
-  endsOn: text("ends_on").notNull(),
-  limitPaisa: bigint("limit_paisa", { mode: "number" }).notNull(),
-  ...timestamps,
-});
+// `budgets` and `festival_budgets` are owned by the budgeting module (T-PLAT-26).
 
 /** Monthly template that produces a draft each month for the user to confirm (FR-TXN-06). */
 export const recurringTemplates = pgTable("recurring_templates", {
