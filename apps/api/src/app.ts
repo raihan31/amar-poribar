@@ -5,7 +5,6 @@ import type { AppDeps } from "./deps.js";
 import { registerErrorHandler } from "./errors.js";
 import { registerComposition } from "./composition/index.js";
 import { EventBus } from "./platform/events/bus.js";
-import { reportRoutes } from "./routes/reports.js";
 import { syncRoutes } from "./routes/sync.js";
 import { modules } from "./modules/registry.js";
 import { createLogger, installRequestContext, requestOptions } from "./platform/logger.js";
@@ -58,6 +57,5 @@ export async function buildApp(deps: AppDeps) {
   registerComposition(app, ctx);
 
   await app.register(async (scope) => syncRoutes(scope, deps, ctx));
-  await app.register(async (scope) => reportRoutes(scope, deps, ctx));
   return app;
 }
