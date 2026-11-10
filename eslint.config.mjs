@@ -1,4 +1,5 @@
 import tseslint from "typescript-eslint";
+import amar from "./tools/eslint-rules/staff-safe.mjs";
 
 export default tseslint.config(
   {
@@ -45,6 +46,19 @@ export default tseslint.config(
         { object: "process", property: "env", message: "Read configuration through platform/config.ts." },
       ],
     },
+  },
+  {
+    // Staff data boundary (SRS 11.3, DEC-18): facades tagged @staff-safe return aggregates only.
+    files: ["apps/api/src/modules/*/index.ts"],
+    plugins: { amar },
+    rules: { "amar/staff-safe-facade": "error" },
+  },
+  {
+    // The admin module may import only @staff-safe functions (and types) from other modules.
+    files: ["apps/api/src/modules/admin/**/*.ts"],
+    ignores: ["**/*.test.ts"],
+    plugins: { amar },
+    rules: { "amar/admin-imports-only-staff-safe": "error" },
   },
   {
     // Test doubles are loosely typed on purpose.

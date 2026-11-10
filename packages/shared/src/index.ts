@@ -4,3 +4,4 @@ export * from "./schemas.js";
 export * from "./i18n.js";
 export * from "./words.js";
 export * from "./speech.js";
+export * from "./private-fields.js";
