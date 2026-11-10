@@ -1,6 +1,8 @@
 import { fileURLToPath } from "node:url";
 import Fastify, { type FastifyInstance } from "fastify";
+import { claudeRoutes } from "./claude.js";
 import { fcmRoutes } from "./fcm.js";
+import { paymentRoutes } from "./payments.js";
 import { smsRoutes } from "./sms.js";
 
 /** One small app hosting every fake external service (SMS gateway, FCM). */
@@ -9,6 +11,8 @@ export function buildFakes(): FastifyInstance {
   app.get("/health", async () => ({ ok: true }));
   smsRoutes(app);
   fcmRoutes(app);
+  paymentRoutes(app);
+  claudeRoutes(app);
   return app;
 }
 

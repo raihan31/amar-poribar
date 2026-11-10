@@ -1,0 +1,12 @@
+{
+  "feature": "parse-text",
+  "input": "বাজার করলাম",
+  "response": {
+    "text": "{\"drafts\":[]}",
+    "usage": {
+      "inputTokens": 600,
+      "outputTokens": 80
+    },
+    "stopReason": "end_turn"
+  }
+}

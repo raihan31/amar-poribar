@@ -1,0 +1,12 @@
+{
+  "feature": "parse-text",
+  "input": "বাজারে ৫০০ আর রিকশায় ৫০",
+  "response": {
+    "text": "{\"drafts\":[{\"type\":\"expense\",\"feeTaka\":0,\"date\":\"2026-10-06\",\"accountType\":null,\"counterparty\":null,\"confidence\":0.9,\"amountTaka\":500,\"categoryKey\":\"bazaar\",\"note\":\"বাজার\"},{\"type\":\"expense\",\"feeTaka\":0,\"date\":\"2026-10-06\",\"accountType\":null,\"counterparty\":null,\"confidence\":0.9,\"amountTaka\":50,\"categoryKey\":\"transport\",\"note\":\"রিকশা\"}]}",
+    "usage": {
+      "inputTokens": 600,
+      "outputTokens": 80
+    },
+    "stopReason": "end_turn"
+  }
+}
