@@ -1,0 +1,21 @@
+{
+  "name": "@amar-poribar/fakes",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "fastify": "^5.12.0"
+  },
+  "devDependencies": {
+    "@amar-poribar/tsconfig": "workspace:*",
+    "@types/node": "^22.0.0",
+    "typescript": "~5.9.0",
+    "vitest": "^5.0.0"
+  }
+}
