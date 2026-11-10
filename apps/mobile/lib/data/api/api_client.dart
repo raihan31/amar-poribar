@@ -1,21 +1,13 @@
-import 'dart:convert';
-
 import 'package:http/http.dart' as http;
+
+import '../auth/session_manager.dart';
+import 'api_transport.dart';
+
+export 'api_exception.dart';
 
 /// Base URL of apps/api. Override with `--dart-define=API_URL=https://...`.
 const String kApiUrl =
     String.fromEnvironment('API_URL', defaultValue: 'http://10.0.2.2:4000');
-
-class ApiException implements Exception {
-  final int status;
-  final String message;
-  ApiException(this.status, this.message);
-
-  bool get isUnauthorized => status == 401;
-
-  @override
-  String toString() => message;
-}
 
 /// A transaction proposed by the parser, waiting for the user to confirm (SRS FR-AI-05).
 class TransactionDraft {
@@ -142,42 +134,26 @@ class SyncResponse {
 
 /// Thin client for apps/api. Takes an [http.Client] so tests can inject a mock.
 class ApiClient {
-  final http.Client _http;
-  final String baseUrl;
-  String? token;
+  final ApiTransport _t;
+  final SessionManager? session;
 
-  ApiClient({http.Client? client, this.baseUrl = kApiUrl, this.token})
-      : _http = client ?? http.Client();
+  ApiClient({
+    http.Client? client,
+    String baseUrl = kApiUrl,
+    String? token,
+    this.session,
+  }) : _t = ApiTransport(
+          client ?? http.Client(),
+          baseUrl,
+          session: session,
+          token: token,
+        );
 
-  Future<dynamic> _send(String method, String path, {Object? body}) async {
-    final req = http.Request(method, Uri.parse('$baseUrl$path'));
-    if (body != null) {
-      req.headers['content-type'] = 'application/json';
-      req.body = jsonEncode(body);
-    }
-    if (token != null) req.headers['authorization'] = 'Bearer $token';
-    final http.Response res;
-    try {
-      res = await http.Response.fromStream(await _http.send(req));
-    } catch (_) {
-      throw ApiException(
-        0,
-        'সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না / Cannot reach the server',
-      );
-    }
-    if (res.statusCode == 204 || res.body.isEmpty) return null;
-    final data = jsonDecode(utf8.decode(res.bodyBytes));
-    if (res.statusCode >= 400) {
-      final msg = (data is Map && data['error'] is Map)
-          ? data['error']['message'] as String?
-          : null;
-      throw ApiException(
-        res.statusCode,
-        msg ?? 'Request failed (${res.statusCode})',
-      );
-    }
-    return data;
-  }
+  String? get token => _t.token;
+  set token(String? v) => _t.token = v;
+
+  Future<dynamic> _send(String method, String path, {Object? body}) =>
+      _t.send(method, path, body: body);
 
   /// Sends an OTP. Outside production the API also returns the code (`devCode`) for local testing.
   Future<String?> requestOtp(String phone) async {
@@ -187,15 +163,24 @@ class ApiClient {
     return r['devCode'] as String?;
   }
 
-  /// Verifies the OTP and stores the access token on this client.
+  /// Verifies the OTP and stores the tokens (in the session when there is one).
   Future<String> verifyOtp(String phone, String code) async {
     final r = await _send(
       'POST',
       '/v1/auth/otp/verify',
       body: {'phone': phone, 'code': code},
     ) as Map<String, dynamic>;
-    token = r['accessToken'] as String;
-    return token!;
+    final access = r['accessToken'] as String;
+    final refresh = r['refreshToken'] as String?;
+    final sm = session;
+    if (sm != null && refresh != null) {
+      await sm.setTokens(
+        tokensFromJson({...r, 'refreshToken': refresh}, sm.now()),
+      );
+    } else {
+      token = access;
+    }
+    return access;
   }
 
   Future<List<FamilyInfo>> families() async {

@@ -27,7 +27,8 @@ dependencies:
   uuid: ^4.3.3
   permission_handler: ^11.3.1 # Runtime permissions for Nearby (Bluetooth, Wi-Fi, location)
   http: ^1.2.2 # REST API client (auth, AI parsing)
-  shared_preferences: ^2.3.2 # Keeps the sign-in token
+  shared_preferences: ^2.3.2 # Small non-secret preferences
+  flutter_secure_storage: ^9.2.2 # Access and refresh tokens (FR-AUTH-03)
   speech_to_text: ^7.0.0 # Device Bangla speech recognition (FR-VOICE-01)
   flutter_tts: ^4.2.0 # Reads drafts and the monthly summary aloud (FR-VOICE-03/04)
   
