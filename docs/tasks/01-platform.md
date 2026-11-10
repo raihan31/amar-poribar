@@ -72,7 +72,7 @@ M0 is complete when `pnpm verify:m0` passes (T-PLAT-33).
 **Files**
 - C `apps/api/src/platform/module.ts` — types `ModuleContext`, `ModuleDefinition<F>`, `Facades`
 - C `apps/api/src/modules/registry.ts` — ordered list of module definitions
-- C `apps/api/src/modules/<name>/{index.ts,schema.ts,events.ts,jobs.ts}` + folders `http/ app/ domain/ infra/` (each with a `.gitkeep`) for the 16 modules: `identity families ledger budgeting recurring ai reporting sync comms notifications shopping lending billing privacy admin` (platform is not a module folder; it lives in `src/platform`)
+- C `apps/api/src/modules/<name>/{index.ts,schema.ts,events.ts,jobs.ts}` + folders `http/ app/ domain/ infra/` (each with a `.gitkeep`) for the 15 modules: `identity families ledger budgeting recurring ai reporting sync comms notifications shopping lending billing privacy admin` (platform is not a module folder; it lives in `src/platform`)
 - C `tools/gen-module.mjs` — scaffolding script
 - M `package.json` (root): `"gen:module": "node tools/gen-module.mjs"`
 - M `apps/api/src/app.ts` — keep behaviour; add the registry loop but with an empty registry for now
@@ -99,7 +99,7 @@ M0 is complete when `pnpm verify:m0` passes (T-PLAT-33).
    ```
 2. Each `modules/<name>/index.ts` exports: (a) the facade **interface** `XFacade`, (b) DTO types, (c) event types re-exported from `events.ts`, (d) `export const xModule: ModuleDefinition<XFacade>`. Nothing from `infra/`, `http/` or `schema.ts` is exported (R3).
 3. Declaration merging in each `index.ts`: `declare module "../../platform/module.js" { interface Facades { families: FamiliesFacade } }` so `ctx.facades.families` is typed.
-4. `registry.ts` exports `modules: ModuleDefinition[]` in dependency order (identity, families, ledger, budgeting, recurring, ai, reporting, sync, notifications, comms, shopping, lending, billing, privacy, admin). `app.ts` loops: `for (const m of modules) ctx.facades[m.name] = await m.register(app, ctx)`. R8: nothing else lists modules.
+4. `registry.ts` exports `modules: ModuleDefinition[]` in dependency order (identity, families, billing, ledger, budgeting, recurring, ai, reporting, sync, notifications, comms, shopping, lending, privacy, admin; `billing` comes before `ai` because `ai` depends on it). `app.ts` loops: `for (const m of modules) ctx.facades[m.name] = await m.register(app, ctx)`. R8: nothing else lists modules.
 5. `tools/gen-module.mjs <name> [dep,dep]`: creates the folder tree, an `index.ts` with the facade/def stub, an empty `schema.ts` (`export const <name>Schema = pgSchema("<name>");`), `events.ts` (`export {};`), `jobs.ts` (`export const jobs = [];`), a `<name>.test.ts` placeholder, and appends the module to `registry.ts` between the markers `// <modules>` and `// </modules>`.
 6. Create all 16 modules by running the generator (so the generator itself is exercised), then commit.
 **Contract** — `ModuleDefinition.dependsOn` must equal the SRS §3.3 table (asserted in T-PLAT-03).
@@ -108,7 +108,7 @@ M0 is complete when `pnpm verify:m0` passes (T-PLAT-33).
 **Acceptance**
 - `pnpm gen:module demo --root /tmp/gm-test && test -f /tmp/gm-test/modules/demo/index.ts`
 - `pnpm --filter @amar-poribar/api test -- registry` and `pnpm typecheck` exit 0.
-**Done when** — `apps/api/src/modules/*` exists for all 16 modules, is registered in order, and the API still starts and passes all existing tests.
+**Done when** — `apps/api/src/modules/*` exists for all 15 modules, is registered in order, and the API still starts and passes all existing tests.
 
 ---
 
