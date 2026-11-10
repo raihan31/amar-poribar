@@ -90,6 +90,60 @@ jobs:
           if-no-files-found: ignore
       - run: dart run tool/check_coverage.dart 70 lib/domain lib/data lib/core coverage/lcov.info
 
+  mobile-emulator:
+    name: Flutter (integration tests on emulator)
+    runs-on: ubuntu-latest
+    # Runs on pushes to main, and on pull requests only when apps/mobile changed.
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check whether apps/mobile changed
+        id: paths
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          elif git diff --name-only "origin/${{ github.base_ref }}...HEAD" -- apps/mobile | grep -q .; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::No apps/mobile changes; skipping the emulator job."
+          fi
+      - uses: actions/setup-java@v4
+        if: steps.paths.outputs.run == 'true'
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        if: steps.paths.outputs.run == 'true'
+        with:
+          channel: stable
+          flutter-version: "3.47.6"
+          cache: true
+      - name: Enable KVM
+        if: steps.paths.outputs.run == 'true'
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Prepare
+        if: steps.paths.outputs.run == 'true'
+        working-directory: apps/mobile
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+          flutter gen-l10n
+      - name: Integration tests
+        if: steps.paths.outputs.run == 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          working-directory: apps/mobile
+          # No integration_test folder exists until the first flow lands.
+          script: |
+            if [ -d integration_test ]; then flutter test integration_test; else echo "no integration_test yet"; fi
+
   mobile-size:
     name: Flutter (APK size gate)
     runs-on: ubuntu-latest
