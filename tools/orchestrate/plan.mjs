@@ -19,7 +19,10 @@ const cand = new Set(graph.filter((t) => t.ms === N).map((t) => t.id));
 const queue = [...cand];
 while (queue.length) {
   for (const d of byId.get(queue.pop()).deps) {
-    if (!cand.has(d) && status(d) !== "done") { cand.add(d); queue.push(d); }
+    if (!cand.has(d) && status(d) !== "done") {
+      cand.add(d);
+      queue.push(d);
+    }
   }
 }
 const pending = [...cand].filter((id) => status(id) !== "done");
@@ -28,11 +31,17 @@ const blocked = new Set(pending.filter((id) => status(id) === "blocked"));
 // A task is waiting when a dependency is not done (and not itself runnable now).
 const depsDone = (t) => t.deps.every((d) => status(d) === "done");
 const downstream = (id, seen = new Set()) => {
-  for (const t of graph) if (t.deps.includes(id) && !seen.has(t.id)) { seen.add(t.id); downstream(t.id, seen); }
+  for (const t of graph)
+    if (t.deps.includes(id) && !seen.has(t.id)) {
+      seen.add(t.id);
+      downstream(t.id, seen);
+    }
   return seen;
 };
 const weight = new Map(pending.map((id) => [id, downstream(id).size]));
-const unreachable = pending.filter((id) => status(id) !== "blocked" && !depsDone(byId.get(id)) && hasBlockedAncestor(id));
+const unreachable = pending.filter(
+  (id) => status(id) !== "blocked" && !depsDone(byId.get(id)) && hasBlockedAncestor(id),
+);
 function hasBlockedAncestor(id, seen = new Set()) {
   for (const d of byId.get(id).deps) {
     if (seen.has(d)) continue;
@@ -60,7 +69,8 @@ const HOT = [
   ["eslint", /eslint\.config\.mjs$/],
 ];
 const hotOf = (t) => new Set(t.files.flatMap((f) => HOT.filter(([, re]) => re.test(f)).map(([k]) => k)));
-const overlap = (a, b) => a === b || a.startsWith(b.endsWith("/") ? b : b + "/") || b.startsWith(a.endsWith("/") ? a : a + "/");
+const overlap = (a, b) =>
+  a === b || a.startsWith(b.endsWith("/") ? b : b + "/") || b.startsWith(a.endsWith("/") ? a : a + "/");
 
 const wave = [];
 const hotTaken = new Set();
@@ -79,7 +89,8 @@ console.log(
       milestone: N,
       wave: wave.map(({ id, title, layer, doc, files }) => ({ id, title, layer, doc, files })),
       readyNotChosen: ready.length - wave.length,
-      waiting: pending.filter((id) => status(id) === "todo" && !depsDone(byId.get(id)) && !unreachable.includes(id)).length,
+      waiting: pending.filter((id) => status(id) === "todo" && !depsDone(byId.get(id)) && !unreachable.includes(id))
+        .length,
       unreachable,
       blocked: [...blocked],
       done: [...cand].filter((id) => status(id) === "done").length,

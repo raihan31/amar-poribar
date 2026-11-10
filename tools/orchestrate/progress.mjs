@@ -16,7 +16,9 @@ export function readProgress() {
   const map = new Map();
   if (!existsSync(file)) return map;
   for (const line of readFileSync(file, "utf8").split("\n")) {
-    const m = line.match(/^\| (T-[A-Z]+-\d+[A-Z]?) \| M(\d) \| (todo|doing|done|blocked) \| ([^|]*)\| ([^|]*)\| ([^|]*)\|/);
+    const m = line.match(
+      /^\| (T-[A-Z]+-\d+[A-Z]?) \| M(\d) \| (todo|doing|done|blocked) \| ([^|]*)\| ([^|]*)\| ([^|]*)\|/,
+    );
     if (m) map.set(m[1], { status: m[3], sha: m[4].trim(), date: m[5].trim(), note: m[6].trim() });
   }
   return map;
