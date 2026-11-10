@@ -10,3 +10,4 @@ tools/design
 apps/api/arch-fixtures
 tools/orchestrate/graph.json
 apps/api/openapi.json
+coverage

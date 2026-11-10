@@ -7,6 +7,7 @@ export default tseslint.config(
       "**/dist/**",
       "**/.next/**",
       "**/node_modules/**",
+      "**/coverage/**",
       "apps/mobile/**",
       "**/*.g.dart",
       "apps/api/drizzle/**",
@@ -21,7 +22,11 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ["packages/*/src/*.test.ts", "packages/*/src/*/*.test.ts"],
+          allowDefaultProject: [
+            "packages/*/vitest.config.ts",
+            "packages/*/src/*.test.ts",
+            "packages/*/src/*/*.test.ts",
+          ],
         },
         tsconfigRootDir: import.meta.dirname,
       },
