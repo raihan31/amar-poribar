@@ -37,5 +37,19 @@
   "sync_nearby_failed": "Could not start nearby sync: allow permissions (Bluetooth, location).",
   "sync_nearby_askTitle": "Sync with nearby phone?",
   "sync_nearby_askBody": "Phone: {name}\nCode: {code}\n\nTap \"Yes\" if both phones show the same code.",
-  "txn_dashboard_count": "{count, plural, =0{No transactions} =1{1 transaction} other{{count} transactions}}"
+  "txn_dashboard_count": "{count, plural, =0{No transactions} =1{1 transaction} other{{count} transactions}}",
+  "voice_fallback_title": "Cannot speak",
+  "voice_fallback_heading": "This phone has no Bangla voice",
+  "voice_fallback_body": "No worry. You can type your expenses. You can also install the Bangla voice.",
+  "voice_fallback_install": "Install Bangla voice",
+  "voice_fallback_installNote": "Google's page opens. Come back when it is installed.",
+  "voice_fallback_typeTitle": "Type it now",
+  "voice_fallback_typeHint": "Type: \"bazar 850 cash\"",
+  "voice_fallback_send": "Send",
+  "voice_fallback_save": "Save",
+  "voice_fallback_noTts": "Reading answers aloud is also off on this phone. Read the text instead.",
+  "voice_fallback_noTtsAction": "Install",
+  "voice_fallback_hint": "Please type it",
+  "voice_fallback_back": "Back",
+  "voice_fallback_nothing": "Nothing understood"
 }
