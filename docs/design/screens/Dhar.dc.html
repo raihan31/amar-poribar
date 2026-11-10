@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>ধার</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:'Hind Siliguri',system-ui,sans-serif}
+.r{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:20px;background:#fff;border:1px solid #E8DCC8}
+.a{width:48px;height:48px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex:none}
+.s{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;border-radius:12px;padding:2px 10px}</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#FFF8EE;color:#2A2118;display:flex;flex-direction:column;overflow:hidden">
+  <div style="padding:24px 12px 0;display:flex;align-items:center;gap:4px">
+    <button aria-label="পেছনে" style="width:56px;height:56px;border:0;background:transparent;color:#2A2118;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div style="font-size:26px;font-weight:700">ধার</div>
+  </div>
+  <div style="padding:0 20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+    <button style="height:52px;border:3px solid #1B5E20;border-radius:26px;background:#E6F2E3;color:#1B5E20;font:700 17px 'Hind Siliguri'">✓ আমি পাব</button>
+    <button style="height:52px;border:2px solid #E1D3BC;border-radius:26px;background:#fff;font:600 17px 'Hind Siliguri'">আমি দেব</button>
+  </div>
+
+  <div style="margin:12px 20px 0;padding:14px 16px;border-radius:20px;background:#1B5E20;color:#fff"><div style="font-size:14px">মোট পাব</div><div style="font-size:34px;font-weight:700;line-height:1.1">৳ ২২,০০০</div></div>
+
+  <div style="margin:12px 20px 0;display:flex;flex-direction:column;gap:8px">
+    <div class="r"><div class="a" style="background:#BFD8F2;color:#173F6B">র</div><div style="flex:1"><div style="font-size:18px;font-weight:700">রফিক ভাই</div><div style="font-size:13px;color:#5A4B3B">দেবে: ১০ ডিসেম্বর</div><span class="s" style="background:#F1E6D3;color:#4A3C2C">বাকি আছে</span></div><div style="font-size:19px;font-weight:700">৳ ১২,০০০</div></div>
+    <div class="r" style="border-color:#B3261E"><div class="a" style="background:#F4C7B8;color:#7A2E14">ক</div><div style="flex:1"><div style="font-size:18px;font-weight:700">করিম চাচা</div><div style="font-size:13px;color:#5A4B3B">দেওয়ার কথা ছিল: ২ নভেম্বর</div><span class="s" style="background:#F8D7D3;color:#8A1C14"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v6M12 17v.5"/></svg>৯ দিন দেরি</span></div><div style="font-size:19px;font-weight:700">৳ ৮,০০০</div></div>
+    <div class="r"><div class="a" style="background:#E3D2F2;color:#4A2670">স</div><div style="flex:1"><div style="font-size:18px;font-weight:700">সালমা খালা</div><div style="font-size:13px;color:#5A4B3B">দেবে: ঈদের পরে</div><span class="s" style="background:#E6F2E3;color:#14451A"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>অর্ধেক পেয়েছি</span></div><div style="font-size:19px;font-weight:700">৳ ২,০০০</div></div>
+  </div>
+
+  <div style="margin:10px 20px 0;display:flex;gap:8px;align-items:center;font-size:14px;color:#5A4B3B"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>ধারের হিসাব শুধু আপনি দেখেন। পরিবার দেখে না।</div>
+
+  <div style="flex:1"></div>
+  <div style="padding:0 20px 24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px">
+    <button style="height:64px;border:3px solid #1B5E20;border-radius:32px;background:#fff;color:#1B5E20;font:700 17px 'Hind Siliguri';display:flex;align-items:center;justify-content:center;gap:6px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>ফেরত পেয়েছি</button>
+    <button style="height:64px;border:0;border-radius:32px;background:#1B5E20;color:#fff;font:700 17px 'Hind Siliguri';display:flex;align-items:center;justify-content:center;gap:6px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>নতুন ধার</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

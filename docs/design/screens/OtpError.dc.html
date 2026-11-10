@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>ভুল কোড</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:'Hind Siliguri',system-ui,sans-serif}
+.o{height:64px;border-radius:16px;border:3px solid #B3261E;background:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700}</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#FFF8EE;color:#2A2118;display:flex;flex-direction:column;overflow:hidden;padding:0 24px">
+  <div style="margin-top:64px;font-size:30px;font-weight:700;color:#1B5E20">কোডটি লিখুন</div>
+  <div style="margin-top:6px;font-size:17px;color:#5A4B3B">০১৭১২ ৩৪৫ ৬৭৮ নম্বরে কোড পাঠানো হয়েছে।</div>
+
+  <div style="margin-top:26px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px">
+    <div class="o">৪</div><div class="o">৭</div><div class="o">৯</div><div class="o">১</div><div class="o">০</div><div class="o">৩</div>
+  </div>
+
+  <div style="margin-top:14px;padding:14px 16px;border-radius:18px;background:#F8D7D3;color:#8A1C14;display:flex;gap:12px;align-items:center">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16v.5"/></svg>
+    <div><div style="font-size:18px;font-weight:700">কোডটি মেলেনি</div><div style="font-size:15px">আবার দেখে লিখুন। আর ৪ বার চেষ্টা করতে পারবেন।</div></div>
+  </div>
+
+  <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px">
+    <button style="height:64px;border:3px solid #1B5E20;border-radius:32px;background:#fff;color:#1B5E20;font:700 19px 'Hind Siliguri'">নতুন কোড পাঠান</button>
+    <button style="height:56px;border:0;background:transparent;color:#5A4B3B;font:600 17px 'Hind Siliguri';text-decoration:underline">নম্বর ভুল? বদলান</button>
+  </div>
+
+  <div style="margin-top:22px;padding:14px 16px;border-radius:18px;background:#fff;border:1px solid #E8DCC8;font-size:15px;line-height:1.5;color:#4A3C2C">
+    <b>কোড না এলে:</b> একটু অপেক্ষা করুন। এরপরও না এলে বাড়ির কাউকে ফোন দিন। কোড কাউকে বলবেন না।
+  </div>
+
+  <div style="flex:1"></div>
+  <div style="font-size:14px;color:#5A4B3B;text-align:center;margin-bottom:10px">এক ঘণ্টায় সর্বোচ্চ ৫ বার কোড চাওয়া যায়। এ নম্বরে ২ বার চাওয়া হয়েছে।</div>
+  <button style="height:72px;border:0;border-radius:36px;background:#C9BBA3;color:#4A3C2C;font:700 22px 'Hind Siliguri';margin-bottom:28px" disabled>ঢুকুন</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

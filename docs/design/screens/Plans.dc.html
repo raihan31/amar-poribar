@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>প্ল্যান</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:'Hind Siliguri',system-ui,sans-serif}
+.p{padding:12px 14px;border-radius:20px;background:#fff;border:2px solid #E8DCC8}
+.p li{font-size:14px;line-height:1.5;list-style:none}
+.p ul{margin:4px 0 0;padding:0}</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#FFF8EE;color:#2A2118;display:flex;flex-direction:column;overflow:hidden">
+  <div style="padding:24px 12px 0;display:flex;align-items:center;gap:4px">
+    <button aria-label="পেছনে" style="width:56px;height:56px;border:0;background:transparent;color:#2A2118;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div style="font-size:26px;font-weight:700">প্ল্যান</div>
+  </div>
+
+  <div style="margin:4px 20px 0;padding:12px 14px;border-radius:18px;background:#FDEBCB;color:#6B3F00;display:flex;gap:10px;align-items:center">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2zM12 10v5M12 18v.5"/></svg>
+    <div style="font-size:16px;font-weight:700;line-height:1.3">এ মাসের এআই শেষ। হাতে লিখে বা অফলাইন কথায় চলবে।</div>
+  </div>
+
+  <div style="margin:10px 20px 0;display:flex;flex-direction:column;gap:8px">
+    <div class="p" style="border-color:#1B5E20">
+      <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:20px;font-weight:700">ফ্রি</div><span style="font-size:13px;font-weight:700;background:#E6F2E3;color:#14451A;border-radius:12px;padding:3px 10px">✓ এখন আছে</span></div>
+      <ul><li>১টি পরিবার, ৩ জন সদস্য</li><li>মাসে ১০০টি এআই লেখা</li><li>৬ মাসের হিসাব</li></ul>
+    </div>
+    <div class="p">
+      <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:20px;font-weight:700">পরিবার প্লাস</div><div style="font-size:20px;font-weight:700">৳ ৯৯ <span style="font-size:13px;font-weight:500">/ মাস</span></div></div>
+      <ul><li>৮ জন সদস্য, সব পুরনো হিসাব</li><li>মাসে ১,০০০টি এআই লেখা, রসিদের ছবি, "জিজ্ঞেস করুন"</li></ul>
+    </div>
+    <div class="p">
+      <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:20px;font-weight:700">প্রবাসী</div><div style="font-size:20px;font-weight:700">৳ ১৪৯ <span style="font-size:13px;font-weight:500">/ মাস</span></div></div>
+      <ul><li>প্লাসের সব কিছু</li><li>রেমিট্যান্স পরিকল্পনা, রিয়াল/দিরহাম/রিঙ্গিত থেকে টাকা</li></ul>
+    </div>
+  </div>
+
+  <div style="margin:10px 20px 0;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#14451A;padding:10px 14px;border-radius:16px;background:#E6F2E3"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>আমরা আপনার বিকাশের পিন চাই না।</div>
+
+  <div style="flex:1"></div>
+  <div style="padding:0 20px 24px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+    <button style="height:64px;border:0;border-radius:32px;background:#E2136E;color:#fff;font:700 17px 'Hind Siliguri'">বিকাশ দিয়ে দিন</button>
+    <button style="height:64px;border:0;border-radius:32px;background:#2A2118;color:#fff;font:700 17px 'Hind Siliguri'">নগদ দিয়ে দিন</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

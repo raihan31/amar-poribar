@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin Privacy Requests</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:Inter,'Hind Siliguri',system-ui,sans-serif}
+.nv{display:block;padding:10px 14px;border-radius:10px;color:#DDEBDD;font-size:15px;font-weight:500;text-decoration:none}
+th{text-align:left;font-size:13px;color:#5A4B3B;font-weight:600;padding:10px 12px;border-bottom:1px solid #E3D9C5;white-space:nowrap}
+td{padding:14px 12px;border-bottom:1px solid #EFE6D3;font-size:15px;white-space:nowrap}
+.p{display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:3px 10px;font-size:13px;font-weight:600}
+.b{height:40px;padding:0 14px;border-radius:10px;font:600 14px Inter,'Hind Siliguri',sans-serif;border:1px solid #14451A;background:#fff;color:#14451A}
+.l{font-size:13px;color:#5A4B3B}</style>
+</helmet>
+<div style="min-height:800px;background:#F6F1E7;color:#2A2118;display:flex;flex-wrap:wrap">
+  <nav style="flex:0 0 232px;background:#14451A;padding:24px 14px;display:flex;flex-direction:column;gap:4px;box-sizing:border-box">
+    <div style="color:#fff;font-size:18px;font-weight:700;padding:0 14px 4px">আমার পরিবার</div>
+    <div style="color:#B9D6BC;font-size:12px;padding:0 14px 16px">Admin console</div>
+    <a class="nv" href="AdminOverview.dc.html">Overview</a>
+    <a class="nv" href="AdminFamilies.dc.html">Families</a>
+    <a class="nv" href="AdminPrivacy.dc.html" style="background:#fff;color:#14451A;font-weight:700">Privacy requests <span style="margin-left:6px;background:#F2A33A;color:#2A2118;border-radius:10px;padding:1px 8px;font-size:12px;font-weight:700">3</span></a>
+    <a class="nv" href="AdminPlans.dc.html">Plans &amp; AI quota</a>
+    <a class="nv" href="AdminAudit.dc.html">Audit log</a>
+    <a class="nv" href="AdminStaff.dc.html">Staff accounts</a>
+    <a class="nv" href="AdminHealth.dc.html">System health</a>
+  </nav>
+  <main style="flex:999 1 560px;min-width:0;padding:28px 32px;box-sizing:border-box">
+    <h1 style="margin:0;font-size:26px">Privacy requests</h1>
+    <div class="l" style="margin-top:4px;font-size:15px">Data export and deletion must be finished within 30 days of the request (PDPO 2025).</div>
+
+    <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:8px">
+      <span class="p" style="background:#14451A;color:#fff;font-size:14px;padding:8px 16px">Open · 3</span>
+      <span class="p" style="background:#fff;border:1px solid #CDBFA5;font-size:14px;padding:8px 16px">Done · 41</span>
+      <span class="p" style="background:#fff;border:1px solid #CDBFA5;font-size:14px;padding:8px 16px">Rejected · 2</span>
+    </div>
+
+    <div style="margin-top:16px;background:#fff;border:1px solid #E3D9C5;border-radius:16px;overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;min-width:860px">
+        <thead><tr><th>Request</th><th>Type</th><th>Person</th><th>Family</th><th>Received</th><th>Deadline</th><th>Step</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><b>#PR-0192</b></td><td>Delete account</td><td>••• 457</td><td>রহিম পরিবার</td><td>30 Oct</td><td><span class="p" style="background:#FDEBCB;color:#6B3F00">&#9888; 18 days left</span></td><td>Identity checked</td><td><button class="b">Continue</button></td></tr>
+          <tr><td><b>#PR-0195</b></td><td>Export my data</td><td>••• 904</td><td>হোসেন পরিবার</td><td>3 Nov</td><td><span class="p" style="background:#F1E6D3;color:#4A3C2C">22 days left</span></td><td>Building file</td><td><button class="b">Continue</button></td></tr>
+          <tr><td><b>#PR-0188</b></td><td>Delete account</td><td>••• 117</td><td>সরকার পরিবার</td><td>30 Oct</td><td><span class="p" style="background:#F8D7D3;color:#8A1C14">&#9632; 5 days left</span></td><td>Waiting: owner transfer</td><td><button class="b" style="background:#14451A;color:#fff">Act now</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <section style="margin-top:16px;background:#fff;border:1px solid #E3D9C5;border-radius:16px;padding:18px">
+      <h2 style="margin:0 0 4px;font-size:17px">#PR-0188 · Delete account</h2>
+      <div class="l">Steps are done in order. Each one is written to the audit log.</div>
+      <ol style="margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:15px">
+        <li style="display:flex;gap:10px;align-items:center"><span class="p" style="background:#E6F2E3;color:#14451A">&#10003; Done</span>Confirm the person owns the phone number (OTP)</li>
+        <li style="display:flex;gap:10px;align-items:center"><span class="p" style="background:#FDEBCB;color:#6B3F00">Waiting</span>This person is the family owner. Ask them to transfer ownership, or delete the whole family</li>
+        <li style="display:flex;gap:10px;align-items:center"><span class="p">To do</span>Offer a data export before deleting</li>
+        <li style="display:flex;gap:10px;align-items:center"><span class="p">To do</span>Delete profile, sign-ins and personal data (transactions they wrote stay, with the name removed)</li>
+        <li style="display:flex;gap:10px;align-items:center"><span class="p">To do</span>Send the person a confirmation by SMS</li>
+      </ol>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="b" style="background:#14451A;color:#fff">Message the owner</button><button class="b">Reject with reason…</button></div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

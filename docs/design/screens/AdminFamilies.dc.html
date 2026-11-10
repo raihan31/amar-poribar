@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin Families</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:Inter,'Hind Siliguri',system-ui,sans-serif}
+.nv{display:block;padding:10px 14px;border-radius:10px;color:#DDEBDD;font-size:15px;font-weight:500;text-decoration:none}
+th{text-align:left;font-size:13px;color:#5A4B3B;font-weight:600;padding:10px 12px;border-bottom:1px solid #E3D9C5;white-space:nowrap}
+td{padding:14px 12px;border-bottom:1px solid #EFE6D3;font-size:15px;white-space:nowrap}
+.p{display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:3px 10px;font-size:13px;font-weight:600}
+.f{height:44px;border:1px solid #CDBFA5;border-radius:10px;background:#fff;padding:0 14px;font:500 15px Inter,'Hind Siliguri',sans-serif;color:#2A2118;display:inline-flex;align-items:center}</style>
+</helmet>
+<div style="min-height:800px;background:#F6F1E7;color:#2A2118;display:flex;flex-wrap:wrap">
+  <nav style="flex:0 0 232px;background:#14451A;padding:24px 14px;display:flex;flex-direction:column;gap:4px;box-sizing:border-box">
+    <div style="color:#fff;font-size:18px;font-weight:700;padding:0 14px 4px">আমার পরিবার</div>
+    <div style="color:#B9D6BC;font-size:12px;padding:0 14px 16px">Admin console</div>
+    <a class="nv" href="AdminOverview.dc.html">Overview</a>
+    <a class="nv" href="AdminFamilies.dc.html" style="background:#fff;color:#14451A;font-weight:700">Families</a>
+    <a class="nv" href="AdminPrivacy.dc.html">Privacy requests <span style="margin-left:6px;background:#F2A33A;color:#2A2118;border-radius:10px;padding:1px 8px;font-size:12px;font-weight:700">3</span></a>
+    <a class="nv" href="AdminPlans.dc.html">Plans &amp; AI quota</a>
+    <a class="nv" href="AdminAudit.dc.html">Audit log</a>
+    <a class="nv" href="AdminStaff.dc.html">Staff accounts</a>
+    <a class="nv" href="AdminHealth.dc.html">System health</a>
+  </nav>
+  <main style="flex:999 1 560px;min-width:0;padding:28px 32px;box-sizing:border-box">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+      <h1 style="margin:0;font-size:26px">Families <span style="font-size:16px;color:#5A4B3B;font-weight:500">· 1,312 total</span></h1>
+      <button style="height:44px;padding:0 18px;border:1px solid #14451A;border-radius:10px;background:#fff;color:#14451A;font:600 15px Inter,sans-serif">Export list (CSV)</button>
+    </div>
+
+    <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+      <div class="f" style="flex:1 1 280px;color:#6B5A48;min-width:220px">Search by family name or owner phone (last 3 digits shown)</div>
+      <div class="f">Plan: All</div><div class="f">Status: All</div><div class="f">AI quota: Over 90%</div>
+    </div>
+
+    <div style="margin-top:16px;background:#fff;border:1px solid #E3D9C5;border-radius:16px;overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;min-width:820px">
+        <thead><tr><th>Family</th><th>Owner</th><th>Members</th><th>Plan</th><th>AI used</th><th>Last active</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><b>রহিম পরিবার</b></td><td>••• 678</td><td>5</td><td>Free</td><td>93 / 100</td><td>Today</td><td><span class="p" style="background:#E6F2E3;color:#14451A">&#10003; Active</span></td><td><a href="AdminFamily.dc.html" style="font-weight:600;color:#14451A">Open</a></td></tr>
+          <tr><td><b>করিম পরিবার</b></td><td>••• 321</td><td>3</td><td>Plus</td><td>412 / 1,000</td><td>Yesterday</td><td><span class="p" style="background:#E6F2E3;color:#14451A">&#10003; Active</span></td><td><a href="AdminFamily.dc.html" style="font-weight:600;color:#14451A">Open</a></td></tr>
+          <tr><td><b>হোসেন পরিবার</b></td><td>••• 904</td><td>7</td><td>Plus</td><td>760 / 1,000</td><td>Today</td><td><span class="p" style="background:#E6F2E3;color:#14451A">&#10003; Active</span></td><td><a href="AdminFamily.dc.html" style="font-weight:600;color:#14451A">Open</a></td></tr>
+          <tr><td><b>আহমেদ পরিবার</b></td><td>— none —</td><td>2</td><td>Free</td><td>12 / 100</td><td>9 days ago</td><td><span class="p" style="background:#FDEBCB;color:#6B3F00">&#9888; No owner</span></td><td><a href="AdminFamily.dc.html" style="font-weight:600;color:#14451A">Open</a></td></tr>
+          <tr><td><b>সরকার পরিবার</b></td><td>••• 117</td><td>4</td><td>Probashi</td><td>201 / 1,000</td><td>Today</td><td><span class="p" style="background:#E6F2E3;color:#14451A">&#10003; Active</span></td><td><a href="AdminFamily.dc.html" style="font-weight:600;color:#14451A">Open</a></td></tr>
+          <tr><td><b>দাস পরিবার</b></td><td>••• 552</td><td>3</td><td>Free</td><td>0 / 100</td><td>41 days ago</td><td><span class="p" style="background:#F1E6D3;color:#4A3C2C">Dormant</span></td><td><a href="AdminFamily.dc.html" style="font-weight:600;color:#14451A">Open</a></td></tr>
+          <tr><td><b>মিয়া পরিবার</b></td><td>••• 088</td><td>6</td><td>Free</td><td>100 / 100</td><td>Today</td><td><span class="p" style="background:#F8D7D3;color:#8A1C14">&#9632; Suspended</span></td><td><a href="AdminFamily.dc.html" style="font-weight:600;color:#14451A">Open</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#5A4B3B;flex-wrap:wrap;gap:8px"><span>Showing 1–7 of 1,312 · only counts and status, no transaction data</span><span><b style="color:#14451A">1</b> &nbsp; 2 &nbsp; 3 &nbsp; … &nbsp; Next</span></div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

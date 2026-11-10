@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>সহজ হোম</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:'Hind Siliguri',system-ui,sans-serif}
+.t{height:128px;border:0;border-radius:26px;background:#1B5E20;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font:700 21px 'Hind Siliguri';line-height:1.2;text-align:center}</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#FFF8EE;color:#2A2118;display:flex;flex-direction:column;overflow:hidden;padding:0 20px">
+  <div style="margin-top:28px;display:flex;align-items:center;justify-content:space-between">
+    <div style="font-size:30px;font-weight:700;color:#1B5E20">আমার পরিবার</div>
+    <div style="display:flex;align-items:center;gap:6px;background:#E6F2E3;color:#14451A;border-radius:18px;padding:6px 12px;font-size:14px;font-weight:700"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>সব কিছু শুনিয়ে দেবে</div>
+  </div>
+
+  <button style="margin-top:20px;height:200px;border:0;border-radius:44px;background:#F2A33A;color:#2A2118;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font:700 40px 'Hind Siliguri'">
+    <svg width="84" height="84" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>বলুন
+  </button>
+  <div style="margin-top:6px;text-align:center;font-size:18px;color:#5A4B3B">খরচ বলতে এখানে চাপুন</div>
+
+  <div style="margin-top:16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+    <button class="t" style="background:#FDEBCB;color:#6B3F00"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="3" width="8" height="18" rx="2"/><path d="M4 8v8M20 8v8"/></svg>কম্পন</button>
+    <button class="t"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>কথা</button>
+    <button class="t"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>মাসের কথা শুনুন</button>
+    <button class="t"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>খরচ দেখুন</button>
+  </div>
+
+  <div style="flex:1"></div>
+  <button style="margin-bottom:20px;min-height:56px;border:0;background:transparent;color:#5A4B3B;font:600 17px 'Hind Siliguri';text-decoration:underline">সাধারণ মোডে যান</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

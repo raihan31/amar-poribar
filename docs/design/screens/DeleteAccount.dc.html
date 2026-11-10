@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>তথ্য মুছুন</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:'Hind Siliguri',system-ui,sans-serif}
+.c{padding:14px 16px;border-radius:20px;background:#fff;border:1px solid #E8DCC8}
+.t{display:flex;gap:10px;align-items:center;font-size:16px;line-height:1.35;padding:4px 0}</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#FFF8EE;color:#2A2118;display:flex;flex-direction:column;overflow:hidden;padding:0 20px">
+  <div style="margin-top:24px;display:flex;align-items:center;gap:4px">
+    <button aria-label="পেছনে" style="width:56px;height:56px;border:0;background:transparent;color:#2A2118;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div style="font-size:26px;font-weight:700">আমার তথ্য মুছুন</div>
+  </div>
+
+  <div class="c">
+    <div style="font-size:17px;font-weight:700;color:#B3261E;margin-bottom:4px">যা মুছে যাবে</div>
+    <div class="t"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="3"/><path d="M5 21v-3a7 7 0 0 1 14 0v3"/></svg>আপনার নাম, ফোন নম্বর ও সেটিং</div>
+    <div class="t"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>এই ফোন ও অন্য ফোনে ঢোকার অনুমতি</div>
+    <div style="font-size:17px;font-weight:700;color:#14451A;margin:8px 0 4px">যা থেকে যাবে</div>
+    <div class="t"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14451A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18"/></svg>পরিবারের হিসাবে আপনার লেখা খরচ, কিন্তু আপনার নাম ছাড়া</div>
+  </div>
+
+  <div style="margin-top:10px;padding:14px 16px;border-radius:20px;background:#FDEBCB;color:#6B3F00;display:flex;gap:10px;align-items:center">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2zM12 10v5M12 18v.5"/></svg>
+    <div style="font-size:16px;font-weight:600;line-height:1.35">আপনি রহিম পরিবারের মালিক। মোছার আগে আম্মুকে মালিক করে দিন।</div>
+  </div>
+  <button style="margin-top:8px;height:56px;border:3px solid #1B5E20;border-radius:28px;background:#fff;color:#1B5E20;font:700 17px 'Hind Siliguri'">মালিক বদলান</button>
+
+  <button style="margin-top:10px;height:60px;border:0;border-radius:30px;background:#E6F2E3;color:#1B5E20;font:700 18px 'Hind Siliguri';display:flex;align-items:center;justify-content:center;gap:10px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>আগে আমার তথ্য ডাউনলোড করুন</button>
+
+  <div style="margin-top:12px;font-size:16px;font-weight:600">নিশ্চিত করতে ফোন নম্বরের শেষ ৩ সংখ্যা লিখুন</div>
+  <div style="margin-top:6px;height:60px;border-radius:18px;border:3px solid #1B5E20;background:#fff;display:flex;align-items:center;padding:0 16px;font-size:26px;font-weight:700;letter-spacing:4px">৬৭<span style="width:2px;height:30px;background:#F2A33A;margin-left:4px"></span></div>
+
+  <div style="flex:1"></div>
+  <button style="height:68px;border:0;border-radius:34px;background:#B3261E;color:#fff;font:700 20px 'Hind Siliguri';display:flex;align-items:center;justify-content:center;gap:10px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>আমার তথ্য মুছে দিন</button>
+  <div style="margin:8px 0 24px;text-align:center;font-size:14px;color:#5A4B3B">৩০ দিনের মধ্যে সব মুছে যাবে। এর মধ্যে মত বদলালে আবার ঢুকলেই থাকবে।</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

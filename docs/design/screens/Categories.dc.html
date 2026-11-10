@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>খাত</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:'Hind Siliguri',system-ui,sans-serif}
+.c{height:100px;border:2px solid #E1D3BC;border-radius:20px;background:#fff;color:#2A2118;font:600 15px 'Hind Siliguri';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.c svg{width:32px;height:32px}
+.h{background:#F1E6D3;color:#5A4B3B;border-style:dashed}</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#FFF8EE;color:#2A2118;display:flex;flex-direction:column;overflow:hidden">
+  <div style="padding:24px 12px 0;display:flex;align-items:center;gap:4px">
+    <button aria-label="পেছনে" style="width:56px;height:56px;border:0;background:transparent;color:#2A2118;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div style="font-size:26px;font-weight:700">খাত</div>
+  </div>
+  <div style="padding:0 20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+    <button style="height:52px;border:3px solid #1B5E20;border-radius:26px;background:#E6F2E3;color:#1B5E20;font:700 17px 'Hind Siliguri'">✓ খরচ</button>
+    <button style="height:52px;border:2px solid #E1D3BC;border-radius:26px;background:#fff;font:600 17px 'Hind Siliguri'">আয়</button>
+  </div>
+  <div style="padding:10px 20px 0;font-size:14px;color:#5A4B3B">চেপে ধরলে নাম বদলানো, ছবি বদলানো বা লুকানো যাবে।</div>
+
+  <div style="margin:10px 20px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+    <button class="c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6zM9 8a3 3 0 0 1 6 0"/></svg>বাজার</button>
+    <button class="c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v9H3z"/></svg>বাসা ভাড়া</button>
+    <button class="c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>বিল</button>
+    <button class="c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-8-5-8-11a4.5 4.5 0 0 1 8-2 4.5 4.5 0 0 1 8 2c0 6-8 11-8 11z"/></svg>জাকাত-দান</button>
+    <button class="c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12v9H4v-9M2 7h20v5H2zM12 21V7"/></svg>ঈদ-উৎসব</button>
+    <button class="c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5"/></svg>পড়ালেখা</button>
+    <button class="c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M6 17l4-8h5l3 8M10 9l-1-3H6"/></svg>যাতায়াত</button>
+    <button class="c h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 6.1A10 10 0 0 1 22 12a14 14 0 0 1-3 3.7M6.5 6.8A14 14 0 0 0 2 12s4 7 10 7a9.5 9.5 0 0 0 3.5-.7"/></svg>বিনোদন<span style="font-size:12px;font-weight:700">লুকানো</span></button>
+    <button class="c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>অন্যান্য</button>
+  </div>
+
+  <div style="margin:12px 20px 0;padding:12px 14px;border-radius:18px;background:#fff;border:1px solid #E8DCC8">
+    <div style="font-size:16px;font-weight:700">আয়ের খাত (আয় ট্যাবে)</div>
+    <div style="margin-top:4px;font-size:15px;color:#5A4B3B">বেতন · ব্যবসা · রেমিট্যান্স · ভাড়া পাওয়া · অন্যান্য</div>
+  </div>
+
+  <div style="flex:1"></div>
+  <div style="padding:0 20px 24px;display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:10px">
+    <button style="height:64px;border:0;border-radius:32px;background:#1B5E20;color:#fff;font:700 19px 'Hind Siliguri';display:flex;align-items:center;justify-content:center;gap:8px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>নতুন খাত</button>
+    <button style="height:64px;border:3px solid #1B5E20;border-radius:32px;background:#fff;color:#1B5E20;font:700 16px 'Hind Siliguri'">নাম বদল</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

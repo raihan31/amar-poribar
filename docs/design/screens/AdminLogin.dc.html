@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin Sign-in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:Inter,'Hind Siliguri',system-ui,sans-serif}
+label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+.i{height:48px;border:1px solid #CDBFA5;border-radius:10px;background:#fff;padding:0 14px;display:flex;align-items:center;font-size:16px;box-sizing:border-box}</style>
+</helmet>
+<div style="min-height:800px;background:#F6F1E7;color:#2A2118;display:flex;flex-wrap:wrap">
+  <aside style="flex:1 1 380px;background:#14451A;color:#fff;padding:48px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;min-height:260px">
+    <div><div style="font-size:26px;font-weight:700">আমার পরিবার</div><div style="font-size:15px;color:#B9D6BC;margin-top:2px">Admin console</div></div>
+    <div style="font-size:20px;line-height:1.45;max-width:380px">Staff tools for families, plans and privacy requests. Family data stays private.</div>
+  </aside>
+  <main style="flex:1 1 440px;display:flex;align-items:center;justify-content:center;padding:40px 24px;box-sizing:border-box">
+    <div style="width:100%;max-width:400px">
+      <h1 style="margin:0;font-size:26px">Staff sign-in</h1>
+      <div style="margin-top:4px;font-size:15px;color:#5A4B3B">Only for Amar Poribar staff. Family members sign in on the app.</div>
+
+      <div style="margin-top:22px"><label>Work email</label><div class="i">rubel@amarporibar.example</div></div>
+      <div style="margin-top:14px"><label>Password</label><div class="i" style="justify-content:space-between">••••••••••••<span style="font-size:14px;font-weight:600;color:#14451A">Show</span></div></div>
+      <div style="margin-top:14px"><label>6-digit code from your authenticator app</label>
+        <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px">
+          <div class="i" style="justify-content:center;font-size:22px;font-weight:700">4</div><div class="i" style="justify-content:center;font-size:22px;font-weight:700">8</div><div class="i" style="justify-content:center;font-size:22px;font-weight:700">2</div><div class="i" style="justify-content:center;border:2px solid #14451A"></div><div class="i"></div><div class="i"></div>
+        </div>
+      </div>
+
+      <button style="margin-top:20px;width:100%;height:50px;border:0;border-radius:10px;background:#14451A;color:#fff;font:600 16px Inter,sans-serif">Sign in</button>
+
+      <div style="margin-top:14px;display:flex;justify-content:space-between;font-size:14px"><a href="AdminLogin.dc.html" style="color:#14451A;font-weight:600">Forgot password?</a><a href="AdminLogin.dc.html" style="color:#14451A;font-weight:600">Lost your device?</a></div>
+
+      <div style="margin-top:22px;padding:12px 14px;border-radius:10px;background:#FDEBCB;color:#6B3F00;font-size:14px;line-height:1.45;display:flex;gap:10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 3l10 18H2zM12 10v5M12 18v.5"/></svg><span>5 wrong tries lock the account for 15 minutes. Every sign-in is recorded in the audit log.</span></div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

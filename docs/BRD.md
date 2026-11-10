@@ -4,10 +4,10 @@
 |---|---|
 | Product | **Amar Poribar** (আমার পরিবার — "My Family"): an AI-assisted family expense tracker for Bangladesh |
 | Document | Business Requirements Document |
-| Version | 0.2 (draft) — adds voice entry, spoken monthly summary and low-literacy design |
-| Date | 2026-10-06 |
+| Version | 0.3 — adds family communication, admin console, shared bazaar list, privacy workflows and Simple mode (BR-25..BR-30). Voice entry stays free on every plan (SRS DEC-10) |
+| Date | 2026-11-11 |
 | Owner | Raihan (product owner) |
-| Status | Draft for review |
+| Status | Basis for SRS v1.0 |
 
 ---
 
@@ -135,6 +135,7 @@ The first goal is to serve the owner's own family well (dog-fooding). The second
 - Dashboard: month total, by category, by member, by account
 - Bangla and English UI, BDT (৳) formatting, Bangla numerals optional
 - Web app and Android app
+- **Family communication** (buzz, text chat, voice notes), notification inbox and push, offline status, data export and erasure (BR-25, BR-28, BR-30)
 
 **Phase 2: v1 (about 8 weeks later)**
 - Receipt or memo photo → expense (vision AI)
@@ -144,6 +145,7 @@ The first goal is to serve the owner's own family well (dog-fooding). The second
 - Recurring expenses (rent, salaries, subscriptions), bill reminders
 - Offline-first capture with background sync
 - Festival budgets (Eid/Puja planner)
+- Video messages and video calls, shared bazaar list, Simple mode, staff admin console (BR-25, BR-26, BR-27, BR-29)
 
 **Phase 3: growth**
 - Freemium plans with bKash/Nagad payment for subscriptions
@@ -188,6 +190,12 @@ The first goal is to serve the owner's own family well (dog-fooding). The second
 | BR-22 | Users can listen to the monthly summary (and other key text) read aloud in Bangla | Must | 1 |
 | BR-23 | Someone who can't read comfortably can add an expense, check it and save it using only voice, pictures and large buttons | Must | 1 |
 | BR-24 | Users can ask questions by voice and hear the answer | Should | 2 |
+| BR-25 | Family members can reach each other inside the app by vibration buzz, text, voice notes, video messages and video calls | Must | 1–2 |
+| BR-26 | Staff can manage families, plans, privacy requests and system health without seeing family money or conversations | Must | 2 |
+| BR-27 | Families can keep a shared bazaar list that turns into an expense | Should | 2 |
+| BR-28 | The app works offline, shows its sync state in plain words, and notifies by push and inbox | Must | 1–2 |
+| BR-29 | A Simple mode makes the app usable with one big button and spoken results | Should | 2 |
+| BR-30 | Users can export and erase their own data | Must | 1 |
 
 ---
 
@@ -209,7 +217,7 @@ The first goal is to serve the owner's own family well (dog-fooding). The second
 | Plan | Price (indicative) | Includes |
 |---|---|---|
 | Free | ৳0 | 1 family, up to 3 members, 100 AI entries per month, 6-month history |
-| Poribar Plus | ৳99 per month or ৳999 per year | Up to 8 members, unlimited history, 1,000 AI entries, voice and receipt entry, "Ask" queries, export |
+| Poribar Plus | ৳99 per month or ৳999 per year | Up to 8 members, unlimited history, 1,000 AI entries, receipt photo entry, "Ask" queries, export (device voice entry is free on every plan) |
 | Probashi (expatriate) | ৳149 per month | Plus features, remittance planner, multi-currency (SAR/AED/MYR/GBP → BDT) |
 
 Payment by bKash or Nagad checkout through a licensed payment gateway (for example SSLCommerz or the MFS merchant APIs).
@@ -242,6 +250,7 @@ Payment by bKash or Nagad checkout through a licensed payment gateway (for examp
 - Speech-to-text with Bangla support: the phone's own recogniser (Google on most Android phones, Chrome on the web). Free, and audio stays on the device
 - Text-to-speech with a Bangla voice: the phone's own engine (Google TTS has bn-BD)
 - An SMS or OTP gateway in Bangladesh for phone login (for example SSL Wireless or Alpha SMS), or Firebase Auth
+- Firebase Cloud Messaging (push), an S3-compatible object store, a TURN/STUN server (coturn), and payment gateways (bKash, Nagad, SSLCommerz) for phase 3
 - PostgreSQL hosting; a region close to Bangladesh is preferred (for example Singapore or Mumbai)
 
 ---
@@ -260,6 +269,9 @@ Payment by bKash or Nagad checkout through a licensed payment gateway (for examp
 | Speech recognition misreads dialects (Sylheti, Chattogram) or noisy bazaars | Medium | Medium | Read-back before saving, picture picker, typed fallback, offline keyword parser tuned on real phrases |
 | Phone has no Bangla text-to-speech voice | Medium | Medium | Detect it and guide the user to install Google's Bangla voice; always show the text too |
 | AI summary states a wrong amount | Low | High | AI never writes numbers; amounts come from the database through placeholders and are checked |
+| Video calls are poor on weak 4G | High | Medium | Audio-only fallback, 360p start, TURN relay, buzz and voice notes as lighter options |
+| Push notifications not delivered (no Google Play Services, battery savers) | Medium | Medium | In-app polling fallback, inbox, quiet-hours explanation, buzz also shown on next open |
+| Media storage cost grows | Medium | Medium | Short limits (60 s voice, 30 s video), 180-day retention, per-family storage alarm |
 
 ---
 
@@ -275,6 +287,8 @@ Payment by bKash or Nagad checkout through a licensed payment gateway (for examp
 | Dhar | Informal loan between people |
 | Hisab / khata | Account / ledger book |
 | PDPO | Personal Data Protection Ordinance 2025 |
+| Buzz | A vibration nudge with a short phrase, sent between family members |
+| Simple mode | A layout with one big action and spoken results |
 
 ---
 

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin Plans and AI quota</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:Inter,'Hind Siliguri',system-ui,sans-serif}
+.nv{display:block;padding:10px 14px;border-radius:10px;color:#DDEBDD;font-size:15px;font-weight:500;text-decoration:none}
+th{text-align:left;font-size:13px;color:#5A4B3B;font-weight:600;padding:10px 12px;border-bottom:1px solid #E3D9C5;white-space:nowrap}
+td{padding:14px 12px;border-bottom:1px solid #EFE6D3;font-size:15px;white-space:nowrap}
+.p{display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:3px 10px;font-size:13px;font-weight:600}
+.k{background:#fff;border:1px solid #E3D9C5;border-radius:16px;padding:18px}
+.b{height:40px;padding:0 14px;border-radius:10px;font:600 14px Inter,'Hind Siliguri',sans-serif;border:1px solid #14451A;background:#fff;color:#14451A}
+.i{height:40px;border:1px solid #CDBFA5;border-radius:10px;background:#fff;padding:0 12px;display:inline-flex;align-items:center;font-size:15px;box-sizing:border-box;min-width:80px}
+.l{font-size:13px;color:#5A4B3B}
+.f{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:14px}</style>
+</helmet>
+<div style="min-height:800px;background:#F6F1E7;color:#2A2118;display:flex;flex-wrap:wrap">
+  <nav style="flex:0 0 232px;background:#14451A;padding:24px 14px;display:flex;flex-direction:column;gap:4px;box-sizing:border-box">
+    <div style="color:#fff;font-size:18px;font-weight:700;padding:0 14px 4px">আমার পরিবার</div>
+    <div style="color:#B9D6BC;font-size:12px;padding:0 14px 16px">Admin console</div>
+    <a class="nv" href="AdminOverview.dc.html">Overview</a>
+    <a class="nv" href="AdminFamilies.dc.html">Families</a>
+    <a class="nv" href="AdminPrivacy.dc.html">Privacy requests <span style="margin-left:6px;background:#F2A33A;color:#2A2118;border-radius:10px;padding:1px 8px;font-size:12px;font-weight:700">3</span></a>
+    <a class="nv" href="AdminPlans.dc.html" style="background:#fff;color:#14451A;font-weight:700">Plans &amp; AI quota</a>
+    <a class="nv" href="AdminAudit.dc.html">Audit log</a>
+    <a class="nv" href="AdminStaff.dc.html">Staff accounts</a>
+    <a class="nv" href="AdminHealth.dc.html">System health</a>
+  </nav>
+  <main style="flex:999 1 560px;min-width:0;padding:28px 32px;box-sizing:border-box">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+      <h1 style="margin:0;font-size:26px">Plans &amp; AI quota</h1>
+      <div class="l" style="font-size:14px">Changes apply from the next billing month</div>
+    </div>
+
+    <div style="margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start">
+      <section class="k">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:18px">Free</h2><span class="p" style="background:#F1E6D3;color:#4A3C2C">1,021 families</span></div>
+        <div style="font-size:30px;font-weight:700;margin-top:6px">৳ 0</div>
+        <ul class="f"><li>Up to 3 members</li><li>100 AI entries per month</li><li>6-month history</li></ul>
+        <div class="l" style="margin-top:14px">AI entries per month</div>
+        <div style="display:flex;gap:8px;margin-top:4px;align-items:center"><span class="i">100</span><button class="b">Save</button></div>
+      </section>
+      <section class="k" style="border:2px solid #14451A">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:18px">Poribar Plus</h2><span class="p" style="background:#F1E6D3;color:#4A3C2C">231 families</span></div>
+        <div style="font-size:30px;font-weight:700;margin-top:6px">৳ 99 <span style="font-size:15px;font-weight:500;color:#5A4B3B">/ month · ৳ 999 / year</span></div>
+        <ul class="f"><li>Up to 8 members, unlimited history</li><li>1,000 AI entries per month</li><li>Voice and receipt entry, Ask</li><li>Export</li></ul>
+        <div class="l" style="margin-top:14px">AI entries per month</div>
+        <div style="display:flex;gap:8px;margin-top:4px;align-items:center"><span class="i">1,000</span><button class="b">Save</button></div>
+      </section>
+      <section class="k">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:18px">Probashi</h2><span class="p" style="background:#F1E6D3;color:#4A3C2C">60 families</span></div>
+        <div style="font-size:30px;font-weight:700;margin-top:6px">৳ 149 <span style="font-size:15px;font-weight:500;color:#5A4B3B">/ month</span></div>
+        <ul class="f"><li>Everything in Plus</li><li>Remittance planner</li><li>Multi-currency (SAR, AED, MYR, GBP to BDT)</li></ul>
+        <div class="l" style="margin-top:14px">AI entries per month</div>
+        <div style="display:flex;gap:8px;margin-top:4px;align-items:center"><span class="i">1,000</span><button class="b">Save</button></div>
+      </section>
+    </div>
+
+    <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">
+      <section class="k">
+        <h2 style="margin:0 0 4px;font-size:17px">AI cost per active family</h2>
+        <div style="font-size:30px;font-weight:700">৳ 11.4 <span style="font-size:15px;font-weight:500;color:#5A4B3B">this month</span></div>
+        <div style="height:14px;border-radius:7px;background:#EADFC9;margin:10px 0 6px;position:relative"><div style="width:76%;height:14px;border-radius:7px;background:#14451A"></div><div style="position:absolute;left:100%;top:-4px;width:2px;height:22px;background:#2A2118"></div></div>
+        <div class="l">76% of the ৳ 15 goal (NFR-13) &middot; <b style="color:#14451A">&#10003; Within goal</b></div>
+        <div class="l" style="margin-top:10px">Template fallback is used when quota runs out, so cost stops at the limit.</div>
+      </section>
+      <section class="k">
+        <h2 style="margin:0 0 4px;font-size:17px">When quota runs out</h2>
+        <div style="font-size:15px;line-height:1.5">Members fall back to manual entry. The SMS parser and the offline quick parser still work with no AI. Monthly summary switches to the fixed template.</div>
+      </section>
+    </div>
+
+    <section class="k" style="margin-top:14px;padding:0">
+      <div style="padding:18px 18px 0"><h2 style="margin:0;font-size:17px">Families near quota</h2><div class="l" style="margin-top:2px">Counts only. Staff cannot see what was entered.</div></div>
+      <div style="overflow-x:auto;margin-top:8px">
+        <table style="width:100%;border-collapse:collapse;min-width:720px">
+          <thead><tr><th>Family</th><th>Plan</th><th>AI used</th><th>Resets</th><th>State</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><b>মিয়া পরিবার</b></td><td>Free</td><td>100 / 100</td><td>1 Dec</td><td><span class="p" style="background:#F8D7D3;color:#8A1C14">&#9632; Quota reached</span></td><td><a href="AdminFamily.dc.html" style="font-weight:600;color:#14451A">Open</a></td></tr>
+            <tr><td><b>রহিম পরিবার</b></td><td>Free</td><td>93 / 100</td><td>1 Dec</td><td><span class="p" style="background:#FDEBCB;color:#6B3F00">&#9888; 93% used</span></td><td><a href="AdminFamily.dc.html" style="font-weight:600;color:#14451A">Open</a></td></tr>
+            <tr><td><b>হোসেন পরিবার</b></td><td>Plus</td><td>760 / 1,000</td><td>1 Dec</td><td><span class="p" style="background:#E6F2E3;color:#14451A">&#10003; On track</span></td><td><a href="AdminFamily.dc.html" style="font-weight:600;color:#14451A">Open</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

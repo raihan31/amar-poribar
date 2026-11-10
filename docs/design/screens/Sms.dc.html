@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>এসএমএস থেকে খরচ</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:'Hind Siliguri',system-ui,sans-serif}</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#FFF8EE;color:#2A2118;display:flex;flex-direction:column;overflow:hidden;padding:0 20px">
+  <div style="margin-top:32px;font-size:26px;font-weight:700">এসএমএস থেকে লিখুন</div>
+  <div style="font-size:15px;color:#5A4B3B">বিকাশ, নগদ বা রকেটের মেসেজ পেস্ট করুন।</div>
+
+  <div style="margin-top:14px;padding:14px;border-radius:18px;background:#fff;border:2px dashed #C9BBA3;font-size:14px;line-height:1.5;color:#4A3C2C">You have sent Tk 2,000.00 to 01XXXXX-789. Fee Tk 0.00. Balance Tk 8,450.00. TrxID 9K4L2M7N at 10/11/2026 14:32</div>
+
+  <div style="margin-top:12px;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#1B5E20"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>বিকাশ মেসেজ চেনা গেছে · এআই লাগেনি</div>
+
+  <div style="margin-top:12px;padding:18px;border-radius:24px;background:#fff;border:2px solid #1B5E20">
+    <div style="font-size:15px;color:#5A4B3B">টাকা পাঠানো</div>
+    <div style="font-size:46px;font-weight:700;color:#1B5E20;line-height:1.15">৳ ২,০০০</div>
+    <div style="margin-top:8px;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:16px">
+      <span style="color:#5A4B3B">কাকে</span><b>০১XXXXX-৭৮৯</b>
+      <span style="color:#5A4B3B">ফি</span><b>৳ ০</b>
+      <span style="color:#5A4B3B">অ্যাকাউন্ট</span><b>বিকাশ</b>
+      <span style="color:#5A4B3B">সময়</span><b>আজ, দুপুর ২:৩২</b>
+      <span style="color:#5A4B3B">ট্রানজ্যাকশন</span><b>9K4L2M7N</b>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding:12px 14px;border-radius:16px;background:#FDEBCB;color:#6B3F00;font-size:15px;font-weight:600;display:flex;gap:10px;align-items:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2zM12 10v5M12 18v.5"/></svg>এই মেসেজ আগে রাখা হয়নি। কোন খাত?</div>
+  <div style="margin-top:10px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+    <button style="height:64px;border:3px solid #1B5E20;border-radius:18px;background:#E6F2E3;color:#1B5E20;font:700 15px 'Hind Siliguri'">✓ পরিবারকে সাহায্য</button>
+    <button style="height:64px;border:2px solid #E1D3BC;border-radius:18px;background:#fff;font:600 15px 'Hind Siliguri'">বিল</button>
+    <button style="height:64px;border:2px solid #E1D3BC;border-radius:18px;background:#fff;font:600 15px 'Hind Siliguri'">অন্যান্য</button>
+  </div>
+  <div style="flex:1"></div>
+  <div style="display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;margin-bottom:28px">
+    <button style="height:80px;border:3px solid #B3261E;border-radius:40px;background:#fff;color:#B3261E;font:700 18px 'Hind Siliguri'">না</button>
+    <button style="height:80px;border:0;border-radius:40px;background:#1B5E20;color:#fff;font:700 24px 'Hind Siliguri'">✓ রাখুন</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

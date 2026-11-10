@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin System health</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:Inter,'Hind Siliguri',system-ui,sans-serif}
+.nv{display:block;padding:10px 14px;border-radius:10px;color:#DDEBDD;font-size:15px;font-weight:500;text-decoration:none}
+.p{display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:3px 10px;font-size:13px;font-weight:600}
+.k{background:#fff;border:1px solid #E3D9C5;border-radius:16px;padding:18px}
+.v{font-size:30px;font-weight:700;margin-top:4px}
+.l{font-size:13px;color:#5A4B3B}
+.r{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #EFE6D3;font-size:15px}</style>
+</helmet>
+<div style="min-height:800px;background:#F6F1E7;color:#2A2118;display:flex;flex-wrap:wrap">
+  <nav style="flex:0 0 232px;background:#14451A;padding:24px 14px;display:flex;flex-direction:column;gap:4px;box-sizing:border-box">
+    <div style="color:#fff;font-size:18px;font-weight:700;padding:0 14px 4px">আমার পরিবার</div>
+    <div style="color:#B9D6BC;font-size:12px;padding:0 14px 16px">Admin console</div>
+    <a class="nv" href="AdminOverview.dc.html">Overview</a>
+    <a class="nv" href="AdminFamilies.dc.html">Families</a>
+    <a class="nv" href="AdminPrivacy.dc.html">Privacy requests <span style="margin-left:6px;background:#F2A33A;color:#2A2118;border-radius:10px;padding:1px 8px;font-size:12px;font-weight:700">3</span></a>
+    <a class="nv" href="AdminPlans.dc.html">Plans &amp; AI quota</a>
+    <a class="nv" href="AdminAudit.dc.html">Audit log</a>
+    <a class="nv" href="AdminStaff.dc.html">Staff accounts</a>
+    <a class="nv" href="AdminHealth.dc.html" style="background:#fff;color:#14451A;font-weight:700">System health</a>
+  </nav>
+  <main style="flex:999 1 560px;min-width:0;padding:28px 32px;box-sizing:border-box">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+      <h1 style="margin:0;font-size:26px">System health</h1>
+      <div class="l" style="font-size:14px">Last 30 days · updated 11 Nov 2026, 10:00 (Asia/Dhaka)</div>
+    </div>
+
+    <div style="margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+      <div class="k"><div class="l">API availability</div><div class="v">99.71%</div><div class="l"><b style="color:#14451A">&#10003; Meets 99.5% target</b></div></div>
+      <div class="k"><div class="l">p95 API latency (CRUD)</div><div class="v">212 ms</div><div class="l"><b style="color:#14451A">&#10003; Under 300 ms</b></div></div>
+      <div class="k"><div class="l">OTP delivery rate</div><div class="v">95.8%</div><div class="l"><b style="color:#6B3F00">&#9888; Below usual 98.5%</b></div></div>
+      <div class="k"><div class="l">Push (FCM) delivery rate</div><div class="v">97.4%</div><div class="l"><b style="color:#14451A">&#10003; Normal</b></div></div>
+      <div class="k"><div class="l">SMS gateway</div><div class="v" style="font-size:22px;margin-top:10px">Slow</div><div class="l"><b style="color:#6B3F00">&#9888; Median send time 9 s</b></div></div>
+      <div class="k"><div class="l">AI errors and template fallback</div><div class="v">1.3%</div><div class="l"><b style="color:#14451A">&#10003; Normal</b> · fallback used 41 times</div></div>
+    </div>
+
+    <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">
+      <section class="k">
+        <h2 style="margin:0 0 4px;font-size:17px">Backups (NFR-08)</h2>
+        <div class="r"><span style="flex:1">Last daily backup</span><b>Today, 03:00</b><span class="p" style="background:#E6F2E3;color:#14451A">&#10003; Done</span></div>
+        <div class="r"><span style="flex:1">Backups kept</span><b>14 days</b></div>
+        <div class="r" style="border-bottom:0"><span style="flex:1">Last restore test</span><b>2 Oct 2026</b><span class="p" style="background:#E6F2E3;color:#14451A">&#10003; Passed</span></div>
+        <div class="l" style="margin-top:6px">Next restore test due: 2 Jan 2027 (every quarter)</div>
+      </section>
+
+      <section class="k">
+        <h2 style="margin:0 0 4px;font-size:17px">Recent incidents</h2>
+        <div class="r"><div style="flex:1"><b>OTP delays on one gateway route</b><div class="l">Started 11 Nov, 07:40 · switched to backup route</div></div><span class="p" style="background:#FDEBCB;color:#6B3F00">&#9888; Watching</span></div>
+        <div class="r"><div style="flex:1"><b>AI provider slow for 12 minutes</b><div class="l">6 Nov, 14:05 · fallback template used</div></div><span class="p" style="background:#E6F2E3;color:#14451A">&#10003; Resolved</span></div>
+        <div class="r" style="border-bottom:0"><div style="flex:1"><b>Push delay after app release</b><div class="l">28 Oct, 11:30 · token refresh fixed</div></div><span class="p" style="background:#E6F2E3;color:#14451A">&#10003; Resolved</span></div>
+      </section>
+    </div>
+
+    <div class="k" style="margin-top:14px;display:flex;gap:12px;align-items:center;background:#E6F2E3;border-color:#B9D6BC">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14451A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      <div style="font-size:14px;line-height:1.45;color:#14451A">Logs and metrics here contain counts and timings only. No phone numbers, names, notes or message content (NFR-12).</div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
