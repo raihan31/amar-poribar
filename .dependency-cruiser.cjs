@@ -35,6 +35,17 @@ module.exports = {
       to: { path: `^${R}/modules/[^/]+/schema\\.ts$` },
     },
     {
+      name: "admin-staff-safe-only",
+      comment:
+        "R6/DEC-18: admin may import only modules/<m>/index.ts for m in families, billing, privacy (platform lives outside modules/)",
+      severity: "error",
+      from: { path: `^${R}/modules/admin/` },
+      to: {
+        path: `^${R}/modules/[^/]+/`,
+        pathNot: [`^${R}/modules/admin/`, `^${R}/modules/(families|billing|privacy)/index\\.ts$`],
+      },
+    },
+    {
       name: "domain-pure",
       comment: "R7: domain code does no I/O",
       severity: "error",
