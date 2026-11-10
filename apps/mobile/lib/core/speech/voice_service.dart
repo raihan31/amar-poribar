@@ -9,8 +9,10 @@ abstract class VoiceService {
 
   /// Listens for Bangla speech and calls [onResult] with the final transcript.
   /// Audio is handled by the device's own recogniser and is never uploaded by us (FR-VOICE-01).
-  Future<void> listen(void Function(String text) onResult,
-      {void Function(String error)? onError});
+  Future<void> listen(
+    void Function(String text) onResult, {
+    void Function(String error)? onError,
+  });
   Future<void> stopListening();
 
   Future<void> speak(String text);
@@ -32,7 +34,8 @@ class DeviceVoiceService implements VoiceService {
       _ready = await _stt.initialize();
       await _tts.setLanguage('bn-BD');
       await _tts.setSpeechRate(
-          0.45); // about 0.9 in the SRS scale; Android's TTS rate is 0..1
+        0.45,
+      ); // about 0.9 in the SRS scale; Android's TTS rate is 0..1
     } catch (_) {
       _ready = false;
     }
@@ -40,15 +43,19 @@ class DeviceVoiceService implements VoiceService {
   }
 
   @override
-  Future<void> listen(void Function(String text) onResult,
-      {void Function(String error)? onError}) async {
+  Future<void> listen(
+    void Function(String text) onResult, {
+    void Function(String error)? onError,
+  }) async {
     if (!await init()) {
       onError?.call(
-          'এই ফোনে কথা শোনার সুবিধা নেই / Speech recognition is not available on this phone');
+        'এই ফোনে কথা শোনার সুবিধা নেই / Speech recognition is not available on this phone',
+      );
       return;
     }
     await _stt.listen(
-      listenOptions: SpeechListenOptions(partialResults: false, localeId: 'bn_BD'),
+      listenOptions:
+          SpeechListenOptions(partialResults: false, localeId: 'bn_BD'),
       onResult: (r) {
         if (r.finalResult && r.recognizedWords.trim().isNotEmpty) {
           onResult(r.recognizedWords);

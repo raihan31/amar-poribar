@@ -92,12 +92,12 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
     setState(() {
       _queued = [
         for (final p in all)
-          if (p.status != 'ready') p
+          if (p.status != 'ready') p,
       ];
       // Keep drafts from this session, replace the queue-backed ones with the latest.
       final session = [
         for (final d in _drafts ?? <TransactionDraft>[])
-          if (d.pendingId == null) d
+          if (d.pendingId == null) d,
       ];
       final merged = [...session, ...ready];
       _drafts = merged.isEmpty && _drafts == null ? null : merged;
@@ -108,8 +108,9 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
   Future<void> _processQueue() async {
     final family = ref.read(authProvider).family;
     try {
-      if (family != null)
+      if (family != null) {
         await ref.read(pendingQueueProvider).process(family.id);
+      }
     } on ApiException catch (e) {
       if (e.isUnauthorized) return; // the normal flow will ask to sign in again
     } catch (_) {
@@ -145,12 +146,21 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
   Future<void> _speakBudgetAlerts(String familyId) async {
     try {
       final store = ref.read(localStoreProvider);
-      final month = DateTime.now().toUtc().add(const Duration(hours: 6)).toIso8601String().substring(0, 7);
+      final month = DateTime.now()
+          .toUtc()
+          .add(const Duration(hours: 6))
+          .toIso8601String()
+          .substring(0, 7);
       final raw = await ref.read(apiClientProvider).budgets(familyId);
       final budgets = [
         for (final b in raw)
-          BudgetStatus(b['categoryId'] as String?, (b['nameBn'] ?? '') as String, (b['limitPaisa'] as num).toInt(),
-              (b['spentPaisa'] as num).toInt(), b['level'] as String),
+          BudgetStatus(
+            b['categoryId'] as String?,
+            (b['nameBn'] ?? '') as String,
+            (b['limitPaisa'] as num).toInt(),
+            (b['spentPaisa'] as num).toInt(),
+            b['level'] as String,
+          ),
       ];
       final last = <String, String>{};
       for (final b in budgets) {
@@ -179,18 +189,23 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
             : ' · ${r.rejectedReasons.length} বাদ';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(
-                  'সিঙ্ক হয়েছে: ${r.pushed} পাঠানো, ${r.pulled} পাওয়া$rej')),
+            content: Text(
+              'সিঙ্ক হয়েছে: ${r.pushed} পাঠানো, ${r.pulled} পাওয়া$rej',
+            ),
+          ),
         );
       });
 
   Future<void> _readBack(TransactionDraft? d) {
     final voice = ref.read(voiceServiceProvider);
     if (d == null) return voice.speak('কিছু বোঝা যায়নি। আবার বলুন।');
-    return voice.speak(draftToSpeech(
+    return voice.speak(
+      draftToSpeech(
         type: d.type,
         amountPaisa: d.amountPaisa,
-        categoryName: categoryByKey(d.categoryKey)?.nameBn));
+        categoryName: categoryByKey(d.categoryKey)?.nameBn,
+      ),
+    );
   }
 
   Future<void> _listen(String familyId) async {
@@ -228,17 +243,21 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
     final categoryId = await store.categoryIdForKey(d.categoryKey);
     final accountId = await store.accountIdForType(d.accountType);
     if (d.type == 'income') {
-      await notifier.addIncome(d.amountTaka,
-          note: d.note,
-          categoryId: categoryId,
-          accountId: accountId,
-          source: d.source);
+      await notifier.addIncome(
+        d.amountTaka,
+        note: d.note,
+        categoryId: categoryId,
+        accountId: accountId,
+        source: d.source,
+      );
     } else {
-      await notifier.addExpense(d.amountTaka,
-          note: d.note,
-          categoryId: categoryId,
-          accountId: accountId,
-          source: d.source);
+      await notifier.addExpense(
+        d.amountTaka,
+        note: d.note,
+        categoryId: categoryId,
+        accountId: accountId,
+        source: d.source,
+      );
     }
     if (d.pendingId != null) await store.deletePending(d.pendingId!);
     _syncQuietly();
@@ -256,31 +275,37 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('এআই এন্ট্রি / AI entry'), actions: [
-        if (auth.family != null)
+      appBar: AppBar(
+        title: const Text('এআই এন্ট্রি / AI entry'),
+        actions: [
+          if (auth.family != null)
+            IconButton(
+              icon: const Icon(Icons.sync),
+              tooltip: 'সিঙ্ক',
+              onPressed: _busy ? null : () => _syncNow(auth.family!),
+            ),
           IconButton(
-            icon: const Icon(Icons.sync),
-            tooltip: 'সিঙ্ক',
-            onPressed: _busy ? null : () => _syncNow(auth.family!),
+            icon: const Icon(Icons.logout),
+            tooltip: 'লগআউট',
+            onPressed: () async {
+              await ref.read(authProvider.notifier).signOut();
+              if (context.mounted) {
+                Navigator.pushReplacementNamed(context, '/login');
+              }
+            },
           ),
-        IconButton(
-          icon: const Icon(Icons.logout),
-          tooltip: 'লগআউট',
-          onPressed: () async {
-            await ref.read(authProvider.notifier).signOut();
-            if (context.mounted)
-              Navigator.pushReplacementNamed(context, '/login');
-          },
-        ),
-      ]),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: !auth.signedIn
             ? Center(
                 child: ElevatedButton(
-                    onPressed: () =>
-                        Navigator.pushReplacementNamed(context, '/login'),
-                    child: const Text('লগইন করুন')))
+                  onPressed: () =>
+                      Navigator.pushReplacementNamed(context, '/login'),
+                  child: const Text('লগইন করুন'),
+                ),
+              )
             : auth.family == null
                 ? _createFamily()
                 : _entry(auth.family!),
@@ -288,120 +313,151 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
     );
   }
 
-  Widget _createFamily() =>
-      Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        const Text('আপনার পরিবারের নাম দিন'),
-        const SizedBox(height: 8),
-        TextField(
+  Widget _createFamily() => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text('আপনার পরিবারের নাম দিন'),
+          const SizedBox(height: 8),
+          TextField(
             controller: _familyName,
-            decoration: const InputDecoration(border: OutlineInputBorder())),
-        const SizedBox(height: 12),
-        ElevatedButton(
-          onPressed: _busy
-              ? null
-              : () => _guard(() => ref
-                  .read(authProvider.notifier)
-                  .createFamily(_familyName.text.trim())),
-          child: const Text('তৈরি করুন'),
-        ),
-        if (_error != null)
-          Text(_error!,
-              style: TextStyle(color: Theme.of(context).colorScheme.error)),
-      ]);
-
-  Widget _entry(FamilyInfo family) => ListView(children: [
-        SizedBox(
-          height: 72,
-          child: ElevatedButton.icon(
-            icon: Icon(_listening ? Icons.hearing : Icons.mic, size: 32),
-            label: Text(_listening ? 'শুনছি…' : 'চাপ দিয়ে বলুন',
-                style: const TextStyle(fontSize: 20)),
+            decoration: const InputDecoration(border: OutlineInputBorder()),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
             onPressed: _busy
                 ? null
-                : () => _listening
-                    ? ref.read(voiceServiceProvider).stopListening()
-                    : _listen(family.id),
+                : () => _guard(
+                      () => ref
+                          .read(authProvider.notifier)
+                          .createFamily(_familyName.text.trim()),
+                    ),
+            child: const Text('তৈরি করুন'),
           ),
-        ),
-        const SizedBox(height: 12),
-        _summaryCard(family),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _text,
-          minLines: 3,
-          maxLines: 6,
-          decoration: const InputDecoration(
-            hintText:
-                'যেমন: আজ বাজারে ৮৫০ টাকা ক্যাশে, অথবা bKash SMS পেস্ট করুন',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        const SizedBox(height: 8),
-        ElevatedButton(
-          onPressed: _busy ? null : () => _parse(family.id),
-          child: Text(_busy ? '…' : 'বুঝে নাও'),
-        ),
-        if (_error != null)
-          Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Text(_error!,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.error))),
-        if (_drafts != null && _drafts!.isEmpty)
-          const Padding(
-              padding: EdgeInsets.only(top: 12),
-              child: Text('কিছু বোঝা যায়নি')),
-        if (_notice != null)
-          Padding(
-              padding: const EdgeInsets.only(top: 12), child: Text(_notice!)),
-        for (final p in _queued)
-          Card(
-            margin: const EdgeInsets.only(top: 12),
-            child: ListTile(
-              leading: Icon(
-                  p.status == 'failed' ? Icons.error_outline : Icons.schedule),
-              title:
-                  Text(p.rawText, maxLines: 2, overflow: TextOverflow.ellipsis),
-              subtitle: Text(p.status == 'failed'
-                  ? 'বোঝা যায়নি: ${p.error ?? ''} — হাতে লিখুন'
-                  : 'অপেক্ষায় আছে — নেটওয়ার্ক পেলে বুঝে নেওয়া হবে'),
-              trailing: IconButton(
-                icon: const Icon(Icons.close),
-                tooltip: 'বাদ দিন',
-                onPressed: () async {
-                  await ref.read(localStoreProvider).deletePending(p.id);
-                  await _loadPending();
-                },
+          if (_error != null)
+            Text(
+              _error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+        ],
+      );
+
+  Widget _entry(FamilyInfo family) => ListView(
+        children: [
+          SizedBox(
+            height: 72,
+            child: ElevatedButton.icon(
+              icon: Icon(_listening ? Icons.hearing : Icons.mic, size: 32),
+              label: Text(
+                _listening ? 'শুনছি…' : 'চাপ দিয়ে বলুন',
+                style: const TextStyle(fontSize: 20),
               ),
+              onPressed: _busy
+                  ? null
+                  : () => _listening
+                      ? ref.read(voiceServiceProvider).stopListening()
+                      : _listen(family.id),
             ),
           ),
-        for (var i = 0; i < (_drafts?.length ?? 0); i++) _draftCard(i),
-      ]);
+          const SizedBox(height: 12),
+          _summaryCard(family),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _text,
+            minLines: 3,
+            maxLines: 6,
+            decoration: const InputDecoration(
+              hintText:
+                  'যেমন: আজ বাজারে ৮৫০ টাকা ক্যাশে, অথবা bKash SMS পেস্ট করুন',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          ElevatedButton(
+            onPressed: _busy ? null : () => _parse(family.id),
+            child: Text(_busy ? '…' : 'বুঝে নাও'),
+          ),
+          if (_error != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                _error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ),
+          if (_drafts != null && _drafts!.isEmpty)
+            const Padding(
+              padding: EdgeInsets.only(top: 12),
+              child: Text('কিছু বোঝা যায়নি'),
+            ),
+          if (_notice != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Text(_notice!),
+            ),
+          for (final p in _queued)
+            Card(
+              margin: const EdgeInsets.only(top: 12),
+              child: ListTile(
+                leading: Icon(
+                  p.status == 'failed' ? Icons.error_outline : Icons.schedule,
+                ),
+                title: Text(
+                  p.rawText,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  p.status == 'failed'
+                      ? 'বোঝা যায়নি: ${p.error ?? ''} — হাতে লিখুন'
+                      : 'অপেক্ষায় আছে — নেটওয়ার্ক পেলে বুঝে নেওয়া হবে',
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.close),
+                  tooltip: 'বাদ দিন',
+                  onPressed: () async {
+                    await ref.read(localStoreProvider).deletePending(p.id);
+                    await _loadPending();
+                  },
+                ),
+              ),
+            ),
+          for (var i = 0; i < (_drafts?.length ?? 0); i++) _draftCard(i),
+        ],
+      );
 
   /// Month summary in plain words, with a Listen button (FR-VOICE-04).
   Widget _summaryCard(FamilyInfo family) => Card(
         child: Padding(
           padding: const EdgeInsets.all(12),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              const Text('এই মাসের সারাংশ',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              TextButton.icon(
-                icon: const Icon(Icons.volume_up),
-                label: const Text('শুনুন'),
-                onPressed: () => _guard(() async {
-                  final s = _summary ??
-                      await ref.read(apiClientProvider).summary(family.id);
-                  setState(() => _summary = s);
-                  await ref.read(voiceServiceProvider).speak(s.speechText);
-                }),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'এই মাসের সারাংশ',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  TextButton.icon(
+                    icon: const Icon(Icons.volume_up),
+                    label: const Text('শুনুন'),
+                    onPressed: () => _guard(() async {
+                      final s = _summary ??
+                          await ref.read(apiClientProvider).summary(family.id);
+                      setState(() => _summary = s);
+                      await ref.read(voiceServiceProvider).speak(s.speechText);
+                    }),
+                  ),
+                ],
               ),
-            ]),
-            if (_summary != null)
-              Text(_summary!.text,
-                  style: const TextStyle(fontSize: 16, height: 1.5)),
-          ]),
+              if (_summary != null)
+                Text(
+                  _summary!.text,
+                  style: const TextStyle(fontSize: 16, height: 1.5),
+                ),
+            ],
+          ),
         ),
       );
 
@@ -410,55 +466,75 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
     final cat = categoryByKey(d.categoryKey);
     return Card(
       margin: const EdgeInsets.only(top: 12),
-      child: Column(children: [
-        ListTile(
-          leading:
-              Text(cat?.icon ?? '📦', style: const TextStyle(fontSize: 28)),
-          title: Text(
-              '৳ ${d.amountTaka.toStringAsFixed(2)} · ${cat?.nameBn ?? "ক্যাটাগরি বাছাই করুন"}'),
-          subtitle: Text(d.note),
-          trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-            IconButton(
-                icon: const Icon(Icons.volume_up),
-                tooltip: 'শুনুন',
-                onPressed: () => _readBack(d)),
-            IconButton(
-              icon: const Icon(Icons.close, size: 30),
-              tooltip: 'বাদ দিন',
-              onPressed: () => _discard(i),
+      child: Column(
+        children: [
+          ListTile(
+            leading:
+                Text(cat?.icon ?? '📦', style: const TextStyle(fontSize: 28)),
+            title: Text(
+              '৳ ${d.amountTaka.toStringAsFixed(2)} · ${cat?.nameBn ?? "ক্যাটাগরি বাছাই করুন"}',
             ),
-            IconButton(
-                icon: const Icon(Icons.check_circle, size: 30),
-                tooltip: 'সংরক্ষণ',
-                onPressed: () => _confirm(i)),
-          ]),
-        ),
-        // Icon grid for people who find reading hard; tapping also says the name (FR-VOICE-06).
-        if (d.categoryKey == null)
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Wrap(spacing: 8, runSpacing: 8, children: [
-              for (final c in kDefaultCategories.where(
-                  (c) => c.kind == (d.type == 'income' ? 'income' : 'expense')))
-                InkWell(
-                  onTap: () {
-                    ref.read(voiceServiceProvider).speak(c.nameBn);
-                    setState(() => _drafts = [..._drafts!]..[i] =
-                        d.copyWith(categoryKey: c.key));
-                  },
-                  child: SizedBox(
-                    width: 76,
-                    child: Column(children: [
-                      Text(c.icon, style: const TextStyle(fontSize: 28)),
-                      Text(c.nameBn,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 11))
-                    ]),
-                  ),
+            subtitle: Text(d.note),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.volume_up),
+                  tooltip: 'শুনুন',
+                  onPressed: () => _readBack(d),
                 ),
-            ]),
+                IconButton(
+                  icon: const Icon(Icons.close, size: 30),
+                  tooltip: 'বাদ দিন',
+                  onPressed: () => _discard(i),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.check_circle, size: 30),
+                  tooltip: 'সংরক্ষণ',
+                  onPressed: () => _confirm(i),
+                ),
+              ],
+            ),
           ),
-      ]),
+          // Icon grid for people who find reading hard; tapping also says the name (FR-VOICE-06).
+          if (d.categoryKey == null)
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final c in kDefaultCategories.where(
+                    (c) =>
+                        c.kind == (d.type == 'income' ? 'income' : 'expense'),
+                  ))
+                    InkWell(
+                      onTap: () {
+                        ref.read(voiceServiceProvider).speak(c.nameBn);
+                        setState(
+                          () => _drafts = [..._drafts!]..[i] =
+                              d.copyWith(categoryKey: c.key),
+                        );
+                      },
+                      child: SizedBox(
+                        width: 76,
+                        child: Column(
+                          children: [
+                            Text(c.icon, style: const TextStyle(fontSize: 28)),
+                            Text(
+                              c.nameBn,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: 11),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

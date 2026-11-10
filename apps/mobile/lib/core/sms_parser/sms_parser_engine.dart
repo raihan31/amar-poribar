@@ -1,4 +1,5 @@
 import 'package:amar_poribar/domain/models/enums.dart';
+import 'package:flutter/foundation.dart';
 
 class ParsedBankTransaction {
   final double amount;
@@ -41,25 +42,27 @@ class DbblParserStrategy implements BankParserStrategy {
   ParsedBankTransaction parse(String sender, String rawText) {
     // A mock regex parsing DBBL expense string.
     // E.g., "Tk 500.00 has been debited from A/C **1234 on 03-Oct for POS Purchase at SWAPNO."
-    
+
     final debitRegex = RegExp(r'Tk\s+([\d,.]+)\s+has been debited');
     final creditRegex = RegExp(r'Tk\s+([\d,.]+)\s+has been credited');
-    
+
     if (debitRegex.hasMatch(rawText)) {
-      final amountStr = debitRegex.firstMatch(rawText)?.group(1)?.replaceAll(',', '');
+      final amountStr =
+          debitRegex.firstMatch(rawText)?.group(1)?.replaceAll(',', '');
       return ParsedBankTransaction(
         amount: double.tryParse(amountStr ?? '0') ?? 0,
         type: TransactionType.expense,
       );
     } else if (creditRegex.hasMatch(rawText)) {
-      final amountStr = creditRegex.firstMatch(rawText)?.group(1)?.replaceAll(',', '');
+      final amountStr =
+          creditRegex.firstMatch(rawText)?.group(1)?.replaceAll(',', '');
       return ParsedBankTransaction(
         amount: double.tryParse(amountStr ?? '0') ?? 0,
         type: TransactionType.income,
       );
     }
 
-    throw FormatException('Could not parse DBBL transaction amount');
+    throw const FormatException('Could not parse DBBL transaction amount');
   }
 }
 
@@ -76,7 +79,7 @@ class SmsParserEngine {
           return strategy.parse(sender, rawText);
         } catch (e) {
           // If a parser throws, gracefully continue or return null
-          print('Parser ${strategy.bankIdentifier} failed: $e');
+          debugPrint('Parser ${strategy.bankIdentifier} failed: $e');
           return null;
         }
       }

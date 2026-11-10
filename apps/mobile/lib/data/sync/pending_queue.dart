@@ -41,7 +41,7 @@ class PendingQueue {
         for (final p in await store.pending())
           if (p.status == 'ready' && p.draftJson != null)
             TransactionDraft.fromJson(
-                    jsonDecode(p.draftJson!) as Map<String, dynamic>)
-                .withPendingId(p.id),
+              jsonDecode(p.draftJson!) as Map<String, dynamic>,
+            ).withPendingId(p.id),
       ];
 }

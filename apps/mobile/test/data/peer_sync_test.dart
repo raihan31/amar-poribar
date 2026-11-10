@@ -1,11 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:amar_poribar/data/database/database.dart';
 import 'package:amar_poribar/data/database/local_store.dart';
 import 'package:amar_poribar/data/sync/p2p_transport.dart';
 import 'package:amar_poribar/data/sync/peer_sync_engine.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// Two phones joined by an in-memory link.
 class MemoryTransport implements P2pTransport {
@@ -21,13 +20,18 @@ class MemoryTransport implements P2pTransport {
   @override
   int get maxMessageBytes => maxBytes;
   @override
-  Future<void> start(String deviceName,
-          Future<bool> Function(PeerInfo peer) approve) async =>
+  Future<void> start(
+    String deviceName,
+    Future<bool> Function(PeerInfo peer) approve,
+  ) async =>
       started = true;
   @override
   Future<void> send(String peerId, String text) async {
-    expect(text.length, lessThanOrEqualTo(maxBytes),
-        reason: 'every message must fit the transport limit');
+    expect(
+      text.length,
+      lessThanOrEqualTo(maxBytes),
+      reason: 'every message must fit the transport limit',
+    );
     sent.add(text);
     scheduleMicrotask(() => other!._events.add(PeerMessage('link', text)));
   }
@@ -47,10 +51,15 @@ class Phone {
   final status = <String>[];
 }
 
-Future<Phone> phone(String family,
-    {int maxBytes = 30000, DateTime? now}) async {
-  final store = await LocalStore.open(AppDatabase.memory(),
-      now: () => now ?? DateTime.utc(2026, 11, 9, 10));
+Future<Phone> phone(
+  String family, {
+  int maxBytes = 30000,
+  DateTime? now,
+}) async {
+  final store = await LocalStore.open(
+    AppDatabase.memory(),
+    now: () => now ?? DateTime.utc(2026, 11, 9, 10),
+  );
   final t = MemoryTransport(maxBytes);
   late Phone p;
   final engine = PeerSyncEngine(
@@ -75,7 +84,7 @@ Future<void> link(Phone a, Phone b) async {
 
 Future<Set<String>> ids(LocalStore s) async => {
       for (final r in (await s.changesAfter(0, includePrivate: true)).rows)
-        r['id'] as String
+        r['id'] as String,
     };
 
 void main() {
@@ -95,12 +104,19 @@ void main() {
     final b = await phone('fam', maxBytes: 1200);
     for (var i = 0; i < 25; i++) {
       await a.store.addTransaction(
-          id: 'a$i', type: 'expense', amountPaisa: i + 1, note: 'বাজার $i');
+        id: 'a$i',
+        type: 'expense',
+        amountPaisa: i + 1,
+        note: 'বাজার $i',
+      );
     }
     await link(a, b);
     expect((await ids(b.store)).length, 25);
-    expect(a.transport.sent.length, greaterThan(3),
-        reason: 'rows were split over several messages');
+    expect(
+      a.transport.sent.length,
+      greaterThan(3),
+      reason: 'rows were split over several messages',
+    );
   });
 
   test('a delete made on one phone reaches the other', () async {
@@ -120,7 +136,11 @@ void main() {
     final a = await phone('fam');
     final b = await phone('fam');
     await a.store.addTransaction(
-        id: 'secret', type: 'expense', amountPaisa: 1, isPrivate: true);
+      id: 'secret',
+      type: 'expense',
+      amountPaisa: 1,
+      isPrivate: true,
+    );
     await a.store.addTransaction(id: 'shared', type: 'expense', amountPaisa: 1);
     await link(a, b);
     expect(await ids(b.store), {'shared'});
@@ -153,8 +173,11 @@ void main() {
     final pushes =
         a.transport.sent.where((m) => m.contains('"t":"push"')).toList();
     expect(pushes, isNotEmpty);
-    expect(pushes.join().contains('"a0"'), isFalse,
-        reason: 'old entries are not sent again');
+    expect(
+      pushes.join().contains('"a0"'),
+      isFalse,
+      reason: 'old entries are not sent again',
+    );
     expect((await ids(b.store)).contains('later'), isTrue);
   });
 
@@ -165,16 +188,23 @@ void main() {
     await a.store.addTransaction(id: 'ok', type: 'expense', amountPaisa: 1);
     await b.store.addTransaction(id: 'future', type: 'expense', amountPaisa: 1);
     await link(a, b);
-    expect(await ids(a.store), {'ok'},
-        reason: "the future-dated phone's entry is not merged");
+    expect(
+      await ids(a.store),
+      {'ok'},
+      reason: "the future-dated phone's entry is not merged",
+    );
     expect(a.status.any((s) => s.contains('date and time')), isTrue);
   });
 
   test('data before a valid hello is ignored', () async {
     final a = await phone('fam');
     a.transport.other = MemoryTransport(30000);
-    a.transport._events.add(const PeerMessage('stranger',
-        '{"t":"push","rows":[{"id":"evil","hlc":"2026-11-09T10:00:00.000Z-0000-x"}],"lastSeq":1,"more":false}'));
+    a.transport._events.add(
+      const PeerMessage(
+        'stranger',
+        '{"t":"push","rows":[{"id":"evil","hlc":"2026-11-09T10:00:00.000Z-0000-x"}],"lastSeq":1,"more":false}',
+      ),
+    );
     await pumpEventQueue(times: 50);
     expect(await ids(a.store), isEmpty);
   });

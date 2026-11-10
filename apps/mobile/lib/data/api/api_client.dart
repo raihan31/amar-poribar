@@ -132,7 +132,12 @@ class SyncResponse {
   final List<({String? id, String reason})> rejected;
   final List<Map<String, dynamic>> changes;
   const SyncResponse(
-      this.cursor, this.more, this.applied, this.rejected, this.changes);
+    this.cursor,
+    this.more,
+    this.applied,
+    this.rejected,
+    this.changes,
+  );
 }
 
 /// Thin client for apps/api. Takes an [http.Client] so tests can inject a mock.
@@ -156,7 +161,9 @@ class ApiClient {
       res = await http.Response.fromStream(await _http.send(req));
     } catch (_) {
       throw ApiException(
-          0, 'সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না / Cannot reach the server');
+        0,
+        'সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না / Cannot reach the server',
+      );
     }
     if (res.statusCode == 204 || res.body.isEmpty) return null;
     final data = jsonDecode(utf8.decode(res.bodyBytes));
@@ -165,7 +172,9 @@ class ApiClient {
           ? data['error']['message'] as String?
           : null;
       throw ApiException(
-          res.statusCode, msg ?? 'Request failed (${res.statusCode})');
+        res.statusCode,
+        msg ?? 'Request failed (${res.statusCode})',
+      );
     }
     return data;
   }
@@ -180,8 +189,11 @@ class ApiClient {
 
   /// Verifies the OTP and stores the access token on this client.
   Future<String> verifyOtp(String phone, String code) async {
-    final r = await _send('POST', '/v1/auth/otp/verify',
-        body: {'phone': phone, 'code': code}) as Map<String, dynamic>;
+    final r = await _send(
+      'POST',
+      '/v1/auth/otp/verify',
+      body: {'phone': phone, 'code': code},
+    ) as Map<String, dynamic>;
     token = r['accessToken'] as String;
     return token!;
   }
@@ -189,8 +201,13 @@ class ApiClient {
   Future<List<FamilyInfo>> families() async {
     final r = await _send('GET', '/v1/me') as Map<String, dynamic>;
     return (r['families'] as List)
-        .map((f) => FamilyInfo(
-            f['id'] as String, f['name'] as String, f['role'] as String))
+        .map(
+          (f) => FamilyInfo(
+            f['id'] as String,
+            f['name'] as String,
+            f['role'] as String,
+          ),
+        )
         .toList();
   }
 
@@ -201,46 +218,66 @@ class ApiClient {
   }
 
   /// Text or a pasted MFS SMS to drafts (SRS FR-AI-01, FR-AI-02).
-  Future<List<TransactionDraft>> parse(String familyId, String text,
-      {DateTime? now}) async {
-    final r = await _send('POST', '/v1/families/$familyId/ai/parse', body: {
-      'text': text,
-      'now': (now ?? DateTime.now()).toUtc().toIso8601String()
-    }) as Map<String, dynamic>;
+  Future<List<TransactionDraft>> parse(
+    String familyId,
+    String text, {
+    DateTime? now,
+  }) async {
+    final r = await _send(
+      'POST',
+      '/v1/families/$familyId/ai/parse',
+      body: {
+        'text': text,
+        'now': (now ?? DateTime.now()).toUtc().toIso8601String(),
+      },
+    ) as Map<String, dynamic>;
     return (r['drafts'] as List)
         .map((d) => TransactionDraft.fromJson(d as Map<String, dynamic>))
         .toList();
   }
 
-  Future<MonthlySummary> summary(String familyId,
-      {String locale = 'bn'}) async {
+  Future<MonthlySummary> summary(
+    String familyId, {
+    String locale = 'bn',
+  }) async {
     final r =
         await _send('GET', '/v1/families/$familyId/ai/summary?locale=$locale')
             as Map<String, dynamic>;
     return MonthlySummary(
-        r['text'] as String, r['speechText'] as String, r['usedAi'] as bool);
+      r['text'] as String,
+      r['speechText'] as String,
+      r['usedAi'] as bool,
+    );
   }
 
   /// Exchange transaction changes with the server (SRS §4.3.1). [cursor] is the value from the last response.
-  Future<SyncResponse> sync(String familyId, String nodeId, String? cursor,
-      List<Map<String, dynamic>> changes) async {
-    final r = await _send('POST', '/v1/families/$familyId/sync', body: {
-      'nodeId': nodeId,
-      'cursor': cursor,
-      'changes': {'transactions': changes}
-    }) as Map<String, dynamic>;
+  Future<SyncResponse> sync(
+    String familyId,
+    String nodeId,
+    String? cursor,
+    List<Map<String, dynamic>> changes,
+  ) async {
+    final r = await _send(
+      'POST',
+      '/v1/families/$familyId/sync',
+      body: {
+        'nodeId': nodeId,
+        'cursor': cursor,
+        'changes': {'transactions': changes},
+      },
+    ) as Map<String, dynamic>;
     return SyncResponse(
       r['cursor'] as String,
       r['more'] as bool,
       (r['applied'] as num).toInt(),
       [
         for (final x in r['rejected'] as List)
-          (id: x['id'] as String?, reason: x['reason'] as String)
+          (id: x['id'] as String?, reason: x['reason'] as String),
       ],
       [
         for (final c
             in (r['changes'] as Map<String, dynamic>)['transactions'] as List)
-          Map<String, dynamic>.from(c as Map)
+          Map<String, dynamic>.from(c as Map),
       ],
     );
   }
@@ -259,7 +296,10 @@ class ApiClient {
 
   /// This month's budgets with spend and 80%/100% level.
   Future<List<Map<String, dynamic>>> budgets(String familyId) async {
-    final r = await _send('GET', '/v1/families/$familyId/budgets') as Map<String, dynamic>;
-    return [for (final b in r['budgets'] as List) Map<String, dynamic>.from(b as Map)];
+    final r = await _send('GET', '/v1/families/$familyId/budgets')
+        as Map<String, dynamic>;
+    return [
+      for (final b in r['budgets'] as List) Map<String, dynamic>.from(b as Map),
+    ];
   }
 }

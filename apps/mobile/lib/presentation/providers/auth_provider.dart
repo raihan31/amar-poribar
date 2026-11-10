@@ -41,7 +41,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> signIn(String phone, String code) async {
     final token = await api.verifyOtp(phone, code);
     try {
-      (await SharedPreferences.getInstance()).setString(_tokenKey, token);
+      await (await SharedPreferences.getInstance()).setString(_tokenKey, token);
     } catch (_) {/* session just won't survive a restart */}
     await _loadFamily(token);
   }
@@ -50,7 +50,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final fams = await api.families();
       state = AuthState(
-          loaded: true, token: token, family: fams.isEmpty ? null : fams.first);
+        loaded: true,
+        token: token,
+        family: fams.isEmpty ? null : fams.first,
+      );
     } on ApiException catch (e) {
       if (e.isUnauthorized) {
         await signOut();
@@ -69,7 +72,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> signOut() async {
     api.token = null;
     try {
-      (await SharedPreferences.getInstance()).remove(_tokenKey);
+      await (await SharedPreferences.getInstance()).remove(_tokenKey);
     } catch (_) {}
     state = const AuthState(loaded: true);
   }
@@ -86,10 +89,14 @@ final voiceServiceProvider =
 
 final syncServiceProvider = Provider<SyncService>((ref) {
   return SyncService(
-      ref.watch(localStoreProvider), ref.watch(apiClientProvider));
+    ref.watch(localStoreProvider),
+    ref.watch(apiClientProvider),
+  );
 });
 
 final pendingQueueProvider = Provider<PendingQueue>((ref) {
   return PendingQueue(
-      ref.watch(localStoreProvider), ref.watch(apiClientProvider));
+    ref.watch(localStoreProvider),
+    ref.watch(apiClientProvider),
+  );
 });
