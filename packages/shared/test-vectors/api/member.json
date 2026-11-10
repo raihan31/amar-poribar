@@ -1,0 +1,9 @@
+{
+  "_kind": "response",
+  "_operation": "GET /v1/families/{familyId}/members",
+  "_status": 200,
+  "body": [
+    { "name": "রহিম", "phone": "+8801700000001", "role": "owner", "userId": "00000000-0000-4000-8000-0000000000a1" },
+    { "name": null, "phone": "+8801700000002", "role": "member", "userId": "00000000-0000-4000-8000-0000000000a2" }
+  ]
+}

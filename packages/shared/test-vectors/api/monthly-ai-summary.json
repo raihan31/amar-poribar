@@ -1,0 +1,12 @@
+{
+  "_kind": "response",
+  "_operation": "GET /v1/families/{familyId}/ai/summary",
+  "_status": 200,
+  "body": {
+    "locale": "bn",
+    "month": "2026-10",
+    "speechText": "অক্টোবর মাসে মোট খরচ হয়েছে দুই হাজার তিনশো পঞ্চাশ টাকা।",
+    "text": "অক্টোবরে খরচ হয়েছে ২,৩৫০ টাকা।",
+    "usedAi": false
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "_kind": "response",
+  "_operation": "POST /v1/families/{familyId}/ai/parse",
+  "_status": 200,
+  "body": {
+    "accountType": "bkash",
+    "amountPaisa": 150000,
+    "categoryKey": null,
+    "confidence": 0.95,
+    "counterparty": "01XXXXXX678",
+    "feePaisa": 500,
+    "note": "আম্মুকে পাঠানো",
+    "occurredAt": "2026-10-05T14:22:00+06:00",
+    "source": "sms",
+    "trxId": "BJ51AB12CD",
+    "type": "expense"
+  }
+}
