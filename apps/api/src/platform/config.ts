@@ -58,6 +58,7 @@ export const ConfigSchema = z.object({
   TURN_SECRET: optStr(),
   TURN_TTL_SECONDS: z.preprocess(blank, z.coerce.number().int().positive().default(3600)),
   PAYMENT_PROVIDER: z.preprocess(blank, z.enum(["fake", "real"]).default("fake")),
+  OPENAPI_PUBLIC: z.preprocess(blank, z.enum(["true", "false"]).default("false")),
   ...paymentShape,
   ROLE: z.preprocess(blank, z.enum(["api", "worker", "all"]).default("all")),
   LOG_LEVEL: z.preprocess(
@@ -135,6 +136,7 @@ function build(c: z.output<typeof ConfigSchema>) {
     role: c.ROLE,
     logLevel: c.LOG_LEVEL,
     metricsToken: c.METRICS_TOKEN,
+    openapiPublic: c.OPENAPI_PUBLIC === "true",
     featureFlags,
   };
 }
