@@ -14,6 +14,8 @@ export interface AppDeps {
   corsOrigins?: string[];
   /** Serve `/v1/openapi.json` in production too (OPENAPI_PUBLIC=true). */
   openapiPublic?: boolean;
+  /** Bearer token for `/metrics`; unset means closed in production, open elsewhere. */
+  metricsToken?: string;
   /** Job queue; defaults to inline mode until the worker is wired. */
   jobs?: Jobs;
 }
