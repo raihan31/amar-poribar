@@ -11,9 +11,9 @@ const app = await buildApp({
   aiModel: env.aiModel,
   jwtSecret: env.jwtSecret,
   isProd: env.isProd,
+  logLevel: env.logLevel,
   corsOrigins: env.corsOrigins,
 });
 
 await app.listen({ port: env.port, host: "0.0.0.0" });
-// eslint-disable-next-line no-console -- replaced by the logger in T-PLAT-05
-console.log(`Amar Poribar API on http://localhost:${env.port}`);
+app.log.info(`Amar Poribar API on http://localhost:${env.port}`);

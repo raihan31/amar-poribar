@@ -10,6 +10,7 @@ export interface AppDeps {
   aiModel?: string;
   jwtSecret: string;
   isProd: boolean;
+  logLevel?: string;
   /** Origins allowed by CORS in production. Development allows any origin. */
   corsOrigins?: string[];
 }

@@ -14,10 +14,15 @@ import { reportRoutes } from "./routes/reports.js";
 import { syncRoutes } from "./routes/sync.js";
 import { transactionRoutes } from "./routes/transactions.js";
 import { modules } from "./modules/registry.js";
+import { createLogger, installRequestContext, requestOptions } from "./platform/logger.js";
 import type { ModuleContext } from "./platform/module.js";
 
 export async function buildApp(deps: AppDeps) {
-  const app = Fastify({ logger: { level: deps.isProd ? "info" : "warn" } });
+  const app = Fastify({
+    loggerInstance: createLogger({ level: deps.logLevel ?? (deps.isProd ? "info" : "warn") }),
+    ...requestOptions,
+  });
+  installRequestContext(app);
   registerErrorHandler(app);
   const allowed = deps.corsOrigins ?? [];
   await app.register(cors, { origin: deps.isProd ? (allowed.length ? allowed : false) : true });
