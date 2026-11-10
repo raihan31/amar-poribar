@@ -1,6 +1,8 @@
 import { buildApp } from "../../src/app.js";
-import type { Db } from "../../src/db/client.js";
-import type { Sql } from "../../src/platform/db.js";
+import type { Db, Sql } from "../../src/platform/db.js";
+import { createJobs } from "../../src/platform/jobs/jobs.js";
+import { LocalFanout } from "../../src/platform/realtime/fanout.js";
+import { testConfig } from "./config.js";
 import { MemoryPush } from "../../src/platform/ports/fakes/memory-push.js";
 import { MemorySms } from "../../src/platform/ports/fakes/memory-sms.js";
 import { DbLimiter, MemoryLimiter, type Limiter } from "../../src/platform/rate-limit/limiter.js";
@@ -28,7 +30,17 @@ export async function buildTestApp(opts: BuildTestAppOptions) {
     limiter: (opts.dbLimiter ? new DbLimiter(opts.sql) : new MemoryLimiter()) as Limiter,
     clock: opts.clock ?? (() => FIXED_NOW),
   };
-  const app = await buildApp({ db: opts.db, jwtSecret: "test-secret", isProd: false });
+  const app = await buildApp({
+    config: testConfig(),
+    db: opts.db,
+    deps: {
+      sql: opts.sql,
+      ports: { sms: fakes.sms, push: fakes.push },
+      limiter: fakes.limiter,
+      jobs: createJobs({ inline: true }),
+      fanout: new LocalFanout(),
+    },
+  });
   await app.ready();
 
   /** OTP flow: request a code (read from the dev response or the fake SMS) and verify it. */

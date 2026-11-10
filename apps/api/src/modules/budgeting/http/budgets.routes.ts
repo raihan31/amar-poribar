@@ -6,6 +6,7 @@ import { currentDhakaMonth } from "../../../platform/time/month.js";
 import type { BudgetingDeps } from "../app/deps.js";
 import { getBudgetSummary } from "../app/get-budgets.js";
 import { putBudgets } from "../app/put-budgets.js";
+import { docs } from "../../../platform/http/responses.js";
 
 type FamilyParams = { Params: { familyId: string } };
 const MonthQuery = z.object({ month: MonthSchema.optional() });
@@ -13,14 +14,14 @@ const MonthQuery = z.object({ month: MonthSchema.optional() });
 export function budgetsRoutes(app: FastifyInstance, deps: BudgetingDeps) {
   const opts = { preHandler: app.authenticate };
 
-  app.get<FamilyParams>("/v1/families/:familyId/budgets", opts, async (req) => {
+  app.get<FamilyParams>("/v1/families/:familyId/budgets", { ...opts, schema: docs.object }, async (req) => {
     const { familyId } = req.params;
     await deps.families.requireRole(familyId, req.user.sub, "viewer");
     const { month = currentDhakaMonth() } = parseOr400(MonthQuery, req.query);
     return getBudgetSummary(deps, familyId, req.user.sub, month);
   });
 
-  app.put<FamilyParams>("/v1/families/:familyId/budgets", opts, async (req) => {
+  app.put<FamilyParams>("/v1/families/:familyId/budgets", { ...opts, schema: docs.object }, async (req) => {
     const { familyId } = req.params;
     await deps.families.requireRole(familyId, req.user.sub, "admin");
     const { month = currentDhakaMonth() } = parseOr400(MonthQuery, req.query);

@@ -1,8 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { buildApp } from "./app.js";
+import { buildApp } from "../../app.js";
 import { CreateRecurringSchema } from "@amar-poribar/shared";
-import type { Db } from "./db/client.js";
-import { monthsBetween } from "./month.js";
+import { testConfig } from "../../../tests/support/config.js";
+import type { Db } from "../db.js";
+import { monthsBetween } from "../time/month.js";
 import {
   ReceiptRequestSchema,
   CreateFestivalBudgetSchema,
@@ -14,7 +15,7 @@ import {
 } from "@amar-poribar/shared";
 
 // These tests don't touch the database; DB-backed tests need `pnpm db:up` (TODO).
-const app = await buildApp({ db: {} as Db, jwtSecret: "test", isProd: false });
+const app = await buildApp({ config: testConfig(), db: {} as Db });
 
 beforeAll(() => app.ready());
 afterAll(() => app.close());
@@ -34,10 +35,8 @@ describe("api", () => {
 describe("cors in production", () => {
   it("allows only the configured web origin", async () => {
     const prod = await buildApp({
+      config: testConfig({ NODE_ENV: "production", CORS_ORIGIN: "http://localhost:3000" }),
       db: {} as Db,
-      jwtSecret: "test",
-      isProd: true,
-      corsOrigins: ["http://localhost:3000"],
     });
     const allowed = await prod.inject({ method: "GET", url: "/health", headers: { origin: "http://localhost:3000" } });
     const other = await prod.inject({ method: "GET", url: "/health", headers: { origin: "https://evil.example" } });

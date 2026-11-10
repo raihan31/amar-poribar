@@ -10,7 +10,6 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --project unit",
     "test:db": "vitest run --project db",
-    "e2e": "node scripts/e2e.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx --env-file-if-exists=../../.env src/platform/migrate-cli.ts",
     "db:reset": "tsx --env-file-if-exists=../../.env src/platform/reset-cli.ts",

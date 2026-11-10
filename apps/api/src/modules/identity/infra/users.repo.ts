@@ -1,5 +1,5 @@
 import { eq, inArray } from "drizzle-orm";
-import type { Db } from "../../../db/client.js";
+import type { Db } from "../../../platform/db.js";
 import type { UserRepo } from "../app/ports.js";
 import { users } from "../schema.js";
 

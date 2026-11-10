@@ -35,6 +35,7 @@ const paymentShape = Object.fromEntries(PAYMENT_KEYS.map((k) => [k, optStr()])) 
 export const ConfigSchema = z.object({
   NODE_ENV: z.preprocess(blank, z.enum(["development", "test", "production"]).default("development")),
   PORT: z.preprocess(blank, z.coerce.number().int().min(0).max(65535).default(4000)),
+  WORKER_PORT: z.preprocess(blank, z.coerce.number().int().min(0).max(65535).default(4001)),
   DATABASE_URL: withDefault("postgres://amar:amar@localhost:5432/amar_poribar"),
   DB_POOL_MAX: z.preprocess(blank, z.coerce.number().int().min(1).max(200).default(10)),
   MIGRATE_ON_START: z.preprocess(blank, z.enum(["true", "false"]).default("true")),
@@ -109,6 +110,7 @@ function build(c: z.output<typeof ConfigSchema>) {
     nodeEnv: c.NODE_ENV,
     isProd: c.NODE_ENV === "production",
     port: c.PORT,
+    workerPort: c.WORKER_PORT,
     databaseUrl: c.DATABASE_URL,
     dbPoolMax: c.DB_POOL_MAX,
     migrateOnStart: c.MIGRATE_ON_START === "true",
@@ -144,7 +146,11 @@ function build(c: z.output<typeof ConfigSchema>) {
 export type Config = Readonly<ReturnType<typeof build>>;
 
 /** Parse and validate environment variables; throws one Error listing every invalid variable. */
-export function loadConfig(env: Record<string, string | undefined> = process.env): Config {
+export function loadConfig(
+  source: Record<string, string | undefined> = process.env,
+  overrides: Record<string, string | undefined> = {},
+): Config {
+  const env = { ...source, ...overrides };
   const parsed = ConfigSchema.safeParse(env);
   const issues = [...(parsed.success ? [] : parsed.error.issues), ...crossChecks(env)];
   if (!parsed.success || issues.length > 0) {

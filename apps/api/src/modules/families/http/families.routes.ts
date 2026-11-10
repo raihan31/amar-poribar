@@ -3,9 +3,10 @@ import { CreateFamilySchema } from "@amar-poribar/shared";
 import { parseOr400 } from "../../../platform/errors.js";
 import { createFamily } from "../app/create-family.js";
 import type { FamiliesDeps } from "../app/deps.js";
+import { docs } from "../../../platform/http/responses.js";
 
 export function familiesRoutes(app: FastifyInstance, deps: FamiliesDeps) {
-  app.post("/v1/families", { preHandler: app.authenticate }, async (req, reply) => {
+  app.post("/v1/families", { preHandler: app.authenticate, schema: docs.object }, async (req, reply) => {
     const { name } = parseOr400(CreateFamilySchema, req.body);
     const family = await createFamily(deps, { name, userId: req.user.sub });
     return reply.status(201).send(family);

@@ -19,10 +19,28 @@
       "get": {
         "responses": {
           "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
-        "x-undocumented": true
+        "tags": [
+          "platform"
+        ]
       }
     },
     "/metrics": {
@@ -230,37 +248,70 @@
     "/v1/auth/otp/request": {
       "post": {
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
-        },
-        "x-undocumented": true
+        }
       }
     },
     "/v1/auth/otp/verify": {
       "post": {
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
-        },
-        "x-undocumented": true
+        }
       }
     },
     "/v1/auth/refresh": {
       "post": {
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
-        },
-        "x-undocumented": true
+        }
       }
     },
     "/v1/families": {
       "post": {
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -268,8 +319,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/accounts": {
@@ -285,7 +335,19 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": {},
+                    "properties": {},
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -293,8 +355,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       },
       "post": {
         "parameters": [
@@ -308,7 +369,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -316,8 +386,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/accounts/{accountId}": {
@@ -341,7 +410,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -349,8 +427,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/ai/ask": {
@@ -366,7 +443,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -374,8 +460,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/ai/parse": {
@@ -391,7 +476,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -399,8 +493,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/ai/receipt": {
@@ -416,7 +509,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -424,8 +526,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/ai/summary": {
@@ -441,7 +542,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -449,8 +559,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/budgets": {
@@ -466,7 +575,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -474,8 +592,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       },
       "put": {
         "parameters": [
@@ -489,7 +606,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -497,8 +623,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/categories": {
@@ -514,7 +639,19 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": {},
+                    "properties": {},
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -522,8 +659,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       },
       "post": {
         "parameters": [
@@ -537,7 +673,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -545,8 +690,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/categories/{categoryId}": {
@@ -570,7 +714,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -578,8 +731,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/festival-budgets": {
@@ -595,7 +747,19 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": {},
+                    "properties": {},
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -603,8 +767,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       },
       "post": {
         "parameters": [
@@ -618,7 +781,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -626,8 +798,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/festival-budgets/{festivalId}": {
@@ -651,7 +822,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Default Response"
           }
         },
@@ -659,8 +830,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       },
       "patch": {
         "parameters": [
@@ -682,7 +852,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -690,8 +869,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/invites": {
@@ -707,7 +885,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -715,8 +902,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/members": {
@@ -732,7 +918,19 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": {},
+                    "properties": {},
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -740,8 +938,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/members/{userId}": {
@@ -765,7 +962,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Default Response"
           }
         },
@@ -773,8 +970,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       },
       "patch": {
         "parameters": [
@@ -796,7 +992,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -804,8 +1009,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/recurring": {
@@ -821,7 +1025,19 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": {},
+                    "properties": {},
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -829,8 +1045,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       },
       "post": {
         "parameters": [
@@ -844,7 +1059,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -852,8 +1076,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/recurring/drafts": {
@@ -869,7 +1092,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -877,8 +1109,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/recurring/reminders": {
@@ -894,7 +1125,19 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": {},
+                    "properties": {},
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -902,8 +1145,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/recurring/{recurringId}": {
@@ -927,7 +1169,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -935,8 +1186,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/recurring/{recurringId}/confirm": {
@@ -960,7 +1210,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -968,8 +1227,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/reports/export.csv": {
@@ -985,7 +1243,14 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -993,8 +1258,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/reports/remittances": {
@@ -1010,7 +1274,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -1018,8 +1291,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/reports/summary": {
@@ -1035,7 +1307,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -1043,8 +1324,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/sync": {
@@ -1060,7 +1340,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -1068,8 +1357,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/transactions": {
@@ -1085,7 +1373,19 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": {},
+                    "properties": {},
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -1093,8 +1393,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       },
       "post": {
         "parameters": [
@@ -1108,7 +1407,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -1116,8 +1424,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/families/{familyId}/transactions/{txnId}": {
@@ -1141,7 +1448,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Default Response"
           }
         },
@@ -1149,8 +1456,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       },
       "patch": {
         "parameters": [
@@ -1172,7 +1478,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -1180,8 +1495,42 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
+      }
+    },
+    "/v1/flags": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "flags": {
+                      "additionalProperties": {
+                        "type": "boolean"
+                      },
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "flags"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "summary": "Feature flags",
+        "tags": [
+          "platform"
+        ]
       }
     },
     "/v1/invites/{token}/accept": {
@@ -1197,7 +1546,16 @@
           }
         ],
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -1205,14 +1563,22 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     },
     "/v1/me": {
       "get": {
         "responses": {
-          "200": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
             "description": "Default Response"
           }
         },
@@ -1220,8 +1586,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "x-undocumented": true
+        ]
       }
     }
   }

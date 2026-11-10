@@ -24,18 +24,37 @@ export async function truncateAll(sql: Sql): Promise<void> {
   await sql.unsafe(`truncate table ${list} restart identity cascade`);
 }
 
-/** Run `fn` against a fresh database cloned from the migrated template; dropped afterwards. */
-export async function withTestDb<T>(fn: (t: TestDb) => Promise<T>): Promise<T> {
+export interface OwnedTestDb extends TestDb {
+  /** Close the pool and drop the database. */
+  drop: () => Promise<void>;
+}
+
+/** A fresh database cloned from the migrated template. The caller must `drop()` it (use in `beforeAll`/`afterAll`). */
+export async function createTestDb(): Promise<OwnedTestDb> {
   const name = `test_${randomUUID().replaceAll("-", "")}`;
   const admin = createDb({ databaseUrl: adminUrl(), dbPoolMax: 1 });
   await admin.sql.unsafe(`create database ${name} template ${TEMPLATE_DB}`);
   const url = withDatabase(adminUrl(), name);
   const conn = createDb({ databaseUrl: url, dbPoolMax: 6 });
+  return {
+    db: conn.db,
+    sql: conn.sql,
+    url,
+    truncateAll: () => truncateAll(conn.sql),
+    drop: async () => {
+      await conn.close();
+      await admin.sql.unsafe(`drop database if exists ${name} with (force)`);
+      await admin.close();
+    },
+  };
+}
+
+/** Run `fn` against a fresh database cloned from the migrated template; dropped afterwards. */
+export async function withTestDb<T>(fn: (t: TestDb) => Promise<T>): Promise<T> {
+  const t = await createTestDb();
   try {
-    return await fn({ db: conn.db, sql: conn.sql, url, truncateAll: () => truncateAll(conn.sql) });
+    return await fn(t);
   } finally {
-    await conn.close();
-    await admin.sql.unsafe(`drop database if exists ${name} with (force)`);
-    await admin.close();
+    await t.drop();
   }
 }

@@ -7,7 +7,7 @@ import { MAX_FRAME_BYTES } from "./protocol.js";
 export async function realtimePlugin(app: FastifyInstance, opts: { hub: Hub }): Promise<void> {
   const { hub } = opts;
   await app.register(websocket, { options: { maxPayload: MAX_FRAME_BYTES } });
-  app.get("/v1/ws", { websocket: true }, (socket) => hub.attach(socket));
+  app.get("/v1/ws", { websocket: true, schema: { hide: true } }, (socket) => hub.attach(socket));
   await hub.start();
   app.addHook("onClose", async () => {
     await hub.stop();

@@ -1,14 +1,20 @@
 import type { FastifyBaseLogger, FastifyInstance } from "fastify";
-import type { Db } from "../db/client.js";
-
-// Ports that later platform tasks replace with real interfaces. They are `unknown` until then so
-// modules can already declare the context shape they will receive.
-export type Config = unknown; // T-PLAT-04
+import type { Db } from "./db.js";
 import type { EventBus } from "./events/bus.js";
+import type { Flags } from "./flags/flags.js";
 import type { Jobs } from "./jobs/jobs.js";
-export type { EventBus, Jobs };
-export type ObjectStorage = unknown; // T-PLAT-12
-export type Flags = unknown; // T-PLAT-11
+import type { Ports } from "./ports/index.js";
+import type { Limiter } from "./rate-limit/limiter.js";
+import type { Hub } from "./realtime/hub.js";
+import type { ObjectStorage } from "./storage/storage.js";
+
+export type { EventBus, Flags, Hub, Jobs, Limiter, ObjectStorage, Ports };
+
+/**
+ * Configuration visible to modules: the parsed `Config` plus the AI client. Modules read only the keys they
+ * need and validate them (see `identity` and `ai`), so it stays loosely typed.
+ */
+export type Config = unknown;
 
 /** Facades of every registered module. Each module augments this interface from its `index.ts`. */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmented by each module
@@ -22,6 +28,11 @@ export interface ModuleContext {
   jobs: Jobs;
   storage: ObjectStorage;
   flags: Flags;
+  limiter: Limiter;
+  /** WebSocket hub; absent when the app has no database connection (unit tests, OpenAPI build). */
+  realtime: Hub | undefined;
+  /** SMS, push and payment adapters (fakes unless configured). */
+  ports: Ports;
   clock: () => Date;
   facades: Partial<Facades>;
 }
