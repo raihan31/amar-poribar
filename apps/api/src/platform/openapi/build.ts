@@ -1,6 +1,5 @@
 import { buildApp } from "../../app.js";
 import type { Db } from "../../db/client.js";
-import { OtpStore } from "../../otp.js";
 
 export { apiRoot, apiVersion } from "./version.js";
 
@@ -32,7 +31,6 @@ export function countUndocumented(doc: { paths?: Record<string, Record<string, u
 export async function buildOpenApiDocument() {
   const app = await buildApp({
     db: {} as Db,
-    otp: new OtpStore(),
     jwtSecret: "openapi-build",
     isProd: false,
     logLevel: "silent",

@@ -7,7 +7,6 @@ import { budgetLevel, effectiveBudgets } from "./budgets.js";
 import { canAssignRole, canManageMember } from "./auth.js";
 import type { Db } from "./db/client.js";
 import { dayRange, monthRange, monthsBetween } from "./month.js";
-import { OtpStore } from "./otp.js";
 import {
   SyncRequestSchema,
   SyncTransactionSchema,
@@ -21,7 +20,7 @@ import {
 } from "@amar-poribar/shared";
 
 // These tests don't touch the database; DB-backed tests need `pnpm db:up` (TODO).
-const app = await buildApp({ db: {} as Db, otp: new OtpStore(), jwtSecret: "test", isProd: false });
+const app = await buildApp({ db: {} as Db, jwtSecret: "test", isProd: false });
 
 beforeAll(() => app.ready());
 afterAll(() => app.close());
@@ -30,17 +29,6 @@ describe("api", () => {
   it("reports health", async () => {
     const res = await app.inject({ method: "GET", url: "/health" });
     expect(res.json()).toEqual({ ok: true });
-  });
-
-  it("rejects non-Bangladeshi phone numbers", async () => {
-    const res = await app.inject({ method: "POST", url: "/v1/auth/otp/request", payload: { phone: "12345" } });
-    expect(res.statusCode).toBe(400);
-    expect(res.json().error.code).toBe("invalid_request");
-  });
-
-  it("issues a dev OTP outside production", async () => {
-    const res = await app.inject({ method: "POST", url: "/v1/auth/otp/request", payload: { phone: "01712345678" } });
-    expect(res.json().devCode).toMatch(/^\d{6}$/);
   });
 
   it("requires auth on family routes", async () => {
@@ -53,7 +41,6 @@ describe("cors in production", () => {
   it("allows only the configured web origin", async () => {
     const prod = await buildApp({
       db: {} as Db,
-      otp: new OtpStore(),
       jwtSecret: "test",
       isProd: true,
       corsOrigins: ["http://localhost:3000"],

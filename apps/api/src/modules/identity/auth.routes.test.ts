@@ -1,0 +1,65 @@
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { buildApp } from "../../app.js";
+import type { Db } from "../../db/client.js";
+
+const app = await buildApp({ db: {} as Db, jwtSecret: "test", isProd: false, logLevel: "silent" });
+beforeAll(() => app.ready());
+afterAll(() => app.close());
+
+describe("identity auth routes", () => {
+  it("rejects non-Bangladeshi phone numbers", async () => {
+    const res = await app.inject({ method: "POST", url: "/v1/auth/otp/request", payload: { phone: "12345" } });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error.code).toBe("invalid_request");
+  });
+
+  it("issues a dev OTP outside production", async () => {
+    const res = await app.inject({ method: "POST", url: "/v1/auth/otp/request", payload: { phone: "01712345678" } });
+    expect(res.json().devCode).toMatch(/^\d{6}$/);
+  });
+
+  it("does not return the OTP in production", async () => {
+    const prod = await buildApp({ db: {} as Db, jwtSecret: "test", isProd: true, logLevel: "silent" });
+    const res = await prod.inject({ method: "POST", url: "/v1/auth/otp/request", payload: { phone: "01712345678" } });
+    expect(res.json()).toEqual({ sent: true });
+    await prod.close();
+  });
+
+  it("rejects a malformed or unknown code", async () => {
+    const malformed = await app.inject({
+      method: "POST",
+      url: "/v1/auth/otp/verify",
+      payload: { phone: "01812345678", code: "abcdef" },
+    });
+    expect(malformed.statusCode).toBe(400);
+    const unknown = await app.inject({
+      method: "POST",
+      url: "/v1/auth/otp/verify",
+      payload: { phone: "01999999999", code: "123456" },
+    });
+    expect(unknown.statusCode).toBe(401);
+    expect(unknown.json().error.code).toBe("invalid_otp");
+  });
+
+  it("refresh rejects access token", async () => {
+    const access = app.jwt.sign({ sub: "u1", typ: "access" }, { expiresIn: "15m" });
+    const res = await app.inject({ method: "POST", url: "/v1/auth/refresh", payload: { refreshToken: access } });
+    expect(res.statusCode).toBe(401);
+    expect(res.json().error.code).toBe("unauthorized");
+  });
+
+  it("refresh issues a new pair for a refresh token", async () => {
+    const refresh = app.jwt.sign({ sub: "u1", typ: "refresh" }, { expiresIn: "30d" });
+    const res = await app.inject({ method: "POST", url: "/v1/auth/refresh", payload: { refreshToken: refresh } });
+    expect(res.statusCode).toBe(200);
+    expect(Object.keys(res.json()).sort()).toEqual(["accessToken", "refreshToken"]);
+  });
+
+  it("authenticate rejects refresh tokens and missing tokens", async () => {
+    const refresh = app.jwt.sign({ sub: "u1", typ: "refresh" }, { expiresIn: "30d" });
+    const a = await app.inject({ method: "GET", url: "/v1/me", headers: { authorization: `Bearer ${refresh}` } });
+    const b = await app.inject({ method: "GET", url: "/v1/me" });
+    expect(a.statusCode).toBe(401);
+    expect(b.statusCode).toBe(401);
+  });
+});
