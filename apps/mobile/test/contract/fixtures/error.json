@@ -1,0 +1,6 @@
+{
+  "_kind": "response",
+  "_operation": "PATCH /v1/families/{familyId}/transactions/{txnId}",
+  "_status": 404,
+  "body": { "error": { "code": "not_found", "message": "Transaction not found" } }
+}
