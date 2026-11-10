@@ -36,7 +36,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _requestOtp() => _run(() async {
-        final dev = await ref.read(apiClientProvider).requestOtp(_phone.text.trim());
+        final dev =
+            await ref.read(apiClientProvider).requestOtp(_phone.text.trim());
         setState(() {
           _sent = true;
           _hint = dev == null ? null : 'Dev OTP: $dev';
@@ -44,12 +45,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       });
 
   Future<void> _verify() => _run(() async {
-        await ref.read(authProvider.notifier).signIn(_phone.text.trim(), _code.text.trim());
+        await ref
+            .read(authProvider.notifier)
+            .signIn(_phone.text.trim(), _code.text.trim());
         if (!mounted) return;
         // First time signed in: walk through how to use it, spoken aloud.
-        final seen = await ref.read(localStoreProvider).getMeta('tutorial_done');
+        final seen =
+            await ref.read(localStoreProvider).getMeta('tutorial_done');
         if (mounted) {
-          Navigator.pushReplacementNamed(context, seen == null ? '/tutorial' : '/ai-entry');
+          Navigator.pushReplacementNamed(
+            context,
+            seen == null ? '/tutorial' : '/ai-entry',
+          );
         }
       });
 
@@ -65,14 +72,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             TextField(
               controller: _phone,
               keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(labelText: 'মোবাইল নম্বর', hintText: '01XXXXXXXXX', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: 'মোবাইল নম্বর',
+                hintText: '01XXXXXXXXX',
+                border: OutlineInputBorder(),
+              ),
             ),
             const SizedBox(height: 12),
             if (_sent) ...[
               TextField(
                 controller: _code,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: '৬ সংখ্যার কোড', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: '৬ সংখ্যার কোড',
+                  border: OutlineInputBorder(),
+                ),
               ),
               const SizedBox(height: 12),
             ],
@@ -83,11 +97,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Text(_sent ? 'লগইন' : 'OTP পাঠান'),
               ),
             ),
-            if (_hint != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(_hint!)),
+            if (_hint != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(_hint!),
+              ),
             if (_error != null)
               Padding(
                 padding: const EdgeInsets.only(top: 12),
-                child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                child: Text(
+                  _error!,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
               ),
           ],
         ),

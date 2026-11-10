@@ -33,8 +33,10 @@ class LocalStore {
   LocalStore._(this.db, this.nodeId, this._clock, this._now);
 
   /// Opens the store. A device keeps the same node id and clock across restarts.
-  static Future<LocalStore> open(AppDatabase db,
-      {DateTime Function()? now}) async {
+  static Future<LocalStore> open(
+    AppDatabase db, {
+    DateTime Function()? now,
+  }) async {
     Future<String?> get(String k) async =>
         (await (db.select(db.meta)..where((m) => m.key.equals(k)))
                 .getSingleOrNull())
@@ -43,17 +45,23 @@ class LocalStore {
     if (node == null) {
       node = 'd${_uuid.v4().substring(0, 8)}';
       await db.into(db.meta).insertOnConflictUpdate(
-          MetaCompanion.insert(key: _nodeKey, value: node));
+            MetaCompanion.insert(key: _nodeKey, value: node),
+          );
     }
     final saved = await get(_clockKey);
-    return LocalStore._(db, node,
-        saved == null ? Hlc.zero(node) : Hlc.parse(saved), now ?? DateTime.now);
+    return LocalStore._(
+      db,
+      node,
+      saved == null ? Hlc.zero(node) : Hlc.parse(saved),
+      now ?? DateTime.now,
+    );
   }
 
   Future<Hlc> _tick() async {
     _clock = _clock.send(_now());
     await db.into(db.meta).insertOnConflictUpdate(
-        MetaCompanion.insert(key: _clockKey, value: _clock.toString()));
+          MetaCompanion.insert(key: _clockKey, value: _clock.toString()),
+        );
     return _clock;
   }
 
@@ -117,8 +125,12 @@ class LocalStore {
     return rowId;
   }
 
-  Future<void> updateTransaction(String id,
-      {int? amountPaisa, String? categoryId, String? note}) async {
+  Future<void> updateTransaction(
+    String id, {
+    int? amountPaisa,
+    String? categoryId,
+    String? note,
+  }) async {
     final hlc = await _tick();
     final seq = await _nextSeq();
     await (db.update(db.transactions)..where((t) => t.id.equals(id))).write(
@@ -139,8 +151,9 @@ class LocalStore {
     final hlc = await _tick();
     await (db.update(db.transactions)..where((t) => t.id.equals(id))).write(
       TransactionsCompanion(
-          deletedAt: Value(_now().toUtc().toIso8601String()),
-          hlc: Value(hlc.toString())),
+        deletedAt: Value(_now().toUtc().toIso8601String()),
+        hlc: Value(hlc.toString()),
+      ),
     );
   }
 
@@ -155,13 +168,17 @@ class LocalStore {
 
   /// Income and expense totals in paisa for a UTC month range [start, end).
   Future<({int incomePaisa, int expensePaisa})> totals(
-      DateTime start, DateTime end) async {
+    DateTime start,
+    DateTime end,
+  ) async {
     final rows = await (db.select(db.transactions)
-          ..where((t) =>
-              t.deletedAt.isNull() &
-              t.occurredAt
-                  .isBiggerOrEqualValue(start.toUtc().toIso8601String()) &
-              t.occurredAt.isSmallerThanValue(end.toUtc().toIso8601String())))
+          ..where(
+            (t) =>
+                t.deletedAt.isNull() &
+                t.occurredAt
+                    .isBiggerOrEqualValue(start.toUtc().toIso8601String()) &
+                t.occurredAt.isSmallerThanValue(end.toUtc().toIso8601String()),
+          ))
         .get();
     var income = 0;
     var expense = 0;
@@ -177,8 +194,11 @@ class LocalStore {
   /// Changes made after [seq] in this device's change log, oldest first, tombstones included.
   /// Private entries are only passed on when [includePrivate] is set (for the server, which keeps them
   /// visible to their creator only); peers never get them.
-  Future<ChangeBatch> changesAfter(int seq,
-      {bool includePrivate = false, int limit = 500}) async {
+  Future<ChangeBatch> changesAfter(
+    int seq, {
+    bool includePrivate = false,
+    int limit = 500,
+  }) async {
     final q = db.select(db.transactions)
       ..orderBy([(t) => OrderingTerm.asc(t.localSeq)])
       ..limit(limit + 1);
@@ -190,8 +210,11 @@ class LocalStore {
     final rows = await q.get();
     final more = rows.length > limit;
     final page = more ? rows.sublist(0, limit) : rows;
-    return ChangeBatch(page.map(rowToJson).toList(),
-        page.isEmpty ? seq : page.last.localSeq, more);
+    return ChangeBatch(
+      page.map(rowToJson).toList(),
+      page.isEmpty ? seq : page.last.localSeq,
+      more,
+    );
   }
 
   /// Merge changes from a peer or the server. Per record, the greater HLC wins; applying the same
@@ -206,8 +229,10 @@ class LocalStore {
         final existing = await (db.select(db.transactions)
               ..where((t) => t.id.equals(c['id'] as String)))
             .getSingleOrNull();
-        if (existing != null && existing.hlc.compareTo(c['hlc'] as String) >= 0)
+        if (existing != null &&
+            existing.hlc.compareTo(c['hlc'] as String) >= 0) {
           continue;
+        }
         // Merged rows get a place in our own change log so peers and the server can fetch them from us.
         final seq = await _nextSeq();
         await db
@@ -216,7 +241,8 @@ class LocalStore {
         changed++;
       }
       await db.into(db.meta).insertOnConflictUpdate(
-          MetaCompanion.insert(key: _clockKey, value: _clock.toString()));
+            MetaCompanion.insert(key: _clockKey, value: _clock.toString()),
+          );
     });
     return changed;
   }
@@ -227,13 +253,15 @@ class LocalStore {
     final id = _uuid.v4();
     final order = int.parse(await getMeta('pending_order') ?? '0') + 1;
     await setMeta('pending_order', '$order');
-    await db.into(db.pendingEntries).insert(PendingEntriesCompanion.insert(
-          id: id,
-          rawText: text,
-          queueOrder: order,
-          source: Value(source),
-          createdAt: _now().toUtc().toIso8601String(),
-        ));
+    await db.into(db.pendingEntries).insert(
+          PendingEntriesCompanion.insert(
+            id: id,
+            rawText: text,
+            queueOrder: order,
+            source: Value(source),
+            createdAt: _now().toUtc().toIso8601String(),
+          ),
+        );
     return id;
   }
 
@@ -255,25 +283,28 @@ class LocalStore {
         await (db.delete(db.pendingEntries)..where((p) => p.id.equals(id)))
             .go();
         for (var i = 0; i < drafts.length; i++) {
-          await db
-              .into(db.pendingEntries)
-              .insert(PendingEntriesCompanion.insert(
-                id: _uuid.v4(),
-                rawText: row.rawText,
-                queueOrder: row.queueOrder,
-                subOrder: Value(i),
-                source: Value(row.source),
-                createdAt: row.createdAt,
-                status: const Value('ready'),
-                draftJson: Value(jsonEncode(drafts[i])),
-              ));
+          await db.into(db.pendingEntries).insert(
+                PendingEntriesCompanion.insert(
+                  id: _uuid.v4(),
+                  rawText: row.rawText,
+                  queueOrder: row.queueOrder,
+                  subOrder: Value(i),
+                  source: Value(row.source),
+                  createdAt: row.createdAt,
+                  status: const Value('ready'),
+                  draftJson: Value(jsonEncode(drafts[i])),
+                ),
+              );
         }
       });
 
   Future<void> markFailed(String id, String error) =>
       (db.update(db.pendingEntries)..where((p) => p.id.equals(id))).write(
-          PendingEntriesCompanion(
-              status: const Value('failed'), error: Value(error)));
+        PendingEntriesCompanion(
+          status: const Value('failed'),
+          error: Value(error),
+        ),
+      );
 
   Future<void> deletePending(String id) =>
       (db.delete(db.pendingEntries)..where((p) => p.id.equals(id))).go();
@@ -284,17 +315,17 @@ class LocalStore {
     await db.transaction(() async {
       await db.delete(db.cachedCategories).go();
       for (final r in rows) {
-        await db
-            .into(db.cachedCategories)
-            .insert(CachedCategoriesCompanion.insert(
-              id: r['id'] as String,
-              key: r['key'] as String,
-              kind: r['kind'] as String,
-              nameEn: r['nameEn'] as String,
-              nameBn: r['nameBn'] as String,
-              icon: Value(r['icon'] as String?),
-              isHidden: Value((r['isHidden'] ?? false) as bool),
-            ));
+        await db.into(db.cachedCategories).insert(
+              CachedCategoriesCompanion.insert(
+                id: r['id'] as String,
+                key: r['key'] as String,
+                kind: r['kind'] as String,
+                nameEn: r['nameEn'] as String,
+                nameBn: r['nameBn'] as String,
+                icon: Value(r['icon'] as String?),
+                isHidden: Value((r['isHidden'] ?? false) as bool),
+              ),
+            );
       }
     });
   }
@@ -305,9 +336,10 @@ class LocalStore {
       for (final r in rows) {
         await db.into(db.cachedAccounts).insert(
               CachedAccountsCompanion.insert(
-                  id: r['id'] as String,
-                  name: r['name'] as String,
-                  type: r['type'] as String),
+                id: r['id'] as String,
+                name: r['name'] as String,
+                type: r['type'] as String,
+              ),
             );
       }
     });

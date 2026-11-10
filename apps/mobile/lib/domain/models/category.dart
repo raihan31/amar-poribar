@@ -8,7 +8,7 @@ class Category {
   final TransactionType type;
 
   // CRDT specific fields
-  final int isDeleted; 
+  final int isDeleted;
   final String hlc;
 
   Category({
@@ -39,7 +39,7 @@ class Category {
       name: map['name'] as String,
       icon: map['icon'] as String,
       colorHex: map['color_hex'] as String,
-      type: TransactionType.fromString(map['type']),
+      type: TransactionType.fromString(map['type'] as String),
       isDeleted: map['is_deleted'] as int,
       hlc: map['hlc'] as String,
     );

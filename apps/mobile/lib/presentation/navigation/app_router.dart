@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../screens/ai_entry_screen.dart';
+import '../screens/dashboard_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/onboarding_screen.dart';
-import '../screens/dashboard_screen.dart';
-import '../screens/transaction_screen.dart';
 import '../screens/settings_screen.dart';
+import '../screens/transaction_screen.dart';
 import '../screens/tutorial_screen.dart'; // contains PendingSmsScreen too
 
 class AppRouter {
@@ -21,13 +21,13 @@ class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case onboardingRoute:
-        return MaterialPageRoute(builder: (_) => OnboardingScreen());
+        return MaterialPageRoute(builder: (_) => const OnboardingScreen());
       case dashboardRoute:
-        return MaterialPageRoute(builder: (_) => DashboardScreen());
+        return MaterialPageRoute(builder: (_) => const DashboardScreen());
       case transactionsRoute:
         return MaterialPageRoute(builder: (_) => const TransactionScreen());
       case pendingSmsRoute:
-        return MaterialPageRoute(builder: (_) => PendingSmsScreen());
+        return MaterialPageRoute(builder: (_) => const PendingSmsScreen());
       case loginRoute:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case tutorialRoute:
@@ -35,7 +35,7 @@ class AppRouter {
       case aiEntryRoute:
         return MaterialPageRoute(builder: (_) => const AiEntryScreen());
       case settingsRoute:
-        return MaterialPageRoute(builder: (_) => SettingsScreen());
+        return MaterialPageRoute(builder: (_) => const SettingsScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

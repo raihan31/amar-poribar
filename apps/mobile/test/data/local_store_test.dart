@@ -1,7 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:amar_poribar/data/database/database.dart';
 import 'package:amar_poribar/data/database/local_store.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// Two phones with their own databases and wall clocks.
 Future<LocalStore> device(DateTime Function() now) =>
@@ -20,7 +19,7 @@ Future<Map<String, String?>> snapshot(LocalStore s) async {
   return {
     for (final r in all)
       r['id'] as String:
-          '${r['amountPaisa']}|${r['note']}|${r['deletedAt'] != null}|${r['hlc']}'
+          '${r['amountPaisa']}|${r['note']}|${r['deletedAt'] != null}|${r['hlc']}',
   };
 }
 
@@ -32,9 +31,17 @@ void main() {
     final a = await device(() => clockA);
     final b = await device(() => clockB);
     await a.addTransaction(
-        id: 'a1', type: 'expense', amountPaisa: 85000, note: 'bazaar');
+      id: 'a1',
+      type: 'expense',
+      amountPaisa: 85000,
+      note: 'bazaar',
+    );
     await b.addTransaction(
-        id: 'b1', type: 'income', amountPaisa: 500000, note: 'salary');
+      id: 'b1',
+      type: 'income',
+      amountPaisa: 500000,
+      note: 'salary',
+    );
     await sync(a, b);
     expect((await snapshot(a)).keys.toSet(), {'a1', 'b1'});
     expect(await snapshot(a), await snapshot(b));
@@ -45,7 +52,11 @@ void main() {
     final a = await device(() => clockA);
     final b = await device(() => clockB);
     await a.addTransaction(
-        id: 'x', type: 'expense', amountPaisa: 1000, note: 'v1');
+      id: 'x',
+      type: 'expense',
+      amountPaisa: 1000,
+      note: 'v1',
+    );
     await sync(a, b);
     clockA = DateTime.utc(2026, 11, 9, 10, 5);
     clockB = DateTime.utc(2026, 11, 9, 10, 9);
@@ -92,7 +103,9 @@ void main() {
     expect(later.rows.map((r) => r['id']), ['2', '1']);
   });
 
-  test('an entry made offline with an old HLC is still delivered after the cursor', () async {
+  test(
+      'an entry made offline with an old HLC is still delivered after the cursor',
+      () async {
     // The flaw an HLC cursor has: B's entry carries an older HLC than what A already holds.
     final a = await device(() => DateTime.utc(2026, 11, 9, 12));
     final b = await device(() => DateTime.utc(2026, 11, 9, 8));
@@ -120,7 +133,11 @@ void main() {
   test('private entries are not shared unless asked', () async {
     final a = await device(() => clockA);
     await a.addTransaction(
-        id: 'p', type: 'expense', amountPaisa: 1, isPrivate: true);
+      id: 'p',
+      type: 'expense',
+      amountPaisa: 1,
+      isPrivate: true,
+    );
     expect((await a.changesAfter(0)).rows, isEmpty);
     expect((await a.changesAfter(0, includePrivate: true)).rows, hasLength(1));
   });
@@ -144,18 +161,21 @@ void main() {
   test('totals add up income and expense including fees for a month', () async {
     final a = await device(() => clockA);
     await a.addTransaction(
-        type: 'expense',
-        amountPaisa: 85000,
-        feePaisa: 500,
-        occurredAt: DateTime.utc(2026, 11, 3));
+      type: 'expense',
+      amountPaisa: 85000,
+      feePaisa: 500,
+      occurredAt: DateTime.utc(2026, 11, 3),
+    );
     await a.addTransaction(
-        type: 'income',
-        amountPaisa: 500000,
-        occurredAt: DateTime.utc(2026, 11, 4));
+      type: 'income',
+      amountPaisa: 500000,
+      occurredAt: DateTime.utc(2026, 11, 4),
+    );
     await a.addTransaction(
-        type: 'expense',
-        amountPaisa: 999,
-        occurredAt: DateTime.utc(2026, 10, 30));
+      type: 'expense',
+      amountPaisa: 999,
+      occurredAt: DateTime.utc(2026, 10, 30),
+    );
     final t = await a.totals(DateTime.utc(2026, 11), DateTime.utc(2026, 12));
     expect(t.expensePaisa, 85500);
     expect(t.incomePaisa, 500000);

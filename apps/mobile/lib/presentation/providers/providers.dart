@@ -7,7 +7,8 @@ import '../../domain/models/enums.dart';
 /// in-memory one.
 final localStoreProvider = Provider<LocalStore>((ref) {
   throw StateError(
-      'localStoreProvider must be overridden with an opened LocalStore');
+    'localStoreProvider must be overridden with an opened LocalStore',
+  );
 });
 
 class AppState {
@@ -55,11 +56,13 @@ class AppStateNotifier extends StateNotifier<AppState> {
     state = state.copyWith(activeRole: role);
   }
 
-  Future<void> addExpense(double taka,
-      {String? note,
-      String? categoryId,
-      String? accountId,
-      String source = 'manual'}) async {
+  Future<void> addExpense(
+    double taka, {
+    String? note,
+    String? categoryId,
+    String? accountId,
+    String source = 'manual',
+  }) async {
     await store.addTransaction(
       type: 'expense',
       amountPaisa: (taka * 100).round(),
@@ -71,11 +74,13 @@ class AppStateNotifier extends StateNotifier<AppState> {
     await reload();
   }
 
-  Future<void> addIncome(double taka,
-      {String? note,
-      String? categoryId,
-      String? accountId,
-      String source = 'manual'}) async {
+  Future<void> addIncome(
+    double taka, {
+    String? note,
+    String? categoryId,
+    String? accountId,
+    String source = 'manual',
+  }) async {
     await store.addTransaction(
       type: 'income',
       amountPaisa: (taka * 100).round(),

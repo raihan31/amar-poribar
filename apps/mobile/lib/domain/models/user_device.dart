@@ -4,11 +4,12 @@ class UserDevice {
   final String id;
   final Role role;
   final String name;
-  final String publicKey; // For encrypting data targeted to this specific device (optional, for future)
+  final String
+      publicKey; // For encrypting data targeted to this specific device (optional, for future)
   final String masterKeyHash; // Verifying they belong to the family
-  
+
   // CRDT specific fields
-  final int isDeleted; 
+  final int isDeleted;
   final String hlc;
 
   UserDevice({
@@ -36,7 +37,7 @@ class UserDevice {
   factory UserDevice.fromMap(Map<String, dynamic> map) {
     return UserDevice(
       id: map['id'] as String,
-      role: Role.fromString(map['role']),
+      role: Role.fromString(map['role'] as String),
       name: map['name'] as String,
       publicKey: map['public_key'] as String,
       masterKeyHash: map['master_key_hash'] as String,

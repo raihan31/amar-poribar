@@ -34,14 +34,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       builder: (ctx) => AlertDialog(
         title: const Text('কাছের ফোনের সাথে সিঙ্ক?'),
         content: Text(
-            'ফোন: ${peer.name}\nকোড: ${peer.authCode}\n\nদুই ফোনেই একই কোড দেখালে "হ্যাঁ" চাপুন।'),
+          'ফোন: ${peer.name}\nকোড: ${peer.authCode}\n\nদুই ফোনেই একই কোড দেখালে "হ্যাঁ" চাপুন।',
+        ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('না')),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('না'),
+          ),
           FilledButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('হ্যাঁ')),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('হ্যাঁ'),
+          ),
         ],
       ),
     );
@@ -59,8 +62,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
     final family = ref.read(authProvider).family;
     if (family == null) {
-      setState(() =>
-          _status = 'প্রথমে একবার লগইন করে পরিবারে যোগ দিন (ইন্টারনেট লাগবে)।');
+      setState(
+        () => _status =
+            'প্রথমে একবার লগইন করে পরিবারে যোগ দিন (ইন্টারনেট লাগবে)।',
+      );
       return;
     }
     final engine = PeerSyncEngine(
@@ -78,8 +83,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       await engine.start();
       setState(() => _engine = engine);
     } catch (e) {
-      setState(() => _status =
-          'কাছের সিঙ্ক চালু করা যায়নি: অনুমতি দিন (ব্লুটুথ, লোকেশন)।');
+      setState(
+        () => _status =
+            'কাছের সিঙ্ক চালু করা যায়নি: অনুমতি দিন (ব্লুটুথ, লোকেশন)।',
+      );
     }
   }
 
@@ -94,8 +101,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       await sync.refreshReferenceData(family.id);
       final r = await sync.sync(family.id);
       await ref.read(appStateProvider.notifier).reload();
-      setState(() => _status =
-          'সার্ভারের সাথে সিঙ্ক হয়েছে: ${r.pushed} পাঠানো, ${r.pulled} পাওয়া');
+      setState(
+        () => _status =
+            'সার্ভারের সাথে সিঙ্ক হয়েছে: ${r.pushed} পাঠানো, ${r.pulled} পাওয়া',
+      );
     } catch (e) {
       setState(() => _status = e.toString());
     }

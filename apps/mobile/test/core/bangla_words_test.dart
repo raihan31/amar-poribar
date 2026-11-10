@@ -1,6 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:amar_poribar/core/speech/bangla_words.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   // Same cases as packages/shared/src/words.test.ts, so both implementations agree.
@@ -28,7 +27,11 @@ void main() {
 
   test('draft read-back matches the web wording', () {
     expect(
-      draftToSpeech(type: 'expense', amountPaisa: 85000, categoryName: 'বাজার ও মুদি'),
+      draftToSpeech(
+        type: 'expense',
+        amountPaisa: 85000,
+        categoryName: 'বাজার ও মুদি',
+      ),
       'বাজার ও মুদি খাতে আটশো পঞ্চাশ টাকা খরচ। ঠিক আছে?',
     );
     expect(
@@ -37,5 +40,8 @@ void main() {
     );
   });
 
-  test('rejects negative numbers', () => expect(() => numberToBanglaWords(-1), throwsRangeError));
+  test(
+    'rejects negative numbers',
+    () => expect(() => numberToBanglaWords(-1), throwsRangeError),
+  );
 }

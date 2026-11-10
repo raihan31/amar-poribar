@@ -1,7 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:amar_poribar/core/speech/budget_alerts.dart';
 import 'package:amar_poribar/core/speech/tutorial.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 BudgetStatus b(String? id, String name, int limit, int spent, String level) =>
     BudgetStatus(id, name, limit, spent, level);
@@ -17,8 +16,10 @@ void main() {
     expect(a, hasLength(1));
     expect(a.single.level, 'warning');
     expect(a.single.text, contains('বাজার ও মুদি'));
-    expect(a.single.text,
-        contains('একহাজার টাকা'.replaceAll('একহাজার', 'এক হাজার')));
+    expect(
+      a.single.text,
+      contains('একহাজার টাকা'.replaceAll('একহাজার', 'এক হাজার')),
+    );
     expect(a.single.text, contains('নয়শো টাকা'));
   });
 
@@ -33,8 +34,11 @@ void main() {
   test('does not repeat the same alert, but does speak when it gets worse', () {
     final warn = [b('c1', 'বাজার', 100000, 90000, 'warning')];
     expect(alertsToSpeak(warn, {'c1': 'warning'}), isEmpty);
-    expect(alertsToSpeak(warn, {'c1': 'exceeded'}), isEmpty,
-        reason: 'never step back down');
+    expect(
+      alertsToSpeak(warn, {'c1': 'exceeded'}),
+      isEmpty,
+      reason: 'never step back down',
+    );
     final over = [b('c1', 'বাজার', 100000, 120000, 'exceeded')];
     expect(alertsToSpeak(over, {'c1': 'warning'}), hasLength(1));
   });
@@ -42,7 +46,7 @@ void main() {
   test('each budget is tracked separately', () {
     final both = [
       b('c1', 'বাজার', 100, 90, 'warning'),
-      b('c2', 'ভাড়া', 100, 95, 'warning')
+      b('c2', 'ভাড়া', 100, 95, 'warning'),
     ];
     final a = alertsToSpeak(both, {'c1': 'warning'});
     expect(a.map((x) => x.key), ['c2']);
@@ -52,8 +56,11 @@ void main() {
     expect(kTutorialSteps.length, inInclusiveRange(4, 8));
     for (final s in kTutorialSteps) {
       expect(s.length, lessThan(160), reason: 'short enough to listen to');
-      expect(RegExp(r'[0-9]').hasMatch(s), isFalse,
-          reason: 'digits are read badly by TTS; use words');
+      expect(
+        RegExp(r'[0-9]').hasMatch(s),
+        isFalse,
+        reason: 'digits are read badly by TTS; use words',
+      );
     }
   });
 }

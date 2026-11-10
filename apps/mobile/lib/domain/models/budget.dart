@@ -1,14 +1,14 @@
-
 class Budget {
   final String id;
-  final String roleOwnerId; // Applies specifically to a Role, or 'family' for global
+  final String
+      roleOwnerId; // Applies specifically to a Role, or 'family' for global
   final String? categoryId; // Null implies total overall budget
   final double amount;
   final DateTime periodStart;
   final DateTime periodEnd;
 
   // CRDT specific fields
-  final int isDeleted; 
+  final int isDeleted;
   final String hlc;
 
   Budget({
@@ -41,8 +41,8 @@ class Budget {
       roleOwnerId: map['role_owner_id'] as String,
       categoryId: map['category_id'] as String?,
       amount: (map['amount'] as num).toDouble(),
-      periodStart: DateTime.parse(map['period_start']),
-      periodEnd: DateTime.parse(map['period_end']),
+      periodStart: DateTime.parse(map['period_start'] as String),
+      periodEnd: DateTime.parse(map['period_end'] as String),
       isDeleted: map['is_deleted'] as int,
       hlc: map['hlc'] as String,
     );

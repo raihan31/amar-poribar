@@ -34,8 +34,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
     super.dispose();
   }
 
-  Future<void> _speak() =>
-      _voice.speak(kTutorialSteps[_step]);
+  Future<void> _speak() => _voice.speak(kTutorialSteps[_step]);
 
   Future<void> _go(int delta) async {
     final next = _step + delta;
@@ -57,7 +56,8 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            'কীভাবে ব্যবহার করবেন (${_step + 1}/${kTutorialSteps.length})'),
+          'কীভাবে ব্যবহার করবেন (${_step + 1}/${kTutorialSteps.length})',
+        ),
         actions: [TextButton(onPressed: _finish, child: const Text('বাদ দিন'))],
       ),
       body: Padding(
@@ -67,9 +67,11 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
           children: [
             Expanded(
               child: Center(
-                child: Text(kTutorialSteps[_step],
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 24, height: 1.6)),
+                child: Text(
+                  kTutorialSteps[_step],
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 24, height: 1.6),
+                ),
               ),
             ),
             SizedBox(
@@ -81,28 +83,33 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            Row(children: [
-              Expanded(
-                child: SizedBox(
-                  height: 64,
-                  child: OutlinedButton(
-                    onPressed: _step == 0 ? null : () => _go(-1),
-                    child: const Text('পেছনে', style: TextStyle(fontSize: 20)),
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 64,
+                    child: OutlinedButton(
+                      onPressed: _step == 0 ? null : () => _go(-1),
+                      child:
+                          const Text('পেছনে', style: TextStyle(fontSize: 20)),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: SizedBox(
-                  height: 64,
-                  child: FilledButton(
-                    onPressed: () => _go(1),
-                    child: Text(last ? 'শুরু করুন' : 'পরের ধাপ',
-                        style: const TextStyle(fontSize: 20)),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: SizedBox(
+                    height: 64,
+                    child: FilledButton(
+                      onPressed: () => _go(1),
+                      child: Text(
+                        last ? 'শুরু করুন' : 'পরের ধাপ',
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ]),
+              ],
+            ),
           ],
         ),
       ),

@@ -57,7 +57,9 @@ class PeerSyncEngine {
     switch (e) {
       case PeerConnected(:final peerId):
         await _send(
-            peerId, {'t': 'hello', 'node': store.nodeId, 'family': familyId});
+          peerId,
+          {'t': 'hello', 'node': store.nodeId, 'family': familyId},
+        );
       case PeerDisconnected(:final peerId):
         _peerNodes.remove(peerId);
         _dropped.remove(peerId);
@@ -66,7 +68,8 @@ class PeerSyncEngine {
           await _onMessage(peerId, jsonDecode(text) as Map<String, dynamic>);
         } on ClockDriftException {
           onStatus?.call(
-              "A nearby phone's date and time are wrong, so its changes were not accepted.");
+            "A nearby phone's date and time are wrong, so its changes were not accepted.",
+          );
         } catch (_) {
           // A malformed message from a peer must not stop syncing with others.
         }
@@ -86,21 +89,26 @@ class PeerSyncEngine {
         _peerNodes[peerId] = node;
         await _pull(peerId, node);
       case 'pull':
-        if (!_peerNodes.containsKey(peerId))
+        if (!_peerNodes.containsKey(peerId)) {
           return; // no data before a valid hello
+        }
         await _answerPull(peerId, (m['after'] as num).toInt());
       case 'push':
         final node = _peerNodes[peerId];
         if (node == null) return;
         final rows = [
-          for (final r in m['rows'] as List) Map<String, dynamic>.from(r as Map)
+          for (final r in m['rows'] as List)
+            Map<String, dynamic>.from(r as Map),
         ];
         final changed = await store.applyChanges(rows);
         // Only move the cursor once the rows are safely merged.
         await store.setMeta(
-            _cursorKey(node), '${(m['lastSeq'] as num).toInt()}');
-        if (changed > 0)
+          _cursorKey(node),
+          '${(m['lastSeq'] as num).toInt()}',
+        );
+        if (changed > 0) {
           onStatus?.call('Received $changed change(s) from a nearby phone.');
+        }
         if (m['more'] == true) await _pull(peerId, node);
     }
   }
@@ -121,14 +129,15 @@ class PeerSyncEngine {
         't': 'push',
         'rows': batch.rows,
         'lastSeq': batch.lastSeq,
-        'more': batch.more
+        'more': batch.more,
       });
       if (utf8.encode(msg).length <= transport.maxMessageBytes) {
         await transport.send(peerId, msg);
         return;
       }
-      if (limit == 1)
+      if (limit == 1) {
         return; // a single row too large to send: skip rather than loop
+      }
       limit = (limit / 2).ceil();
     }
   }

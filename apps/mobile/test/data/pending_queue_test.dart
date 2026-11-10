@@ -1,9 +1,8 @@
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:amar_poribar/data/api/api_client.dart';
 import 'package:amar_poribar/data/database/database.dart';
 import 'package:amar_poribar/data/database/local_store.dart';
 import 'package:amar_poribar/data/sync/pending_queue.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 TransactionDraft draft(int paisa, {String note = 'n'}) => TransactionDraft(
       type: 'expense',
@@ -27,8 +26,11 @@ class ScriptedApi extends ApiClient {
   final seen = <String>[];
 
   @override
-  Future<List<TransactionDraft>> parse(String familyId, String text,
-      {DateTime? now}) async {
+  Future<List<TransactionDraft>> parse(
+    String familyId,
+    String text, {
+    DateTime? now,
+  }) async {
     seen.add(text);
     final r = script[text];
     if (r is ApiException) throw r;
@@ -36,8 +38,10 @@ class ScriptedApi extends ApiClient {
   }
 }
 
-Future<LocalStore> store() => LocalStore.open(AppDatabase.memory(),
-    now: () => DateTime.utc(2026, 11, 9, 10));
+Future<LocalStore> store() => LocalStore.open(
+      AppDatabase.memory(),
+      now: () => DateTime.utc(2026, 11, 9, 10),
+    );
 
 void main() {
   test(
@@ -57,8 +61,11 @@ void main() {
     final ready = await PendingQueue(s, api).readyDrafts();
     expect(ready.map((d) => d.amountPaisa), [85000, 1000, 2000]);
     expect(ready.every((d) => d.pendingId != null), isTrue);
-    expect(ready[1].source, 'voice',
-        reason: 'a spoken entry stays marked as voice');
+    expect(
+      ready[1].source,
+      'voice',
+      reason: 'a spoken entry stays marked as voice',
+    );
     // Nothing was saved as a real transaction yet.
     expect((await s.changesAfter(0, includePrivate: true)).rows, isEmpty);
   });
@@ -83,10 +90,15 @@ void main() {
       'c': [draft(3)],
     });
     await PendingQueue(s, api).process('f1');
-    expect(api.seen, ['a', 'b'],
-        reason: 'it stops at the first offline failure');
-    expect((await s.pending()).map((p) => '${p.rawText}:${p.status}'),
-        ['a:ready', 'b:queued', 'c:queued']);
+    expect(
+      api.seen,
+      ['a', 'b'],
+      reason: 'it stops at the first offline failure',
+    );
+    expect(
+      (await s.pending()).map((p) => '${p.rawText}:${p.status}'),
+      ['a:ready', 'b:queued', 'c:queued'],
+    );
   });
 
   test('quota used up marks only that item failed, with the reason', () async {
@@ -110,7 +122,9 @@ void main() {
     final api =
         ScriptedApi({'x': ApiException(401, 'Missing or invalid token')});
     await expectLater(
-        PendingQueue(s, api).process('f1'), throwsA(isA<ApiException>()));
+      PendingQueue(s, api).process('f1'),
+      throwsA(isA<ApiException>()),
+    );
     expect((await s.pending()).single.status, 'queued');
   });
 
@@ -128,10 +142,11 @@ void main() {
     final s = await store();
     await s.queueText('once');
     final q = PendingQueue(
-        s,
-        ScriptedApi({
-          'once': [draft(7)]
-        }));
+      s,
+      ScriptedApi({
+        'once': [draft(7)],
+      }),
+    );
     await q.process('f1');
     await q.process('f1');
     final ready = await q.readyDrafts();

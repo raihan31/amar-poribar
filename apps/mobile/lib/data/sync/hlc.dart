@@ -37,18 +37,23 @@ class Hlc implements Comparable<Hlc> {
 
   /// Clock value for a local event (create, edit, delete).
   Hlc send(DateTime now) {
-    final wall = DateTime.fromMillisecondsSinceEpoch(now.millisecondsSinceEpoch,
-        isUtc: true);
+    final wall = DateTime.fromMillisecondsSinceEpoch(
+      now.millisecondsSinceEpoch,
+      isUtc: true,
+    );
     if (wall.isAfter(time)) return Hlc(wall, 0, nodeId);
-    if (counter >= maxCounter)
+    if (counter >= maxCounter) {
       return Hlc(time.add(const Duration(milliseconds: 1)), 0, nodeId);
+    }
     return Hlc(time, counter + 1, nodeId);
   }
 
   /// Clock value after seeing [remote], so later local events sort after it.
   Hlc receive(Hlc remote, DateTime now) {
-    final wall = DateTime.fromMillisecondsSinceEpoch(now.millisecondsSinceEpoch,
-        isUtc: true);
+    final wall = DateTime.fromMillisecondsSinceEpoch(
+      now.millisecondsSinceEpoch,
+      isUtc: true,
+    );
     if (remote.time.isAfter(wall.add(maxDrift))) {
       throw ClockDriftException(remote);
     }

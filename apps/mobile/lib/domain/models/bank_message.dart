@@ -10,7 +10,7 @@ class BankMessage {
   final DateTime receivedAt;
 
   // CRDT specific
-  final int isDeleted; 
+  final int isDeleted;
   final String hlc;
 
   BankMessage({
@@ -44,10 +44,14 @@ class BankMessage {
       id: map['id'] as String,
       rawText: map['raw_text'] as String,
       sender: map['sender'] as String,
-      status: BankMessageStatus.fromString(map['status']),
-      detectedAmount: map['detected_amount'] == null ? null : (map['detected_amount'] as num).toDouble(),
-      detectedType: map['detected_type'] == null ? null : TransactionType.fromString(map['detected_type']),
-      receivedAt: DateTime.parse(map['received_at']),
+      status: BankMessageStatus.fromString(map['status'] as String),
+      detectedAmount: map['detected_amount'] == null
+          ? null
+          : (map['detected_amount'] as num).toDouble(),
+      detectedType: map['detected_type'] == null
+          ? null
+          : TransactionType.fromString(map['detected_type'] as String),
+      receivedAt: DateTime.parse(map['received_at'] as String),
       isDeleted: map['is_deleted'] as int,
       hlc: map['hlc'] as String,
     );
