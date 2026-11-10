@@ -13,7 +13,7 @@ export {
   txnSyncSeq,
   txnTypeEnum,
 } from "../modules/ledger/schema.js";
-import { accounts, categories, txnTypeEnum } from "../modules/ledger/schema.js";
+import { categories } from "../modules/ledger/schema.js";
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -22,7 +22,6 @@ const timestamps = {
 
 // `users` is owned by the identity module (T-PLAT-23); re-exported so the legacy tables below keep their foreign keys.
 export { users } from "../modules/identity/schema.js";
-import { users } from "../modules/identity/schema.js";
 
 // `families`, `family_members` and `family_invites` are owned by the families module (T-PLAT-24). Only the
 // `families` table is re-exported, so the legacy tables below keep their foreign keys and the AI quota lookup.
@@ -30,30 +29,6 @@ export { families } from "../modules/families/schema.js";
 import { families } from "../modules/families/schema.js";
 
 // `budgets` and `festival_budgets` are owned by the budgeting module (T-PLAT-26).
-
-/** Monthly template that produces a draft each month for the user to confirm (FR-TXN-06). */
-export const recurringTemplates = pgTable("recurring_templates", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  familyId: uuid("family_id")
-    .notNull()
-    .references(() => families.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  type: txnTypeEnum("type").notNull().default("expense"),
-  amountPaisa: bigint("amount_paisa", { mode: "number" }).notNull(),
-  categoryId: uuid("category_id").references(() => categories.id),
-  accountId: uuid("account_id").references(() => accounts.id),
-  dayOfMonth: integer("day_of_month").notNull(),
-  startsOn: text("starts_on").notNull(),
-  endsOn: text("ends_on"),
-  remindDaysBefore: integer("remind_days_before").notNull().default(2),
-  active: boolean("active").notNull().default(true),
-  /** Last month (YYYY-MM) whose draft was confirmed; stops the same month being recorded twice. */
-  lastConfirmedMonth: text("last_confirmed_month"),
-  createdBy: uuid("created_by")
-    .notNull()
-    .references(() => users.id),
-  ...timestamps,
-});
 
 export const aiUsage = pgTable(
   "ai_usage",

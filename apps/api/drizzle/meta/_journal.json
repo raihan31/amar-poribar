@@ -78,6 +78,13 @@
       "when": 1794348395100,
       "tag": "0010_budgeting_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794348428148,
+      "tag": "0011_recurring_tables",
+      "breakpoints": true
     }
   ]
 }

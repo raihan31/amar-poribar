@@ -1,6 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "./app.js";
-import { dueDateIn, isDueIn, reminderState } from "./recurring.js";
 import { CreateRecurringSchema } from "@amar-poribar/shared";
 import { csvCell, csvRow, dhakaStamp, paisaToDecimal } from "./csv.js";
 import type { Db } from "./db/client.js";
@@ -147,41 +146,9 @@ describe("festival budgets", () => {
 });
 
 describe("recurring entries", () => {
-  const base = {
-    dayOfMonth: 5,
-    startsOn: "2026-01-01",
-    endsOn: null,
-    active: true,
-    lastConfirmedMonth: null,
-    remindDaysBefore: 2,
-  };
-
   it("requires auth", async () => {
     expect((await app.inject({ method: "GET", url: "/v1/families/x/recurring/drafts" })).statusCode).toBe(401);
     expect((await app.inject({ method: "POST", url: "/v1/families/x/recurring/y/confirm" })).statusCode).toBe(401);
-  });
-
-  it("clamps the due day to short months", () => {
-    expect(dueDateIn("2026-02", 31)).toBe("2026-02-28");
-    expect(dueDateIn("2028-02", 30)).toBe("2028-02-29");
-    expect(dueDateIn("2026-11", 31)).toBe("2026-11-30");
-    expect(dueDateIn("2026-11", 5)).toBe("2026-11-05");
-  });
-
-  it("is due once per month, within its dates and only while active", () => {
-    expect(isDueIn(base, "2026-11")).toBe(true);
-    expect(isDueIn({ ...base, lastConfirmedMonth: "2026-11" }, "2026-11")).toBe(false);
-    expect(isDueIn({ ...base, lastConfirmedMonth: "2026-10" }, "2026-11")).toBe(true);
-    expect(isDueIn({ ...base, startsOn: "2026-11-06" }, "2026-11")).toBe(false);
-    expect(isDueIn({ ...base, endsOn: "2026-10-31" }, "2026-11")).toBe(false);
-    expect(isDueIn({ ...base, active: false }, "2026-11")).toBe(false);
-  });
-
-  it("reminds from N days before until it is confirmed", () => {
-    expect(reminderState(base, "2026-11-02")).toBeNull();
-    expect(reminderState(base, "2026-11-03")).toEqual({ due: "2026-11-05", daysUntil: 2 });
-    expect(reminderState(base, "2026-11-09")).toEqual({ due: "2026-11-05", daysUntil: -4 });
-    expect(reminderState({ ...base, lastConfirmedMonth: "2026-11" }, "2026-11-09")).toBeNull();
   });
 
   it("validates templates", () => {

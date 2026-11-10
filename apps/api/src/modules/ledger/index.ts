@@ -6,6 +6,7 @@ import { assertNoClockDrift } from "./app/clock-drift.js";
 import { getCategoryByKey, listCategories } from "./app/categories.js";
 import type { LedgerDeps } from "./app/deps.js";
 import { applyChange, type ApplyResult } from "./app/apply-sync-change.js";
+import { assertOwnedRefs } from "./app/refs.js";
 import { listChangesAfter, type ChangesPage } from "./app/list-for-sync.js";
 import { expenseTotalBetween, monthTotals, type MonthTotals } from "./app/month-totals.js";
 import { remittanceByMonth, type RemittanceByMonth } from "./app/remittance.js";
@@ -34,6 +35,11 @@ export interface LedgerFacade {
   getCategoryByKey(familyId: string, key: string): Promise<Category | null>;
   /** The caller has already checked the member role (for example recurring confirm). */
   createTransaction(familyId: string, actor: { userId: string }, input: CreateTransactionInput): Promise<Transaction>;
+  /** 400 `invalid_category` / `invalid_account` unless the category and account belong to this family. */
+  assertOwnedRefs(
+    familyId: string,
+    refs: { categoryId?: string | null | undefined; accountId?: string | null | undefined },
+  ): Promise<void>;
   /** Oldest first; other members' private entries are excluded (FR-TXN-05). */
   listForExport(familyId: string, userId: string, range: { start: Date; end: Date }): AsyncIterable<ExportRow>;
   /** Remittance received vs. spending for each month from `from` to `to` (YYYY-MM, inclusive). */
@@ -71,6 +77,7 @@ export const ledgerModule: ModuleDefinition<LedgerFacade> = {
       listCategories: (familyId) => listCategories(deps, familyId),
       getCategoryByKey: (familyId, key) => getCategoryByKey(deps, familyId, key),
       createTransaction: (familyId, actor, data) => createTransaction(deps, { familyId, actorId: actor.userId, data }),
+      assertOwnedRefs: (familyId, refs) => assertOwnedRefs(ctx.db, familyId, refs),
       listForExport: (familyId, userId, range) => totalsRepo.exportRows(ctx.db, familyId, userId, range),
       remittanceByMonth: (familyId, userId, from, to) => remittanceByMonth(deps, familyId, userId, from, to),
       listChangesAfter: (familyId, userId, role, seq, limit) =>
