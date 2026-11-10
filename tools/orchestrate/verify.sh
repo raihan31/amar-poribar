@@ -21,8 +21,14 @@ if [ "$MODE" = "--full" ]; then
     docker run -d --rm --name "$PG" -e POSTGRES_USER=amar -e POSTGRES_PASSWORD=amar -e POSTGRES_DB=amar_poribar -p 127.0.0.1::5432 postgres:16-alpine >/dev/null
     for i in $(seq 1 30); do docker exec "$PG" pg_isready -U amar >/dev/null 2>&1 && break; sleep 1; done
     PORT=$(docker port "$PG" 5432/tcp | head -1 | sed 's/.*://')
+    S3C=""
+    if ! (echo > /dev/tcp/127.0.0.1/9100) 2>/dev/null; then
+      S3C="verify-s3-$$"
+      docker run -d --rm --name "$S3C" -e initialBuckets=amar-test -p 127.0.0.1:9100:9090 adobe/s3mock:latest >/dev/null 2>&1; sleep 6
+    fi
     DATABASE_URL="postgres://amar:amar@127.0.0.1:$PORT/amar_poribar" run pnpm test:db
     docker stop "$PG" >/dev/null 2>&1
+    [ -n "$S3C" ] && docker stop "$S3C" >/dev/null 2>&1
   fi
   if [ -d apps/mobile ] && git diff --name-only "${VERIFY_BASE:-HEAD~1}" HEAD -- apps/mobile 2>/dev/null | grep -q .; then
     (cd apps/mobile && run flutter pub get && run dart run build_runner build --delete-conflicting-outputs && run flutter analyze && run flutter test)
