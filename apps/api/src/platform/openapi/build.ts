@@ -1,5 +1,6 @@
 import { buildApp } from "../../app.js";
-import type { Db } from "../../db/client.js";
+import { loadConfig } from "../config.js";
+import type { Db } from "../db.js";
 
 export { apiRoot, apiVersion } from "./version.js";
 
@@ -29,13 +30,13 @@ export function countUndocumented(doc: { paths?: Record<string, Record<string, u
 
 /** Builds the app with fakes and a stub db, and returns the OpenAPI document with sorted keys. */
 export async function buildOpenApiDocument() {
-  const app = await buildApp({
-    db: {} as Db,
-    jwtSecret: "openapi-build",
-    isProd: false,
-    logLevel: "silent",
-    openapiPublic: true,
+  const config = loadConfig({
+    NODE_ENV: "test",
+    JWT_SECRET: "openapi-build",
+    LOG_LEVEL: "silent",
+    OPENAPI_PUBLIC: "true",
   });
+  const app = await buildApp({ config, db: {} as Db });
   try {
     await app.ready();
     return sortKeys(app.swagger()) as { paths: Record<string, Record<string, unknown>> };

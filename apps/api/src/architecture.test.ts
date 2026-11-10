@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
+import { buildOpenApiDocument, countUndocumented } from "./platform/openapi/build.js";
 import { MODULE_DEPS } from "./platform/arch/module-deps.js";
 import { modules } from "./modules/registry.js";
 
@@ -16,9 +17,6 @@ function walk(dir: string): string[] {
 const tsFiles = walk(src).filter((f) => f.endsWith(".ts") && !f.endsWith(".test.ts"));
 const rel = (f: string) => relative(src, f);
 const moduleNames = readdirSync(modulesDir).filter((n) => statSync(join(modulesDir, n)).isDirectory());
-
-/** Tables still declared in the pre-modular schema; T-PLAT-31 deletes this exception. */
-const LEGACY_SCHEMA_FILES = new Set(["db/schema.ts"]);
 
 describe("modular monolith architecture", () => {
   it("every module folder has index.ts, schema.ts and events.ts (R9)", () => {
@@ -45,11 +43,11 @@ describe("modular monolith architecture", () => {
     }
   });
 
-  it("pgTable( is declared only in modules/*/schema.ts, platform and the legacy schema (R3)", () => {
+  it("pgTable( is declared only in modules/*/schema.ts and platform (R3)", () => {
     const offenders = tsFiles.filter((f) => {
       const r = rel(f);
       if (!readFileSync(f, "utf8").includes("pgTable(")) return false;
-      return !(/^modules\/[^/]+\/schema\.ts$/.test(r) || r.startsWith("platform/") || LEGACY_SCHEMA_FILES.has(r));
+      return !(/^modules\/[^/]+\/schema\.ts$/.test(r) || r.startsWith("platform/"));
     });
     expect(offenders.map(rel)).toEqual([]);
   });
@@ -78,5 +76,31 @@ describe("modular monolith architecture", () => {
       const targets = new Set([...readFileSync(f, "utf8").matchAll(/modules\/([^/"]+)\/index\.js/g)].map((x) => x[1]));
       expect(targets.size, r).toBeLessThanOrEqual(1);
     }
+  });
+
+  it("src contains only app.ts, server.ts, worker.ts and the layer folders (T-PLAT-31)", () => {
+    const entries = readdirSync(src).filter((n) => !n.endsWith(".test.ts"));
+    expect(entries.sort()).toEqual(
+      ["app.ts", "architecture.test.ts", "composition", "modules", "platform", "security", "server.ts", "worker.ts"]
+        .filter((n) => n !== "architecture.test.ts")
+        .sort(),
+    );
+  });
+
+  it("no files remain in src/routes", () => {
+    expect(existsSync(join(src, "routes"))).toBe(false);
+  });
+
+  it("no file imports src/db/schema", () => {
+    expect(existsSync(join(src, "db"))).toBe(false);
+    const offenders = [...tsFiles, ...walk(src).filter((f) => f.endsWith(".test.ts"))].filter((f) =>
+      /from "[^"]*\/db\/(schema|client)\.js"/.test(readFileSync(f, "utf8")),
+    );
+    expect(offenders.map(rel)).toEqual([]);
+  });
+
+  it("openapi undocumented count is 0", async () => {
+    expect(countUndocumented(await buildOpenApiDocument())).toBe(0);
+    expect(JSON.parse(readFileSync(join(src, "..", "openapi-baseline.json"), "utf8"))).toEqual({ undocumented: 0 });
   });
 });

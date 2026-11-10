@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { describe, expect, it } from "vitest";
 import { withTestDb } from "../../../tests/support/db-test.js";
 import { registerErrorHandler } from "../../platform/errors.js";
@@ -40,6 +41,8 @@ describe("ai quota (db)", () => {
   it("usage row increments once per call", async () => {
     await withTestDb(async ({ db, sql }) => {
       const app = Fastify();
+      app.setValidatorCompiler(validatorCompiler);
+      app.setSerializerCompiler(serializerCompiler);
       registerErrorHandler(app);
       app.decorate("authenticate", async (req: { user?: unknown }) => {
         req.user = { sub: "u1" };

@@ -44,7 +44,11 @@ export function registerHealth(app: FastifyInstance, deps: HealthDeps): void {
     );
   });
 
-  app.get("/health", async () => ({ ok: true }));
+  route(
+    app,
+    { method: "GET", url: "/health", schema: { tags: ["platform"], response: { 200: z.object({ ok: z.boolean() }) } } },
+    async () => ({ ok: true }),
+  );
 
   const checks = z.object({ db: z.boolean(), migrations: z.boolean(), jobs: z.boolean() });
   const readyBody = z.object({ ok: z.boolean(), checks, failing: z.array(z.string()) });

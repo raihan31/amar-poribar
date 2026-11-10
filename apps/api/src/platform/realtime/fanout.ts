@@ -64,3 +64,10 @@ export class PgFanout implements Fanout {
     return parsed as FanoutMessage;
   }
 }
+
+/** Single-instance fanout with no database: messages never leave the process (tests, OpenAPI build). */
+export class LocalFanout implements Fanout {
+  async start(): Promise<void> {}
+  async publish(): Promise<void> {}
+  async stop(): Promise<void> {}
+}

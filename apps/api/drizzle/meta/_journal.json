@@ -12,85 +12,8 @@
     {
       "idx": 1,
       "version": "7",
-      "when": 1794342677766,
-      "tag": "0001_outbox",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1794343402775,
-      "tag": "0002_rate_limits",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1794344008401,
-      "tag": "0003_feature_flags",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1794344944523,
-      "tag": "0004_identity_users",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1794344954132,
-      "tag": "0005_health_checks",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1794345931203,
-      "tag": "0006_families_tables",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1794347027596,
-      "tag": "0007_ledger_tables",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1794347314648,
-      "tag": "0008_realtime_payloads",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1794347872004,
-      "tag": "0009_health_samples",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1794348395100,
-      "tag": "0010_budgeting_tables",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "7",
-      "when": 1794348428148,
-      "tag": "0011_recurring_tables",
-      "breakpoints": true
-    },
-    {
-      "idx": 12,
-      "version": "7",
-      "when": 1794348463230,
-      "tag": "0012_ai_tables",
+      "when": 1794350671979,
+      "tag": "0001_baseline",
       "breakpoints": true
     }
   ]

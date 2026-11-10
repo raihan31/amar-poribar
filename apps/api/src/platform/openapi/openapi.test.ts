@@ -5,7 +5,8 @@ import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { z } from "zod";
 import { buildApp } from "../../app.js";
-import type { Db } from "../../db/client.js";
+import type { Db } from "../db.js";
+import { testConfig } from "../../../tests/support/config.js";
 import { route } from "../http/route.js";
 import { apiRoot, buildOpenApiDocument } from "./build.js";
 import { isPublicRoute } from "./plugin.js";
@@ -18,13 +19,7 @@ type Doc = {
   paths: Record<string, Record<string, { security?: unknown[]; "x-undocumented"?: boolean }>>;
 };
 
-const app = await buildApp({
-  db: {} as Db,
-  jwtSecret: "test",
-  isProd: false,
-  logLevel: "silent",
-  openapiPublic: true,
-});
+const app = await buildApp({ config: testConfig({ OPENAPI_PUBLIC: "true" }), db: {} as Db });
 beforeAll(() => app.ready());
 afterAll(() => app.close());
 
@@ -72,39 +67,27 @@ describe("openapi", () => {
   });
 
   it("flags routes without response schemas as x-undocumented and not the ones with schemas", async () => {
-    const local = await buildApp({
-      db: {} as Db,
-      jwtSecret: "t",
-      isProd: false,
-      logLevel: "silent",
-    });
+    const local = await buildApp({ config: testConfig(), db: {} as Db });
     route(
       local,
       { method: "GET", url: "/v1/zz-documented", schema: { response: { 200: z.object({ ok: z.boolean() }) } } },
       async () => ({ ok: true }),
     );
+    local.get("/v1/zz-undocumented", async () => ({ ok: true }));
     await local.ready();
     const doc = local.swagger() as unknown as Doc;
     expect(doc.paths["/v1/zz-documented"]!.get!["x-undocumented"]).toBeUndefined();
-    expect(doc.paths["/health"]!.get!["x-undocumented"]).toBe(true);
+    expect(doc.paths["/v1/zz-undocumented"]!.get!["x-undocumented"]).toBe(true);
     await local.close();
   });
 
   it("hides /v1/openapi.json in production unless OPENAPI_PUBLIC", async () => {
-    const prod = await buildApp({
-      db: {} as Db,
-      jwtSecret: "t",
-      isProd: true,
-      logLevel: "silent",
-    });
+    const prod = await buildApp({ config: testConfig({ NODE_ENV: "production" }), db: {} as Db });
     expect((await prod.inject({ method: "GET", url: "/v1/openapi.json" })).statusCode).toBe(404);
     await prod.close();
     const pub = await buildApp({
+      config: testConfig({ NODE_ENV: "production", OPENAPI_PUBLIC: "true" }),
       db: {} as Db,
-      jwtSecret: "t",
-      isProd: true,
-      logLevel: "silent",
-      openapiPublic: true,
     });
     expect((await pub.inject({ method: "GET", url: "/v1/openapi.json" })).statusCode).toBe(200);
     await pub.close();

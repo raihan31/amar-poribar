@@ -1,7 +1,7 @@
 import Fastify from "fastify";
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { describe, expect, it } from "vitest";
-import type { Db } from "../../db/client.js";
+import type { Db } from "../db.js";
 import { createJobs } from "../jobs/jobs.js";
 import { registerHealth } from "./routes.js";
 import { createMetrics } from "./metrics.js";

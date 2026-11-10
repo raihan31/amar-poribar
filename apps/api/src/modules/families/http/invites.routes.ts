@@ -5,6 +5,7 @@ import { parseOr400 } from "../../../platform/errors.js";
 import { acceptInvite } from "../app/accept-invite.js";
 import { createInvite } from "../app/create-invite.js";
 import type { FamiliesDeps } from "../app/deps.js";
+import { docs } from "../../../platform/http/responses.js";
 
 const CreateInviteSchema = z.object({
   role: RoleSchema.default("member"),
@@ -14,7 +15,7 @@ const CreateInviteSchema = z.object({
 export function invitesRoutes(app: FastifyInstance, deps: FamiliesDeps) {
   app.post<{ Params: { familyId: string } }>(
     "/v1/families/:familyId/invites",
-    { preHandler: app.authenticate },
+    { preHandler: app.authenticate, schema: docs.object },
     async (req, reply) => {
       const body = parseOr400(CreateInviteSchema, req.body ?? {});
       const invite = await createInvite(deps, {
@@ -27,7 +28,9 @@ export function invitesRoutes(app: FastifyInstance, deps: FamiliesDeps) {
     },
   );
 
-  app.post<{ Params: { token: string } }>("/v1/invites/:token/accept", { preHandler: app.authenticate }, async (req) =>
-    acceptInvite(deps, { token: req.params.token, userId: req.user.sub }),
+  app.post<{ Params: { token: string } }>(
+    "/v1/invites/:token/accept",
+    { preHandler: app.authenticate, schema: docs.object },
+    async (req) => acceptInvite(deps, { token: req.params.token, userId: req.user.sub }),
   );
 }

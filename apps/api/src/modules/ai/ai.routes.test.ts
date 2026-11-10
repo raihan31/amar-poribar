@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { afterEach, describe, expect, it } from "vitest";
 import { registerErrorHandler } from "../../platform/errors.js";
 import type { ModuleContext } from "../../platform/module.js";
@@ -42,6 +43,8 @@ const totals = (expensePaisa: number) => ({
 async function build(opts: { client?: AiClient; quota?: number; store?: MemoryStore }) {
   const store = opts.store ?? new MemoryStore();
   const app = Fastify();
+  app.setValidatorCompiler(validatorCompiler);
+  app.setSerializerCompiler(serializerCompiler);
   registerErrorHandler(app);
   app.decorate("authenticate", async (req: { user?: unknown }) => {
     req.user = { sub: "u1" };

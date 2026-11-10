@@ -1,8 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../../app.js";
-import type { Db } from "../../db/client.js";
+import type { Db } from "../../platform/db.js";
+import { testConfig } from "../../../tests/support/config.js";
 
-const app = await buildApp({ db: {} as Db, jwtSecret: "test", isProd: false, logLevel: "silent" });
+const app = await buildApp({ config: testConfig(), db: {} as Db });
 beforeAll(() => app.ready());
 afterAll(() => app.close());
 
@@ -19,7 +20,7 @@ describe("identity auth routes", () => {
   });
 
   it("does not return the OTP in production", async () => {
-    const prod = await buildApp({ db: {} as Db, jwtSecret: "test", isProd: true, logLevel: "silent" });
+    const prod = await buildApp({ config: testConfig({ NODE_ENV: "production" }), db: {} as Db });
     const res = await prod.inject({ method: "POST", url: "/v1/auth/otp/request", payload: { phone: "01712345678" } });
     expect(res.json()).toEqual({ sent: true });
     await prod.close();

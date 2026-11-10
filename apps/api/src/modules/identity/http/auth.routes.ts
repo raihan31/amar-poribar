@@ -6,6 +6,7 @@ import { refreshTokens } from "../app/refresh.js";
 import { requestOtp } from "../app/request-otp.js";
 import type { OtpStore, TokenService, UserRepo } from "../app/ports.js";
 import { verifyOtp } from "../app/verify-otp.js";
+import { docs } from "../../../platform/http/responses.js";
 
 const VerifySchema = z.object({ phone: BdPhoneSchema, code: z.string().regex(/^\d{6}$/) });
 
@@ -17,14 +18,16 @@ export interface AuthRouteDeps {
 }
 
 export function authRoutes(app: FastifyInstance, deps: AuthRouteDeps) {
-  app.post("/v1/auth/otp/request", async (req) => {
+  app.post("/v1/auth/otp/request", { schema: docs.object }, async (req) => {
     const { phone } = parseOr400(z.object({ phone: BdPhoneSchema }), req.body);
     return requestOtp(deps, phone);
   });
 
-  app.post("/v1/auth/otp/verify", async (req) => verifyOtp(deps, parseOr400(VerifySchema, req.body)));
+  app.post("/v1/auth/otp/verify", { schema: docs.object }, async (req) =>
+    verifyOtp(deps, parseOr400(VerifySchema, req.body)),
+  );
 
-  app.post("/v1/auth/refresh", async (req) => {
+  app.post("/v1/auth/refresh", { schema: docs.object }, async (req) => {
     const { refreshToken } = parseOr400(z.object({ refreshToken: z.string() }), req.body);
     return refreshTokens(deps.tokens, refreshToken);
   });

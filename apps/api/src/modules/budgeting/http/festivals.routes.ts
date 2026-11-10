@@ -8,6 +8,7 @@ import {
   listFestivalBudgets,
   updateFestivalBudget,
 } from "../app/festival-usecases.js";
+import { docs } from "../../../platform/http/responses.js";
 
 type FamilyParams = { Params: { familyId: string } };
 type FestivalParams = { Params: { familyId: string; festivalId: string } };
@@ -15,26 +16,38 @@ type FestivalParams = { Params: { familyId: string; festivalId: string } };
 export function festivalsRoutes(app: FastifyInstance, deps: BudgetingDeps) {
   const opts = { preHandler: app.authenticate };
 
-  app.get<FamilyParams>("/v1/families/:familyId/festival-budgets", opts, async (req) => {
+  app.get<FamilyParams>("/v1/families/:familyId/festival-budgets", { ...opts, schema: docs.list }, async (req) => {
     await deps.families.requireRole(req.params.familyId, req.user.sub, "viewer");
     return listFestivalBudgets(deps, req.params.familyId, req.user.sub);
   });
 
-  app.post<FamilyParams>("/v1/families/:familyId/festival-budgets", opts, async (req, reply) => {
-    await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
-    const body = parseOr400(CreateFestivalBudgetSchema, req.body);
-    return reply.status(201).send(await createFestivalBudget(deps, req.params.familyId, body));
-  });
+  app.post<FamilyParams>(
+    "/v1/families/:familyId/festival-budgets",
+    { ...opts, schema: docs.object },
+    async (req, reply) => {
+      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
+      const body = parseOr400(CreateFestivalBudgetSchema, req.body);
+      return reply.status(201).send(await createFestivalBudget(deps, req.params.familyId, body));
+    },
+  );
 
-  app.patch<FestivalParams>("/v1/families/:familyId/festival-budgets/:festivalId", opts, async (req) => {
-    await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
-    const body = parseOr400(UpdateFestivalBudgetSchema, req.body);
-    return updateFestivalBudget(deps, req.params.familyId, req.params.festivalId, body);
-  });
+  app.patch<FestivalParams>(
+    "/v1/families/:familyId/festival-budgets/:festivalId",
+    { ...opts, schema: docs.object },
+    async (req) => {
+      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
+      const body = parseOr400(UpdateFestivalBudgetSchema, req.body);
+      return updateFestivalBudget(deps, req.params.familyId, req.params.festivalId, body);
+    },
+  );
 
-  app.delete<FestivalParams>("/v1/families/:familyId/festival-budgets/:festivalId", opts, async (req, reply) => {
-    await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
-    await deleteFestivalBudget(deps, req.params.familyId, req.params.festivalId);
-    return reply.status(204).send();
-  });
+  app.delete<FestivalParams>(
+    "/v1/families/:familyId/festival-budgets/:festivalId",
+    { ...opts, schema: docs.noContent },
+    async (req, reply) => {
+      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
+      await deleteFestivalBudget(deps, req.params.familyId, req.params.festivalId);
+      return reply.status(204).send();
+    },
+  );
 }

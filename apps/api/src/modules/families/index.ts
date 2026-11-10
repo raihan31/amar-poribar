@@ -1,6 +1,5 @@
 import type { Role } from "@amar-poribar/shared";
 import { HttpError } from "../../platform/errors.js";
-import type { Db } from "../../platform/db.js";
 import type { ModuleDefinition } from "../../platform/module.js";
 import { requireRole } from "./app/require-role.js";
 import { canAssignRole, canEditAll, canManageMember } from "./domain/roles.js";
@@ -34,19 +33,6 @@ declare module "../../platform/module.js" {
   interface Facades {
     families: FamiliesFacade;
   }
-}
-
-/**
- * Role check for routes that have not moved into a module yet and only hold a `Db`.
- * Removed once the last legacy route moves (T-PLAT-25..30).
- */
-export function requireRoleWithDb(db: Db, familyId: string, userId: string, minRole: Role): Promise<Role> {
-  return requireRole(db, familyId, userId, minRole);
-}
-
-/** Legacy-route counterpart of `requireRoleWithDb`: the member's role, or null. */
-export function findMemberRoleWithDb(db: Db, familyId: string, userId: string): Promise<Role | null> {
-  return familiesRepo.memberRole(db, familyId, userId);
 }
 
 export const familiesModule: ModuleDefinition<FamiliesFacade> = {

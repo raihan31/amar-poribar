@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import Fastify from "fastify";
+import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { describe, expect, it } from "vitest";
-import { registerErrorHandler } from "../errors.js";
+import { registerErrorHandler } from "../platform/errors.js";
 import type { IdentityFacade } from "../modules/identity/index.js";
 import type { FamiliesFacade } from "../modules/families/index.js";
 import type { ModuleContext } from "../platform/module.js";
@@ -13,6 +14,8 @@ const vector = JSON.parse(
 
 async function build(user: Record<string, unknown> | null) {
   const app = Fastify();
+  app.setValidatorCompiler(validatorCompiler);
+  app.setSerializerCompiler(serializerCompiler);
   registerErrorHandler(app);
   app.decorate("authenticate", async (req: { user: { sub: string } }) => {
     req.user = { sub: String(vector.body.user.id) };
