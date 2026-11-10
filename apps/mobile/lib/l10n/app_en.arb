@@ -8,7 +8,6 @@
   "auth_login_phoneHint": "We will send a 6-digit code by SMS.",
   "auth_login_codeLabel": "Enter the code",
   "auth_login_submit": "Sign in",
-  "auth_login_devOtp": "Dev OTP: {code}",
   "auth_login_tagline": "All the family accounts, in one place",
   "auth_login_resend": "Send again ({time})",
   "auth_login_resendNow": "Send again",

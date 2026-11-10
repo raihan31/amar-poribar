@@ -84,7 +84,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l = context.l10n;
+    final l10n = context.l10n;
     final s = ref.watch(loginControllerProvider);
     final style = ref.watch(numeralStyleProvider);
     String digits(String v) =>
@@ -112,12 +112,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   children: [
                     const SizedBox(height: 40),
                     _Header(
-                      title: l.auth_login_title,
-                      tagline: l.auth_login_tagline,
+                      title: l10n.auth_login_title,
+                      tagline: l10n.auth_login_tagline,
                     ),
                     const SizedBox(height: 44),
                     Text(
-                      l.auth_login_phoneLabel,
+                      l10n.auth_login_phoneLabel,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -128,7 +128,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: 8),
                     if (s.phoneInvalid)
                       Text(
-                        l.auth_login_phoneInvalid,
+                        l10n.auth_login_phoneInvalid,
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -137,7 +137,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       )
                     else
                       Text(
-                        l.auth_login_phoneHint,
+                        l10n.auth_login_phoneHint,
                         style: const TextStyle(
                           fontSize: 14,
                           color: AppTokens.muted,
@@ -146,7 +146,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     if (onCode) ...[
                       const SizedBox(height: 22),
                       Text(
-                        l.auth_login_codeLabel,
+                        l10n.auth_login_codeLabel,
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -171,14 +171,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const Spacer(),
                     const SizedBox(height: 24),
                     BigButton(
-                      label: l.auth_login_submit,
+                      label: l10n.auth_login_submit,
                       height: 72,
                       onPressed: canSubmit ? _submit : null,
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 12, bottom: 28),
                       child: Text(
-                        l.auth_login_helpFooter,
+                        l10n.auth_login_helpFooter,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 14,
@@ -204,7 +204,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     bool locked,
     String Function(String) digits,
   ) {
-    final l = context.l10n;
+    final l10n = context.l10n;
     return Container(
       height: 68,
       decoration: BoxDecoration(
@@ -253,7 +253,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     disabledBorder: InputBorder.none,
                     filled: false,
                     // Invisible; gives the field its spoken name.
-                    labelText: l.auth_login_phoneSemantics,
+                    labelText: l10n.auth_login_phoneSemantics,
                     labelStyle: const TextStyle(color: Colors.transparent),
                     floatingLabelStyle:
                         const TextStyle(color: Colors.transparent),
@@ -271,7 +271,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               onPressed: _changeNumber,
               style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
               child: Text(
-                l.auth_login_changeNumber,
+                l10n.auth_login_changeNumber,
                 style:
                     const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
@@ -363,14 +363,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Widget _resendRow(LoginState s, String Function(String) digits) {
-    final l = context.l10n;
+    final l10n = context.l10n;
     final left = s.resendSecondsLeft;
     final time =
         digits('${left ~/ 60}:${(left % 60).toString().padLeft(2, '0')}');
     return Row(
       children: [
         Text(
-          '${l.auth_login_resendQuestion} ',
+          '${l10n.auth_login_resendQuestion} ',
           style: const TextStyle(fontSize: 15, color: AppTokens.muted),
         ),
         TextButton(
@@ -381,7 +381,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             tapTargetSize: MaterialTapTargetSize.padded,
           ),
           child: Text(
-            left > 0 ? l.auth_login_resend(time) : l.auth_login_resendNow,
+            left > 0 ? l10n.auth_login_resend(time) : l10n.auth_login_resendNow,
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,

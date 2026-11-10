@@ -8,10 +8,6 @@
   "auth_login_phoneHint": "আমরা একটি ৬ সংখ্যার কোড এসএমএসে পাঠাব।",
   "auth_login_codeLabel": "কোডটি লিখুন",
   "auth_login_submit": "ঢুকুন",
-  "auth_login_devOtp": "ডেভ OTP: {code}",
-  "@auth_login_devOtp": {
-    "placeholders": {"code": {"type": "String"}}
-  },
   "auth_login_tagline": "পরিবারের সব হিসাব, এক জায়গায়",
   "auth_login_resend": "আবার পাঠান ({time})",
   "@auth_login_resend": {
