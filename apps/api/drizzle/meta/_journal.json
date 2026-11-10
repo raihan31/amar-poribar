@@ -8,6 +8,13 @@
       "when": 1767225600000,
       "tag": "0000_schemas",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794342677766,
+      "tag": "0001_outbox",
+      "breakpoints": true
     }
   ]
 }
