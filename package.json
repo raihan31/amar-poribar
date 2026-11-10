@@ -22,7 +22,7 @@
     "format:check": "prettier --check .",
     "arch": "depcruise apps/api/src --config .dependency-cruiser.cjs && pnpm --filter @amar-poribar/api exec vitest run src/architecture.test.ts",
     "openapi:check": "turbo run build --filter=@amar-poribar/api^... && pnpm --filter @amar-poribar/api openapi:build -- --check",
-    "test:db": "echo 'added in T-PLAT-19' && exit 0",
+    "test:db": "turbo run test:db --filter=@amar-poribar/api --concurrency=1",
     "gen:module": "node tools/gen-module.mjs",
     "arch:negative": "node tools/arch-negative.mjs"
   },
