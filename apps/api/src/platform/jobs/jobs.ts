@@ -31,6 +31,8 @@ export interface Jobs {
   work(name: string, handler: (data: unknown) => Promise<void> | void, opts?: { concurrency?: number }): Promise<void>;
   /** Jobs that exhausted their retries. */
   deadLetterCount(): Promise<number>;
+  /** True when the queue is usable: always in inline mode, a started and reachable pg-boss otherwise. */
+  ping(): Promise<boolean>;
   /** Inline mode only: run schedules whose time has come since the last call. */
   runDue(): Promise<string[]>;
 }
@@ -81,6 +83,9 @@ function createInline(config: JobsConfig): Jobs {
     },
     async deadLetterCount() {
       return 0;
+    },
+    async ping() {
+      return true;
     },
     async runDue() {
       const end = floor(clock().getTime());
@@ -163,6 +168,11 @@ function createPgBoss(config: JobsConfig, sql?: Sql): Jobs {
               + (select count(*) from ${JOBS_SCHEMA}.archive where state = 'failed') as n`,
       );
       return Number(rows[0]?.n ?? 0);
+    },
+    async ping() {
+      if (!started) return false;
+      await boss.getDb().executeSql("select 1", []);
+      return true;
     },
     async runDue() {
       throw new Error("runDue is only available in inline mode");

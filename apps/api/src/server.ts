@@ -12,6 +12,7 @@ const app = await buildApp({
   logLevel: env.logLevel,
   corsOrigins: env.corsOrigins,
   openapiPublic: env.openapiPublic,
+  ...(env.metricsToken ? { metricsToken: env.metricsToken } : {}),
 });
 
 await app.listen({ port: env.port, host: "0.0.0.0" });
