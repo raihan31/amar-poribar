@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/l10n/l10n_x.dart';
 import '../../data/api/api_client.dart';
 import '../providers/auth_provider.dart';
 import '../providers/providers.dart';
@@ -40,7 +41,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             await ref.read(apiClientProvider).requestOtp(_phone.text.trim());
         setState(() {
           _sent = true;
-          _hint = dev == null ? null : 'Dev OTP: $dev';
+          _hint = dev == null ? null : context.l10n.auth_login_devOtp(dev);
         });
       });
 
@@ -63,7 +64,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('লগইন / Sign in')),
+      appBar: AppBar(title: Text(context.l10n.auth_login_title)),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -72,10 +73,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             TextField(
               controller: _phone,
               keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(
-                labelText: 'মোবাইল নম্বর',
-                hintText: '01XXXXXXXXX',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: context.l10n.auth_login_phoneLabel,
+                hintText: context.l10n.auth_login_phoneHint,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 12),
@@ -83,9 +84,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               TextField(
                 controller: _code,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: '৬ সংখ্যার কোড',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: context.l10n.auth_login_codeLabel,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 12),
@@ -94,7 +95,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               height: 52,
               child: ElevatedButton(
                 onPressed: _busy ? null : (_sent ? _verify : _requestOtp),
-                child: Text(_sent ? 'লগইন' : 'OTP পাঠান'),
+                child: Text(
+                  _sent
+                      ? context.l10n.auth_login_submit
+                      : context.l10n.auth_login_sendOtp,
+                ),
               ),
             ),
             if (_hint != null)

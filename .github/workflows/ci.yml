@@ -72,6 +72,8 @@ jobs:
       - run: flutter pub get
       # Drift's generated code (*.g.dart) is not committed.
       - run: dart run build_runner build --delete-conflicting-outputs
+      - run: flutter gen-l10n
+      - run: dart run tool/l10n_check.dart
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze --fatal-infos
       - run: flutter test --coverage

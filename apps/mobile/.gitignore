@@ -93,3 +93,6 @@ GoogleService-Info.plist
 # Claude Code / graphify local output
 .claude/settings.local.json
 graphify-out/
+
+# Generated localisation code (rebuild with: flutter gen-l10n)
+/lib/l10n/gen/
