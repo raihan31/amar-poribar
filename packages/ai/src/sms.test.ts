@@ -35,12 +35,16 @@ describe("parseMfsSms", () => {
   });
 
   it("parses mobile recharge", () => {
-    const d = parseMfsSms("Mobile Recharge Tk 50.00 to 01612345678 successful. Balance Tk 950.00. TrxID BJ7REC0001 at 01/10/2026 09:00");
+    const d = parseMfsSms(
+      "Mobile Recharge Tk 50.00 to 01612345678 successful. Balance Tk 950.00. TrxID BJ7REC0001 at 01/10/2026 09:00",
+    );
     expect(d?.categoryKey).toBe("mobile_recharge");
   });
 
   it("parses Bangla digits", () => {
-    const d = parseMfsSms("Payment Tk ৮৫০.০০ to Shwapno is successful. Balance Tk ১,০০০.০০. TrxID BJ8PAY0002 at ০২/১০/২০২৬ ১৮:৩০");
+    const d = parseMfsSms(
+      "Payment Tk ৮৫০.০০ to Shwapno is successful. Balance Tk ১,০০০.০০. TrxID BJ8PAY0002 at ০২/১০/২০২৬ ১৮:৩০",
+    );
     expect(d?.amountPaisa).toBe(85_000);
     expect(d?.counterparty).toBe("Shwapno");
   });

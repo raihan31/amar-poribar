@@ -59,7 +59,10 @@ export async function syncRoutes(app: FastifyInstance, { db }: AppDeps) {
     for (const raw of body.changes.transactions) {
       const parsed = SyncTransactionSchema.safeParse(raw);
       if (!parsed.success) {
-        rejected.push({ id: typeof (raw as { id?: unknown })?.id === "string" ? (raw as { id: string }).id : null, reason: "invalid" });
+        rejected.push({
+          id: typeof (raw as { id?: unknown })?.id === "string" ? (raw as { id: string }).id : null,
+          reason: "invalid",
+        });
       } else incoming.push(parsed.data);
     }
 
@@ -69,12 +72,23 @@ export async function syncRoutes(app: FastifyInstance, { db }: AppDeps) {
     try {
       for (const r of incoming) probe = receiveHlc(probe, parseHlc(r.hlc), nowMs);
     } catch (e) {
-      if (e instanceof ClockDriftError) throw new HttpError(400, "clock_drift", "This device's clock is too far ahead; fix the date and time, then sync again");
+      if (e instanceof ClockDriftError)
+        throw new HttpError(
+          400,
+          "clock_drift",
+          "This device's clock is too far ahead; fix the date and time, then sync again",
+        );
       throw e;
     }
 
-    const ownCats = new Set((await db.select({ id: categories.id }).from(categories).where(eq(categories.familyId, familyId))).map((c) => c.id));
-    const ownAccs = new Set((await db.select({ id: accounts.id }).from(accounts).where(eq(accounts.familyId, familyId))).map((a) => a.id));
+    const ownCats = new Set(
+      (await db.select({ id: categories.id }).from(categories).where(eq(categories.familyId, familyId))).map(
+        (c) => c.id,
+      ),
+    );
+    const ownAccs = new Set(
+      (await db.select({ id: accounts.id }).from(accounts).where(eq(accounts.familyId, familyId))).map((a) => a.id),
+    );
 
     let applied = 0;
     for (const r of incoming) {
@@ -89,7 +103,8 @@ export async function syncRoutes(app: FastifyInstance, { db }: AppDeps) {
           const [existing] = await tx.select().from(transactions).where(eq(transactions.id, r.id)).for("update");
           if (existing && existing.familyId !== familyId) throw new HttpError(409, "id_taken", "id_taken");
           if (existing && !winsOver(r.hlc, existing.hlc)) return; // older or equal: nothing to do
-          if (existing && existing.createdBy !== userId && !canEditAll(role)) throw new HttpError(403, "forbidden", "forbidden");
+          if (existing && existing.createdBy !== userId && !canEditAll(role))
+            throw new HttpError(403, "forbidden", "forbidden");
           const values = {
             type: r.type,
             amountPaisa: r.amountPaisa,
@@ -108,11 +123,15 @@ export async function syncRoutes(app: FastifyInstance, { db }: AppDeps) {
             updatedAt: new Date(),
           };
           if (existing) await tx.update(transactions).set(values).where(eq(transactions.id, r.id));
-          else await tx.insert(transactions).values({ ...values, id: r.id, familyId, paidByUserId: userId, createdBy: userId });
+          else
+            await tx
+              .insert(transactions)
+              .values({ ...values, id: r.id, familyId, paidByUserId: userId, createdBy: userId });
           applied++;
         });
       } catch (e) {
-        if (e instanceof HttpError) rejected.push({ id: r.id, reason: e.code === "forbidden" ? "forbidden" : "id_taken" });
+        if (e instanceof HttpError)
+          rejected.push({ id: r.id, reason: e.code === "forbidden" ? "forbidden" : "id_taken" });
         else if (isUniqueViolation(e)) rejected.push({ id: r.id, reason: "duplicate_trx_id" });
         else throw e;
       }

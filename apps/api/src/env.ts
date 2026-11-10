@@ -29,6 +29,9 @@ export const env = {
   anthropicApiKey: optional("ANTHROPIC_API_KEY"),
   aiModel: optional("AI_MODEL"),
   /** Comma-separated browser origins allowed to call the API in production, e.g. the web app's URL. */
-  corsOrigins: (optional("CORS_ORIGIN") ?? "").split(",").map((o) => o.trim()).filter(Boolean),
+  corsOrigins: (optional("CORS_ORIGIN") ?? "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean),
   isProd,
 };

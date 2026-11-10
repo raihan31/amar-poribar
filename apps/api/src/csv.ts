@@ -23,8 +23,13 @@ export function paisaToDecimal(paisa: number): string {
 /** Format a date in Asia/Dhaka as YYYY-MM-DD HH:mm. */
 export function dhakaStamp(d: Date): string {
   const p = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Dhaka", year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+    timeZone: "Asia/Dhaka",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
   }).formatToParts(d);
   const g = (t: string) => p.find((x) => x.type === t)!.value;
   return `${g("year")}-${g("month")}-${g("day")} ${g("hour")}:${g("minute")}`;

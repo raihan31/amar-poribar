@@ -8,7 +8,17 @@ import { canAssignRole, canManageMember } from "./auth.js";
 import type { Db } from "./db/client.js";
 import { dayRange, monthRange, monthsBetween } from "./month.js";
 import { OtpStore } from "./otp.js";
-import { SyncRequestSchema, SyncTransactionSchema, ReceiptRequestSchema, CreateFestivalBudgetSchema, UpdateFestivalBudgetSchema, UpdateTransactionSchema, CreateAccountSchema, UpdateAccountSchema, UpdateCategorySchema } from "@amar-poribar/shared";
+import {
+  SyncRequestSchema,
+  SyncTransactionSchema,
+  ReceiptRequestSchema,
+  CreateFestivalBudgetSchema,
+  UpdateFestivalBudgetSchema,
+  UpdateTransactionSchema,
+  CreateAccountSchema,
+  UpdateAccountSchema,
+  UpdateCategorySchema,
+} from "@amar-poribar/shared";
 
 // These tests don't touch the database; DB-backed tests need `pnpm db:up` (TODO).
 const app = await buildApp({ db: {} as Db, otp: new OtpStore(), jwtSecret: "test", isProd: false });
@@ -42,7 +52,11 @@ describe("api", () => {
 describe("cors in production", () => {
   it("allows only the configured web origin", async () => {
     const prod = await buildApp({
-      db: {} as Db, otp: new OtpStore(), jwtSecret: "test", isProd: true, corsOrigins: ["http://localhost:3000"],
+      db: {} as Db,
+      otp: new OtpStore(),
+      jwtSecret: "test",
+      isProd: true,
+      corsOrigins: ["http://localhost:3000"],
     });
     const allowed = await prod.inject({ method: "GET", url: "/health", headers: { origin: "http://localhost:3000" } });
     const other = await prod.inject({ method: "GET", url: "/health", headers: { origin: "https://evil.example" } });
@@ -166,7 +180,7 @@ describe("csv export", () => {
   it("quotes cells and blocks spreadsheet formulas", () => {
     expect(csvCell('say "hi", ok')).toBe('"say ""hi"", ok"');
     expect(csvCell("বাজার")).toBe("বাজার");
-    expect(csvCell("=HYPERLINK(\"http://evil\")")).toBe('"\'=HYPERLINK(""http://evil"")"');
+    expect(csvCell('=HYPERLINK("http://evil")')).toBe('"\'=HYPERLINK(""http://evil"")"');
     expect(csvCell("-5 note")).toBe("'-5 note");
     expect(csvCell(-500)).toBe("-500");
     expect(csvRow(["a", null, 3])).toBe("a,,3");
@@ -183,7 +197,9 @@ describe("csv export", () => {
 describe("festival budgets", () => {
   it("requires auth", async () => {
     expect((await app.inject({ method: "GET", url: "/v1/families/x/festival-budgets" })).statusCode).toBe(401);
-    expect((await app.inject({ method: "POST", url: "/v1/families/x/festival-budgets", payload: {} })).statusCode).toBe(401);
+    expect((await app.inject({ method: "POST", url: "/v1/families/x/festival-budgets", payload: {} })).statusCode).toBe(
+      401,
+    );
   });
 
   it("validates the date range", () => {
@@ -202,7 +218,14 @@ describe("festival budgets", () => {
 });
 
 describe("recurring entries", () => {
-  const base = { dayOfMonth: 5, startsOn: "2026-01-01", endsOn: null, active: true, lastConfirmedMonth: null, remindDaysBefore: 2 };
+  const base = {
+    dayOfMonth: 5,
+    startsOn: "2026-01-01",
+    endsOn: null,
+    active: true,
+    lastConfirmedMonth: null,
+    remindDaysBefore: 2,
+  };
 
   it("requires auth", async () => {
     expect((await app.inject({ method: "GET", url: "/v1/families/x/recurring/drafts" })).statusCode).toBe(401);
@@ -269,14 +292,21 @@ describe("receipt", () => {
     const b64 = "A".repeat(200);
     expect(ReceiptRequestSchema.safeParse({ mediaType: "image/jpeg", imageBase64: b64 }).success).toBe(true);
     expect(ReceiptRequestSchema.safeParse({ mediaType: "image/gif", imageBase64: b64 }).success).toBe(false);
-    expect(ReceiptRequestSchema.safeParse({ mediaType: "image/png", imageBase64: "not base64!" + b64 }).success).toBe(false);
-    expect(ReceiptRequestSchema.safeParse({ mediaType: "image/png", imageBase64: "A".repeat(7_000_001) }).success).toBe(false);
+    expect(ReceiptRequestSchema.safeParse({ mediaType: "image/png", imageBase64: "not base64!" + b64 }).success).toBe(
+      false,
+    );
+    expect(ReceiptRequestSchema.safeParse({ mediaType: "image/png", imageBase64: "A".repeat(7_000_001) }).success).toBe(
+      false,
+    );
   });
 });
 
 describe("sync", () => {
   const row = {
-    id: "3f2b8c1e-5a4d-4e0b-9c6a-1d2e3f4a5b6c", type: "expense", amountPaisa: 85000, occurredAt: "2026-11-09T10:00:00.000Z",
+    id: "3f2b8c1e-5a4d-4e0b-9c6a-1d2e3f4a5b6c",
+    type: "expense",
+    amountPaisa: 85000,
+    occurredAt: "2026-11-09T10:00:00.000Z",
     hlc: "2026-11-09T10:00:00.000Z-0001-device1",
   };
 
@@ -298,7 +328,13 @@ describe("sync", () => {
   });
 
   it("first sync has no cursor and no changes by default", () => {
-    expect(SyncRequestSchema.parse({ nodeId: "d1" })).toEqual({ nodeId: "d1", cursor: null, changes: { transactions: [] } });
-    expect(SyncRequestSchema.safeParse({ nodeId: "d1", changes: { transactions: new Array(501).fill({}) } }).success).toBe(false);
+    expect(SyncRequestSchema.parse({ nodeId: "d1" })).toEqual({
+      nodeId: "d1",
+      cursor: null,
+      changes: { transactions: [] },
+    });
+    expect(
+      SyncRequestSchema.safeParse({ nodeId: "d1", changes: { transactions: new Array(501).fill({}) } }).success,
+    ).toBe(false);
   });
 });

@@ -70,7 +70,10 @@ export async function reportRoutes(app: FastifyInstance, { db }: AppDeps) {
       .where(and(visible, eq(transactions.type, "expense")))
       .groupBy(ym);
     const senders = await db
-      .select({ name: sql<string>`coalesce(${transactions.counterparty}, '')`, total: sql<string>`sum(${transactions.amountPaisa})` })
+      .select({
+        name: sql<string>`coalesce(${transactions.counterparty}, '')`,
+        total: sql<string>`sum(${transactions.amountPaisa})`,
+      })
       .from(transactions)
       .innerJoin(categories, eq(categories.id, transactions.categoryId))
       .where(and(visible, eq(transactions.type, "income"), eq(categories.key, "remittance")))
@@ -128,7 +131,18 @@ export async function reportRoutes(app: FastifyInstance, { db }: AppDeps) {
       .orderBy(asc(transactions.occurredAt));
 
     const lines = [
-      csvRow(["Date", "Type", "Amount (BDT)", "Fee (BDT)", "Category", "Category (বাংলা)", "Account", "Counterparty", "TrxID", "Note"]),
+      csvRow([
+        "Date",
+        "Type",
+        "Amount (BDT)",
+        "Fee (BDT)",
+        "Category",
+        "Category (বাংলা)",
+        "Account",
+        "Counterparty",
+        "TrxID",
+        "Note",
+      ]),
       ...rows.map((r) =>
         csvRow([
           dhakaStamp(r.t.occurredAt),
@@ -145,11 +159,13 @@ export async function reportRoutes(app: FastifyInstance, { db }: AppDeps) {
       ),
     ];
     const name = from === to ? from : `${from}_to_${to}`;
-    return reply
-      .header("content-type", "text/csv; charset=utf-8")
-      .header("content-disposition", `attachment; filename="amar-poribar-${name}.csv"`)
-      // BOM so Excel reads the Bangla text as UTF-8.
-      .send("\uFEFF" + lines.join("\r\n") + "\r\n");
+    return (
+      reply
+        .header("content-type", "text/csv; charset=utf-8")
+        .header("content-disposition", `attachment; filename="amar-poribar-${name}.csv"`)
+        // BOM so Excel reads the Bangla text as UTF-8.
+        .send("\uFEFF" + lines.join("\r\n") + "\r\n")
+    );
   });
 }
 

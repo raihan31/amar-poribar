@@ -15,9 +15,7 @@ export const TransactionSourceSchema = z.enum(["manual", "ai_text", "sms", "voic
 export type TransactionSource = z.infer<typeof TransactionSourceSchema>;
 
 /** Bangladeshi mobile number, with or without +88 / 88 prefix (SRS FR-AUTH-02). */
-export const BdPhoneSchema = z
-  .string()
-  .regex(/^(?:\+?88)?01[3-9]\d{8}$/, "Invalid Bangladeshi mobile number");
+export const BdPhoneSchema = z.string().regex(/^(?:\+?88)?01[3-9]\d{8}$/, "Invalid Bangladeshi mobile number");
 
 /** Normalise a BD phone number to +8801XXXXXXXXX. */
 export function normalizeBdPhone(phone: string): string {
@@ -142,7 +140,16 @@ export type UpdateCategoryInput = z.infer<typeof UpdateCategorySchema>;
 /** Set budgets for a month. `categoryId: null` is the overall family budget; a limit of 0 clears it (FR-BUD-01). */
 export const PutBudgetsSchema = z.object({
   budgets: z
-    .array(z.object({ categoryId: z.uuid().nullable(), limitPaisa: z.number().int().min(0).max(MAX_AMOUNT_PAISA * 100) }))
+    .array(
+      z.object({
+        categoryId: z.uuid().nullable(),
+        limitPaisa: z
+          .number()
+          .int()
+          .min(0)
+          .max(MAX_AMOUNT_PAISA * 100),
+      }),
+    )
     .min(1)
     .max(100),
 });
@@ -159,7 +166,11 @@ export const CreateFestivalBudgetSchema = z
     name: z.string().min(1).max(80),
     startsOn: DateOnlySchema,
     endsOn: DateOnlySchema,
-    limitPaisa: z.number().int().positive().max(MAX_AMOUNT_PAISA * 100),
+    limitPaisa: z
+      .number()
+      .int()
+      .positive()
+      .max(MAX_AMOUNT_PAISA * 100),
   })
   .refine((v) => v.endsOn >= v.startsOn, "endsOn must not be before startsOn");
 export type CreateFestivalBudgetInput = z.infer<typeof CreateFestivalBudgetSchema>;
@@ -169,7 +180,11 @@ export const UpdateFestivalBudgetSchema = z
     name: z.string().min(1).max(80),
     startsOn: DateOnlySchema,
     endsOn: DateOnlySchema,
-    limitPaisa: z.number().int().positive().max(MAX_AMOUNT_PAISA * 100),
+    limitPaisa: z
+      .number()
+      .int()
+      .positive()
+      .max(MAX_AMOUNT_PAISA * 100),
   })
   .partial()
   .refine((v) => Object.keys(v).length > 0, "Nothing to update");
@@ -186,7 +201,11 @@ export const CreateRecurringSchema = z
     /** Day of month, 1..31. Shorter months use their last day. */
     dayOfMonth: z.number().int().min(1).max(31),
     startsOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-    endsOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+    endsOn: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .nullable()
+      .optional(),
     /** Remind this many days before the due date. */
     remindDaysBefore: z.number().int().min(0).max(14).default(2),
   })
@@ -200,7 +219,10 @@ export const UpdateRecurringSchema = z
     categoryId: z.uuid().nullable(),
     accountId: z.uuid().nullable(),
     dayOfMonth: z.number().int().min(1).max(31),
-    endsOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
+    endsOn: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .nullable(),
     remindDaysBefore: z.number().int().min(0).max(14),
     active: z.boolean(),
   })
@@ -226,9 +248,7 @@ export const ReceiptRequestSchema = z.object({
 });
 export type ReceiptRequest = z.infer<typeof ReceiptRequestSchema>;
 
-const HlcSchema = z
-  .string()
-  .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z-[0-9A-F]{4}-.+$/, "Not an HLC");
+const HlcSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z-[0-9A-F]{4}-.+$/, "Not an HLC");
 
 /** A transaction as exchanged by sync (SRS §4.3.1). The same JSON the mobile app stores. */
 export const SyncTransactionSchema = z.object({
@@ -253,7 +273,11 @@ export type SyncTransaction = z.infer<typeof SyncTransactionSchema>;
 export const SyncRequestSchema = z.object({
   nodeId: z.string().min(1).max(64),
   /** Opaque cursor from the previous response; null on a first sync. */
-  cursor: z.string().regex(/^\d{1,18}$/).nullable().default(null),
+  cursor: z
+    .string()
+    .regex(/^\d{1,18}$/)
+    .nullable()
+    .default(null),
   changes: z.object({ transactions: z.array(z.unknown()).max(500).default([]) }).default({ transactions: [] }),
 });
 export type SyncRequest = z.infer<typeof SyncRequestSchema>;

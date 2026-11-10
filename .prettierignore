@@ -1,0 +1,9 @@
+node_modules
+dist
+.next
+pnpm-lock.yaml
+apps/mobile
+apps/api/drizzle
+docs
+tools/design
+*.md

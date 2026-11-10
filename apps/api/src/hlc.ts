@@ -55,7 +55,9 @@ export function receiveHlc(clock: Hlc, remote: Hlc, nowMs: number): Hlc {
     counter = remote.counter;
   }
   if (nowMs > time) return { time: nowMs, counter: 0, node: clock.node };
-  return counter >= MAX_COUNTER ? { time: time + 1, counter: 0, node: clock.node } : { time, counter: counter + 1, node: clock.node };
+  return counter >= MAX_COUNTER
+    ? { time: time + 1, counter: 0, node: clock.node }
+    : { time, counter: counter + 1, node: clock.node };
 }
 
 /** True when `incoming` should replace `existing` (per-record last-write-wins; equal HLCs change nothing). */
@@ -72,7 +74,10 @@ export function nextHlc(after?: string | null, nowMs = Date.now()): string {
   let next = sendHlc(last, nowMs);
   if (after && isHlc(after) && formatHlc(next) <= after) {
     const a = parseHlc(after);
-    next = a.counter >= MAX_COUNTER ? { time: a.time + 1, counter: 0, node: NODE } : { time: a.time, counter: a.counter + 1, node: NODE };
+    next =
+      a.counter >= MAX_COUNTER
+        ? { time: a.time + 1, counter: 0, node: NODE }
+        : { time: a.time, counter: a.counter + 1, node: NODE };
   }
   last = next;
   return formatHlc(next);

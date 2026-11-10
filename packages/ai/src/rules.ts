@@ -20,7 +20,10 @@ const CATEGORY_KEYWORDS: [RegExp, string][] = [
   [/পানির বিল|ওয়াসা|wasa|water bill/i, "water"],
   [/ইন্টারনেট|ওয়াইফাই|wifi|internet|ডিশ|dish|ক্যাবল/i, "internet"],
   [/বাসা ভাড়া|ঘর ভাড়া|বাড়ি ভাড়া|house rent|basa vara|basha vara|\brent\b/i, "rent"],
-  [/রিকশা|রিক্সা|সিএনজি|বাস ভাড়া|বাসে|উবার|পাঠাও|ট্রেন|লঞ্চ|rickshaw|riksha|cng|uber|pathao|bus|train|fare|ভাড়া/i, "transport"],
+  [
+    /রিকশা|রিক্সা|সিএনজি|বাস ভাড়া|বাসে|উবার|পাঠাও|ট্রেন|লঞ্চ|rickshaw|riksha|cng|uber|pathao|bus|train|fare|ভাড়া/i,
+    "transport",
+  ],
   [/বাজার|সবজি|মাছ|মাংস|চাল|ডাল|তেল|ডিম|মুদি|bazar|bazaar|grocer|vegetable|fish|rice|shwapno|স্বপ্ন/i, "bazaar"],
   [/ওষুধ|ঔষধ|ডাক্তার|হাসপাতাল|ক্লিনিক|টেস্ট|medicine|doctor|hospital|clinic|pharmacy|osudh/i, "medical"],
   [/স্কুল|কলেজ|বেতন দিলাম স্কুলে|প্রাইভেট|কোচিং|টিউশন|বই|খাতা|school|college|coaching|tuition|book/i, "education"],
@@ -45,7 +48,11 @@ const INCOME_WORDS = /বেতন পেলাম|পেলাম|আয়|rec
 
 /** Every number written with digits, e.g. "৮৫০" or "1,500". */
 function digitAmounts(text: string): number[] {
-  return [...bnToLatinDigits(text).replace(/(\d),(?=\d)/g, "$1").matchAll(/\d+(?:\.\d{1,2})?/g)].map((m) => Number(m[0]));
+  return [
+    ...bnToLatinDigits(text)
+      .replace(/(\d),(?=\d)/g, "$1")
+      .matchAll(/\d+(?:\.\d{1,2})?/g),
+  ].map((m) => Number(m[0]));
 }
 
 function dayOffset(text: string): number {
@@ -74,9 +81,7 @@ export function quickParse(text: string, now: Date = new Date()): QuickParseResu
   const categoryKey = CATEGORY_KEYWORDS.find(([re]) => re.test(text))?.[1] ?? null;
   const accountType = ACCOUNT_KEYWORDS.find(([re]) => re.test(text))?.[1] ?? null;
   const offset = dayOffset(text);
-  const occurredAt = offset
-    ? new Date(now.getTime() - offset * 86_400_000).toISOString()
-    : now.toISOString();
+  const occurredAt = offset ? new Date(now.getTime() - offset * 86_400_000).toISOString() : now.toISOString();
 
   return {
     complete: categoryKey !== null,

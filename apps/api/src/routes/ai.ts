@@ -1,7 +1,15 @@
 import { createHash } from "node:crypto";
 import { and, desc, eq, gte, isNull, lt, or, sql } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
-import { AiUnavailableError, askQuestion, monthlySummary, parseInput, parseReceipt, type AskTools, type SummaryInput } from "@amar-poribar/ai";
+import {
+  AiUnavailableError,
+  askQuestion,
+  monthlySummary,
+  parseInput,
+  parseReceipt,
+  type AskTools,
+  type SummaryInput,
+} from "@amar-poribar/ai";
 import {
   AskRequestSchema,
   ParseRequestSchema,
@@ -24,13 +32,17 @@ type FamilyParams = { Params: { familyId: string } };
 async function hasAiQuota(db: Db, familyId: string): Promise<boolean> {
   const month = currentDhakaMonth();
   const [family] = await db.select({ quota: families.aiQuotaMonth }).from(families).where(eq(families.id, familyId));
-  const [usage] = await db.select({ requests: aiUsage.requests }).from(aiUsage)
+  const [usage] = await db
+    .select({ requests: aiUsage.requests })
+    .from(aiUsage)
     .where(and(eq(aiUsage.familyId, familyId), eq(aiUsage.month, month)));
   return (family?.quota ?? 0) > (usage?.requests ?? 0);
 }
 
 async function recordAiUse(db: Db, familyId: string): Promise<void> {
-  await db.insert(aiUsage).values({ familyId, month: currentDhakaMonth(), requests: 1 })
+  await db
+    .insert(aiUsage)
+    .values({ familyId, month: currentDhakaMonth(), requests: 1 })
     .onConflictDoUpdate({ target: [aiUsage.familyId, aiUsage.month], set: { requests: sql`${aiUsage.requests} + 1` } });
 }
 
@@ -58,7 +70,8 @@ export async function aiRoutes(app: FastifyInstance, { db, anthropic, aiModel }:
       if (result.usedAi) await recordAiUse(db, familyId);
       return result;
     } catch (err) {
-      if (err instanceof AiUnavailableError) throw new HttpError(503, "ai_unavailable", "AI couldn't read that; please enter it manually");
+      if (err instanceof AiUnavailableError)
+        throw new HttpError(503, "ai_unavailable", "AI couldn't read that; please enter it manually");
       throw err;
     }
   });
@@ -89,10 +102,17 @@ export async function aiRoutes(app: FastifyInstance, { db, anthropic, aiModel }:
 
     // Same numbers → same summary. Only aggregates are hashed and sent to the AI, never notes or names.
     const factsHash = createHash("sha256").update(JSON.stringify(input)).digest("hex");
-    const [cached] = await db.select().from(aiSummaries).where(and(
-      eq(aiSummaries.familyId, familyId), eq(aiSummaries.month, month),
-      eq(aiSummaries.locale, locale), eq(aiSummaries.factsHash, factsHash),
-    ));
+    const [cached] = await db
+      .select()
+      .from(aiSummaries)
+      .where(
+        and(
+          eq(aiSummaries.familyId, familyId),
+          eq(aiSummaries.month, month),
+          eq(aiSummaries.locale, locale),
+          eq(aiSummaries.factsHash, factsHash),
+        ),
+      );
     if (cached) return { month, locale, text: cached.text, speechText: cached.speechText, usedAi: cached.usedAi };
 
     const useAi = anthropic && (await hasAiQuota(db, familyId));
@@ -100,8 +120,17 @@ export async function aiRoutes(app: FastifyInstance, { db, anthropic, aiModel }:
     // Only AI summaries are cached; the template is free to rebuild and shouldn't block a later AI version.
     if (summary.usedAi) {
       await recordAiUse(db, familyId);
-      await db.insert(aiSummaries)
-        .values({ familyId, month, locale, factsHash, text: summary.text, speechText: summary.speechText, usedAi: true })
+      await db
+        .insert(aiSummaries)
+        .values({
+          familyId,
+          month,
+          locale,
+          factsHash,
+          text: summary.text,
+          speechText: summary.speechText,
+          usedAi: true,
+        })
         .onConflictDoNothing();
     }
     return { month, locale, ...summary };
@@ -113,14 +142,21 @@ export async function aiRoutes(app: FastifyInstance, { db, anthropic, aiModel }:
     await requireRole(db, familyId, req.user.sub, "member");
     const { question, forSpeech } = parseOr400(AskRequestSchema, req.body);
     if (!anthropic) throw new HttpError(503, "ai_unavailable", "Ask is not available right now");
-    if (!(await hasAiQuota(db, familyId))) throw new HttpError(429, "ai_quota", "This month's AI limit has been reached");
+    if (!(await hasAiQuota(db, familyId)))
+      throw new HttpError(429, "ai_quota", "This month's AI limit has been reached");
 
     const userId = req.user.sub;
     const tools: AskTools = {
       sumByCategory: async (month) =>
-        (await monthTotals(db, familyId, userId, month)).byCategory.map((c) => ({ name: `${c.nameEn} / ${c.name}`, totalPaisa: c.totalPaisa })),
+        (await monthTotals(db, familyId, userId, month)).byCategory.map((c) => ({
+          name: `${c.nameEn} / ${c.name}`,
+          totalPaisa: c.totalPaisa,
+        })),
       compareMonths: async (a, b) => {
-        const [ta, tb] = await Promise.all([monthTotals(db, familyId, userId, a), monthTotals(db, familyId, userId, b)]);
+        const [ta, tb] = await Promise.all([
+          monthTotals(db, familyId, userId, a),
+          monthTotals(db, familyId, userId, b),
+        ]);
         return {
           a: { month: a, incomePaisa: ta.incomePaisa, expensePaisa: ta.expensePaisa },
           b: { month: b, incomePaisa: tb.incomePaisa, expensePaisa: tb.expensePaisa },
@@ -132,14 +168,16 @@ export async function aiRoutes(app: FastifyInstance, { db, anthropic, aiModel }:
           .select({ t: transactions, nameEn: categories.nameEn, nameBn: categories.nameBn })
           .from(transactions)
           .leftJoin(categories, eq(categories.id, transactions.categoryId))
-          .where(and(
-            eq(transactions.familyId, familyId),
-            isNull(transactions.deletedAt),
-            gte(transactions.occurredAt, start),
-            lt(transactions.occurredAt, end),
-            // Same visibility rule as the app: other members' private entries are never read (FR-TXN-05).
-            or(eq(transactions.isPrivate, false), eq(transactions.createdBy, userId)),
-          ))
+          .where(
+            and(
+              eq(transactions.familyId, familyId),
+              isNull(transactions.deletedAt),
+              gte(transactions.occurredAt, start),
+              lt(transactions.occurredAt, end),
+              // Same visibility rule as the app: other members' private entries are never read (FR-TXN-05).
+              or(eq(transactions.isPrivate, false), eq(transactions.createdBy, userId)),
+            ),
+          )
           .orderBy(desc(transactions.occurredAt))
           .limit(200);
         return rows
@@ -167,7 +205,8 @@ export async function aiRoutes(app: FastifyInstance, { db, anthropic, aiModel }:
       await recordAiUse(db, familyId);
       return { answer, usedAi: true };
     } catch (err) {
-      if (err instanceof AiUnavailableError) throw new HttpError(503, "ai_unavailable", "AI couldn't answer that right now");
+      if (err instanceof AiUnavailableError)
+        throw new HttpError(503, "ai_unavailable", "AI couldn't answer that right now");
       throw err;
     }
   });
@@ -181,18 +220,23 @@ export async function aiRoutes(app: FastifyInstance, { db, anthropic, aiModel }:
       await requireRole(db, familyId, req.user.sub, "member");
       const { imageBase64, mediaType } = parseOr400(ReceiptRequestSchema, req.body);
       if (!anthropic) throw new HttpError(503, "ai_unavailable", "Receipt reading is not available right now");
-      if (!(await hasAiQuota(db, familyId))) throw new HttpError(429, "ai_quota", "This month's AI limit has been reached");
+      if (!(await hasAiQuota(db, familyId)))
+        throw new HttpError(429, "ai_quota", "This month's AI limit has been reached");
 
       const cats = await db
         .select({ key: categories.key, nameEn: categories.nameEn, nameBn: categories.nameBn, kind: categories.kind })
         .from(categories)
         .where(and(eq(categories.familyId, familyId), eq(categories.isHidden, false)));
       try {
-        const drafts = await parseReceipt({ base64: imageBase64, mediaType }, { client: anthropic, categories: cats, model: aiModel });
+        const drafts = await parseReceipt(
+          { base64: imageBase64, mediaType },
+          { client: anthropic, categories: cats, model: aiModel },
+        );
         await recordAiUse(db, familyId);
         return { drafts, usedAi: true };
       } catch (err) {
-        if (err instanceof AiUnavailableError) throw new HttpError(503, "ai_unavailable", "Couldn't read that photo; please enter it manually");
+        if (err instanceof AiUnavailableError)
+          throw new HttpError(503, "ai_unavailable", "Couldn't read that photo; please enter it manually");
         throw err;
       }
     },

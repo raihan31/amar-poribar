@@ -46,7 +46,10 @@ export async function festivalRoutes(app: FastifyInstance, { db }: AppDeps) {
   app.post<FamilyParams>("/v1/families/:familyId/festival-budgets", async (req, reply) => {
     await requireRole(db, req.params.familyId, req.user.sub, "admin");
     const body = parseOr400(CreateFestivalBudgetSchema, req.body);
-    const [row] = await db.insert(festivalBudgets).values({ ...body, familyId: req.params.familyId }).returning();
+    const [row] = await db
+      .insert(festivalBudgets)
+      .values({ ...body, familyId: req.params.familyId })
+      .returning();
     return reply.status(201).send(row);
   });
 
@@ -60,7 +63,11 @@ export async function festivalRoutes(app: FastifyInstance, { db }: AppDeps) {
     const startsOn = body.startsOn ?? current.startsOn;
     const endsOn = body.endsOn ?? current.endsOn;
     if (endsOn < startsOn) throw new HttpError(400, "invalid_request", "endsOn must not be before startsOn");
-    const [row] = await db.update(festivalBudgets).set({ ...body, updatedAt: new Date() }).where(where).returning();
+    const [row] = await db
+      .update(festivalBudgets)
+      .set({ ...body, updatedAt: new Date() })
+      .where(where)
+      .returning();
     return row;
   });
 

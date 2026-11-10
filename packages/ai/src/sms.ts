@@ -65,10 +65,17 @@ export function maskPhone(text: string): string {
 function extractCounterparty(sms: string, kind: SmsKind): string | null {
   const biller = sms.match(/Biller\s*:?\s*([A-Za-z][\w &.-]{1,40}?)(?=\s*(?:\.|,|Account|Acc|Amount|Bill|$))/i);
   if (biller?.[1]) return biller[1].trim();
-  const labelled = sms.match(/(?:Receiver|Sender|Merchant|Agent)\s*:?\s*([+\w][\w &.()-]{2,40}?)(?=\s*(?:\.|,|Ref|Amount|TxnID|TrxID|Fee|Balance|$))/i);
+  const labelled = sms.match(
+    /(?:Receiver|Sender|Merchant|Agent)\s*:?\s*([+\w][\w &.()-]{2,40}?)(?=\s*(?:\.|,|Ref|Amount|TxnID|TrxID|Fee|Balance|$))/i,
+  );
   if (labelled?.[1]) return maskPhone(labelled[1].trim());
   const preposition = kind === "received" ? "from" : "to";
-  const m = sms.match(new RegExp(String.raw`\b${preposition}\s+([+\w][\w &.()-]{2,40}?)(?=\s+(?:is\s+)?(?:successful|Ref|Fee|Balance|TrxID)|[.,]|$)`, "i"));
+  const m = sms.match(
+    new RegExp(
+      String.raw`\b${preposition}\s+([+\w][\w &.()-]{2,40}?)(?=\s+(?:is\s+)?(?:successful|Ref|Fee|Balance|TrxID)|[.,]|$)`,
+      "i",
+    ),
+  );
   return m?.[1] ? maskPhone(m[1].trim()) : null;
 }
 

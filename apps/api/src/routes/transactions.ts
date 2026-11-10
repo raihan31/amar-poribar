@@ -45,17 +45,18 @@ export async function transactionRoutes(app: FastifyInstance, { db }: AppDeps) {
   });
 
   /** Category and account must belong to this family (tenant isolation, NFR-06). */
-  async function assertOwnedRefs(
-    familyId: string,
-    refs: { categoryId?: string | null; accountId?: string | null },
-  ) {
+  async function assertOwnedRefs(familyId: string, refs: { categoryId?: string | null; accountId?: string | null }) {
     if (refs.categoryId) {
-      const [c] = await db.select({ id: categories.id }).from(categories)
+      const [c] = await db
+        .select({ id: categories.id })
+        .from(categories)
         .where(and(eq(categories.id, refs.categoryId), eq(categories.familyId, familyId)));
       if (!c) throw new HttpError(400, "invalid_category", "Unknown category");
     }
     if (refs.accountId) {
-      const [a] = await db.select({ id: accounts.id }).from(accounts)
+      const [a] = await db
+        .select({ id: accounts.id })
+        .from(accounts)
         .where(and(eq(accounts.id, refs.accountId), eq(accounts.familyId, familyId)));
       if (!a) throw new HttpError(400, "invalid_account", "Unknown account");
     }
@@ -89,7 +90,9 @@ export async function transactionRoutes(app: FastifyInstance, { db }: AppDeps) {
     const { familyId, txnId } = req.params;
     const role = await requireRole(db, familyId, req.user.sub, "member");
     const input = parseOr400(UpdateTransactionSchema, req.body);
-    const [txn] = await db.select().from(transactions)
+    const [txn] = await db
+      .select()
+      .from(transactions)
       .where(and(eq(transactions.id, txnId), visibleTo(familyId, req.user.sub)));
     if (!txn) throw new HttpError(404, "not_found", "Transaction not found");
     if (txn.createdBy !== req.user.sub && !canEditAll(role)) {
@@ -114,13 +117,18 @@ export async function transactionRoutes(app: FastifyInstance, { db }: AppDeps) {
   app.delete<TxnParams>("/v1/families/:familyId/transactions/:txnId", async (req, reply) => {
     const { familyId, txnId } = req.params;
     const role = await requireRole(db, familyId, req.user.sub, "member");
-    const [txn] = await db.select().from(transactions)
+    const [txn] = await db
+      .select()
+      .from(transactions)
       .where(and(eq(transactions.id, txnId), visibleTo(familyId, req.user.sub)));
     if (!txn) throw new HttpError(404, "not_found", "Transaction not found");
     if (txn.createdBy !== req.user.sub && !canEditAll(role)) {
       throw new HttpError(403, "forbidden", "You can only delete your own entries");
     }
-    await db.update(transactions).set({ deletedAt: sql`now()`, hlc: nextHlc(txn.hlc), syncSeq: bumpSyncSeq, updatedAt: new Date() }).where(eq(transactions.id, txnId));
+    await db
+      .update(transactions)
+      .set({ deletedAt: sql`now()`, hlc: nextHlc(txn.hlc), syncSeq: bumpSyncSeq, updatedAt: new Date() })
+      .where(eq(transactions.id, txnId));
     return reply.status(204).send();
   });
 }

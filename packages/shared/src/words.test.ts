@@ -30,12 +30,22 @@ describe("amountInWords", () => {
 describe("speech", () => {
   it("reads a draft back in simple Bangla", () => {
     const draft = {
-      type: "expense", amountPaisa: 85_000, feePaisa: 0, occurredAt: "2026-10-06T10:00:00+06:00",
-      categoryKey: "bazaar", accountType: "cash", note: "বাজার", counterparty: null, trxId: null,
-      source: "voice", confidence: 0.9,
+      type: "expense",
+      amountPaisa: 85_000,
+      feePaisa: 0,
+      occurredAt: "2026-10-06T10:00:00+06:00",
+      categoryKey: "bazaar",
+      accountType: "cash",
+      note: "বাজার",
+      counterparty: null,
+      trxId: null,
+      source: "voice",
+      confidence: 0.9,
     } as const;
     expect(draftToSpeech(draft, "বাজার ও মুদি")).toBe("বাজার ও মুদি খাতে আটশো পঞ্চাশ টাকা খরচ। ঠিক আছে?");
-    expect(draftToSpeech({ ...draft, amountPaisa: 50_000 }, null)).toBe("পাঁচশো টাকা খরচ। কিসের জন্য? নিচের ছবিতে চাপ দিন।");
+    expect(draftToSpeech({ ...draft, amountPaisa: 50_000 }, null)).toBe(
+      "পাঁচশো টাকা খরচ। কিসের জন্য? নিচের ছবিতে চাপ দিন।",
+    );
     expect(monthName("2026-10")).toBe("অক্টোবর");
   });
 });

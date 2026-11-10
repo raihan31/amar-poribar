@@ -46,7 +46,13 @@ export async function parseReceipt(
   const response = await client.beta.messages.parse({
     model,
     max_tokens: 4000,
-    system: [{ type: "text", text: `${RECEIPT_PROMPT}\n\nCategory keys:\n${categoryList}`, cache_control: { type: "ephemeral" } }],
+    system: [
+      {
+        type: "text",
+        text: `${RECEIPT_PROMPT}\n\nCategory keys:\n${categoryList}`,
+        cache_control: { type: "ephemeral" },
+      },
+    ],
     messages: [
       {
         role: "user",

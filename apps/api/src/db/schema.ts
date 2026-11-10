@@ -49,15 +49,21 @@ export const families = pgTable("families", {
   currency: text("currency").notNull().default("BDT"),
   plan: text("plan").notNull().default("free"),
   aiQuotaMonth: integer("ai_quota_month").notNull().default(100),
-  createdBy: uuid("created_by").notNull().references(() => users.id),
+  createdBy: uuid("created_by")
+    .notNull()
+    .references(() => users.id),
   ...timestamps,
 });
 
 export const familyMembers = pgTable(
   "family_members",
   {
-    familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),
-    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    familyId: uuid("family_id")
+      .notNull()
+      .references(() => families.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     role: roleEnum("role").notNull().default("member"),
     joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -67,12 +73,16 @@ export const familyMembers = pgTable(
 /** Shareable invite link, valid for 7 days (SRS FR-FAM-02). */
 export const familyInvites = pgTable("family_invites", {
   id: uuid("id").primaryKey().defaultRandom(),
-  familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),
+  familyId: uuid("family_id")
+    .notNull()
+    .references(() => families.id, { onDelete: "cascade" }),
   token: text("token").notNull().unique(),
   role: roleEnum("role").notNull().default("member"),
   /** Optional: when set, only the user with this phone can accept. */
   phone: text("phone"),
-  createdBy: uuid("created_by").notNull().references(() => users.id),
+  createdBy: uuid("created_by")
+    .notNull()
+    .references(() => users.id),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   acceptedBy: uuid("accepted_by").references(() => users.id),
   acceptedAt: timestamp("accepted_at", { withTimezone: true }),
@@ -81,7 +91,9 @@ export const familyInvites = pgTable("family_invites", {
 
 export const accounts = pgTable("accounts", {
   id: uuid("id").primaryKey().defaultRandom(),
-  familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),
+  familyId: uuid("family_id")
+    .notNull()
+    .references(() => families.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   type: accountTypeEnum("type").notNull(),
   ownerUserId: uuid("owner_user_id").references(() => users.id),
@@ -92,7 +104,9 @@ export const accounts = pgTable("accounts", {
 
 export const categories = pgTable("categories", {
   id: uuid("id").primaryKey().defaultRandom(),
-  familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),
+  familyId: uuid("family_id")
+    .notNull()
+    .references(() => families.id, { onDelete: "cascade" }),
   key: text("key").notNull(),
   kind: categoryKindEnum("kind").notNull(),
   nameEn: text("name_en").notNull(),
@@ -105,7 +119,9 @@ export const transactions = pgTable(
   "transactions",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),
+    familyId: uuid("family_id")
+      .notNull()
+      .references(() => families.id, { onDelete: "cascade" }),
     type: txnTypeEnum("type").notNull(),
     amountPaisa: bigint("amount_paisa", { mode: "number" }).notNull(),
     feePaisa: bigint("fee_paisa", { mode: "number" }).notNull().default(0),
@@ -119,19 +135,25 @@ export const transactions = pgTable(
     source: txnSourceEnum("source").notNull().default("manual"),
     aiConfidence: real("ai_confidence"),
     isPrivate: boolean("is_private").notNull().default(false),
-    createdBy: uuid("created_by").notNull().references(() => users.id),
+    createdBy: uuid("created_by")
+      .notNull()
+      .references(() => users.id),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
     /** Hybrid logical clock of the last change (SRS FR-SYNC-02). Empty for rows that predate sync. */
     hlc: text("hlc").notNull().default(""),
     /** Bumped on every insert/update (see `bumpSyncSeq`); the cursor sync clients page by. */
-    syncSeq: bigint("sync_seq", { mode: "number" }).notNull().default(sql`nextval('txn_sync_seq')`),
+    syncSeq: bigint("sync_seq", { mode: "number" })
+      .notNull()
+      .default(sql`nextval('txn_sync_seq')`),
     ...timestamps,
   },
   (t) => [
     index("txn_family_seq_idx").on(t.familyId, t.syncSeq),
     index("txn_family_time_idx").on(t.familyId, t.occurredAt.desc()),
     // SRS FR-TXN-04: no duplicate MFS transactions.
-    uniqueIndex("txn_family_trx_uidx").on(t.familyId, t.trxId).where(sql`${t.trxId} is not null`),
+    uniqueIndex("txn_family_trx_uidx")
+      .on(t.familyId, t.trxId)
+      .where(sql`${t.trxId} is not null`),
   ],
 );
 
@@ -139,7 +161,9 @@ export const budgets = pgTable(
   "budgets",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),
+    familyId: uuid("family_id")
+      .notNull()
+      .references(() => families.id, { onDelete: "cascade" }),
     categoryId: uuid("category_id").references(() => categories.id),
     month: text("month").notNull(),
     limitPaisa: bigint("limit_paisa", { mode: "number" }).notNull(),
@@ -150,7 +174,9 @@ export const budgets = pgTable(
 /** One-off budget over a date range, e.g. Eid-ul-Adha (SRS FR-BUD-04). */
 export const festivalBudgets = pgTable("festival_budgets", {
   id: uuid("id").primaryKey().defaultRandom(),
-  familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),
+  familyId: uuid("family_id")
+    .notNull()
+    .references(() => families.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   startsOn: text("starts_on").notNull(),
   endsOn: text("ends_on").notNull(),
@@ -161,7 +187,9 @@ export const festivalBudgets = pgTable("festival_budgets", {
 /** Monthly template that produces a draft each month for the user to confirm (FR-TXN-06). */
 export const recurringTemplates = pgTable("recurring_templates", {
   id: uuid("id").primaryKey().defaultRandom(),
-  familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),
+  familyId: uuid("family_id")
+    .notNull()
+    .references(() => families.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   type: txnTypeEnum("type").notNull().default("expense"),
   amountPaisa: bigint("amount_paisa", { mode: "number" }).notNull(),
@@ -174,14 +202,18 @@ export const recurringTemplates = pgTable("recurring_templates", {
   active: boolean("active").notNull().default(true),
   /** Last month (YYYY-MM) whose draft was confirmed; stops the same month being recorded twice. */
   lastConfirmedMonth: text("last_confirmed_month"),
-  createdBy: uuid("created_by").notNull().references(() => users.id),
+  createdBy: uuid("created_by")
+    .notNull()
+    .references(() => users.id),
   ...timestamps,
 });
 
 export const aiUsage = pgTable(
   "ai_usage",
   {
-    familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),
+    familyId: uuid("family_id")
+      .notNull()
+      .references(() => families.id, { onDelete: "cascade" }),
     month: text("month").notNull(),
     requests: integer("requests").notNull().default(0),
   },
@@ -192,7 +224,9 @@ export const aiUsage = pgTable(
 export const aiSummaries = pgTable(
   "ai_summaries",
   {
-    familyId: uuid("family_id").notNull().references(() => families.id, { onDelete: "cascade" }),
+    familyId: uuid("family_id")
+      .notNull()
+      .references(() => families.id, { onDelete: "cascade" }),
     month: text("month").notNull(),
     locale: text("locale").notNull(),
     factsHash: text("facts_hash").notNull(),

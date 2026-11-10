@@ -6,16 +6,106 @@
 
 // Bangla has a distinct word for every number from 0 to 99.
 const UNDER_100 = [
-  "শূন্য", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়",
-  "দশ", "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোলো", "সতেরো", "আঠারো", "উনিশ",
-  "বিশ", "একুশ", "বাইশ", "তেইশ", "চব্বিশ", "পঁচিশ", "ছাব্বিশ", "সাতাশ", "আঠাশ", "ঊনত্রিশ",
-  "ত্রিশ", "একত্রিশ", "বত্রিশ", "তেত্রিশ", "চৌত্রিশ", "পঁয়ত্রিশ", "ছত্রিশ", "সাঁইত্রিশ", "আটত্রিশ", "ঊনচল্লিশ",
-  "চল্লিশ", "একচল্লিশ", "বিয়াল্লিশ", "তেতাল্লিশ", "চুয়াল্লিশ", "পঁয়তাল্লিশ", "ছেচল্লিশ", "সাতচল্লিশ", "আটচল্লিশ", "ঊনপঞ্চাশ",
-  "পঞ্চাশ", "একান্ন", "বাহান্ন", "তিপ্পান্ন", "চুয়ান্ন", "পঞ্চান্ন", "ছাপ্পান্ন", "সাতান্ন", "আটান্ন", "ঊনষাট",
-  "ষাট", "একষট্টি", "বাষট্টি", "তেষট্টি", "চৌষট্টি", "পঁয়ষট্টি", "ছেষট্টি", "সাতষট্টি", "আটষট্টি", "ঊনসত্তর",
-  "সত্তর", "একাত্তর", "বাহাত্তর", "তিয়াত্তর", "চুয়াত্তর", "পঁচাত্তর", "ছিয়াত্তর", "সাতাত্তর", "আটাত্তর", "ঊনআশি",
-  "আশি", "একাশি", "বিরাশি", "তিরাশি", "চুরাশি", "পঁচাশি", "ছিয়াশি", "সাতাশি", "আটাশি", "ঊননব্বই",
-  "নব্বই", "একানব্বই", "বিরানব্বই", "তিরানব্বই", "চুরানব্বই", "পঁচানব্বই", "ছিয়ানব্বই", "সাতানব্বই", "আটানব্বই", "নিরানব্বই",
+  "শূন্য",
+  "এক",
+  "দুই",
+  "তিন",
+  "চার",
+  "পাঁচ",
+  "ছয়",
+  "সাত",
+  "আট",
+  "নয়",
+  "দশ",
+  "এগারো",
+  "বারো",
+  "তেরো",
+  "চৌদ্দ",
+  "পনেরো",
+  "ষোলো",
+  "সতেরো",
+  "আঠারো",
+  "উনিশ",
+  "বিশ",
+  "একুশ",
+  "বাইশ",
+  "তেইশ",
+  "চব্বিশ",
+  "পঁচিশ",
+  "ছাব্বিশ",
+  "সাতাশ",
+  "আঠাশ",
+  "ঊনত্রিশ",
+  "ত্রিশ",
+  "একত্রিশ",
+  "বত্রিশ",
+  "তেত্রিশ",
+  "চৌত্রিশ",
+  "পঁয়ত্রিশ",
+  "ছত্রিশ",
+  "সাঁইত্রিশ",
+  "আটত্রিশ",
+  "ঊনচল্লিশ",
+  "চল্লিশ",
+  "একচল্লিশ",
+  "বিয়াল্লিশ",
+  "তেতাল্লিশ",
+  "চুয়াল্লিশ",
+  "পঁয়তাল্লিশ",
+  "ছেচল্লিশ",
+  "সাতচল্লিশ",
+  "আটচল্লিশ",
+  "ঊনপঞ্চাশ",
+  "পঞ্চাশ",
+  "একান্ন",
+  "বাহান্ন",
+  "তিপ্পান্ন",
+  "চুয়ান্ন",
+  "পঞ্চান্ন",
+  "ছাপ্পান্ন",
+  "সাতান্ন",
+  "আটান্ন",
+  "ঊনষাট",
+  "ষাট",
+  "একষট্টি",
+  "বাষট্টি",
+  "তেষট্টি",
+  "চৌষট্টি",
+  "পঁয়ষট্টি",
+  "ছেষট্টি",
+  "সাতষট্টি",
+  "আটষট্টি",
+  "ঊনসত্তর",
+  "সত্তর",
+  "একাত্তর",
+  "বাহাত্তর",
+  "তিয়াত্তর",
+  "চুয়াত্তর",
+  "পঁচাত্তর",
+  "ছিয়াত্তর",
+  "সাতাত্তর",
+  "আটাত্তর",
+  "ঊনআশি",
+  "আশি",
+  "একাশি",
+  "বিরাশি",
+  "তিরাশি",
+  "চুরাশি",
+  "পঁচাশি",
+  "ছিয়াশি",
+  "সাতাশি",
+  "আটাশি",
+  "ঊননব্বই",
+  "নব্বই",
+  "একানব্বই",
+  "বিরানব্বই",
+  "তিরানব্বই",
+  "চুরানব্বই",
+  "পঁচানব্বই",
+  "ছিয়ানব্বই",
+  "সাতানব্বই",
+  "আটানব্বই",
+  "নিরানব্বই",
 ] as const;
 
 /** Spell a non-negative integer in Bangla words, e.g. 125000 → "এক লাখ পঁচিশ হাজার". */
@@ -52,8 +142,34 @@ export function amountInWords(paisa: number, locale: "bn" | "en" = "bn"): string
   return out;
 }
 
-const MONTHS_BN = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
-const MONTHS_EN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const MONTHS_BN = [
+  "জানুয়ারি",
+  "ফেব্রুয়ারি",
+  "মার্চ",
+  "এপ্রিল",
+  "মে",
+  "জুন",
+  "জুলাই",
+  "আগস্ট",
+  "সেপ্টেম্বর",
+  "অক্টোবর",
+  "নভেম্বর",
+  "ডিসেম্বর",
+];
+const MONTHS_EN = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 /** "2026-10" → "অক্টোবর" / "October". */
 export function monthName(month: string, locale: "bn" | "en" = "bn"): string {
@@ -64,11 +180,24 @@ export function monthName(month: string, locale: "bn" | "en" = "bn"): string {
 const WORD_VALUE = new Map<string, number>(UNDER_100.map((w, i) => [w, i]));
 // Common spoken/spelling variants.
 for (const [w, v] of [
-  ["ছয়", 6], ["ছ", 6], ["নয়", 9], ["ষোল", 16], ["এগার", 11], ["বার", 12], ["তের", 13], ["পনের", 15], ["সতের", 17], ["আঠার", 18],
-] as const) WORD_VALUE.set(w, v);
+  ["ছয়", 6],
+  ["ছ", 6],
+  ["নয়", 9],
+  ["ষোল", 16],
+  ["এগার", 11],
+  ["বার", 12],
+  ["তের", 13],
+  ["পনের", 15],
+  ["সতের", 17],
+  ["আঠার", 18],
+] as const)
+  WORD_VALUE.set(w, v);
 
 const MULTIPLIERS = new Map<string, number>([
-  ["হাজার", 1000], ["লাখ", 1_00_000], ["লক্ষ", 1_00_000], ["কোটি", 1_00_00_000],
+  ["হাজার", 1000],
+  ["লাখ", 1_00_000],
+  ["লক্ষ", 1_00_000],
+  ["কোটি", 1_00_00_000],
 ]);
 
 /**
@@ -77,7 +206,10 @@ const MULTIPLIERS = new Map<string, number>([
  * Speech recognisers sometimes write numbers as words, especially for informal speech.
  */
 export function parseBanglaNumberWords(text: string): number | null {
-  const tokens = text.split(/[\s,।]+/).map((t) => t.replace(/(টাকা|টাকার|টাকায়)$/, "")).filter(Boolean);
+  const tokens = text
+    .split(/[\s,।]+/)
+    .map((t) => t.replace(/(টাকা|টাকার|টাকায়)$/, ""))
+    .filter(Boolean);
   let total = 0;
   let current = 0;
   let half = false;
@@ -92,23 +224,42 @@ export function parseBanglaNumberWords(text: string): number | null {
   };
 
   for (const token of tokens) {
-    if (token === "সাড়ে") { half = true; seen = true; continue; }
-    if (token === "দেড়") { current += 1.5; seen = true; continue; }
-    if (token === "আড়াই") { current += 2.5; seen = true; continue; }
+    if (token === "সাড়ে") {
+      half = true;
+      seen = true;
+      continue;
+    }
+    if (token === "দেড়") {
+      current += 1.5;
+      seen = true;
+      continue;
+    }
+    if (token === "আড়াই") {
+      current += 2.5;
+      seen = true;
+      continue;
+    }
     const mult = MULTIPLIERS.get(token);
     if (mult) {
       total += ((current || 1) + (half ? 0.5 : 0)) * mult;
-      current = 0; half = false; seen = true;
+      current = 0;
+      half = false;
+      seen = true;
       continue;
     }
     const hundreds = hundredsOf(token);
     if (hundreds !== null) {
       current += hundreds + (half ? 50 : 0);
-      half = false; seen = true;
+      half = false;
+      seen = true;
       continue;
     }
     const v = WORD_VALUE.get(token);
-    if (v !== undefined) { current += v; seen = true; continue; }
+    if (v !== undefined) {
+      current += v;
+      seen = true;
+      continue;
+    }
     if (seen && (total || current)) break; // number phrase ended
   }
   const result = Math.round(total + current);

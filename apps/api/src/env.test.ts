@@ -21,7 +21,10 @@ describe("env", () => {
   });
 
   it("parses CORS origins", async () => {
-    const env = await loadEnv({ NODE_ENV: "development", CORS_ORIGIN: "http://localhost:3000, https://app.example.com" });
+    const env = await loadEnv({
+      NODE_ENV: "development",
+      CORS_ORIGIN: "http://localhost:3000, https://app.example.com",
+    });
     expect(env.corsOrigins).toEqual(["http://localhost:3000", "https://app.example.com"]);
   });
 });

@@ -32,7 +32,10 @@ export async function budgetRoutes(app: FastifyInstance, { db }: AppDeps) {
     const spentBy = new Map(totals.byCategory.map((c) => [c.categoryId, c.totalPaisa]));
     const ids = effective.flatMap((b) => (b.categoryId ? [b.categoryId] : []));
     const cats = ids.length
-      ? await db.select().from(categories).where(and(eq(categories.familyId, familyId), inArray(categories.id, ids)))
+      ? await db
+          .select()
+          .from(categories)
+          .where(and(eq(categories.familyId, familyId), inArray(categories.id, ids)))
       : [];
     const catById = new Map(cats.map((c) => [c.id, c]));
 

@@ -20,12 +20,16 @@ export async function recurringRoutes(app: FastifyInstance, { db }: AppDeps) {
 
   async function assertRefs(familyId: string, refs: { categoryId?: string | null; accountId?: string | null }) {
     if (refs.categoryId) {
-      const [c] = await db.select({ id: categories.id }).from(categories)
+      const [c] = await db
+        .select({ id: categories.id })
+        .from(categories)
         .where(and(eq(categories.id, refs.categoryId), eq(categories.familyId, familyId)));
       if (!c) throw new HttpError(400, "invalid_category", "Unknown category");
     }
     if (refs.accountId) {
-      const [a] = await db.select({ id: accounts.id }).from(accounts)
+      const [a] = await db
+        .select({ id: accounts.id })
+        .from(accounts)
         .where(and(eq(accounts.id, refs.accountId), eq(accounts.familyId, familyId)));
       if (!a) throw new HttpError(400, "invalid_account", "Unknown account");
     }
@@ -54,7 +58,9 @@ export async function recurringRoutes(app: FastifyInstance, { db }: AppDeps) {
     const [row] = await db
       .update(recurringTemplates)
       .set({ ...body, updatedAt: new Date() })
-      .where(and(eq(recurringTemplates.id, req.params.recurringId), eq(recurringTemplates.familyId, req.params.familyId)))
+      .where(
+        and(eq(recurringTemplates.id, req.params.recurringId), eq(recurringTemplates.familyId, req.params.familyId)),
+      )
       .returning();
     if (!row) throw new HttpError(404, "not_found", "Recurring entry not found");
     return row;
@@ -88,18 +94,33 @@ export async function recurringRoutes(app: FastifyInstance, { db }: AppDeps) {
     await requireRole(db, familyId, req.user.sub, "member");
     const { month = currentDhakaMonth() } = parseOr400(z.object({ month: MonthSchema.optional() }), req.query);
     const txn = await db.transaction(async (tx) => {
-      const [t] = await tx.select().from(recurringTemplates)
+      const [t] = await tx
+        .select()
+        .from(recurringTemplates)
         .where(and(eq(recurringTemplates.id, recurringId), eq(recurringTemplates.familyId, familyId)))
         .for("update");
       if (!t) throw new HttpError(404, "not_found", "Recurring entry not found");
       if (!isDueIn(t, month)) throw new HttpError(409, "not_due", "Nothing to confirm for this month");
-      const [row] = await tx.insert(transactions).values({
-        familyId, type: t.type, amountPaisa: t.amountPaisa,
-        occurredAt: new Date(`${dueDateIn(month, t.dayOfMonth)}T12:00:00+06:00`),
-        categoryId: t.categoryId, accountId: t.accountId, note: t.name,
-        source: "manual", paidByUserId: req.user.sub, createdBy: req.user.sub, hlc: nextHlc(),
-      }).returning();
-      await tx.update(recurringTemplates).set({ lastConfirmedMonth: month }).where(eq(recurringTemplates.id, recurringId));
+      const [row] = await tx
+        .insert(transactions)
+        .values({
+          familyId,
+          type: t.type,
+          amountPaisa: t.amountPaisa,
+          occurredAt: new Date(`${dueDateIn(month, t.dayOfMonth)}T12:00:00+06:00`),
+          categoryId: t.categoryId,
+          accountId: t.accountId,
+          note: t.name,
+          source: "manual",
+          paidByUserId: req.user.sub,
+          createdBy: req.user.sub,
+          hlc: nextHlc(),
+        })
+        .returning();
+      await tx
+        .update(recurringTemplates)
+        .set({ lastConfirmedMonth: month })
+        .where(eq(recurringTemplates.id, recurringId));
       return row;
     });
     return reply.status(201).send(txn);

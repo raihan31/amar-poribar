@@ -28,7 +28,5 @@ export function effectiveBudgets(rows: BudgetRow[], month: string): (BudgetRow &
     const prev = latest.get(key);
     if (!prev || r.month > prev.month) latest.set(key, r);
   }
-  return [...latest.values()]
-    .filter((r) => r.limitPaisa > 0)
-    .map((r) => ({ ...r, inherited: r.month !== month }));
+  return [...latest.values()].filter((r) => r.limitPaisa > 0).map((r) => ({ ...r, inherited: r.month !== month }));
 }
