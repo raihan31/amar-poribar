@@ -1129,3 +1129,24 @@ Common facts for all T-ADMUI tasks:
 | GAP-WEB-01..05, GAP-ADMUI-01 | T-WEB-02, -03, -19, -31, -37, T-ADMUI-01 |
 
 **Not on web by design** (mobile only per SRS §5.1.3): `D2` tutorial, `D3` Simple-mode home (web gets an equivalent layout in T-WEB-13 through the `data-simple` flag), `E8` dhar, `F4` offline/nearby sync, screen `6` native full-screen vibration (web gets the overlay in T-WEB-32).
+
+## 4. Added after design verification
+
+### T-WEB-42 · Design string conformance test (web)
+- **Closes:** NFR-09, NFR-24, FR-I18N-01
+- **Depends on:** T-WEB-05 (i18n), each web screen task for its strings
+- **Milestone:** M2
+- **Layer:** web
+**Why** — Same reason as T-MOB-77: verification found design strings that no task quoted. The test keeps web copy equal to the design.
+**Files**
+- C `apps/web/test/design-strings.test.ts` (Vitest)
+- C `apps/web/test/allowed-differences.json` (≤ 30 entries, each with a `reason`)
+- C `apps/web/test/screen-registry.ts` — `export const implementedScreens: Record<string,string>` mapping design screen name to the route or component file
+- M `packages/shared/src/i18n/bn.ts` — add the static strings the web screens use
+**Steps**
+1. Load `docs/design/strings.json`; for each screen in `screen-registry.ts` (web implements every non-admin screen except `Tutorial`, `SimpleHome`, `Incoming`, `SyncStatus`, `Dhar`), assert each `static` string is a substring of a value in `packages/shared/src/i18n/bn.ts`, or is listed in `allowed-differences.json`.
+2. Assert the allowed list has ≤ 30 entries and every entry has a `reason`.
+3. Strict mode when all 38 web screens are registered.
+**Tests** — `every static design string exists in bn.ts`, `allowed differences are few and explained`, `strict: all web screens registered`.
+**Acceptance** — `pnpm --filter @amar-poribar/web test design-strings` passes; `node tools/design/extract-strings.mjs --check` exits 0.
+**Done when** — Web copy cannot drift from the design without a failing test.
