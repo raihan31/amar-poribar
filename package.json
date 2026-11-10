@@ -25,7 +25,8 @@
     "test:db": "turbo run test:db --filter=@amar-poribar/api --concurrency=1",
     "seed:dev": "pnpm --filter @amar-poribar/api exec tsx scripts/seed-dev.ts",
     "gen:module": "node tools/gen-module.mjs",
-    "arch:negative": "node tools/arch-negative.mjs"
+    "arch:negative": "node tools/arch-negative.mjs",
+    "i18n:check": "node tools/i18n-keys.mjs"
   },
   "devDependencies": {
     "dependency-cruiser": "^16.10.4",
