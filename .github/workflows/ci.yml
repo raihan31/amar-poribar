@@ -78,3 +78,26 @@ jobs:
       - run: flutter analyze --fatal-infos
       - run: flutter test --coverage
       - run: dart run tool/check_coverage.dart 70 lib/domain lib/data lib/core coverage/lcov.info
+
+  mobile-size:
+    name: Flutter (APK size gate)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: flutter gen-l10n
+      # Signed with the debug key: size builds only, never distributed.
+      - run: flutter build apk --release --split-per-abi --target-platform android-arm,android-arm64
+      - run: dart run tool/check_apk_size.dart build/app/outputs/flutter-apk 35
