@@ -1,5 +1,5 @@
 import type { Role, SyncTransaction } from "@amar-poribar/shared";
-import { winsOver } from "../domain/hlc.js";
+import { winsOver } from "../../../platform/hlc.js";
 import { catalogRepo } from "../infra/catalog.repo.js";
 import { stampChange } from "../infra/stamp-change.js";
 import { transactionsRepo } from "../infra/transactions.repo.js";

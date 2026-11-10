@@ -1,10 +1,10 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { ClockDriftError, formatHlc, nextHlc, parseHlc, receiveHlc, sendHlc, winsOver } from "./domain/hlc.js";
+import { ClockDriftError, formatHlc, nextHlc, parseHlc, receiveHlc, sendHlc, winsOver } from "./hlc.js";
 
 // Same vectors as apps/mobile/test/data/hlc_test.dart, so both implementations behave identically.
 const v = JSON.parse(
-  readFileSync(new URL("../../../../../packages/shared/test-vectors/hlc.json", import.meta.url), "utf8"),
+  readFileSync(new URL("../../../../packages/shared/test-vectors/hlc.json", import.meta.url), "utf8"),
 );
 const ms = (s: string) => Date.parse(s);
 
