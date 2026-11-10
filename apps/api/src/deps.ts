@@ -13,4 +13,6 @@ export interface AppDeps {
   logLevel?: string;
   /** Origins allowed by CORS in production. Development allows any origin. */
   corsOrigins?: string[];
+  /** Serve `/v1/openapi.json` in production too (OPENAPI_PUBLIC=true). */
+  openapiPublic?: boolean;
 }

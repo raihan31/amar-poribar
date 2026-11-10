@@ -13,6 +13,7 @@ const app = await buildApp({
   isProd: env.isProd,
   logLevel: env.logLevel,
   corsOrigins: env.corsOrigins,
+  openapiPublic: env.openapiPublic,
 });
 
 await app.listen({ port: env.port, host: "0.0.0.0" });
