@@ -1,0 +1,74 @@
+{
+  "id": "e2efa6bd-f88a-4a1a-97e6-5f2b38ad4d12",
+  "prevId": "6280f091-59c6-44e0-b15d-6bb4e357468c",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "platform.rate_limits": {
+      "name": "rate_limits",
+      "schema": "platform",
+      "columns": {
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "window_start": {
+          "name": "window_start",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "count": {
+          "name": "count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "rate_limits_key_window_start_pk": {
+          "name": "rate_limits_key_window_start_pk",
+          "columns": [
+            "key",
+            "window_start"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {
+    "admin": "admin",
+    "ai": "ai",
+    "billing": "billing",
+    "budgeting": "budgeting",
+    "comms": "comms",
+    "families": "families",
+    "identity": "identity",
+    "ledger": "ledger",
+    "lending": "lending",
+    "notifications": "notifications",
+    "privacy": "privacy",
+    "recurring": "recurring",
+    "reporting": "reporting",
+    "shopping": "shopping",
+    "sync": "sync"
+  },
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
