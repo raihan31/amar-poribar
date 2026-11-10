@@ -1,11 +1,11 @@
-import type Anthropic from "@anthropic-ai/sdk";
 import type { Db } from "./db/client.js";
+import type { AiClient } from "./modules/ai/index.js";
 import type { Jobs } from "./platform/jobs/jobs.js";
 
 export interface AppDeps {
   db: Db;
   /** Undefined when no API key is configured; only the SMS parser runs then. */
-  anthropic?: Anthropic;
+  anthropic?: AiClient;
   aiModel?: string;
   jwtSecret: string;
   isProd: boolean;
