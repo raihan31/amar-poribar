@@ -7,3 +7,4 @@ export * from "./words.js";
 export * from "./speech.js";
 export * from "./private-fields.js";
 export * from "./flags.js";
+export * from "./design-tokens.js";
