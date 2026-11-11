@@ -22,7 +22,7 @@ describe("notifications schema", () => {
   it("creates tables", async () => {
     const rows = await t.sql<{ tablename: string }[]>`
       select tablename from pg_tables where schemaname = 'notifications' order by tablename`;
-    expect(rows.map((r) => r.tablename)).toEqual(["inbox_items", "preferences"]);
+    expect(rows.map((r) => r.tablename)).toEqual(["delivery_stats", "inbox_items", "preferences"]);
   });
 
   it("dedupe key unique per user", async () => {
