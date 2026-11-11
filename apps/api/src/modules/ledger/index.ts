@@ -80,7 +80,7 @@ export const ledgerModule: ModuleDefinition<LedgerFacade> = {
     transactionsRoutes(app, deps);
     // Invariant, not a notification: a family without categories must not exist (SRS §3.5).
     ctx.bus.onInTx("families.FamilyCreated.v1", (event, tx) =>
-      seedDefaults(tx, event.payload.familyId, event.payload.createdBy),
+      seedDefaults(tx, event.payload.familyId, event.payload.ownerUserId),
     );
     return {
       name: "ledger",
