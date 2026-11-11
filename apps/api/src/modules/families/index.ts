@@ -4,6 +4,7 @@ import type { ModuleDefinition } from "../../platform/module.js";
 import { onInviteCreated } from "./app/on-invite-created.js";
 import type { InvitePorts } from "./app/ports.js";
 import { requireRole } from "./app/require-role.js";
+import { suspendFamily, unsuspendFamily } from "./app/suspension.js";
 import { transferOwnership, type TransferActor } from "./app/transfer-ownership.js";
 import { canAssignRole, canEditAll, canManageMember } from "./domain/roles.js";
 import { familiesRoutes } from "./http/families.routes.js";
@@ -46,6 +47,10 @@ export interface FamiliesFacade {
     toUserId: string,
     actor: TransferActor,
   ): Promise<{ familyId: string; owner: string }>;
+  /** FR-FAM-09. Marks the family read-only and publishes `families.FamilySuspended.v1`. @staff-safe */
+  suspendFamily(familyId: string, reason: string, actor: TransferActor): Promise<void>;
+  /** Lifts the suspension and publishes `families.FamilyUnsuspended.v1`. @staff-safe */
+  unsuspendFamily(familyId: string, actor: TransferActor): Promise<void>;
   /** Called by notifications at registration to supply `notify` for invite delivery (families imports neither). */
   bindInvitePorts(ports: Pick<InvitePorts, "notify">): void;
 }
@@ -111,6 +116,8 @@ export const familiesModule: ModuleDefinition<FamiliesFacade> = {
         return q;
       },
       transferOwnership: (familyId, toUserId, actor) => transferOwnership(deps, { familyId, toUserId, actor }),
+      suspendFamily: (familyId, reason, actor) => suspendFamily(deps, familyId, reason, actor),
+      unsuspendFamily: (familyId, actor) => unsuspendFamily(deps, familyId, actor),
       canEditAll,
       canAssignRole,
       canManageMember,

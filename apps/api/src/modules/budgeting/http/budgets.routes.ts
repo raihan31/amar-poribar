@@ -23,7 +23,7 @@ export function budgetsRoutes(app: FastifyInstance, deps: BudgetingDeps) {
 
   app.put<FamilyParams>("/v1/families/:familyId/budgets", { ...opts, schema: docs.object }, async (req) => {
     const { familyId } = req.params;
-    await deps.families.requireRole(familyId, req.user.sub, "admin");
+    await deps.families.requireRole(familyId, req.user.sub, "admin", { write: true });
     const { month = currentDhakaMonth() } = parseOr400(MonthQuery, req.query);
     const input = parseOr400(PutBudgetsSchema, req.body);
     return putBudgets(deps, familyId, month, input);

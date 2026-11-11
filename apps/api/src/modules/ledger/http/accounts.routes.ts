@@ -22,7 +22,7 @@ export function accountsRoutes(app: FastifyInstance, deps: LedgerDeps) {
   });
 
   app.post<FamilyParams>("/v1/families/:familyId/accounts", { ...opts, schema: docs.object }, async (req, reply) => {
-    await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
+    await deps.families.requireRole(req.params.familyId, req.user.sub, "admin", { write: true });
     const body = parseOr400(CreateAccountSchema, req.body);
     return reply.status(201).send(await createAccount(deps, req.params.familyId, body));
   });
@@ -31,7 +31,7 @@ export function accountsRoutes(app: FastifyInstance, deps: LedgerDeps) {
     "/v1/families/:familyId/accounts/:accountId",
     { ...opts, schema: docs.object },
     async (req) => {
-      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
+      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin", { write: true });
       const body = parseOr400(UpdateAccountSchema, req.body);
       return updateAccount(deps, req.params.familyId, req.params.accountId, body);
     },

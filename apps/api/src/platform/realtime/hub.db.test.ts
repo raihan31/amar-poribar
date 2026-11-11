@@ -198,7 +198,9 @@ describe.skipIf(!url)("realtime hub", () => {
     const bus = new EventBus();
     const one = await instance({ bus });
     const c = await connect(one.port, "u1");
-    await one.db.db.transaction((tx) => bus.publish(tx, "families.FamilySuspended.v1", { familyId: FAMILY }));
+    await one.db.db.transaction((tx) =>
+      bus.publish(tx, "families.FamilySuspended.v1", { familyId: FAMILY, reason: "test" }),
+    );
     await drainOnce(one.db.db, bus);
     expect(await c.closed).toBe(CLOSE.removed);
   });

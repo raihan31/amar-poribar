@@ -18,7 +18,7 @@ export function categoriesRoutes(app: FastifyInstance, deps: LedgerDeps) {
   });
 
   app.post<FamilyParams>("/v1/families/:familyId/categories", { ...opts, schema: docs.object }, async (req, reply) => {
-    await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
+    await deps.families.requireRole(req.params.familyId, req.user.sub, "admin", { write: true });
     const body = parseOr400(CreateCategorySchema, req.body);
     return reply.status(201).send(await createCategory(deps, req.params.familyId, body));
   });
@@ -27,7 +27,7 @@ export function categoriesRoutes(app: FastifyInstance, deps: LedgerDeps) {
     "/v1/families/:familyId/categories/:categoryId",
     { ...opts, schema: docs.object },
     async (req) => {
-      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
+      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin", { write: true });
       const body = parseOr400(UpdateCategorySchema, req.body);
       return updateCategory(deps, req.params.familyId, req.params.categoryId, body);
     },

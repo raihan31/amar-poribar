@@ -1,0 +1,9 @@
+app.get("/v1/families/:familyId/things", opts, async (req) => {
+  await deps.families.requireRole(familyId, req.user.sub, "viewer");
+});
+app.post("/v1/families/:familyId/things", opts, async (req) => {
+  await deps.families.requireRole(familyId, req.user.sub, "member");
+});
+app.patch("/v1/families/:familyId/things/:id", opts, async (req) => {
+  await deps.families.requireRole(familyId, req.user.sub, "member", { write: true });
+});
