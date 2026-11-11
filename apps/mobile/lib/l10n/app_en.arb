@@ -176,5 +176,18 @@
   "tutorial_next": "Next step",
   "tutorial_back": "Back",
   "tutorial_skip": "Skip",
-  "tutorial_start": "Get started"
+  "tutorial_start": "Get started",
+  "push_channel_nudge_name": "Buzz",
+  "push_channel_nudge_desc": "When someone in the family sends a buzz",
+  "push_channel_chat_name": "Chat",
+  "push_channel_chat_desc": "Family chat messages",
+  "push_channel_alerts_name": "Budget alerts",
+  "push_channel_alerts_desc": "Warnings when a budget is almost used up",
+  "push_channel_reminders_name": "Reminders",
+  "push_channel_reminders_desc": "Daily and bill reminders",
+  "push_channel_calls_name": "Video calls",
+  "push_channel_calls_desc": "Incoming family video calls",
+  "push_permission_title": "Allow notifications",
+  "push_permission_body": "To get budget alerts, buzzes and reminders on your phone, the app needs permission to send notifications.",
+  "push_permission_allow": "Allow"
 }
