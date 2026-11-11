@@ -1,14 +1,14 @@
 import { normalizeBdPhone } from "@amar-poribar/shared";
-import { issueTokens, type TokenPair } from "./issue-tokens.js";
 import type { OtpService } from "./otp-service.js";
-import type { TokenService, UserRepo } from "./ports.js";
+import type { UserRepo } from "./ports.js";
+import type { SessionService, TokenPair } from "./session-service.js";
 
 export async function verifyOtp(
-  deps: { otp: OtpService; users: UserRepo; tokens: TokenService },
-  input: { phone: string; code: string },
+  deps: { otp: OtpService; users: UserRepo; sessions: SessionService },
+  input: { phone: string; code: string; deviceId?: string },
 ): Promise<TokenPair> {
   const phone = normalizeBdPhone(input.phone);
   await deps.otp.verify(phone, input.code);
   const user = await deps.users.upsertByPhone(phone);
-  return issueTokens(deps.tokens, user.id);
+  return deps.sessions.start(user.id, input.deviceId);
 }

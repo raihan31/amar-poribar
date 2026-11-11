@@ -23,22 +23,15 @@ describe("identity auth routes", () => {
     expect(malformed.statusCode).toBe(400);
   });
 
-  it("refresh rejects access token", async () => {
+  it("refresh rejects an access token (not a session token)", async () => {
     const access = app.jwt.sign({ sub: "u1", typ: "access" }, { expiresIn: "15m" });
     const res = await app.inject({ method: "POST", url: "/v1/auth/refresh", payload: { refreshToken: access } });
     expect(res.statusCode).toBe(401);
-    expect(res.json().error.code).toBe("unauthorized");
-  });
-
-  it("refresh issues a new pair for a refresh token", async () => {
-    const refresh = app.jwt.sign({ sub: "u1", typ: "refresh" }, { expiresIn: "30d" });
-    const res = await app.inject({ method: "POST", url: "/v1/auth/refresh", payload: { refreshToken: refresh } });
-    expect(res.statusCode).toBe(200);
-    expect(Object.keys(res.json()).sort()).toEqual(["accessToken", "refreshToken"]);
+    expect(res.json().error.code).toBe("refresh_invalid");
   });
 
   it("authenticate rejects refresh tokens and missing tokens", async () => {
-    const refresh = app.jwt.sign({ sub: "u1", typ: "refresh" }, { expiresIn: "30d" });
+    const refresh = app.jwt.sign({ sub: "u1", typ: "refresh" } as never, { expiresIn: "30d" });
     const a = await app.inject({ method: "GET", url: "/v1/me", headers: { authorization: `Bearer ${refresh}` } });
     const b = await app.inject({ method: "GET", url: "/v1/me" });
     expect(a.statusCode).toBe(401);

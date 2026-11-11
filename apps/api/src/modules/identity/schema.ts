@@ -31,3 +31,23 @@ export const otpChallenges = identitySchema.table(
   },
   (t) => [index("otp_challenges_phone_created_idx").on(t.phoneHash, t.createdAt.desc())],
 );
+
+/** One row per refresh token. A rotation chain shares `chain_id`; only a SHA-256 of the secret is stored (T-ID-05). */
+export const sessions = identitySchema.table(
+  "sessions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").notNull(),
+    chainId: uuid("chain_id").notNull(),
+    deviceId: text("device_id"),
+    refreshHash: text("refresh_hash").notNull().unique(),
+    parentId: uuid("parent_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    rotatedAt: timestamp("rotated_at", { withTimezone: true }),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    revokedReason: text("revoked_reason"),
+  },
+  (t) => [index("sessions_user_id_idx").on(t.userId), index("sessions_chain_id_idx").on(t.chainId)],
+);

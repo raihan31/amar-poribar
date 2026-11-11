@@ -6,7 +6,10 @@ import * as q from "./app/get-user.js";
 import { maskPhone } from "./domain/phone.js";
 import { createOtpService } from "./app/otp-service.js";
 import { createOtpRepo } from "./infra/otp-repo.js";
-import { purgeOtpJob } from "./jobs.js";
+import { purgeOtpJob, purgeSessionsJob } from "./jobs.js";
+import { createSessionService } from "./app/session-service.js";
+import { createSessionRepo } from "./infra/session-repo.js";
+import { registerAuthenticate } from "./http/authenticate.js";
 import { registerJwt } from "./infra/jwt.js";
 import { createUserRepo } from "./infra/user-repo.js";
 export * from "./events.js";
@@ -66,8 +69,11 @@ export const identityModule: ModuleDefinition<IdentityFacade> = {
       clock: ctx.clock,
       pepper: config.otpPepper,
     });
+    const sessions = createSessionService({ repo: createSessionRepo(ctx.db), tokens, clock: ctx.clock });
+    registerAuthenticate(app, (sid) => sessions.isSessionRevoked(sid));
     ctx.jobs.register(purgeOtpJob({ db: ctx.db, clock: ctx.clock }));
-    registerIdentityRoutes(app, { otp, users, tokens, isProd: config.isProd });
+    ctx.jobs.register(purgeSessionsJob({ db: ctx.db, clock: ctx.clock }));
+    registerIdentityRoutes(app, { otp, users, sessions, isProd: config.isProd });
     return {
       name: "identity",
       getUserBasics: (id) => users.getBasics(id),

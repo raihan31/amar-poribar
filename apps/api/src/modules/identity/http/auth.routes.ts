@@ -2,19 +2,24 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { BdPhoneSchema } from "@amar-poribar/shared";
 import { parseOr400 } from "../../../platform/errors.js";
-import { refreshTokens } from "../app/refresh.js";
 import { requestOtp } from "../app/request-otp.js";
 import type { OtpService } from "../app/otp-service.js";
-import type { TokenService, UserRepo } from "../app/ports.js";
+import type { UserRepo } from "../app/ports.js";
+import type { SessionService } from "../app/session-service.js";
 import { verifyOtp } from "../app/verify-otp.js";
 import { docs } from "../../../platform/http/responses.js";
 
-const VerifySchema = z.object({ phone: BdPhoneSchema, code: z.string().regex(/^\d{6}$/) });
+const VerifySchema = z.object({
+  phone: BdPhoneSchema,
+  code: z.string().regex(/^\d{6}$/),
+  deviceId: z.string().min(1).max(200).optional(),
+});
+const RefreshSchema = z.object({ refreshToken: z.string(), deviceId: z.string().min(1).max(200).optional() });
 
 export interface AuthRouteDeps {
   otp: OtpService;
   users: UserRepo;
-  tokens: TokenService;
+  sessions: SessionService;
   isProd: boolean;
 }
 
@@ -29,7 +34,7 @@ export function authRoutes(app: FastifyInstance, deps: AuthRouteDeps) {
   );
 
   app.post("/v1/auth/refresh", { schema: docs.object }, async (req) => {
-    const { refreshToken } = parseOr400(z.object({ refreshToken: z.string() }), req.body);
-    return refreshTokens(deps.tokens, refreshToken);
+    const { refreshToken, deviceId } = parseOr400(RefreshSchema, req.body);
+    return deps.sessions.rotate(refreshToken, deviceId);
   });
 }
