@@ -10,6 +10,8 @@ export interface SessionRepo {
   rotate(oldId: string, child: NewSession, now: Date): Promise<boolean>;
   /** Revokes every open session of the chain; returns their ids. */
   revokeChain(chainId: string, reason: string, now: Date): Promise<string[]>;
+  /** Revokes every open session of the user; returns their ids. */
+  revokeAllForUser(userId: string, reason: string, now: Date): Promise<string[]>;
   /** True for a missing, revoked or expired session. */
   isRevoked(id: string, now: Date): Promise<boolean>;
   purgeExpiredBefore(cutoff: Date): Promise<number>;
@@ -71,4 +73,9 @@ export interface UserRepo {
   getBasics(userId: string): Promise<UserBasics | null>;
   getManyBasics(ids: readonly string[]): Promise<UserBasics[]>;
   getManyNames(ids: readonly string[]): Promise<Map<string, { id: string; name: string | null }>>;
+}
+
+/** The slice of the device registry that logout needs (the full registry is T-ID-09). */
+export interface DeviceRemover {
+  removeDevice(userId: string, deviceId: string): Promise<void>;
 }

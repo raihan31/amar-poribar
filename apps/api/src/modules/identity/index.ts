@@ -17,7 +17,7 @@ import { maskPhone } from "./domain/phone.js";
 import { createOtpService } from "./app/otp-service.js";
 import { createOtpRepo } from "./infra/otp-repo.js";
 import { deviceRoutes } from "./http/device-routes.js";
-import { createDeviceRepo, type DeviceToken } from "./infra/device-repo.js";
+import { createDeviceRemover, createDeviceRepo, type DeviceToken } from "./infra/device-repo.js";
 import { purgeDevicesJob, purgeOtpJob, purgeSessionsJob } from "./jobs.js";
 import { createSessionService } from "./app/session-service.js";
 import { createSessionRepo } from "./infra/session-repo.js";
@@ -132,6 +132,7 @@ export const identityModule: ModuleDefinition<IdentityFacade> = {
       otp,
       users,
       sessions,
+      devices: createDeviceRemover(ctx.db),
       sms: otpSms,
       exposeDevCode: !sms.isProd && sms.smsGateway === "fake",
     });

@@ -245,6 +245,24 @@
         ]
       }
     },
+    "/v1/auth/logout": {
+      "post": {
+        "responses": {
+          "204": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
+    "/v1/auth/logout-all": {
+      "post": {
+        "responses": {
+          "204": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
     "/v1/auth/otp/request": {
       "post": {
         "responses": {
