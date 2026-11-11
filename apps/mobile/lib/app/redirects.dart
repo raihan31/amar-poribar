@@ -30,6 +30,7 @@ class Routes {
   static const call = '/call/:callId';
   static const add = '/add';
   static const addVoice = '/add/voice';
+  static const addCategory = '/add/category';
   static const txn = '/txn/:id';
   static const receipt = '/receipt';
   static const ruleLearn = '/rule-learn';
