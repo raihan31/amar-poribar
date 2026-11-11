@@ -8,9 +8,12 @@ import '../../../core/l10n/l10n_x.dart';
 import '../../../core/money/money_format.dart';
 import '../../../core/money/numeral_style_provider.dart';
 import '../../../core/theme/tokens.dart';
+import '../../../core/theme/ui_scale.dart';
+import '../../../presentation/providers/auth_provider.dart';
 import '../../../ui/big_button.dart';
 import '../domain/otp_failure.dart';
 import '../state/login_controller.dart';
+import 'otp_error_panel.dart';
 
 export '../state/login_controller.dart' show LoginPhase;
 
@@ -31,6 +34,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _phoneCtl = TextEditingController();
   final _codeCtl = TextEditingController();
   final _codeFocus = FocusNode();
+  final _newCodeFocus = FocusNode();
 
   @override
   void initState() {
@@ -43,6 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _phoneCtl.dispose();
     _codeCtl.dispose();
     _codeFocus.dispose();
+    _newCodeFocus.dispose();
     super.dispose();
   }
 
@@ -119,6 +124,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _resend() => ref.read(loginControllerProvider.notifier).resend();
 
+  Future<void> _newCode() =>
+      ref.read(loginControllerProvider.notifier).resend(force: true);
+
+  /// Simple mode reads a failure aloud (FR-VOICE-09). The title and body are one sentence run.
+  void _speakFailure(
+    OtpFailure f,
+    LoginState s,
+    String Function(String) digits,
+  ) {
+    if (ref.read(uiScaleProvider) != UiScale.simple) return;
+    final t = otpFailureText(
+      context,
+      f,
+      digits: digits,
+      secondsLeft: s.resendSecondsLeft,
+    );
+    final words = [if (t.title != null) t.title!, t.body].join(' ');
+    ref.read(voiceServiceProvider).speak(words);
+  }
+
   void _changeNumber() {
     ref.read(loginControllerProvider.notifier).changeNumber();
     _codeCtl.clear();
@@ -133,13 +158,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     String digits(String v) =>
         style == NumeralStyle.bangla ? toBanglaDigits(v) : v;
     final onCode = s.phase == LoginPhase.code;
+    final failure = s.error;
+    // Wrong, expired and rate-limited codes get the full panel with next steps.
+    final fullPanel = onCode &&
+        (failure is Invalid || failure is Expired || failure is RateLimited);
 
     ref.listen(loginControllerProvider.select((x) => x.phase), (prev, next) {
       if (next == LoginPhase.code) _codeFocus.requestFocus();
     });
+    ref.listen(loginControllerProvider.select((x) => x.error), (prev, next) {
+      if (next == null) return;
+      _speakFailure(next, ref.read(loginControllerProvider), digits);
+      if (next is Invalid && next.attemptsLeft == 0) {
+        // No tries left: the input is empty and focus goes to the way forward.
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _newCodeFocus.requestFocus());
+      }
+    });
     if (_codeCtl.text != s.code) _codeCtl.text = s.code;
 
-    final canSubmit = !s.busy && (!onCode || s.code.length == 6);
+    final canSubmit = !s.busy && !s.locked && (!onCode || s.code.length == 6);
 
     return Scaffold(
       backgroundColor: AppTokens.bg,
@@ -196,28 +234,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      _codeBoxes(s, digits),
+                      _codeBoxes(
+                        s,
+                        digits,
+                        hasError: failure is Invalid || failure is Expired,
+                      ),
                       const SizedBox(height: 10),
-                      _resendRow(s, digits),
+                      if (!fullPanel) _resendRow(s, digits),
                     ],
-                    if (s.error != null) ...[
-                      const SizedBox(height: 10),
-                      Text(
-                        _errorText(context, s.error!),
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: AppTokens.dangerInk,
-                        ),
+                    if (failure != null) ...[
+                      const SizedBox(height: 14),
+                      OtpErrorPanel(
+                        failure: failure,
+                        digits: digits,
+                        secondsLeft: s.resendSecondsLeft,
+                        codesRequested: s.codesRequested,
+                        showActions: fullPanel,
+                        newCodeFocus: _newCodeFocus,
+                        onNewCode: s.busy ? null : _newCode,
+                        onChangeNumber: _changeNumber,
                       ),
                     ],
                     const Spacer(),
                     const SizedBox(height: 24),
-                    BigButton(
-                      label: l10n.auth_login_submit,
-                      height: 72,
-                      onPressed: canSubmit ? _submit : null,
-                    ),
+                    if (s.locked)
+                      LockedSubmitButton(label: l10n.auth_login_submit)
+                    else
+                      BigButton(
+                        label: l10n.auth_login_submit,
+                        height: 72,
+                        onPressed: canSubmit ? _submit : null,
+                      ),
                     Padding(
                       padding: const EdgeInsets.only(top: 12, bottom: 28),
                       child: Text(
@@ -238,9 +285,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
     );
   }
-
-  String _errorText(BuildContext context, OtpFailure f) => context
-      .l10n.auth_login_failed; // T-MOB-15 gives each failure its own panel
 
   Widget _phoneField(
     LoginState s,
@@ -324,7 +368,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _codeBoxes(LoginState s, String Function(String) digits) {
+  Widget _codeBoxes(
+    LoginState s,
+    String Function(String) digits, {
+    bool hasError = false,
+  }) {
     final active = s.code.length < 6 ? s.code.length : -1;
     return SizedBox(
       height: 64,
@@ -343,12 +391,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         color: AppTokens.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: i == active
-                              ? AppTokens.amber
-                              : i < s.code.length
-                                  ? AppTokens.green
-                                  : AppTokens.inputBorder,
-                          width: i == active ? 3 : 2,
+                          color: hasError
+                              ? AppTokens.danger
+                              : i == active
+                                  ? AppTokens.amber
+                                  : i < s.code.length
+                                      ? AppTokens.green
+                                      : AppTokens.inputBorder,
+                          width: hasError || i == active ? 3 : 2,
                         ),
                       ),
                       child: i < s.code.length
@@ -373,6 +423,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: TextField(
                   controller: _codeCtl,
                   focusNode: _codeFocus,
+                  enabled: !s.locked,
                   autofocus: true,
                   keyboardType: TextInputType.number,
                   autofillHints: const [AutofillHints.oneTimeCode],

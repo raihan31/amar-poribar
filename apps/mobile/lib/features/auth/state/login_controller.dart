@@ -32,6 +32,9 @@ class LoginState {
   final OtpFailure? error;
   final int resendSecondsLeft;
 
+  /// How many codes were asked for on this number (shown in the hourly-limit note).
+  final int codesRequested;
+
   /// A different number signed in on a phone that holds someone else's data: ask first.
   final bool otherUserPending;
 
@@ -43,8 +46,15 @@ class LoginState {
     this.phoneInvalid = false,
     this.error,
     this.resendSecondsLeft = 0,
+    this.codesRequested = 0,
     this.otherUserPending = false,
   });
+
+  /// The code input and "ঢুকুন" are locked: no tries left, or a rate-limit wait is running.
+  bool get locked {
+    final e = error;
+    return (e is Invalid && e.attemptsLeft == 0) || e is RateLimited;
+  }
 
   LoginState copyWith({
     String? phone,
@@ -55,6 +65,7 @@ class LoginState {
     OtpFailure? error,
     bool clearError = false,
     int? resendSecondsLeft,
+    int? codesRequested,
     bool? otherUserPending,
   }) =>
       LoginState(
@@ -65,6 +76,7 @@ class LoginState {
         phoneInvalid: phoneInvalid ?? this.phoneInvalid,
         error: clearError ? null : (error ?? this.error),
         resendSecondsLeft: resendSecondsLeft ?? this.resendSecondsLeft,
+        codesRequested: codesRequested ?? this.codesRequested,
         otherUserPending: otherUserPending ?? this.otherUserPending,
       );
 }
@@ -130,8 +142,23 @@ class LoginController extends StateNotifier<LoginState> {
     if (at == null || !mounted) return;
     final ms = at.difference(_now()).inMilliseconds;
     final left = ms <= 0 ? 0 : (ms / 1000).ceil();
-    state = state.copyWith(resendSecondsLeft: left);
+    // A rate-limit panel goes away by itself when its wait is over.
+    final over = left == 0 && state.error is RateLimited;
+    state = state.copyWith(resendSecondsLeft: left, clearError: over);
     if (left == 0) _timer?.cancel();
+  }
+
+  /// Shows [f]. A rate limit also starts its countdown; no tries left empties the code input.
+  void _fail(OtpFailure f) {
+    if (f is RateLimited) {
+      final s = f.retryAfter.inSeconds;
+      _startCountdown(s < 1 ? 1 : s);
+    }
+    state = state.copyWith(
+      busy: false,
+      error: f,
+      code: f is Invalid && f.attemptsLeft == 0 ? '' : null,
+    );
   }
 
   Future<void> submitPhone() async {
@@ -151,9 +178,10 @@ class LoginController extends StateNotifier<LoginState> {
         phase: LoginPhase.code,
         code: '',
         busy: false,
+        codesRequested: state.codesRequested + 1,
       );
     } on OtpError catch (e) {
-      if (mounted) state = state.copyWith(busy: false, error: e.failure);
+      if (mounted) _fail(e.failure);
     }
   }
 
@@ -170,7 +198,7 @@ class LoginController extends StateNotifier<LoginState> {
       }
       await _finishSignIn(wipe: false);
     } on OtpError catch (e) {
-      if (mounted) state = state.copyWith(busy: false, error: e.failure);
+      if (mounted) _fail(e.failure);
     }
   }
 
@@ -193,16 +221,25 @@ class LoginController extends StateNotifier<LoginState> {
     }
   }
 
-  Future<void> resend() async {
-    if (state.busy || state.resendSecondsLeft > 0) return;
+  /// Asks for another code. [force] skips the resend countdown: the error panel's
+  /// "নতুন কোড পাঠান" is allowed while a wrong or expired code is showing, but never during
+  /// a rate-limit wait.
+  Future<void> resend({bool force = false}) async {
+    if (state.busy) return;
+    if (state.error is RateLimited && state.resendSecondsLeft > 0) return;
+    if (!force && state.resendSecondsLeft > 0) return;
     state = state.copyWith(busy: true, clearError: true);
     try {
       final c = await _repo.requestOtp(state.phone);
       if (!mounted) return;
       _startCountdown(c.resendAfterSeconds);
-      state = state.copyWith(busy: false, code: '');
+      state = state.copyWith(
+        busy: false,
+        code: '',
+        codesRequested: state.codesRequested + 1,
+      );
     } on OtpError catch (e) {
-      if (mounted) state = state.copyWith(busy: false, error: e.failure);
+      if (mounted) _fail(e.failure);
     }
   }
 
