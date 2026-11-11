@@ -1,4 +1,4 @@
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import type { Db } from "../../../platform/db.js";
 import type { UserRepo } from "../app/ports.js";
 import { users } from "../schema.js";
@@ -31,6 +31,14 @@ export function createUserRepo(db: Db): UserRepo {
     },
     async getBasics(userId) {
       const [row] = await db.select(basicsColumns).from(users).where(eq(users.id, userId));
+      return row ?? null;
+    },
+    async updateProfile(userId, patch) {
+      const [row] = await db
+        .update(users)
+        .set({ ...patch, updatedAt: new Date() })
+        .where(and(eq(users.id, userId), isNull(users.erasedAt)))
+        .returning(basicsColumns);
       return row ?? null;
     },
     async getManyBasics(ids) {
