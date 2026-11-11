@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { formatBDT, parseAmountToPaisa, t } from "@amar-poribar/shared";
+import { parseAmountToPaisa } from "@amar-poribar/shared";
 import { api } from "@/lib/api/client";
+import { useFormat } from "@/lib/i18n/format";
+import { useT } from "@/lib/i18n/useT";
 import type { BudgetRow, Category, Family } from "@/lib/types";
 
 /** Monthly budgets with spend, 80%/100% alerts and (for owners and admins) editing (FR-BUD-01..03). */
@@ -15,11 +17,12 @@ export function BudgetList(props: {
   onError: (e: unknown) => void;
 }) {
   const { family, month, categories, spentKey, onError } = props;
+  const t = useT();
+  const { money, name } = useFormat();
   const [rows, setRows] = useState<BudgetRow[]>([]);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Record<string, string>>({});
   const canEdit = family.role === "owner" || family.role === "admin";
-  const money = (p: number) => formatBDT(p, { bnDigits: true });
   const OVERALL = "overall";
 
   const load = useCallback(() => {
@@ -76,7 +79,7 @@ export function BudgetList(props: {
         <>
           {[
             { key: OVERALL, label: t("budgetOverall") },
-            ...expenseCats.map((c) => ({ key: c.id, label: `${c.icon ?? ""} ${c.nameBn}` })),
+            ...expenseCats.map((c) => ({ key: c.id, label: `${c.icon ?? ""} ${name(c)}` })),
           ].map((f) => (
             <label key={f.key} className="budget-edit">
               <span>{f.label}</span>
@@ -105,7 +108,7 @@ export function BudgetList(props: {
               <li key={r.categoryId ?? OVERALL} className="bar-row">
                 <span className="bar-label">
                   <span>
-                    {r.nameBn}
+                    {name(r)}
                     {r.inherited && <span className="muted"> · {t("budgetCarried")}</span>}
                   </span>
                   <span>

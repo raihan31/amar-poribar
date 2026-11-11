@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { t } from "@amar-poribar/shared";
+import { useT } from "@/lib/i18n/useT";
 import { LoginForm } from "@/components/features/auth/LoginForm";
 
 function safeNext(value: string | null): string {
@@ -15,6 +15,7 @@ function LoginRoute() {
 }
 
 export default function LoginPage() {
+  const t = useT();
   return (
     <main>
       <h1>

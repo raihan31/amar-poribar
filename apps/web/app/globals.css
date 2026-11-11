@@ -20,6 +20,15 @@
     --border: #33342f;
   }
 }
+/* Simple mode (FR-VOICE-09): consumed by the shell in T-WEB-06. */
+:root {
+  --text-scale: 1;
+  --primary-height: 44px;
+}
+html[data-simple="1"] {
+  --text-scale: 1.3;
+  --primary-height: 72px;
+}
 * {
   box-sizing: border-box;
 }

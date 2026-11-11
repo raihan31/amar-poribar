@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { t, type MonthlyAiSummary } from "@amar-poribar/shared";
+import { type MonthlyAiSummary } from "@amar-poribar/shared";
+import { useT } from "@/lib/i18n/useT";
 import { speak, stopSpeaking } from "@/lib/voice";
 
 /** Monthly summary in plain words, with a button to hear it (FR-AI-11, FR-VOICE-04). */
 export function SpokenSummary({ summary }: { summary: MonthlyAiSummary }) {
+  const t = useT();
   const [speaking, setSpeaking] = useState(false);
   function toggle() {
     if (speaking) {
