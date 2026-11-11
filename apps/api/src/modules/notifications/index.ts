@@ -1,5 +1,7 @@
 import type { InboxKind } from "@amar-poribar/shared";
 import type { ModuleContext, ModuleDefinition } from "../../platform/module.js";
+import { isQuietNowFor, readPreferences } from "./app/preferences.js";
+import { preferencesRoutes } from "./http/preferences-routes.js";
 import { notificationsRoutes } from "./http/routes.js";
 export * from "./events.js";
 
@@ -60,16 +62,14 @@ export function notify(ctx: ModuleContext, input: NotifyInput): Promise<NotifyRe
   return Promise.reject(new NotImplemented("notify"));
 }
 
-/** Reads a user's preferences, with defaults. Implemented in a later T-NOTIF task. */
+/** Reads a user's preferences, with defaults when no row exists. */
 export function getPreferences(ctx: ModuleContext, userId: string): Promise<Preferences> {
-  void [ctx, userId];
-  return Promise.reject(new NotImplemented("getPreferences"));
+  return readPreferences(ctx.db, userId);
 }
 
-/** True when the user is inside quiet hours now. Implemented in a later T-NOTIF task. */
+/** True when the user is inside quiet hours now (injected clock, Asia/Dhaka). */
 export function isQuietNow(ctx: ModuleContext, userId: string): Promise<boolean> {
-  void [ctx, userId];
-  return Promise.reject(new NotImplemented("isQuietNow"));
+  return isQuietNowFor(ctx.db, userId, ctx.clock());
 }
 
 /** Public surface of the notifications module. Other modules may import only this file (SRS R1). */
@@ -89,8 +89,9 @@ declare module "../../platform/module.js" {
 export const notificationsModule: ModuleDefinition<NotificationsFacade> = {
   name: "notifications",
   dependsOn: ["identity", "families"],
-  register(app) {
+  register(app, ctx) {
     notificationsRoutes(app);
+    preferencesRoutes(app, { db: ctx.db });
     return { name: "notifications", notify, getPreferences, isQuietNow };
   },
 };
