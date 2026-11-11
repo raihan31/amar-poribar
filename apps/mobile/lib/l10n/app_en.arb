@@ -110,5 +110,31 @@
   "auth_expired_otherUserKeep": "No",
   "auth_inviteExpired_title": "Invitation expired",
   "auth_inviteExpired_body": "No problem. Ask the person who invited you to send a new link.",
-  "auth_inviteExpired_nudge": "Buzz {inviter}"
+  "auth_inviteExpired_nudge": "Buzz {inviter}",
+  "onb_consent_title": "Create your family",
+  "onb_consent_step": "Step {n} of {total}",
+  "@onb_consent_step": {
+    "placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}
+  },
+  "onb_consent_nameLabel": "Family name",
+  "onb_consent_nameHint": "Rahim family",
+  "onb_consent_currencyLabel": "Currency",
+  "onb_consent_currencyValue": "৳ Bangladeshi taka ({code})",
+  "@onb_consent_currencyValue": {
+    "placeholders": {"code": {"type": "String"}}
+  },
+  "onb_consent_useTitle": "How your information is used",
+  "onb_consent_use1": "Only the members of your family can see the accounts.",
+  "onb_consent_use2": "Speech is turned into text on your phone. Recordings never go to the server.",
+  "onb_consent_use3": "Phone numbers and account numbers are never sent to the AI. You can delete your data at any time.",
+  "onb_consent_agree": "I agree",
+  "onb_consent_policy": "Privacy policy",
+  "onb_consent_submit": "Create family",
+  "onb_consent_error": "Something went wrong. Please try again.",
+  "onb_consent_step2Title": "Your family is ready",
+  "onb_consent_step2Body": "You can listen to a short guide on how to use the app.",
+  "onb_consent_listen": "Listen to the guide",
+  "onb_consent_notNow": "Not now",
+  "onb_consent_policyError": "Could not load the policy. Check your internet and try again.",
+  "onb_consent_retry": "Try again"
 }

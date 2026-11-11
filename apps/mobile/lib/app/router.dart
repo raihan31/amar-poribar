@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/ui/login_screen.dart';
 import '../features/auth/ui/session_expired_screen.dart';
+import '../features/onboarding/ui/consent_screen.dart';
+import '../features/onboarding/ui/policy_screen.dart';
 import '../features/onboarding/ui/welcome_screen.dart';
 import '../features/settings/ui/profile_screen.dart';
 import '../features/voice/ui/voice_fallback_screen.dart';
@@ -36,6 +38,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.listen(authProvider, poke);
   ref.listen(welcomeDoneProvider, poke);
   ref.listen(tutorialDoneProvider, poke);
+  ref.listen(consentCurrentProvider, poke);
 
   Widget placeholder(String name) => ref.read(placeholderBuilderProvider)(name);
 
@@ -68,7 +71,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           from: s.uri.queryParameters['from'],
         ),
       ),
-      stub(Routes.consent),
+      simple(Routes.consent, (_) => const ConsentScreen()),
       stub(Routes.join),
       simple(Routes.tutorial, (_) => const TutorialScreen()),
       simple(
@@ -109,7 +112,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       stub(Routes.ask),
       simple(Routes.settings, (_) => const SettingsScreen()),
       simple(Routes.profile, (_) => const ProfileScreen()),
-      stub(Routes.consentPolicy),
+      simple(Routes.consentPolicy, (_) => const PolicyScreen()),
       stub(Routes.accounts),
       stub(Routes.categories),
       stub(Routes.recurring),

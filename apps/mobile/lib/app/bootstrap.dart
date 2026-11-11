@@ -23,11 +23,13 @@ Future<List<Override>> bootstrap({
   final opened = store ?? await LocalStore.open(await AppDatabase.open());
   final welcomeDone = await opened.getMeta('welcome_done') != null;
   final tutorialDone = await opened.getMeta('tutorial_done') != null;
+  final consentCurrent = await opened.getMeta(consentVersionKey) != null;
   return [
     localStoreProvider.overrideWithValue(opened),
     tokenStoreProvider.overrideWithValue(tokens ?? SecureTokenStore()),
     welcomeDoneProvider.overrideWith((ref) => welcomeDone),
     tutorialDoneProvider.overrideWith((ref) => tutorialDone),
+    consentCurrentProvider.overrideWith((ref) => consentCurrent),
   ];
 }
 

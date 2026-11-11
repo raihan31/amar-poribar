@@ -3,6 +3,9 @@ import 'package:amar_poribar/features/auth/data/auth_repository.dart';
 import 'package:amar_poribar/features/auth/data/fake_auth_repository.dart';
 import 'package:amar_poribar/features/auth/ui/login_screen.dart';
 import 'package:amar_poribar/features/auth/ui/session_expired_screen.dart';
+import 'package:amar_poribar/features/onboarding/data/fake_onboarding_repository.dart';
+import 'package:amar_poribar/features/onboarding/data/onboarding_repository.dart';
+import 'package:amar_poribar/features/onboarding/ui/consent_screen.dart';
 import 'package:amar_poribar/features/onboarding/ui/welcome_screen.dart';
 import 'package:amar_poribar/features/settings/state/preferences_controller.dart';
 import 'package:flutter/widgets.dart';
@@ -61,6 +64,16 @@ void registerAllScreens() {
     (c) => const SessionExpiredScreen(),
   );
   registerScreen(
+    'A2',
+    Routes.consent,
+    (c) => const ConsentScreen(),
+    needs: [
+      onboardingRepositoryProvider.overrideWithValue(
+        FakeOnboardingRepository(),
+      ),
+    ],
+  );
+  registerScreen(
     'D1',
     Routes.welcome,
     (c) => const WelcomeScreen(),
@@ -81,6 +94,7 @@ const List<String> kAllRoutes = [
   Routes.pendingSms,
   Routes.settings,
   Routes.login,
+  Routes.consent,
   Routes.sessionExpired,
   Routes.add,
   Routes.tutorial,
