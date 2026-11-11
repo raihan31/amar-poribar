@@ -297,5 +297,13 @@
   "home_remitTitle": "বিদেশ থেকে পাঠানো টাকা",
   "home_remitOpen": "দেখুন",
   "home_offline": "ইন্টারনেট নেই। হিসাব ফোনেই থাকছে।",
-  "home_somebody": "কেউ"
+  "home_somebody": "কেউ",
+  "entry_picker_title": "কিসের জন্য?",
+  "entry_picker_hint": "ছবিতে চাপ দিন, নামটি শোনা যাবে।",
+  "entry_picker_confirm": "{category}য় রাখুন",
+  "@entry_picker_confirm": {
+    "placeholders": {"category": {"type": "String"}}
+  },
+  "entry_picker_listen": "শুনুন",
+  "entry_picker_selected": "বাছা হয়েছে"
 }

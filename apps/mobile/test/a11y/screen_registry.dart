@@ -4,6 +4,7 @@ import 'package:amar_poribar/features/auth/data/auth_repository.dart';
 import 'package:amar_poribar/features/auth/data/fake_auth_repository.dart';
 import 'package:amar_poribar/features/auth/ui/login_screen.dart';
 import 'package:amar_poribar/features/auth/ui/session_expired_screen.dart';
+import 'package:amar_poribar/features/entry/ui/category_picker_screen.dart';
 import 'package:amar_poribar/features/family/data/fake_family_repository.dart';
 import 'package:amar_poribar/features/family/data/invite_repository.dart';
 import 'package:amar_poribar/features/family/state/active_family.dart';
@@ -119,6 +120,14 @@ void registerAllScreens() {
     needs: addExpenseOverrides(FakeTransactionRepository()),
   );
   registerScreen(
+    'A4',
+    Routes.addCategory,
+    (c) => const CategoryPickerScreen(
+      args: CategoryPickerArgs(amountPaisa: 50000, caption: 'ক্যাশ · আজ'),
+    ),
+    needs: addExpenseOverrides(FakeTransactionRepository()),
+  );
+  registerScreen(
     'Main',
     Routes.home,
     (c) => const HomeScreen(),
@@ -149,6 +158,7 @@ const List<String> kAllRoutes = [
   Routes.join,
   Routes.add,
   Routes.addVoice,
+  Routes.addCategory,
   Routes.tutorial,
 ];
 

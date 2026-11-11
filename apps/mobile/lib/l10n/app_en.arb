@@ -267,5 +267,13 @@
   "home_remitTitle": "Money sent from abroad",
   "home_remitOpen": "Open",
   "home_offline": "No internet. Your accounts stay on this phone.",
-  "home_somebody": "Someone"
+  "home_somebody": "Someone",
+  "entry_picker_title": "What for?",
+  "entry_picker_hint": "Tap a picture to hear its name.",
+  "entry_picker_confirm": "Keep in {category}",
+  "@entry_picker_confirm": {
+    "placeholders": {"category": {"type": "String"}}
+  },
+  "entry_picker_listen": "Listen",
+  "entry_picker_selected": "Selected"
 }
