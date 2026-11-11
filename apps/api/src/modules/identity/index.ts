@@ -12,7 +12,9 @@ import * as q from "./app/get-user.js";
 import { maskPhone } from "./domain/phone.js";
 import { createOtpService } from "./app/otp-service.js";
 import { createOtpRepo } from "./infra/otp-repo.js";
-import { purgeOtpJob, purgeSessionsJob } from "./jobs.js";
+import { deviceRoutes } from "./http/device-routes.js";
+import { createDeviceRepo, type DeviceToken } from "./infra/device-repo.js";
+import { purgeDevicesJob, purgeOtpJob, purgeSessionsJob } from "./jobs.js";
 import { createSessionService } from "./app/session-service.js";
 import { createSessionRepo } from "./infra/session-repo.js";
 import { registerAuthenticate } from "./http/authenticate.js";
@@ -22,6 +24,7 @@ export * from "./events.js";
 
 export type { UserBasics };
 export type { UserId, UserSummary, UserWithPhone } from "./app/get-user.js";
+export type { DeviceToken };
 export { maskPhone };
 
 /** Public surface of the identity module. Other modules may import only this file (SRS R1). */
@@ -43,6 +46,12 @@ export interface IdentityFacade {
   getUsersBasics(ids: readonly string[]): Promise<Map<string, { id: string; name: string | null }>>;
   /** Throws `HttpError` 401 for an invalid, expired or non-access token (used by the WebSocket hub). */
   verifyAccessToken(token: string): { userId: string };
+  /** Push tokens of the users' devices; rows without a token are skipped (FR-NOTIF-07). */
+  listDeviceTokens(userIds: readonly string[]): Promise<DeviceToken[]>;
+  /** Clears a token FCM reported invalid. */
+  removeToken(token: string): Promise<void>;
+  /** Marks a device as seen now (used by the WebSocket hub). */
+  touchDevice(userId: string, deviceId: string): Promise<void>;
   /** Used only inside identity. */
   createUserIfMissing(phone: string): Promise<{ id: string }>;
 }
@@ -97,7 +106,10 @@ export const identityModule: ModuleDefinition<IdentityFacade> = {
     registerAuthenticate(app, (sid) => sessions.isSessionRevoked(sid));
     ctx.jobs.register(purgeOtpJob({ db: ctx.db, clock: ctx.clock }));
     ctx.jobs.register(purgeSessionsJob({ db: ctx.db, clock: ctx.clock }));
+    const devices = createDeviceRepo(ctx.db);
+    ctx.jobs.register(purgeDevicesJob({ db: ctx.db, clock: ctx.clock }));
     registerIdentityRoutes(app, { otp, users, sessions, isProd: config.isProd });
+    deviceRoutes(app, { devices, clock: ctx.clock });
     // SMS delivery (T-ID-03). Built here so production refuses to start with the fake or without credentials.
     const sms = smsConfig(ctx);
     const gateway = createSmsGateway(sms);
@@ -133,6 +145,9 @@ export const identityModule: ModuleDefinition<IdentityFacade> = {
         if (payload.typ !== "access") throw new HttpError(401, "unauthorized", "Access token required");
         return { userId: payload.sub };
       },
+      listDeviceTokens: (ids) => devices.listTokens(ids),
+      removeToken: (token) => devices.removeToken(token),
+      touchDevice: (userId, deviceId) => devices.touch(userId, deviceId, ctx.clock()),
       createUserIfMissing: (phone) => users.upsertByPhone(phone),
     };
   },

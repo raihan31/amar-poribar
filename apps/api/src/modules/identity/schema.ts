@@ -1,4 +1,5 @@
-import { boolean, index, integer, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { boolean, check, index, integer, primaryKey, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import { pgSchema } from "drizzle-orm/pg-core";
 
 export const identitySchema = pgSchema("identity");
@@ -50,6 +51,28 @@ export const sessions = identitySchema.table(
     revokedReason: text("revoked_reason"),
   },
   (t) => [index("sessions_user_id_idx").on(t.userId), index("sessions_chain_id_idx").on(t.chainId)],
+);
+
+/** One row per app install (T-ID-09). `fcm_token` is unique when set; a token moves to the latest registrant. */
+export const devices = identitySchema.table(
+  "devices",
+  {
+    userId: uuid("user_id").notNull(),
+    deviceId: text("device_id").notNull(),
+    platform: text("platform").notNull(),
+    fcmToken: text("fcm_token"),
+    appVersion: text("app_version"),
+    locale: text("locale"),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.userId, t.deviceId] }),
+    check("devices_platform_check", sql`${t.platform} in ('android','ios','web')`),
+    uniqueIndex("devices_fcm_token_uq")
+      .on(t.fcmToken)
+      .where(sql`${t.fcmToken} is not null`),
+  ],
 );
 
 /** One row per SMS handed to a gateway; receipts update `status` (T-ID-03). Only the phone digest is stored. */
