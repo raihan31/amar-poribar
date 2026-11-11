@@ -76,6 +76,22 @@ class LocalStore {
       .into(db.meta)
       .insertOnConflictUpdate(MetaCompanion.insert(key: key, value: value));
 
+  /// Deletes every local row (transactions, caches, queued entries, meta) but keeps this
+  /// device's node id. Used when a different person signs in on this phone (T-MOB-16).
+  Future<void> wipeLocalData() async {
+    await db.transaction(() async {
+      for (final table in db.allTables) {
+        if (table == db.meta) {
+          await (db.delete(db.meta)..where((m) => m.key.equals(_nodeKey).not()))
+              .go();
+        } else {
+          await db.delete(table).go();
+        }
+      }
+    });
+    _clock = Hlc.zero(nodeId);
+  }
+
   /// Highest sequence number handed out so far.
   Future<int> currentSeq() async => int.parse(await getMeta(_seqKey) ?? '0');
 

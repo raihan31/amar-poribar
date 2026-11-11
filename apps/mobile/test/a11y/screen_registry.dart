@@ -2,6 +2,7 @@ import 'package:amar_poribar/app/redirects.dart';
 import 'package:amar_poribar/features/auth/data/auth_repository.dart';
 import 'package:amar_poribar/features/auth/data/fake_auth_repository.dart';
 import 'package:amar_poribar/features/auth/ui/login_screen.dart';
+import 'package:amar_poribar/features/auth/ui/session_expired_screen.dart';
 import 'package:amar_poribar/features/onboarding/ui/welcome_screen.dart';
 import 'package:amar_poribar/features/settings/state/preferences_controller.dart';
 import 'package:flutter/widgets.dart';
@@ -55,6 +56,11 @@ void registerAllScreens() {
     needs: [authRepositoryProvider.overrideWithValue(FakeAuthRepository())],
   );
   registerScreen(
+    'F6',
+    Routes.sessionExpired,
+    (c) => const SessionExpiredScreen(),
+  );
+  registerScreen(
     'D1',
     Routes.welcome,
     (c) => const WelcomeScreen(),
@@ -75,6 +81,7 @@ const List<String> kAllRoutes = [
   Routes.pendingSms,
   Routes.settings,
   Routes.login,
+  Routes.sessionExpired,
   Routes.add,
   Routes.tutorial,
 ];

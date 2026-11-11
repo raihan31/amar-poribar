@@ -53,32 +53,3 @@ class ErrorScreen extends StatelessWidget {
     );
   }
 }
-
-/// Tells the person the sign-in ended and brings them back to where they were.
-class SessionExpiredScreen extends StatelessWidget {
-  const SessionExpiredScreen({super.key, this.from});
-
-  final String? from;
-
-  @override
-  Widget build(BuildContext context) {
-    final target = from == null
-        ? Routes.login
-        : '${Routes.login}?from=${Uri.encodeQueryComponent(from!)}';
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('আপনার লগইনের সময় শেষ', style: TextStyle(fontSize: 22)),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () => context.go(target),
-              child: const Text('আবার লগইন করুন'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

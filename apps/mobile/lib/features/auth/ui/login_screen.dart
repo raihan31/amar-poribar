@@ -65,12 +65,55 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     } else {
       await c.submitCode();
-      if (mounted && c.signedIn) {
+      if (mounted && ref.read(loginControllerProvider).otherUserPending) {
+        await _askOtherUser();
+      } else if (mounted && c.signedIn) {
         final from = widget.from;
         final safe =
             from != null && from.startsWith('/') && !from.startsWith('//');
         _goTo(safe ? from : Routes.home);
       }
+    }
+  }
+
+  /// A different number signed in on this phone (F6): ask before deleting the earlier data.
+  Future<void> _askOtherUser() async {
+    final l10n = context.l10n;
+    final wipe = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTokens.white,
+        content: Text(
+          l10n.auth_expired_otherUser,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+        ),
+        actions: [
+          BigButton(
+            label: l10n.auth_expired_otherUserWipe,
+            style: BigButtonStyle.danger,
+            height: 64,
+            onPressed: () => Navigator.of(ctx).pop(true),
+          ),
+          const SizedBox(height: 12),
+          BigButton(
+            label: l10n.auth_expired_otherUserKeep,
+            style: BigButtonStyle.outline,
+            height: 64,
+            onPressed: () => Navigator.of(ctx).pop(false),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    final c = ref.read(loginControllerProvider.notifier);
+    if (wipe ?? false) {
+      await c.answerOtherUser(wipe: true);
+      if (mounted) _goTo(Routes.home);
+    } else {
+      _codeCtl.clear();
+      await c.answerOtherUser(wipe: false);
+      if (mounted) _goTo(_route(Routes.login));
     }
   }
 

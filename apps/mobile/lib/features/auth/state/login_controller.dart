@@ -6,6 +6,7 @@ import '../../../core/money/money_format.dart';
 import '../../../presentation/providers/auth_provider.dart';
 import '../data/auth_repository.dart';
 import '../domain/otp_failure.dart';
+import 'session_owner.dart';
 
 enum LoginPhase { phone, code }
 
@@ -31,6 +32,9 @@ class LoginState {
   final OtpFailure? error;
   final int resendSecondsLeft;
 
+  /// A different number signed in on a phone that holds someone else's data: ask first.
+  final bool otherUserPending;
+
   const LoginState({
     this.phone = '',
     this.code = '',
@@ -39,6 +43,7 @@ class LoginState {
     this.phoneInvalid = false,
     this.error,
     this.resendSecondsLeft = 0,
+    this.otherUserPending = false,
   });
 
   LoginState copyWith({
@@ -50,6 +55,7 @@ class LoginState {
     OtpFailure? error,
     bool clearError = false,
     int? resendSecondsLeft,
+    bool? otherUserPending,
   }) =>
       LoginState(
         phone: phone ?? this.phone,
@@ -59,6 +65,7 @@ class LoginState {
         phoneInvalid: phoneInvalid ?? this.phoneInvalid,
         error: clearError ? null : (error ?? this.error),
         resendSecondsLeft: resendSecondsLeft ?? this.resendSecondsLeft,
+        otherUserPending: otherUserPending ?? this.otherUserPending,
       );
 }
 
@@ -76,16 +83,18 @@ final loginControllerProvider =
     ref.watch(authRepositoryProvider),
     ref.watch(loginClockProvider),
     ref.watch(loginSignedInProvider),
+    ref.watch(sessionOwnerProvider),
   ),
 );
 
 class LoginController extends StateNotifier<LoginState> {
-  LoginController(this._repo, this._now, this._onSignedIn)
+  LoginController(this._repo, this._now, this._onSignedIn, [this._owner])
       : super(const LoginState());
 
   final AuthRepository _repo;
   final DateTime Function() _now;
   final Future<void> Function() _onSignedIn;
+  final SessionOwner? _owner;
 
   Timer? _timer;
   DateTime? _resendAt;
@@ -153,11 +162,34 @@ class LoginController extends StateNotifier<LoginState> {
     state = state.copyWith(busy: true, clearError: true);
     try {
       await _repo.verifyOtp(state.phone, state.code);
-      await _onSignedIn();
-      signedIn = true;
-      if (mounted) state = state.copyWith(busy: false);
+      if (await _owner?.isOtherUser() ?? false) {
+        if (mounted) {
+          state = state.copyWith(busy: false, otherUserPending: true);
+        }
+        return;
+      }
+      await _finishSignIn(wipe: false);
     } on OtpError catch (e) {
       if (mounted) state = state.copyWith(busy: false, error: e.failure);
+    }
+  }
+
+  Future<void> _finishSignIn({required bool wipe}) async {
+    await _owner?.claim(wipe: wipe);
+    await _onSignedIn();
+    signedIn = true;
+    if (mounted) state = state.copyWith(busy: false, otherUserPending: false);
+  }
+
+  /// Answer to the other-number question. [wipe] true deletes this phone's earlier data.
+  Future<void> answerOtherUser({required bool wipe}) async {
+    if (!state.otherUserPending) return;
+    if (wipe) {
+      state = state.copyWith(busy: true, otherUserPending: false);
+      await _finishSignIn(wipe: true);
+    } else {
+      await _owner?.decline();
+      if (mounted) state = LoginState(phone: state.phone);
     }
   }
 

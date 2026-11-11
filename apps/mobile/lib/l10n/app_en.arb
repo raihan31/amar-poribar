@@ -70,5 +70,15 @@
   "onb_welcome_on": "On",
   "onb_welcome_off": "Off",
   "onb_welcome_later": "You can change this later in Settings.",
-  "onb_welcome_continue": "Continue"
+  "onb_welcome_continue": "Continue",
+  "auth_expired_title": "Sign in again",
+  "auth_expired_body": "For your safety you sign in again after a while. Your accounts are safe.",
+  "auth_expired_button": "Sign in with your number",
+  "auth_expired_footer": "If you need help, call someone at home.",
+  "auth_expired_otherUser": "This is a different number. Delete the earlier data on this phone?",
+  "auth_expired_otherUserWipe": "Yes, delete it",
+  "auth_expired_otherUserKeep": "No",
+  "auth_inviteExpired_title": "Invitation expired",
+  "auth_inviteExpired_body": "No problem. Ask the person who invited you to send a new link.",
+  "auth_inviteExpired_nudge": "Buzz {inviter}"
 }
