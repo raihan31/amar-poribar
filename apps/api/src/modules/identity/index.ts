@@ -16,6 +16,9 @@ import * as q from "./app/get-user.js";
 import { maskPhone } from "./domain/phone.js";
 import { createOtpService } from "./app/otp-service.js";
 import { createOtpRepo } from "./infra/otp-repo.js";
+import { consentRoutes } from "./http/consent-routes.js";
+import { createConsentRepo } from "./infra/consent-repo.js";
+import { POLICY_VERSION } from "./content/policy.version.js";
 import { deviceRoutes } from "./http/device-routes.js";
 import { createDeviceRemover, createDeviceRepo, type DeviceToken } from "./infra/device-repo.js";
 import { purgeDevicesJob, purgeOtpJob, purgeSessionsJob } from "./jobs.js";
@@ -29,7 +32,7 @@ export * from "./events.js";
 export type { UserBasics };
 export type { UserId, UserSummary, UserWithPhone } from "./app/get-user.js";
 export type { DeviceToken };
-export { maskPhone };
+export { maskPhone, POLICY_VERSION };
 
 /** Public surface of the identity module. Other modules may import only this file (SRS R1). */
 export interface IdentityFacade {
@@ -42,11 +45,10 @@ export interface IdentityFacade {
   /** Throws `HttpError(401, "unauthorized")` when the user is missing or erased. */
   requireUser(id: q.UserId): Promise<q.UserSummary>;
   maskPhone(phone: string): string;
-  /**
-   * Whether the user accepted `policyVersion`. The consents table arrives with T-ID-08; until then nobody
-   * has accepted anything, so this is false and `GET /v1/me` reports `needsAcceptance: true`.
-   */
+  /** Whether the user accepted `policyVersion` of the privacy policy (identity.consents). */
   hasAcceptedCurrentPolicy(userId: string, policyVersion: string): Promise<boolean>;
+  /** The current policy version (`POLICY_VERSION`). */
+  getPolicyVersion(): string;
   getUsersBasics(ids: readonly string[]): Promise<Map<string, { id: string; name: string | null }>>;
   /** Throws `HttpError` 401 for an invalid, expired or non-access token (used by the WebSocket hub). */
   verifyAccessToken(token: string): { userId: string };
@@ -123,6 +125,8 @@ export const identityModule: ModuleDefinition<IdentityFacade> = {
     const devices = createDeviceRepo(ctx.db);
     ctx.jobs.register(purgeDevicesJob({ db: ctx.db, clock: ctx.clock }));
     deviceRoutes(app, { devices, clock: ctx.clock });
+    const consents = createConsentRepo(ctx.db);
+    consentRoutes(app, { consents, clock: ctx.clock });
     // SMS delivery (T-ID-03). Built here so production refuses to start with the fake or without credentials.
     const sms = smsConfig(ctx);
     const gateway = createSmsGateway(sms);
@@ -155,8 +159,8 @@ export const identityModule: ModuleDefinition<IdentityFacade> = {
       findUserByPhone: (phone) => q.findUserByPhone(users, phone),
       requireUser: (id) => q.requireUser(users, id),
       maskPhone,
-      // TODO(T-ID-08): read identity.consents.
-      hasAcceptedCurrentPolicy: async () => false,
+      hasAcceptedCurrentPolicy: (userId, version) => consents.hasAccepted(userId, "privacy_policy", version),
+      getPolicyVersion: () => POLICY_VERSION,
       getUsersBasics: (ids) => users.getManyNames(ids),
       verifyAccessToken(token) {
         let payload;

@@ -75,6 +75,23 @@ export const devices = identitySchema.table(
   ],
 );
 
+/** One row per accepted policy version per kind (T-ID-08, FR-AUTH-10). Accepting twice keeps one row. */
+export const consents = identitySchema.table(
+  "consents",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").notNull(),
+    kind: text("kind").notNull(),
+    version: text("version").notNull(),
+    locale: text("locale").notNull(),
+    acceptedAt: timestamp("accepted_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    check("consents_kind_check", sql`${t.kind} in ('privacy_policy','voice_notes')`),
+    uniqueIndex("consents_user_kind_version_uq").on(t.userId, t.kind, t.version),
+  ],
+);
+
 /** One row per SMS handed to a gateway; receipts update `status` (T-ID-03). Only the phone digest is stored. */
 export const smsDeliveries = identitySchema.table("sms_deliveries", {
   id: uuid("id").primaryKey().defaultRandom(),
