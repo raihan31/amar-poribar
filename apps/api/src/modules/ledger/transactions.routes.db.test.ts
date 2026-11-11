@@ -205,7 +205,9 @@ describe("ledger routes (db)", () => {
       const ctx = {
         db,
         bus,
-        facades: { families: { requireRole: async () => "owner" } },
+        facades: {
+          families: { requireRole: async () => ({ role: "owner", family: { id: "f", name: "f", role: "owner" } }) },
+        },
       } as unknown as ModuleContext;
       await ledgerModule.register(app, ctx);
 

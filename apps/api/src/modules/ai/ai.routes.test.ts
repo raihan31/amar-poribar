@@ -55,7 +55,7 @@ async function build(opts: { client?: AiClient; quota?: number; store?: MemorySt
     clock: () => NOW,
     facades: {
       families: {
-        requireRole: async () => "owner",
+        requireRole: async () => ({ role: "owner", family: { id: "f", name: "f", role: "owner" } }),
         getAiQuota: async () => ({ quotaMonth: opts.quota ?? 50, plan: "free" }),
       },
       ledger: {
@@ -147,7 +147,10 @@ describe("ai routes (fake model)", () => {
       config: undefined,
       clock: () => NOW,
       facades: {
-        families: { requireRole: async () => "owner", getAiQuota: async () => ({ quotaMonth: 5, plan: "free" }) },
+        families: {
+          requireRole: async () => ({ role: "owner", family: { id: "f", name: "f", role: "owner" } }),
+          getAiQuota: async () => ({ quotaMonth: 5, plan: "free" }),
+        },
         ledger: {},
       },
     } as unknown as ModuleContext;

@@ -10,7 +10,7 @@ export function meRoutes(app: FastifyInstance, ctx: ModuleContext) {
     if (!identity || !families) throw new Error("composition: identity and families must be registered");
     const user = await identity.getUserBasics(req.user.sub);
     if (!user) throw new HttpError(404, "not_found", "User not found");
-    const memberships = await families.listFamiliesForUser(user.id);
+    const memberships = await families.listMemberships(user.id);
     // Same body as before the module split: the user row plus the memberships (test vector api/me.json).
     return { user, families: memberships };
   });

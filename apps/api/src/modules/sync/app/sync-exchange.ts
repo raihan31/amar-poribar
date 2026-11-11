@@ -49,7 +49,7 @@ export async function syncExchange(
   body: SyncRequest,
 ): Promise<SyncResponse> {
   // Viewers are summary-only (FR-FAM-05): they neither push nor receive individual entries.
-  const role = await deps.families.requireRole(familyId, userId, "member");
+  const { role } = await deps.families.requireRole(familyId, userId, "member");
   const cursor = parseCursor(body.cursor);
 
   // Validate each pushed row on its own so one bad row doesn't discard the batch.

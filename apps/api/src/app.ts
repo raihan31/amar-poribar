@@ -138,8 +138,7 @@ export async function buildApp({ config, db, deps = {} }: BuildAppOptions) {
         if (!identity) throw new Error("identity module is not registered");
         return identity.verifyAccessToken(token);
       },
-      isMember: async (userId, familyId) =>
-        (await ctx.facades.families?.getMemberIds(familyId))?.includes(userId) ?? false,
+      isMember: async (userId, familyId) => (await ctx.facades.families?.isMember(familyId, userId)) ?? false,
       fanout,
       bus,
       onError: (err) => logger.error({ err: String(err) }, "realtime error"),

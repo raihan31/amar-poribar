@@ -28,7 +28,7 @@ async function build(user: Record<string, unknown> | null) {
   const ctx = {
     facades: {
       identity: { getUserBasics: async () => u } as unknown as IdentityFacade,
-      families: { listFamiliesForUser: async () => vector.body.families } as unknown as FamiliesFacade,
+      families: { listMemberships: async () => vector.body.families } as unknown as FamiliesFacade,
     },
   } as unknown as ModuleContext;
   meRoutes(app, ctx);

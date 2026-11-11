@@ -52,7 +52,10 @@ describe("ai quota (db)", () => {
         config: undefined,
         clock: () => NOW,
         facades: {
-          families: { requireRole: async () => "owner", getAiQuota: async () => ({ quotaMonth: 2, plan: "free" }) },
+          families: {
+            requireRole: async () => ({ role: "owner", family: { id: "f", name: "f", role: "owner" } }),
+            getAiQuota: async () => ({ quotaMonth: 2, plan: "free" }),
+          },
           ledger: { listCategories: async () => [], monthTotals: async () => ({}), askQueries: () => ({}) },
         },
       } as unknown as ModuleContext;

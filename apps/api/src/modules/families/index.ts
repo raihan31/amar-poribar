@@ -6,7 +6,8 @@ import { canAssignRole, canEditAll, canManageMember } from "./domain/roles.js";
 import { familiesRoutes } from "./http/families.routes.js";
 import { invitesRoutes } from "./http/invites.routes.js";
 import { membersRoutes } from "./http/members.routes.js";
-import { familiesRepo, type FamilySummary } from "./infra/families.repo.js";
+import { familiesRepo } from "./infra/families.repo.js";
+import { memberRepo, type FamilySummary } from "./infra/member-repo.js";
 export * from "./events.js";
 
 export type { FamilySummary };
@@ -16,9 +17,15 @@ export { canAssignRole, canEditAll, canManageMember };
 export interface FamiliesFacade {
   readonly name: "families";
   /** 404 for non-members, 403 for an insufficient role. */
-  requireRole(familyId: string, userId: string, minRole: Role): Promise<Role>;
-  listFamiliesForUser(userId: string): Promise<FamilySummary[]>;
-  getMemberIds(familyId: string): Promise<string[]>;
+  requireRole(
+    familyId: string,
+    userId: string,
+    minRole: Role,
+    opts?: { write?: boolean },
+  ): Promise<{ role: Role; family: FamilySummary }>;
+  listMemberships(userId: string): Promise<FamilySummary[]>;
+  listMemberIds(familyId: string): Promise<string[]>;
+  isMember(familyId: string, userId: string): Promise<boolean>;
   getMemberRoles(familyId: string): Promise<Map<string, Role>>;
   /** Display name (else phone) per user id; ids without a user are absent. Ledger uses it for member breakdowns. */
   getUserLabels(userIds: readonly string[]): Promise<Map<string, string>>;
@@ -48,13 +55,16 @@ export const familiesModule: ModuleDefinition<FamiliesFacade> = {
     membersRoutes(app, deps);
     return {
       name: "families",
-      requireRole: (familyId, userId, minRole) => requireRole(ctx.db, familyId, userId, minRole),
-      listFamiliesForUser: (userId) => familiesRepo.listForUser(ctx.db, userId),
-      async getMemberIds(familyId) {
-        return (await familiesRepo.listMembers(ctx.db, familyId)).map((m) => m.userId);
+      requireRole: (familyId, userId, minRole, opts) => requireRole(ctx.db, familyId, userId, minRole, opts),
+      listMemberships: (userId) => memberRepo.listForUser(ctx.db, userId),
+      async listMemberIds(familyId) {
+        return (await memberRepo.listMembers(ctx.db, familyId)).map((m) => m.userId);
+      },
+      async isMember(familyId, userId) {
+        return (await memberRepo.memberRole(ctx.db, familyId, userId)) !== null;
       },
       async getMemberRoles(familyId) {
-        return new Map((await familiesRepo.listMembers(ctx.db, familyId)).map((m) => [m.userId, m.role]));
+        return new Map((await memberRepo.listMembers(ctx.db, familyId)).map((m) => [m.userId, m.role]));
       },
       async getUserLabels(userIds) {
         const users = await Promise.all([...new Set(userIds)].map((id) => identity.getUserBasics(id)));
