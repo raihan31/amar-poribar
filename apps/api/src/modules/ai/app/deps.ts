@@ -1,6 +1,6 @@
 import type { FamiliesFacade } from "../../families/index.js";
 import type { LedgerFacade } from "../../ledger/index.js";
-import type { AiClient } from "../infra/claude-client.js";
+import type { ClaudeClient } from "../infra/claude-client.js";
 
 export interface SummaryKey {
   familyId: string;
@@ -28,8 +28,7 @@ export interface AiDeps {
   store: AiStore;
   families: Pick<FamiliesFacade, "requireRole" | "getAiQuota">;
   ledger: Pick<LedgerFacade, "listCategories" | "getMonthTotals" | "askQueries">;
-  /** Undefined when no API key is configured; only deterministic paths run then. */
-  client?: AiClient | undefined;
-  model?: string | undefined;
+  /** Not enabled when no API key is configured; only deterministic paths run then. */
+  claude: ClaudeClient;
   clock: () => Date;
 }

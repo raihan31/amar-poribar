@@ -39,8 +39,11 @@ export async function summary(
   const cached = await deps.store.findSummary(key);
   if (cached) return { month, locale, text: cached.text, speechText: cached.speechText, usedAi: cached.usedAi };
 
-  const useAi = deps.client && (await hasAiQuota(deps, familyId));
-  const result = await monthlySummary(facts, { client: useAi ? deps.client : undefined, model: deps.model });
+  const useAi = deps.claude.enabled && (await hasAiQuota(deps, familyId));
+  const result = await monthlySummary(facts, {
+    client: useAi ? deps.claude.client : undefined,
+    model: deps.claude.model,
+  });
   // Only AI summaries are cached; the template is free to rebuild and shouldn't block a later AI version.
   if (result.usedAi) {
     await recordAiUse(deps, familyId);

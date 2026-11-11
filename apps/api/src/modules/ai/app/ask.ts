@@ -10,15 +10,16 @@ export async function ask(
   input: { familyId: string; userId: string; question: string; forSpeech?: boolean | undefined },
 ): Promise<{ answer: string; usedAi: true }> {
   const { familyId, userId, question, forSpeech } = input;
-  if (!deps.client) throw new HttpError(503, "ai_unavailable", "Ask is not available right now");
+  const { client, model } = deps.claude;
+  if (!client) throw new HttpError(503, "ai_unavailable", "Ask is not available right now");
   if (!(await hasAiQuota(deps, familyId)))
     throw new HttpError(429, "ai_quota", "This month's AI limit has been reached");
   try {
     const answer = await askQuestion(question, {
-      client: deps.client,
+      client,
       tools: buildAskTools(deps.ledger, familyId, userId),
       today: new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(deps.clock()),
-      model: deps.model,
+      model,
       forSpeech,
     });
     await recordAiUse(deps, familyId);
