@@ -1,0 +1,71 @@
+/* App shell (T-WEB-07) */
+.app-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.app-content {
+  flex: 1;
+  padding-bottom: 72px;
+}
+.tabbar {
+  position: fixed;
+  inset: auto 0 0 0;
+  height: 72px;
+  display: flex;
+  background: var(--bg);
+  border-top: 1px solid var(--muted);
+}
+.tabbar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.tabbar-item:focus-visible {
+  outline: 3px solid var(--green-700);
+  outline-offset: 2px;
+}
+.tabbar-item[aria-current="page"] {
+  color: var(--green-700);
+  font-weight: 700;
+}
+.tabbar-icon {
+  position: relative;
+  display: inline-flex;
+}
+.tabbar-label {
+  font-size: 12px;
+}
+.tabbar-badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--danger);
+  color: var(--bg);
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+}
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 56px;
+  padding: 0 16px;
+}
+.page-header h1 {
+  margin: 0;
+  flex: 1;
+}
+.back-header {
+  justify-content: flex-start;
+}
