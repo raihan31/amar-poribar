@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getPreferences, isQuietNow, notificationsModule, notify, NotImplemented } from "./index.js";
+import { notificationsModule, notify, NotImplemented } from "./index.js";
 
 describe("notifications module", () => {
   it("has the expected name", () => {
@@ -9,7 +9,5 @@ describe("notifications module", () => {
   it("stubs throw NotImplemented", async () => {
     const ctx = {} as never;
     await expect(notify(ctx, { userIds: [], kind: "system", params: {} })).rejects.toBeInstanceOf(NotImplemented);
-    await expect(getPreferences(ctx, "u")).rejects.toBeInstanceOf(NotImplemented);
-    await expect(isQuietNow(ctx, "u")).rejects.toBeInstanceOf(NotImplemented);
   });
 });
