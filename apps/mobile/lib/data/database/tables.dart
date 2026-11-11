@@ -2,6 +2,9 @@ import 'package:drift/drift.dart';
 
 /// Money entries. Synced between devices and the server by HLC (SRS FR-SYNC-02, §4.3.1).
 /// Amounts are integer paisa. A delete is a tombstone: [deletedAt] set with a newer [hlc].
+@TableIndex.sql(
+  'CREATE INDEX txn_family_time ON transactions (family_id, occurred_at DESC, id DESC)',
+)
 class Transactions extends Table {
   TextColumn get id => text()();
   TextColumn get type => text()(); // expense | income | transfer
@@ -17,6 +20,13 @@ class Transactions extends Table {
   BoolColumn get isPrivate => boolean().withDefault(const Constant(false))();
   TextColumn get deletedAt => text().nullable()();
   TextColumn get hlc => text()();
+
+  /// Family the row belongs to ('' until a family is known; migrated to the active family).
+  TextColumn get familyId => text().withDefault(const Constant(''))();
+  TextColumn get splitGroupId => text().nullable()();
+  TextColumn get attachmentKey => text().nullable()();
+  TextColumn get paidByUserId => text().nullable()();
+  TextColumn get createdBy => text().nullable()();
 
   /// Position in this device's own change log, bumped on every local write and every merge. Sync
   /// cursors (per peer, and for the server) page by this, not by HLC, because HLCs are assigned by
