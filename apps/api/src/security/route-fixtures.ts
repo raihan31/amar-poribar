@@ -39,6 +39,8 @@ const MONTH = "2026-01";
 const TAKA_100 = 10_000; // integer paisa
 
 export const ROUTE_FIXTURES: Record<string, RouteFixture> = {
+  "GET /v1/families/{familyId}": (c) => ({ params: fam(c) }),
+  "PATCH /v1/families/{familyId}": (c) => ({ params: fam(c), body: { name: "Isolation" } }),
   "GET /v1/families/{familyId}/accounts": (c) => ({ params: fam(c) }),
   "POST /v1/families/{familyId}/accounts": (c) => ({ params: fam(c), body: { name: "Isolation", type: "cash" } }),
   "PATCH /v1/families/{familyId}/accounts/{accountId}": (c) => ({

@@ -1,4 +1,4 @@
-import { and, count, eq } from "drizzle-orm";
+import { and, asc, count, eq, inArray } from "drizzle-orm";
 import type { Role } from "@amar-poribar/shared";
 import type { Db } from "../../../platform/db.js";
 import type { Tx } from "../../../platform/events/bus.js";
@@ -11,6 +11,13 @@ export interface FamilySummary {
   id: string;
   name: string;
   role: Role;
+}
+
+/** A family as seen in the switcher (screen F2): the caller's role plus status and size. */
+export interface MembershipSummary extends FamilySummary {
+  status: string;
+  memberLimit: number;
+  memberCount: number;
 }
 
 /** The only file (with schema.ts) that reads or writes family_members. */
@@ -66,11 +73,42 @@ export const memberRepo = {
     return row ?? null;
   },
 
-  async listForUser(x: Executor, userId: string): Promise<FamilySummary[]> {
-    return x
-      .select({ id: families.id, name: families.name, role: familyMembers.role })
+  async listForUser(x: Executor, userId: string): Promise<MembershipSummary[]> {
+    const mine = await x
+      .select({
+        id: families.id,
+        name: families.name,
+        role: familyMembers.role,
+        status: families.status,
+        memberLimit: families.memberLimit,
+      })
       .from(familyMembers)
       .innerJoin(families, eq(families.id, familyMembers.familyId))
-      .where(eq(familyMembers.userId, userId));
+      .where(eq(familyMembers.userId, userId))
+      .orderBy(asc(familyMembers.joinedAt), asc(families.id));
+    if (mine.length === 0) return [];
+    const counts = await x
+      .select({ familyId: familyMembers.familyId, n: count() })
+      .from(familyMembers)
+      .where(
+        inArray(
+          familyMembers.familyId,
+          mine.map((f) => f.id),
+        ),
+      )
+      .groupBy(familyMembers.familyId);
+    const byFamily = new Map(counts.map((c) => [c.familyId, c.n]));
+    return mine.map((f) => ({ ...f, memberCount: byFamily.get(f.id) ?? 0 }));
+  },
+
+  async listMembersWithJoined(
+    x: Executor,
+    familyId: string,
+  ): Promise<{ userId: string; role: Role; joinedAt: Date }[]> {
+    return x
+      .select({ userId: familyMembers.userId, role: familyMembers.role, joinedAt: familyMembers.joinedAt })
+      .from(familyMembers)
+      .where(eq(familyMembers.familyId, familyId))
+      .orderBy(asc(familyMembers.joinedAt), asc(familyMembers.userId));
   },
 };
