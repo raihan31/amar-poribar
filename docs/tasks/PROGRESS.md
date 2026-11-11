@@ -39,7 +39,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-PLAT-33 | M0 | done | b425816b5 | 2026-11-10 |  |
 | T-PLAT-34 | M0 | done | 7d77cb503 | 2026-11-10 |  |
 | T-PLAT-35 | M0 | done | eae75e302 | 2026-11-10 |  |
-| T-ID-01 | M1 | todo |  |  |  |
+| T-ID-01 | M1 | done | fc6d9f6e9 | 2026-11-11 |  |
 | T-ID-02 | M1 | todo |  |  |  |
 | T-ID-03 | M1 | todo |  |  |  |
 | T-ID-04 | M1 | todo |  |  |  |
@@ -134,7 +134,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-BILL-06 | M8 | todo |  |  |  |
 | T-BILL-07 | M8 | todo |  |  |  |
 | T-BILL-08 | M8 | todo |  |  |  |
-| T-PRIV-01 | M1 | todo |  |  |  |
+| T-PRIV-01 | M1 | done | 60cca5053 | 2026-11-11 |  |
 | T-PRIV-02 | M5 | todo |  |  |  |
 | T-PRIV-03 | M5 | todo |  |  |  |
 | T-PRIV-04 | M5 | todo |  |  |  |
@@ -164,10 +164,10 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-MOB-08 | M1 | done | 95a9382 | 2026-11-10 |  |
 | T-MOB-09 | M1 | todo |  |  |  |
 | T-MOB-10 | M0 | done | d972616 | 2026-11-10 |  |
-| T-MOB-11 | M1 | todo |  |  |  |
+| T-MOB-11 | M1 | done | 2181ca774 | 2026-11-11 |  |
 | T-MOB-12 | M1 | todo |  |  |  |
 | T-MOB-13 | M1 | done | 469c6a405 | 2026-11-10 |  |
-| T-MOB-14 | M1 | todo |  |  |  |
+| T-MOB-14 | M1 | done | c3421511f | 2026-11-11 |  |
 | T-MOB-15 | M1 | todo |  |  |  |
 | T-MOB-16 | M1 | todo |  |  |  |
 | T-MOB-17 | M1 | todo |  |  |  |
@@ -175,7 +175,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-MOB-19 | M1 | todo |  |  |  |
 | T-MOB-20 | M1 | todo |  |  |  |
 | T-MOB-21 | M1 | todo |  |  |  |
-| T-MOB-22 | M1 | todo |  |  |  |
+| T-MOB-22 | M1 | done | 0b47095c3 | 2026-11-11 |  |
 | T-MOB-23 | M2 | todo |  |  |  |
 | T-MOB-24 | M2 | todo |  |  |  |
 | T-MOB-25 | M2 | todo |  |  |  |
@@ -232,7 +232,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-MOB-76 | M2 | todo |  |  |  |
 | T-MOB-77 | M2 | todo |  |  |  |
 | T-WEB-01 | M0 | done | 90ec5e863 | 2026-11-10 |  |
-| T-WEB-02 | M2 | todo |  |  |  |
+| T-WEB-02 | M2 | done | eadc8fb9f | 2026-11-11 |  |
 | T-WEB-03 | M1 | todo |  |  |  |
 | T-WEB-04 | M2 | todo |  |  |  |
 | T-WEB-05 | M2 | todo |  |  |  |
