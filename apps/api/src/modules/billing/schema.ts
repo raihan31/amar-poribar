@@ -1,4 +1,4 @@
-import { bigint, boolean, integer, pgSchema, primaryKey, text } from "drizzle-orm/pg-core";
+import { bigint, boolean, integer, pgSchema, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const billingSchema = pgSchema("billing");
 
@@ -26,3 +26,13 @@ export const planLimits = billingSchema.table(
   },
   (t) => [primaryKey({ columns: [t.planId, t.key] })],
 );
+
+/** Staff-set quota overrides per family (T-ADM-08 writes them). Null columns mean "use the plan value". */
+export const familyOverrides = billingSchema.table("family_overrides", {
+  familyId: uuid("family_id").primaryKey(),
+  aiEntriesMonth: integer("ai_entries_month"),
+  membersMax: integer("members_max"),
+  reason: text("reason").notNull(),
+  setBy: uuid("set_by").notNull(),
+  setAt: timestamp("set_at", { withTimezone: true }).notNull().defaultNow(),
+});
