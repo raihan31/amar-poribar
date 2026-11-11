@@ -20,6 +20,7 @@ import { listChangesAfter, type ChangesPage } from "./app/list-for-sync.js";
 import { askQueries, type AskQueries } from "./app/ask-queries.js";
 import { getMonthTotals, getRangeTotals, type MonthTotals, type RangeTotals } from "./app/month-totals.js";
 import { remittanceByMonth, type RemittanceByMonth } from "./app/remittance.js";
+import { getMonthlySeries, type MonthlyPoint } from "./app/series.js";
 import { seedDefaults } from "./app/seed-defaults.js";
 import { currentDhakaMonth, dayRange, monthRange, monthsBetween, previousMonth } from "../../platform/time/month.js";
 import { nextHlc } from "../../platform/hlc.js";
@@ -41,6 +42,7 @@ export type {
   Category,
   ChangesPage,
   ExportRow,
+  MonthlyPoint,
   MonthTotals,
   RangeTotals,
   RemittanceByMonth,
@@ -57,6 +59,8 @@ export interface LedgerFacade {
   getMonthTotals(familyId: string, viewer: Viewer, month: string): Promise<MonthTotals>;
   /** Income, expense and per-category expense in `[from, to)` as visible to `viewer` (festival budgets). */
   getRangeTotals(familyId: string, viewer: Viewer, from: Date, to: Date): Promise<RangeTotals>;
+  /** Zero-filled monthly income and expense (with per-category-key split) from `fromMonth` to `toMonth` inclusive. */
+  getMonthlySeries(familyId: string, viewer: Viewer, fromMonth: string, toMonth: string): Promise<MonthlyPoint[]>;
   /** Newest first; other members' private entries are excluded (FR-TXN-05). */
   listVisibleTransactions(familyId: string, viewer: Viewer, filter: VisibleFilter): Promise<Transaction[]>;
   /** Read-only queries for the Ask feature; other members' private entries are never read (FR-TXN-05). */
@@ -113,6 +117,7 @@ export const ledgerModule: ModuleDefinition<LedgerFacade> = {
       name: "ledger",
       getMonthTotals: (familyId, viewer, month) => getMonthTotals(deps, familyId, viewer, month),
       getRangeTotals: (familyId, viewer, from, to) => getRangeTotals(deps, familyId, viewer, from, to),
+      getMonthlySeries: (familyId, viewer, from, to) => getMonthlySeries(deps, familyId, viewer, from, to),
       listVisibleTransactions: (familyId, viewer, filter) => listVisibleTransactions(deps, familyId, viewer, filter),
       askQueries: (familyId, userId) => askQueries(deps, familyId, userId),
       listCategories: (familyId, opts) => listCategories(deps, familyId, opts),
