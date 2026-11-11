@@ -3,6 +3,7 @@ import '../../../data/database/local_store.dart';
 import '../../../domain/models/api/me.dart';
 import '../../../domain/models/member.dart';
 import '../../../domain/models/role.dart';
+import 'family_list_repository.dart';
 import 'family_repository.dart';
 
 /// Real implementation over `GET /v1/families/:id/members`; members are cached so the screens
@@ -33,7 +34,7 @@ class ApiFamilyRepository implements FamilyRepository {
     if (families.isEmpty) {
       throw StateError('The user belongs to no family');
     }
-    return families.first;
+    return chooseActiveFamily(families, await store.getMeta(kActiveFamilyKey));
   }
 
   @override

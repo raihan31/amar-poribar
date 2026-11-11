@@ -28,7 +28,7 @@ class SignedIn extends AuthNotifier {
     state = const AuthState(
       loaded: true,
       token: 't',
-      family: FamilyInfo('f1', 'Rahman', 'owner'),
+      families: [FamilyInfo('f1', 'Rahman', 'owner')],
     );
   }
 }

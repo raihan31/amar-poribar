@@ -18,12 +18,12 @@ const _legacyTokenKey = 'amar-poribar.token';
 class AuthState {
   final bool loaded;
   final String? token;
-  final FamilyInfo? family;
+  final List<FamilyInfo> families;
   final bool expired;
   const AuthState({
     this.loaded = false,
     this.token,
-    this.family,
+    this.families = const [],
     this.expired = false,
   });
 
@@ -93,7 +93,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = AuthState(
         loaded: true,
         token: token,
-        family: fams.isEmpty ? null : fams.first,
+        families: fams,
       );
     } on ApiException catch (e) {
       if (e.isUnauthorized) {
@@ -108,9 +108,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> createFamily(String name) async {
+  /// Creates a family and returns it so the caller can make it the active one.
+  Future<FamilyInfo> createFamily(String name) async {
     final fam = await api.createFamily(name);
-    state = AuthState(loaded: true, token: state.token, family: fam);
+    state = AuthState(
+      loaded: true,
+      token: state.token,
+      families: [...state.families, fam],
+    );
+    return fam;
   }
 
   Future<void> signOut() async {
