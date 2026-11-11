@@ -1,10 +1,18 @@
 import 'package:amar_poribar/domain/models/member.dart';
+import 'package:amar_poribar/domain/models/role.dart';
 import 'package:amar_poribar/ui/member_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Widget _app(Widget c) => MaterialApp(home: Scaffold(body: Center(child: c)));
-const _m = Member(id: '1', name: 'রহিম', avatarIndex: 1);
+Widget _app(Widget c) => MaterialApp(
+      home: Scaffold(body: Center(child: c)),
+    );
+const _m = Member(
+  userId: '1',
+  name: 'রহিম',
+  role: FamilyRole.member,
+  avatarIndex: 1,
+);
 
 void main() {
   testWidgets('online shows word অনলাইন', (t) async {

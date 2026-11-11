@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/money/money.dart';
 import '../../data/database/local_store.dart';
-import '../../domain/models/enums.dart';
 
 /// The on-device store. `main.dart` opens the database and overrides this; tests override it with an
 /// in-memory one.
@@ -13,8 +12,6 @@ final localStoreProvider = Provider<LocalStore>((ref) {
 });
 
 class AppState {
-  final Role activeRole;
-  final Money monthlyBudget;
   final Money totalIncome;
   final Money totalExpense;
 
@@ -22,23 +19,17 @@ class AppState {
   final List<Map<String, dynamic>> recent;
 
   const AppState({
-    this.activeRole = Role.father, // Default admin view
-    this.monthlyBudget = const Money(10000000),
     this.totalIncome = Money.zero,
     this.totalExpense = Money.zero,
     this.recent = const [],
   });
 
   AppState copyWith({
-    Role? activeRole,
-    Money? monthlyBudget,
     Money? totalIncome,
     Money? totalExpense,
     List<Map<String, dynamic>>? recent,
   }) {
     return AppState(
-      activeRole: activeRole ?? this.activeRole,
-      monthlyBudget: monthlyBudget ?? this.monthlyBudget,
       totalIncome: totalIncome ?? this.totalIncome,
       totalExpense: totalExpense ?? this.totalExpense,
       recent: recent ?? this.recent,
@@ -46,15 +37,12 @@ class AppState {
   }
 }
 
-/// Dashboard state backed by the local database: totals for this month and the latest entries.
-class AppStateNotifier extends StateNotifier<AppState> {
+/// Dashboard state backed by the local database: `Money` totals for this month and the latest
+/// entries. Budgets come from the budget repository, roles from `currentRoleProvider`.
+class MonthTotalsNotifier extends StateNotifier<AppState> {
   final LocalStore store;
-  AppStateNotifier(this.store) : super(const AppState()) {
+  MonthTotalsNotifier(this.store) : super(const AppState()) {
     reload();
-  }
-
-  void setRole(Role role) {
-    state = state.copyWith(activeRole: role);
   }
 
   Future<void> addExpense(
@@ -96,10 +84,14 @@ class AppStateNotifier extends StateNotifier<AppState> {
   Future<void> reload() async {
     // Months are Asia/Dhaka (UTC+6) calendar months.
     final dhaka = DateTime.now().toUtc().add(const Duration(hours: 6));
-    final start = DateTime.utc(dhaka.year, dhaka.month)
-        .subtract(const Duration(hours: 6));
-    final end = DateTime.utc(dhaka.year, dhaka.month + 1)
-        .subtract(const Duration(hours: 6));
+    final start = DateTime.utc(
+      dhaka.year,
+      dhaka.month,
+    ).subtract(const Duration(hours: 6));
+    final end = DateTime.utc(
+      dhaka.year,
+      dhaka.month + 1,
+    ).subtract(const Duration(hours: 6));
     final totals = await store.totals(start, end);
     final cats = {for (final c in await store.categories()) c.id: c.nameBn};
     final rows = await store.recent(limit: 20);
@@ -120,9 +112,10 @@ class AppStateNotifier extends StateNotifier<AppState> {
   }
 }
 
-final appStateProvider =
-    StateNotifierProvider<AppStateNotifier, AppState>((ref) {
-  return AppStateNotifier(ref.watch(localStoreProvider));
+final appStateProvider = StateNotifierProvider<MonthTotalsNotifier, AppState>((
+  ref,
+) {
+  return MonthTotalsNotifier(ref.watch(localStoreProvider));
 });
 
 final recentTransactionsProvider = Provider<List<Map<String, dynamic>>>((ref) {

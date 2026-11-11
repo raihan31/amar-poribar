@@ -1,6 +1,7 @@
 import 'package:amar_poribar/core/theme/app_theme.dart';
 import 'package:amar_poribar/core/theme/ui_scale.dart';
 import 'package:amar_poribar/domain/models/member.dart';
+import 'package:amar_poribar/domain/models/role.dart';
 import 'package:amar_poribar/l10n/gen/app_localizations.dart';
 import 'package:amar_poribar/ui/big_button.dart';
 import 'package:amar_poribar/ui/big_mic_button.dart';
@@ -65,7 +66,7 @@ void main() {
                 BigMicButton(onPressed: () {}),
                 const ListenButton(text: 'পরীক্ষা'),
                 const MemberAvatar(
-                  m: Member(id: '1', name: 'আম্মু'),
+                  m: Member(userId: '1', name: 'আম্মু', role: FamilyRole.admin),
                   online: true,
                   showLabel: true,
                 ),

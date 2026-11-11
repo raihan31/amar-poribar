@@ -26,16 +26,8 @@
     "placeholders": {"role": {"type": "String"}}
   },
   "home_dashboard_totalBalance": "মোট ব্যালেন্স",
-  "home_dashboard_percentUsed": "{percent}% ব্যবহৃত",
-  "@home_dashboard_percentUsed": {
-    "placeholders": {"percent": {"type": "String"}}
-  },
   "home_dashboard_spent": "খরচ: ৳{amount}",
   "@home_dashboard_spent": {
-    "placeholders": {"amount": {"type": "String"}}
-  },
-  "home_dashboard_budget": "বাজেট: ৳{amount}",
-  "@home_dashboard_budget": {
     "placeholders": {"amount": {"type": "String"}}
   },
   "home_dashboard_analytics": "মাসের হিসাব",
