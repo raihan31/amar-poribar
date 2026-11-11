@@ -1,4 +1,19 @@
-export type TokenType = "access" | "refresh";
+import type { SessionRow } from "../domain/session.js";
+
+export type NewSession = Omit<SessionRow, "rotatedAt" | "revokedAt">;
+
+/** Persistence of refresh-token sessions (T-ID-05). */
+export interface SessionRepo {
+  insert(s: NewSession & { now: Date }): Promise<void>;
+  findById(id: string): Promise<SessionRow | null>;
+  /** One transaction: marks `oldId` rotated (only if still unrotated and unrevoked) and inserts the child. False when it lost the race. */
+  rotate(oldId: string, child: NewSession, now: Date): Promise<boolean>;
+  /** Revokes every open session of the chain; returns their ids. */
+  revokeChain(chainId: string, reason: string, now: Date): Promise<string[]>;
+  /** True for a missing, revoked or expired session. */
+  isRevoked(id: string, now: Date): Promise<boolean>;
+  purgeExpiredBefore(cutoff: Date): Promise<number>;
+}
 
 export interface OtpChallengeRow {
   id: string;
@@ -21,9 +36,10 @@ export interface OtpRepo {
 }
 
 export interface TokenService {
-  sign(userId: string, typ: TokenType): string;
+  /** Access JWT `{ sub, sid, typ: "access" }`, 15 minutes. */
+  sign(userId: string, sessionId: string): string;
   /** Throws when the signature or expiry is invalid. */
-  verify(token: string): { sub: string; typ: string };
+  verify(token: string): { sub: string; typ: string; sid?: string };
 }
 
 export interface UserBasics {
