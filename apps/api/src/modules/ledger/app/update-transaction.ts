@@ -4,7 +4,7 @@ import { stampChange } from "../infra/stamp-change.js";
 import { transactionsRepo, type Transaction } from "../infra/transactions.repo.js";
 import type { LedgerDeps } from "./deps.js";
 import { publishTransaction } from "./publish.js";
-import { assertOwnedRefs } from "./refs.js";
+import { assertRefs } from "./queries.js";
 
 /** FR-TXN-03: members edit their own entries; admins and owners edit any. */
 export async function updateTransaction(
@@ -17,7 +17,7 @@ export async function updateTransaction(
   if (txn.createdBy !== actorId && !deps.families.canEditAll(role)) {
     throw new HttpError(403, "forbidden", "You can only edit your own entries");
   }
-  await assertOwnedRefs(deps.db, familyId, data);
+  await assertRefs(deps.db, familyId, data);
   const { occurredAt, ...fields } = data;
   return deps.db.transaction(async (tx) => {
     const row = await transactionsRepo.update(tx, txnId, {

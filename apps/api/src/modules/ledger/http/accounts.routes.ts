@@ -2,7 +2,8 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { CreateAccountSchema, UpdateAccountSchema } from "@amar-poribar/shared";
 import { parseOr400 } from "../../../platform/errors.js";
-import { createAccount, listAccounts, updateAccount } from "../app/accounts.js";
+import { createAccount, updateAccount } from "../app/accounts.js";
+import { listAccounts } from "../app/queries.js";
 import type { LedgerDeps } from "../app/deps.js";
 import { docs } from "../../../platform/http/responses.js";
 
@@ -17,7 +18,7 @@ export function accountsRoutes(app: FastifyInstance, deps: LedgerDeps) {
   app.get<FamilyParams>("/v1/families/:familyId/accounts", { ...opts, schema: docs.list }, async (req) => {
     await deps.families.requireRole(req.params.familyId, req.user.sub, "viewer");
     const { includeArchived } = parseOr400(AccountListQuery, req.query);
-    return listAccounts(deps, req.params.familyId, includeArchived);
+    return listAccounts(deps, req.params.familyId, { includeArchived });
   });
 
   app.post<FamilyParams>("/v1/families/:familyId/accounts", { ...opts, schema: docs.object }, async (req, reply) => {

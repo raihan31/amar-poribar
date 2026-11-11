@@ -2,13 +2,23 @@ import type { CreateTransactionInput, Role, SyncTransaction } from "@amar-poriba
 import type { Tx } from "../../platform/events/bus.js";
 import type { ModuleDefinition } from "../../platform/module.js";
 import { createTransaction } from "./app/create-transaction.js";
-import { getCategoryByKey, listCategories } from "./app/categories.js";
 import type { LedgerDeps } from "./app/deps.js";
 import { applyChange, type ApplyResult } from "./app/apply-sync-change.js";
-import { assertOwnedRefs } from "./app/refs.js";
+import {
+  assertRefs,
+  countTransactions,
+  getCategoriesByKeys,
+  getLastActivity,
+  listAccounts,
+  listCategories,
+  listVisibleTransactions,
+} from "./app/queries.js";
+import { onFamilyDeleted } from "./app/on-family-deleted.js";
+import type { Viewer } from "./domain/viewer.js";
+import type { VisibleFilter } from "./infra/query-repo.js";
 import { listChangesAfter, type ChangesPage } from "./app/list-for-sync.js";
 import { askQueries, type AskQueries } from "./app/ask-queries.js";
-import { expenseTotalBetween, monthTotals, type MonthTotals } from "./app/month-totals.js";
+import { getMonthTotals, getRangeTotals, type MonthTotals, type RangeTotals } from "./app/month-totals.js";
 import { remittanceByMonth, type RemittanceByMonth } from "./app/remittance.js";
 import { seedDefaults } from "./app/seed-defaults.js";
 import { currentDhakaMonth, dayRange, monthRange, monthsBetween, previousMonth } from "../../platform/time/month.js";
@@ -32,26 +42,35 @@ export type {
   ChangesPage,
   ExportRow,
   MonthTotals,
+  RangeTotals,
   RemittanceByMonth,
   Transaction,
+  Viewer,
+  VisibleFilter,
 };
 export { currentDhakaMonth, dayRange, monthRange, monthsBetween, previousMonth, nextHlc };
 
 /** Public surface of the ledger module. Other modules may import only this file (SRS R1). */
 export interface LedgerFacade {
   readonly name: "ledger";
-  /** Income, expense and breakdowns for a month, as visible to `userId` (FR-TXN-05). */
-  monthTotals(familyId: string, userId: string, month: string): Promise<MonthTotals>;
-  /** Expense in `[start, end)` as visible to `userId` (festival budgets). */
-  expenseTotalBetween(familyId: string, userId: string, start: Date, end: Date): Promise<number>;
+  /** Income, expense and breakdowns for a month, as visible to `viewer` (FR-TXN-05). */
+  getMonthTotals(familyId: string, viewer: Viewer, month: string): Promise<MonthTotals>;
+  /** Income, expense and per-category expense in `[from, to)` as visible to `viewer` (festival budgets). */
+  getRangeTotals(familyId: string, viewer: Viewer, from: Date, to: Date): Promise<RangeTotals>;
+  /** Newest first; other members' private entries are excluded (FR-TXN-05). */
+  listVisibleTransactions(familyId: string, viewer: Viewer, filter: VisibleFilter): Promise<Transaction[]>;
   /** Read-only queries for the Ask feature; other members' private entries are never read (FR-TXN-05). */
   askQueries(familyId: string, userId: string): AskQueries;
-  listCategories(familyId: string): Promise<Category[]>;
-  getCategoryByKey(familyId: string, key: string): Promise<Category | null>;
+  listCategories(familyId: string, opts: { includeHidden: boolean }): Promise<Category[]>;
+  listAccounts(familyId: string, opts: { includeArchived: boolean }): Promise<Account[]>;
+  getCategoriesByKeys(familyId: string, keys: readonly string[]): Promise<Category[]>;
+  /** `max(updated_at)` over the family's transactions, or null when it has none. */
+  getLastActivity(familyId: string): Promise<Date | null>;
+  countTransactions(familyId: string): Promise<number>;
   /** The caller has already checked the member role (for example recurring confirm). */
   createTransaction(familyId: string, actor: { userId: string }, input: CreateTransactionInput): Promise<Transaction>;
   /** 400 `invalid_category` / `invalid_account` unless the category and account belong to this family. */
-  assertOwnedRefs(
+  assertRefs(
     familyId: string,
     refs: { categoryId?: string | null | undefined; accountId?: string | null | undefined },
   ): Promise<void>;
@@ -85,16 +104,25 @@ export const ledgerModule: ModuleDefinition<LedgerFacade> = {
     ctx.bus.onInTx("families.FamilyCreated.v1", (event, tx) =>
       seedDefaults(tx, event.payload.familyId, event.payload.ownerUserId),
     );
+    // The event is declared by families (T-FAM); the payload is read defensively until its type exists.
+    ctx.bus.on("families.FamilyDeleted.v1", "ledger.delete-family-data", async (event, hctx) => {
+      const { familyId } = event.payload as { familyId: string };
+      await onFamilyDeleted(hctx.db, ctx.storage, familyId);
+    });
     return {
       name: "ledger",
-      monthTotals: (familyId, userId, month) => monthTotals(deps, familyId, userId, month),
-      expenseTotalBetween: (familyId, userId, start, end) => expenseTotalBetween(deps, familyId, userId, start, end),
+      getMonthTotals: (familyId, viewer, month) => getMonthTotals(deps, familyId, viewer, month),
+      getRangeTotals: (familyId, viewer, from, to) => getRangeTotals(deps, familyId, viewer, from, to),
+      listVisibleTransactions: (familyId, viewer, filter) => listVisibleTransactions(deps, familyId, viewer, filter),
       askQueries: (familyId, userId) => askQueries(deps, familyId, userId),
-      listCategories: (familyId) => listCategories(deps, familyId),
-      getCategoryByKey: (familyId, key) => getCategoryByKey(deps, familyId, key),
+      listCategories: (familyId, opts) => listCategories(deps, familyId, opts),
+      listAccounts: (familyId, opts) => listAccounts(deps, familyId, opts),
+      getCategoriesByKeys: (familyId, keys) => getCategoriesByKeys(deps, familyId, keys),
+      getLastActivity: (familyId) => getLastActivity(deps, familyId),
+      countTransactions: (familyId) => countTransactions(deps, familyId),
       createTransaction: (familyId, actor, data) => createTransaction(deps, { familyId, actorId: actor.userId, data }),
-      assertOwnedRefs: (familyId, refs) => assertOwnedRefs(ctx.db, familyId, refs),
-      listForExport: (familyId, userId, range) => totalsRepo.exportRows(ctx.db, familyId, userId, range),
+      assertRefs: (familyId, refs) => assertRefs(ctx.db, familyId, refs),
+      listForExport: (familyId, userId, range) => totalsRepo.exportRows(ctx.db, familyId, { userId }, range),
       remittanceByMonth: (familyId, userId, from, to) => remittanceByMonth(deps, familyId, userId, from, to),
       listChangesAfter: (familyId, userId, role, seq, limit) =>
         listChangesAfter(deps, familyId, userId, role, seq, limit),

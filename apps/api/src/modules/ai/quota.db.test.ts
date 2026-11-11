@@ -56,7 +56,7 @@ describe("ai quota (db)", () => {
             requireRole: async () => ({ role: "owner", family: { id: "f", name: "f", role: "owner" } }),
             getAiQuota: async () => ({ quotaMonth: 2, plan: "free" }),
           },
-          ledger: { listCategories: async () => [], monthTotals: async () => ({}), askQueries: () => ({}) },
+          ledger: { listCategories: async () => [], getMonthTotals: async () => ({}), askQueries: () => ({}) },
         },
       } as unknown as ModuleContext;
       const facade = await createAiModule({ client: fakeClient }).register(app, ctx);

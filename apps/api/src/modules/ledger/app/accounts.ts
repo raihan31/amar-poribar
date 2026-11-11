@@ -11,10 +11,6 @@ async function assertMember(deps: LedgerDeps, familyId: string, userId: string |
   }
 }
 
-export function listAccounts(deps: LedgerDeps, familyId: string, includeArchived: boolean): Promise<Account[]> {
-  return catalogRepo.listAccounts(deps.db, familyId, includeArchived);
-}
-
 // FR-ACC-01 / FR-ACC-02
 export async function createAccount(deps: LedgerDeps, familyId: string, body: CreateAccountInput): Promise<Account> {
   await assertMember(deps, familyId, body.ownerUserId);

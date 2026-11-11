@@ -60,7 +60,7 @@ async function build(opts: { client?: AiClient; quota?: number; store?: MemorySt
       },
       ledger: {
         listCategories: async () => [],
-        monthTotals: async () => totals(250_000),
+        getMonthTotals: async () => totals(250_000),
         askQueries: () => ({}),
       },
     },

@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import type { Db } from "../../../platform/db.js";
 import type { Tx } from "../../../platform/events/bus.js";
 import { defaultAccountRows, defaultCategoryRows } from "../domain/seed-defaults.js";
@@ -13,16 +13,23 @@ export type NewAccount = typeof accounts.$inferInsert;
 export type NewCategory = typeof categories.$inferInsert;
 
 export const catalogRepo = {
-  listCategories(x: Executor, familyId: string): Promise<Category[]> {
-    return x.select().from(categories).where(eq(categories.familyId, familyId));
-  },
-
-  async getCategoryByKey(x: Executor, familyId: string, key: string): Promise<Category | null> {
-    const [row] = await x
+  listCategories(x: Executor, familyId: string, includeHidden: boolean): Promise<Category[]> {
+    return x
       .select()
       .from(categories)
-      .where(and(eq(categories.familyId, familyId), eq(categories.key, key)));
-    return row ?? null;
+      .where(
+        includeHidden
+          ? eq(categories.familyId, familyId)
+          : and(eq(categories.familyId, familyId), eq(categories.isHidden, false)),
+      );
+  },
+
+  getCategoriesByKeys(x: Executor, familyId: string, keys: readonly string[]): Promise<Category[]> {
+    if (keys.length === 0) return Promise.resolve([]);
+    return x
+      .select()
+      .from(categories)
+      .where(and(eq(categories.familyId, familyId), inArray(categories.key, [...keys])));
   },
 
   listAccounts(x: Executor, familyId: string, includeArchived: boolean): Promise<Account[]> {

@@ -13,7 +13,7 @@ export async function createTemplate(
   userId: string,
   input: CreateRecurringInput,
 ): Promise<Template> {
-  await deps.ledger.assertOwnedRefs(familyId, input);
+  await deps.ledger.assertRefs(familyId, input);
   return templatesRepo.insert(deps.db, { ...input, endsOn: input.endsOn ?? null, familyId, createdBy: userId });
 }
 
@@ -23,7 +23,7 @@ export async function updateTemplate(
   id: string,
   input: UpdateRecurringInput,
 ): Promise<Template> {
-  await deps.ledger.assertOwnedRefs(familyId, input);
+  await deps.ledger.assertRefs(familyId, input);
   const row = await templatesRepo.update(deps.db, familyId, id, input);
   if (!row) throw new HttpError(404, "not_found", "Recurring entry not found");
   return row;

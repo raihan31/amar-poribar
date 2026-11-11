@@ -11,8 +11,8 @@ export async function monthSummary(
 ): Promise<MonthSummary> {
   const prevMonth = previousMonth(month);
   const [totals, prev] = await Promise.all([
-    deps.ledger.monthTotals(familyId, userId, month),
-    deps.ledger.monthTotals(familyId, userId, prevMonth),
+    deps.ledger.getMonthTotals(familyId, { userId }, month),
+    deps.ledger.getMonthTotals(familyId, { userId }, prevMonth),
   ]);
   return {
     month,

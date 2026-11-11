@@ -3,7 +3,7 @@ import type { PgInsertValue, PgUpdateSetSource } from "drizzle-orm/pg-core";
 import { transactions } from "../schema.js";
 import type { Executor } from "./catalog.repo.js";
 import { stampChange } from "./stamp-change.js";
-import { notPrivateToOthers, visibleToCaller } from "./visibility.js";
+import { notPrivateToOthers, visibleTo } from "../infra/visibility.js";
 
 export type Transaction = typeof transactions.$inferSelect;
 export type NewTransaction = PgInsertValue<typeof transactions>;
@@ -12,7 +12,7 @@ export type TransactionChanges = PgUpdateSetSource<typeof transactions>;
 export const transactionsRepo = {
   /** Newest first, at most 200. TODO(P1): cursor pagination (FR-TXN-02, T-LED-01). */
   list(x: Executor, familyId: string, userId: string, range?: { start: Date; end: Date }): Promise<Transaction[]> {
-    const conditions = [visibleToCaller(familyId, userId)];
+    const conditions = [visibleTo(familyId, { userId })];
     if (range) conditions.push(gte(transactions.occurredAt, range.start), lt(transactions.occurredAt, range.end));
     return x
       .select()
@@ -26,7 +26,7 @@ export const transactionsRepo = {
     const [row] = await x
       .select()
       .from(transactions)
-      .where(and(eq(transactions.id, txnId), visibleToCaller(familyId, userId)));
+      .where(and(eq(transactions.id, txnId), visibleTo(familyId, { userId })));
     return row ?? null;
   },
 

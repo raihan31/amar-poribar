@@ -12,8 +12,8 @@ export async function summary(
 ): Promise<MonthlyAiSummary> {
   const { familyId, userId, month, locale } = input;
   const [current, last] = await Promise.all([
-    deps.ledger.monthTotals(familyId, userId, month),
-    deps.ledger.monthTotals(familyId, userId, previousMonth(month)),
+    deps.ledger.getMonthTotals(familyId, { userId }, month),
+    deps.ledger.getMonthTotals(familyId, { userId }, previousMonth(month)),
   ]);
   const lastByCategory = new Map(last.byCategory.map((c) => [c.categoryId, c.totalPaisa]));
   const facts: SummaryInput = {

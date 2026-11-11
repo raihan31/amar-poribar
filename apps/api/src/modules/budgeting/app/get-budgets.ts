@@ -25,9 +25,9 @@ export async function getBudgetSummary(
   month: string,
 ): Promise<BudgetSummary> {
   const effective = effectiveBudgets(await budgetsRepo.listUpTo(deps.db, familyId, month), month);
-  const totals = await deps.ledger.monthTotals(familyId, userId, month);
+  const totals = await deps.ledger.getMonthTotals(familyId, { userId }, month);
   const spentBy = new Map(totals.byCategory.map((c) => [c.categoryId, c.totalPaisa]));
-  const catById = new Map((await deps.ledger.listCategories(familyId)).map((c) => [c.id, c]));
+  const catById = new Map((await deps.ledger.listCategories(familyId, { includeHidden: true })).map((c) => [c.id, c]));
   return {
     month,
     budgets: effective.map((b) => {
