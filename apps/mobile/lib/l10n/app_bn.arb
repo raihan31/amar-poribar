@@ -41,18 +41,6 @@
   },
   "auth_otp_serverDown": "এখন সংযোগ হচ্ছে না। একটু পরে আবার চেষ্টা করুন।",
   "auth_otp_networkDown": "ইন্টারনেট নেই। সংযোগ দেখে আবার চেষ্টা করুন।",
-  "home_welcome": "স্বাগতম, {role}",
-  "@home_welcome": {
-    "placeholders": {"role": {"type": "String"}}
-  },
-  "home_dashboard_totalBalance": "মোট ব্যালেন্স",
-  "home_dashboard_spent": "খরচ: ৳{amount}",
-  "@home_dashboard_spent": {
-    "placeholders": {"amount": {"type": "String"}}
-  },
-  "home_dashboard_analytics": "মাসের হিসাব",
-  "home_dashboard_recent": "সাম্প্রতিক লেনদেন",
-  "txn_dashboard_add": "লেনদেন যোগ",
   "settings_title": "সেটিংস",
   "settings_role_title": "বর্তমান ভূমিকা",
   "settings_pair_title": "নতুন ফোন যোগ করুন",
@@ -77,10 +65,6 @@
   "sync_nearby_askBody": "ফোন: {name}\nকোড: {code}\n\nদুই ফোনেই একই কোড দেখালে \"হ্যাঁ\" চাপুন।",
   "@sync_nearby_askBody": {
     "placeholders": {"name": {"type": "String"}, "code": {"type": "String"}}
-  },
-  "txn_dashboard_count": "{count, plural, =0{কোনো লেনদেন নেই} =1{১টি লেনদেন} other{{count}টি লেনদেন}}",
-  "@txn_dashboard_count": {
-    "placeholders": {"count": {"type": "int"}}
   },
   "voice_fallback_title": "কথা বলা যাচ্ছে না",
   "voice_fallback_heading": "এই ফোনে বাংলা ভয়েস নেই",
@@ -228,5 +212,66 @@
   "push_channel_calls_desc": "পরিবারের ভিডিও কল আসলে",
   "push_permission_title": "খবর পেতে অনুমতি দিন",
   "push_permission_body": "বাজেট সতর্কতা, কম্পন আর মনে করানো ফোনে পেতে নোটিফিকেশনের অনুমতি দরকার।",
-  "push_permission_allow": "অনুমতি দিন"
+  "push_permission_allow": "অনুমতি দিন",
+  "home_greetMorning": "সুপ্রভাত, {name}",
+  "@home_greetMorning": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "home_greetNoon": "শুভ দুপুর, {name}",
+  "@home_greetNoon": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "home_greetEvening": "শুভ সন্ধ্যা, {name}",
+  "@home_greetEvening": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "home_greetNight": "শুভ রাত্রি, {name}",
+  "@home_greetNight": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "home_settings": "সেটিং",
+  "home_monthSpent": "{month} খরচ",
+  "@home_monthSpent": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "home_changeMore": "গত মাসের চেয়ে {amount} বেশি",
+  "@home_changeMore": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "home_changeLess": "গত মাসের চেয়ে {amount} কম",
+  "@home_changeLess": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "home_changeSame": "গত মাসের সমান",
+  "home_summarySpeech": "{month} {amount} খরচ হয়েছে। {change}",
+  "@home_summarySpeech": {
+    "placeholders": {"month": {"type": "String"}, "amount": {"type": "String"}, "change": {"type": "String"}}
+  },
+  "home_budgetWarning": "{name} বাজেট {percent} শেষ",
+  "@home_budgetWarning": {
+    "placeholders": {"name": {"type": "String"}, "percent": {"type": "String"}}
+  },
+  "home_notify": "{name}কে জানান",
+  "@home_notify": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "home_budgetPhrase": "বাজেট শেষ",
+  "home_speakExpense": "বলে খরচ লিখুন",
+  "home_tileBuzz": "কম্পন",
+  "home_tileTalk": "কথা",
+  "home_tileVideo": "ভিডিও",
+  "home_legend": "সবুজ = অনলাইন · ধূসর = অফলাইন",
+  "home_activityVoice": "{name} ভয়েস পাঠিয়েছেন · {duration}",
+  "@home_activityVoice": {
+    "placeholders": {"name": {"type": "String"}, "duration": {"type": "String"}}
+  },
+  "home_activityExpense": "{name} লিখেছেন: {note}",
+  "@home_activityExpense": {
+    "placeholders": {"name": {"type": "String"}, "note": {"type": "String"}}
+  },
+  "home_activityEmpty": "এখনো কিছু নেই",
+  "home_remitTitle": "বিদেশ থেকে পাঠানো টাকা",
+  "home_remitOpen": "দেখুন",
+  "home_offline": "ইন্টারনেট নেই। হিসাব ফোনেই থাকছে।",
+  "home_somebody": "কেউ"
 }
