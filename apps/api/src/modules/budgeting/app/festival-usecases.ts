@@ -1,7 +1,7 @@
 import type { CreateFestivalBudgetInput, UpdateFestivalBudgetInput } from "@amar-poribar/shared";
 import { HttpError } from "../../../platform/errors.js";
 import { dayRange } from "../../../platform/time/month.js";
-import { budgetLevel, type BudgetLevel } from "../domain/budget-level.js";
+import { budgetLevel, type BudgetLevel } from "../domain/level.js";
 import { budgetsRepo, type FestivalBudget } from "../infra/budgets.repo.js";
 import type { BudgetingDeps } from "./deps.js";
 

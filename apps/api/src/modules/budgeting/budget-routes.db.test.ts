@@ -29,11 +29,38 @@ async function join(t: TestApp, owner: Tokens, familyId: string, who: Tokens, ro
 }
 
 type BudgetBody = {
-  budgets: { categoryId: string | null; limitPaisa: number; spentPaisa: number; level: string; inherited: boolean }[];
+  budgets: {
+    categoryId: string | null;
+    limitPaisa: number;
+    spentPaisa: number;
+    remainingPaisa: number;
+    level: string;
+    status: { level: string; icon: string; labelBn: string; labelEn: string; speechBn: string };
+    inherited: boolean;
+  }[];
 };
 
+async function putBudgets(t: TestApp, tokens: Tokens, familyId: string, month: string, budgets: unknown[]) {
+  return t.app.inject({
+    method: "PUT",
+    url: `/v1/families/${familyId}/budgets?month=${month}`,
+    headers: t.as(tokens),
+    payload: { budgets },
+  });
+}
+
+async function getBudgets(t: TestApp, tokens: Tokens, familyId: string, month: string) {
+  const res = await t.app.inject({
+    method: "GET",
+    url: `/v1/families/${familyId}/budgets?month=${month}`,
+    headers: t.as(tokens),
+  });
+  expect(res.statusCode).toBe(200);
+  return res.json<BudgetBody>();
+}
+
 describe("budgeting routes (db)", () => {
-  it("put then get budgets", async () => {
+  it("put creates overall and category budgets", async () => {
     await withTestDb(async ({ db, sql }) => {
       const t = await buildTestApp({ db, sql });
       const owner = await t.login("01711111111");
@@ -97,7 +124,7 @@ describe("budgeting routes (db)", () => {
     });
   });
 
-  it("viewer cannot put budgets", async () => {
+  it("viewer can read but not put (403)", async () => {
     await withTestDb(async ({ db, sql }) => {
       const t = await buildTestApp({ db, sql });
       const owner = await t.login("01711111111");
@@ -121,7 +148,7 @@ describe("budgeting routes (db)", () => {
     });
   });
 
-  it("rejects a category from another family", async () => {
+  it("unknown category is rejected", async () => {
     await withTestDb(async ({ db, sql }) => {
       const t = await buildTestApp({ db, sql });
       const owner = await t.login("01711111111");
@@ -134,6 +161,73 @@ describe("budgeting routes (db)", () => {
       });
       expect(res.statusCode).toBe(400);
       expect(res.json<{ error: { code: string } }>().error.code).toBe("invalid_category");
+      await t.close();
+    });
+  });
+
+  it("put twice updates instead of duplicating the overall row", async () => {
+    await withTestDb(async ({ db, sql }) => {
+      const t = await buildTestApp({ db, sql });
+      const owner = await t.login("01711111111");
+      const familyId = await createFamily(t, owner);
+      expect(
+        (await putBudgets(t, owner, familyId, "2026-01", [{ categoryId: null, limitPaisa: 500_000 }])).statusCode,
+      ).toBe(200);
+      expect(
+        (await putBudgets(t, owner, familyId, "2026-01", [{ categoryId: null, limitPaisa: 700_000 }])).statusCode,
+      ).toBe(200);
+      const rows = await sql`select limit_paisa from budgeting.budgets where family_id = ${familyId}`;
+      expect(rows).toHaveLength(1);
+      expect(Number(rows[0]!.limit_paisa)).toBe(700_000);
+      await t.close();
+    });
+  });
+
+  it("inherits last month's budget with inherited true", async () => {
+    await withTestDb(async ({ db, sql }) => {
+      const t = await buildTestApp({ db, sql });
+      const owner = await t.login("01711111111");
+      const familyId = await createFamily(t, owner);
+      await putBudgets(t, owner, familyId, "2026-01", [{ categoryId: null, limitPaisa: 500_000 }]);
+      const body = await getBudgets(t, owner, familyId, "2026-02");
+      expect(body.budgets).toHaveLength(1);
+      expect(body.budgets[0]).toMatchObject({ limitPaisa: 500_000, inherited: true });
+      await t.close();
+    });
+  });
+
+  it("limit zero clears", async () => {
+    await withTestDb(async ({ db, sql }) => {
+      const t = await buildTestApp({ db, sql });
+      const owner = await t.login("01711111111");
+      const familyId = await createFamily(t, owner);
+      await putBudgets(t, owner, familyId, "2026-01", [{ categoryId: null, limitPaisa: 500_000 }]);
+      await putBudgets(t, owner, familyId, "2026-02", [{ categoryId: null, limitPaisa: 0 }]);
+      expect((await getBudgets(t, owner, familyId, "2026-02")).budgets).toHaveLength(0);
+      expect((await getBudgets(t, owner, familyId, "2026-01")).budgets).toHaveLength(1);
+      await t.close();
+    });
+  });
+
+  it("get returns status words and remaining", async () => {
+    await withTestDb(async ({ db, sql }) => {
+      const t = await buildTestApp({ db, sql });
+      const owner = await t.login("01711111111");
+      const familyId = await createFamily(t, owner);
+      await t.app.inject({
+        method: "POST",
+        url: `/v1/families/${familyId}/transactions`,
+        headers: t.as(owner),
+        payload: { type: "expense", amountPaisa: 120_000, occurredAt: "2026-01-10T06:00:00.000Z" },
+      });
+      await putBudgets(t, owner, familyId, "2026-01", [{ categoryId: null, limitPaisa: 100_000 }]);
+      const [b] = (await getBudgets(t, owner, familyId, "2026-01")).budgets;
+      expect(b).toMatchObject({
+        level: "exceeded",
+        remainingPaisa: -20_000,
+        status: { level: "exceeded", icon: "error", labelBn: "বাজেট শেষ", labelEn: "Over budget" },
+      });
+      expect(b!.status.speechBn).toBe("মোট খাতের বাজেট শেষ, দুইশো টাকা বেশি");
       await t.close();
     });
   });
