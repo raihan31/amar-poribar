@@ -1,21 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import { type MonthlyAiSummary } from "@amar-poribar/shared";
 import { useT } from "@/lib/i18n/useT";
-import { speak, stopSpeaking } from "@/lib/voice";
+import { useSpeak } from "@/lib/speech/useSpeak";
 
 /** Monthly summary in plain words, with a button to hear it (FR-AI-11, FR-VOICE-04). */
 export function SpokenSummary({ summary }: { summary: MonthlyAiSummary }) {
   const t = useT();
-  const [speaking, setSpeaking] = useState(false);
+  const { speak, stop, speaking } = useSpeak();
   function toggle() {
-    if (speaking) {
-      stopSpeaking();
-      setSpeaking(false);
-      return;
-    }
-    setSpeaking(speak(summary.speechText, summary.locale === "bn" ? "bn-BD" : "en-IN"));
+    if (speaking) stop();
+    else speak(summary.speechText, { lang: summary.locale === "bn" ? "bn-BD" : "en-IN", interrupt: true });
   }
   return (
     <div className="card">
