@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { bigint, pgSchema, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
 export const budgetingSchema = pgSchema("budgeting");
@@ -8,12 +9,19 @@ export const budgets = budgetingSchema.table(
     id: uuid("id").primaryKey().defaultRandom(),
     // families.families.id (no cross-schema foreign key, DEC-02)
     familyId: uuid("family_id").notNull(),
-    // ledger.categories.id
+    // ledger.categories.id (no foreign key; validated with ledger.assertRefs on write)
     categoryId: uuid("category_id"),
     month: text("month").notNull(),
     limitPaisa: bigint("limit_paisa", { mode: "number" }).notNull(),
   },
-  (t) => [uniqueIndex("budget_family_cat_month_uidx").on(t.familyId, t.categoryId, t.month)],
+  (t) => [
+    // NULL category ids (the overall budget) count as one key, so there is exactly one overall row per month.
+    uniqueIndex("budget_family_cat_month_uidx").on(
+      t.familyId,
+      sql`coalesce(${t.categoryId}, '00000000-0000-0000-0000-000000000000'::uuid)`,
+      t.month,
+    ),
+  ],
 );
 
 /** One-off budget over a date range, e.g. Eid-ul-Adha (SRS FR-BUD-04). */
