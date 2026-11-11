@@ -8,6 +8,12 @@ export type FamilyRow = typeof families.$inferSelect;
 export type InviteRow = typeof familyInvites.$inferSelect;
 
 export const familiesRepo = {
+  /** Row lock on the family; serialises concurrent role changes. Returns false when the family does not exist. */
+  async lock(x: Executor, familyId: string): Promise<boolean> {
+    const rows = await x.select({ id: families.id }).from(families).where(eq(families.id, familyId)).for("update");
+    return rows.length > 0;
+  },
+
   async insertFamily(x: Executor, name: string, createdBy: string): Promise<FamilyRow> {
     const [row] = await x.insert(families).values({ name, createdBy }).returning();
     return row!;
