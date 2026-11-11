@@ -1,22 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { formatBDT, t, type BreakdownRow, type MonthSummary } from "@amar-poribar/shared";
+import { type BreakdownRow, type MonthSummary } from "@amar-poribar/shared";
+import { useFormat } from "@/lib/i18n/format";
+import { useT } from "@/lib/i18n/useT";
 import { delta, monthLabel, shiftMonth } from "@/lib/format/month";
 
 function Delta({ now, before, moreIsBad }: { now: number; before: number; moreIsBad: boolean }) {
+  const t = useT();
+  const { num } = useFormat();
   const d = delta(now, before);
   if (!d || d.dir === "flat") return <span className="delta">{t("vsLastMonth")}: –</span>;
   const bad = (d.dir === "up") === moreIsBad;
   return (
     <span className={`delta ${bad ? "up" : "down"}`}>
-      {t("vsLastMonth")}: {d.pct.toLocaleString("bn-BD")}% {d.dir === "up" ? t("more") : t("less")}
+      {t("vsLastMonth")}: {num(d.pct)}% {d.dir === "up" ? t("more") : t("less")}
     </span>
   );
 }
 
 /** Month totals, comparison with last month, and breakdowns by category, member and account. */
 export function MonthSummaryCard({ summary, onMonth }: { summary: MonthSummary; onMonth: (m: string) => void }) {
+  const t = useT();
+  const { money: fmtMoney, tag } = useFormat();
   const [view, setView] = useState<"category" | "member" | "account">("category");
   const rows: BreakdownRow[] =
     view === "category"
@@ -27,8 +33,8 @@ export function MonthSummaryCard({ summary, onMonth }: { summary: MonthSummary; 
   const max = Math.max(1, ...rows.map((r) => r.totalPaisa));
   const net = summary.incomePaisa - summary.expensePaisa;
   const prevNet = summary.previous.incomePaisa - summary.previous.expensePaisa;
-  const money = (p: number) => formatBDT(p, { bnDigits: true });
-  const label = monthLabel(summary.month, "bn-BD");
+  const money = (p: number) => fmtMoney(p);
+  const label = monthLabel(summary.month, tag);
 
   return (
     <div className="card">

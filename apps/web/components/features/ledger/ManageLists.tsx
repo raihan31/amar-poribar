@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { ACCOUNT_TYPES, t } from "@amar-poribar/shared";
+import { ACCOUNT_TYPES } from "@amar-poribar/shared";
 import { api } from "@/lib/api/client";
+import { useT } from "@/lib/i18n/useT";
 import type { Account, Category, Family } from "@/lib/types";
 
 /** Add, rename, hide and archive accounts and categories (FR-ACC-01, FR-CAT-02). Owners and admins only. */
@@ -14,6 +15,7 @@ export function ManageLists(props: {
   onError: (e: unknown) => void;
 }) {
   const { family, categories, accounts, onChanged, onError } = props;
+  const t = useT();
   const base = `/v1/families/${family.id}`;
   const [accName, setAccName] = useState("");
   const [accType, setAccType] = useState<(typeof ACCOUNT_TYPES)[number]>("cash");

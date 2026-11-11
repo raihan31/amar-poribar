@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { t, type MonthlyAiSummary, type MonthSummary } from "@amar-poribar/shared";
+import { type MonthlyAiSummary, type MonthSummary } from "@amar-poribar/shared";
 import { api } from "@/lib/api/client";
+import { useT } from "@/lib/i18n/useT";
+import { useI18n } from "@/lib/i18n/provider";
 import { ApiProblem } from "@/lib/api/errors";
 import type { Account, Category, Family } from "@/lib/types";
 import { BudgetList } from "../budget/BudgetList";
@@ -14,6 +16,8 @@ import { CreateFamilyForm } from "./CreateFamilyForm";
 import { MemberList } from "./MemberList";
 
 export function FamilyHome({ onLogout }: { onLogout: () => void }) {
+  const t = useT();
+  const { locale } = useI18n();
   const [family, setFamily] = useState<Family | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -40,7 +44,7 @@ export function FamilyHome({ onLogout }: { onLogout: () => void }) {
       api<Category[]>(`/v1/families/${fam.id}/categories`, {}),
       api<Account[]>(`/v1/families/${fam.id}/accounts`, {}),
       api<MonthSummary>(`/v1/families/${fam.id}/reports/summary?${q}`, {}),
-      api<MonthlyAiSummary>(`/v1/families/${fam.id}/ai/summary?locale=bn${q ? `&${q}` : ""}`, {}),
+      api<MonthlyAiSummary>(`/v1/families/${fam.id}/ai/summary?locale=${locale}${q ? `&${q}` : ""}`, {}),
     ]);
     setCategories(cats);
     setAccounts(accs);
@@ -76,7 +80,7 @@ export function FamilyHome({ onLogout }: { onLogout: () => void }) {
       .finally(() => setLoaded(true));
   }, [refresh, handle]);
 
-  if (!loaded) return <p className="muted">লোড হচ্ছে…</p>;
+  if (!loaded) return <p className="muted">{t("common.loading")}</p>;
   if (!family)
     return (
       <CreateFamilyForm
@@ -139,7 +143,7 @@ export function FamilyHome({ onLogout }: { onLogout: () => void }) {
       {notice && <p className="notice">{notice}</p>}
       {error && <p className="error">{error}</p>}
       <button className="secondary" onClick={onLogout}>
-        লগআউট
+        {t("common.logout")}
       </button>
     </>
   );

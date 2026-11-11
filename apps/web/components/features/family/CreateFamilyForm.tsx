@@ -2,17 +2,19 @@
 
 import { useState } from "react";
 import { api } from "@/lib/api/client";
+import { useT } from "@/lib/i18n/useT";
 import type { Family } from "@/lib/types";
 
 export function CreateFamilyForm({ onCreated }: { onCreated: (f: Family) => void }) {
+  const t = useT();
   const [name, setName] = useState("");
   return (
     <div className="card">
-      <p>আপনার পরিবারের নাম দিন</p>
+      <p>{t("family.createPrompt")}</p>
       <div className="row">
-        <input value={name} placeholder="যেমন: রহমান পরিবার" onChange={(e) => setName(e.target.value)} />
+        <input value={name} placeholder={t("family.namePlaceholder")} onChange={(e) => setName(e.target.value)} />
         <button onClick={async () => onCreated(await api<Family>("/v1/families", { body: { name } }))}>
-          তৈরি করুন
+          {t("family.create")}
         </button>
       </div>
     </div>

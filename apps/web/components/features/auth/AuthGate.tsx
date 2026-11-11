@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { t } from "@amar-poribar/shared";
 import { api } from "@/lib/api/client";
+import { useT } from "@/lib/i18n/useT";
 import { FamilyHome } from "../family/FamilyHome";
 import { LoginForm } from "./LoginForm";
 
 export function AuthGate() {
+  const t = useT();
   const [authed, setAuthed] = useState<boolean | null>(null);
   useEffect(() => {
     api<{ authenticated: boolean }>("/api/auth/session")

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { draftToSpeech, formatBDT, t, type ParseResponse, type TransactionDraft } from "@amar-poribar/shared";
+import { draftToSpeech, type ParseResponse, type TransactionDraft } from "@amar-poribar/shared";
 import { api } from "@/lib/api/client";
+import { useFormat } from "@/lib/i18n/format";
+import { useT } from "@/lib/i18n/useT";
 import { speak, stopSpeaking, useSpeechRecognition } from "@/lib/voice";
 import type { Account, Category, Family } from "@/lib/types";
 import { CategoryPicker } from "./CategoryPicker";
@@ -15,6 +17,8 @@ export function QuickAdd(props: {
   onError: (e: unknown) => void;
 }) {
   const { family, categories, accounts, onSaved, onError } = props;
+  const t = useT();
+  const { money, name } = useFormat();
   const [text, setText] = useState("");
   const [drafts, setDrafts] = useState<TransactionDraft[] | null>(null);
   const [busy, setBusy] = useState(false);
@@ -84,7 +88,7 @@ export function QuickAdd(props: {
 
   const categoryName = (key: string | null) => {
     const c = categories.find((x) => x.key === key);
-    return c ? `${c.icon ?? ""} ${c.nameBn}` : "ক্যাটাগরি বাছাই করুন";
+    return c ? `${c.icon ?? ""} ${name(c)}` : t("category.pick");
   };
 
   return (
@@ -120,7 +124,7 @@ export function QuickAdd(props: {
                   {categoryOf(d.categoryKey)?.icon ?? "📦"}
                 </span>
                 <span>
-                  <strong>{formatBDT(d.amountPaisa, { bnDigits: true })}</strong>
+                  <strong>{money(d.amountPaisa)}</strong>
                   <br />
                   <span className="muted">
                     {categoryName(d.categoryKey)} · {d.note}

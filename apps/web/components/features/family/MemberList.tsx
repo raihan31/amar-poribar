@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { t } from "@amar-poribar/shared";
 import { api } from "@/lib/api/client";
+import { useT } from "@/lib/i18n/useT";
 import type { Family, Member, RoleName } from "@/lib/types";
 
 const ROLE_LABEL: Record<RoleName, "roleOwner" | "roleAdmin" | "roleMember" | "roleViewer"> = {
@@ -15,6 +15,7 @@ const ROLE_LABEL: Record<RoleName, "roleOwner" | "roleAdmin" | "roleMember" | "r
 /** Members, roles and invite links (FR-FAM-02, FR-FAM-03). */
 export function MemberList(props: { family: Family; meId: string; onError: (e: unknown) => void; onLeft: () => void }) {
   const { family, meId, onError, onLeft } = props;
+  const t = useT();
   const [members, setMembers] = useState<Member[]>([]);
   const [role, setRole] = useState<RoleName>("member");
   const [link, setLink] = useState<string | null>(null);

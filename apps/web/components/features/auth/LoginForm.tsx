@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { api } from "@/lib/api/client";
+import { useT } from "@/lib/i18n/useT";
 
 export function LoginForm({ onLogin }: { onLogin: () => void }) {
+  const t = useT();
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [sent, setSent] = useState(false);
@@ -33,7 +35,7 @@ export function LoginForm({ onLogin }: { onLogin: () => void }) {
 
   return (
     <div className="card">
-      <p>মোবাইল নম্বর দিয়ে লগইন করুন</p>
+      <p>{t("login.prompt")}</p>
       <div className="row">
         <input inputMode="tel" placeholder="01XXXXXXXXX" value={phone} onChange={(e) => setPhone(e.target.value)} />
         <button onClick={requestOtp}>OTP</button>
@@ -42,11 +44,11 @@ export function LoginForm({ onLogin }: { onLogin: () => void }) {
         <div className="row" style={{ marginTop: 8 }}>
           <input
             inputMode="numeric"
-            placeholder="৬ সংখ্যার কোড"
+            placeholder={t("login.codePlaceholder")}
             value={code}
             onChange={(e) => setCode(e.target.value)}
           />
-          <button onClick={verify}>লগইন</button>
+          <button onClick={verify}>{t("login.submit")}</button>
         </div>
       )}
       {hint && <p className="muted">{hint}</p>}
