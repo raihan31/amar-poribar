@@ -7,6 +7,7 @@ import '../../../domain/models/role.dart';
 import '../../../presentation/providers/providers.dart';
 import '../data/api_family_repository.dart';
 import '../data/family_repository.dart';
+import '../data/invite_repository.dart';
 
 /// The real repository; tests override it with `FakeFamilyRepository`.
 final familyRepositoryProvider = Provider<FamilyRepository>(
@@ -45,6 +46,14 @@ final currentRoleFutureProvider = FutureProvider<FamilyRole>((ref) async {
   }
   return FamilyRole.viewer;
 });
+
+/// The real invite repository; tests override it with `FakeInviteRepository`.
+final inviteRepositoryProvider = Provider<InviteRepository>(
+  (ref) => ApiInviteRepository(ref.watch(familyApiProvider)),
+);
+
+/// Where "now" comes from for the invite countdown; tests override it.
+final inviteClockProvider = Provider<DateTime Function()>((_) => DateTime.now);
 
 /// Synchronous view of [currentRoleFutureProvider]; the least privileged role until it loads.
 final currentRoleProvider = Provider<FamilyRole>(

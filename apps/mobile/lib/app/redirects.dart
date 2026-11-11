@@ -59,6 +59,9 @@ class Routes {
 /// `Meta('welcome_done')` is set. `main.dart` overrides this with the stored value.
 final welcomeDoneProvider = StateProvider<bool>((ref) => false);
 
+/// The invite token waiting for the person to sign in (`Meta('pending_invite')`).
+final pendingInviteProvider = StateProvider<String?>((ref) => null);
+
 /// `Meta('tutorial_done')` is set. Defaults to true so nothing forces the tutorial by accident.
 final tutorialDoneProvider = StateProvider<bool>((ref) => true);
 
@@ -123,6 +126,13 @@ String? redirect(Ref ref, GoRouterState state) {
 
   final onConsent = path == Routes.consent || path == Routes.consentPolicy;
   if (auth.families.isEmpty || !ref.read(consentCurrentProvider)) {
+    if (auth.families.isEmpty) {
+      // A person with an invite joins instead of creating a family (T-MOB-18).
+      final from = _safeFrom(uri.queryParameters['from']);
+      if (from != null && from.startsWith('/join/')) return from;
+      final pending = ref.read(pendingInviteProvider);
+      if (pending != null && pending.isNotEmpty) return '/join/$pending';
+    }
     return onConsent ? null : Routes.consent;
   }
 

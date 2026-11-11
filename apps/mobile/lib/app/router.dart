@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/ui/login_screen.dart';
 import '../features/auth/ui/session_expired_screen.dart';
+import '../features/family/ui/join_screen.dart';
 import '../features/onboarding/ui/consent_screen.dart';
 import '../features/onboarding/ui/policy_screen.dart';
 import '../features/onboarding/ui/welcome_screen.dart';
@@ -72,7 +73,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       simple(Routes.consent, (_) => const ConsentScreen()),
-      stub(Routes.join),
+      simple(
+        Routes.join,
+        (s) => JoinScreen(token: s.pathParameters['token']!),
+      ),
       simple(Routes.tutorial, (_) => const TutorialScreen()),
       simple(
         Routes.sessionExpired,

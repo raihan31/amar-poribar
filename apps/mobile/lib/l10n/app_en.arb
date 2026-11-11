@@ -147,5 +147,21 @@
   "onb_consent_listen": "Listen to the guide",
   "onb_consent_notNow": "Not now",
   "onb_consent_policyError": "Could not load the policy. Check your internet and try again.",
-  "onb_consent_retry": "Try again"
+  "onb_consent_retry": "Try again",
+  "fam_join_invitedBy": "{inviter} invited you",
+  "fam_join_summary": "{members} members · you will be {role}",
+  "fam_join_canTitle": "When you join you can",
+  "fam_join_bulletLedger": "Write and see expenses",
+  "fam_join_bulletViewer": "See the family accounts (summary only)",
+  "fam_join_bulletTalk": "Talk with the family",
+  "fam_join_bulletPrivate": "Keep personal expenses to yourself",
+  "fam_join_expiresIn": "The invite is valid for {days} more days.",
+  "fam_join_accept": "Join",
+  "fam_join_notNow": "Not now",
+  "fam_join_wrongNumber": "This invite is for a different number.",
+  "fam_join_failed": "Could not join. Please try again.",
+  "fam_join_roleOwner": "Owner",
+  "fam_join_roleAdmin": "Admin",
+  "fam_join_roleMember": "Member",
+  "fam_join_roleViewer": "Viewer"
 }
