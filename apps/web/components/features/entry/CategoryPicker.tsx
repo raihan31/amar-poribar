@@ -1,6 +1,6 @@
 "use client";
 
-import { speak } from "@/lib/voice";
+import { speak } from "@/lib/speech/synthesis";
 import { useFormat } from "@/lib/i18n/format";
 import { useT } from "@/lib/i18n/useT";
 import type { Category } from "@/lib/types";
@@ -16,7 +16,7 @@ export function CategoryPicker({ categories, onPick }: { categories: Category[];
           key={c.id}
           className="picker-item secondary"
           onClick={() => onPick(c.key)}
-          onFocus={() => speak(c.nameBn)}
+          onFocus={() => speak(c.nameBn, { interrupt: true })}
           title={name(c)}
           aria-label={name(c)}
         >

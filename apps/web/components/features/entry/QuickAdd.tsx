@@ -5,7 +5,8 @@ import { draftToSpeech, type ParseResponse, type TransactionDraft } from "@amar-
 import { api } from "@/lib/api/client";
 import { useFormat } from "@/lib/i18n/format";
 import { useT } from "@/lib/i18n/useT";
-import { speak, stopSpeaking, useSpeechRecognition } from "@/lib/voice";
+import { useSpeechRecognition } from "@/lib/speech/useSpeechRecognition";
+import { speak, stopSpeaking } from "@/lib/speech/synthesis";
 import type { Account, Category, Family } from "@/lib/types";
 import { CategoryPicker } from "./CategoryPicker";
 
@@ -29,8 +30,8 @@ export function QuickAdd(props: {
   /** Read the first draft back so the user can check it by ear (FR-VOICE-03). */
   function readBack(list: TransactionDraft[]) {
     const first = list[0];
-    if (first) speak(draftToSpeech(first, categoryOf(first.categoryKey)?.nameBn ?? null));
-    else speak(t("noDrafts"));
+    if (first) speak(draftToSpeech(first, categoryOf(first.categoryKey)?.nameBn ?? null), { interrupt: true });
+    else speak(t("noDrafts"), { interrupt: true });
   }
 
   async function parse(input = text, spoken = false) {
@@ -145,7 +146,9 @@ export function QuickAdd(props: {
                 <button
                   className="icon secondary"
                   aria-label={t("speak")}
-                  onClick={() => speak(draftToSpeech(d, categoryOf(d.categoryKey)?.nameBn ?? null))}
+                  onClick={() =>
+                    speak(draftToSpeech(d, categoryOf(d.categoryKey)?.nameBn ?? null), { interrupt: true })
+                  }
                 >
                   🔊
                 </button>
