@@ -83,5 +83,18 @@
   "voice_fallback_noTtsAction": "ইনস্টল",
   "voice_fallback_hint": "লিখে দিন",
   "voice_fallback_back": "পেছনে",
-  "voice_fallback_nothing": "কিছু বোঝা যায়নি"
+  "voice_fallback_nothing": "কিছু বোঝা যায়নি",
+  "onb_welcome_semBangla": "বাংলা ভাষা",
+  "onb_welcome_semEnglish": "ইংরেজি ভাষা",
+  "onb_welcome_semBanglaNum": "বাংলা সংখ্যা",
+  "onb_welcome_semLatinNum": "ইংরেজি সংখ্যা",
+  "onb_welcome_title": "স্বাগতম",
+  "onb_welcome_langTitle": "ভাষা",
+  "onb_welcome_numTitle": "সংখ্যা",
+  "onb_welcome_simpleTitle": "সহজ মোড",
+  "onb_welcome_simpleBody": "বড় লেখা, ছবি আর কথা। সব কিছু শুনিয়ে দেবে।",
+  "onb_welcome_on": "চালু",
+  "onb_welcome_off": "বন্ধ",
+  "onb_welcome_later": "পরে সেটিং থেকে বদলাতে পারবেন।",
+  "onb_welcome_continue": "এগিয়ে চলুন"
 }

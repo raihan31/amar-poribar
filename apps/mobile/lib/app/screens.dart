@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../presentation/providers/providers.dart';
 import 'redirects.dart';
 
 /// Visible stand-in for a screen a later task builds.
@@ -50,39 +48,6 @@ class ErrorScreen extends StatelessWidget {
               child: const Text('হোমে যান'),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// First screen for a person who has never opened the app.
-class WelcomeScreen extends ConsumerWidget {
-  const WelcomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('স্বাগতম', style: TextStyle(fontSize: 28)),
-              const SizedBox(height: 24),
-              FilledButton(
-                onPressed: () async {
-                  await ref
-                      .read(localStoreProvider)
-                      .setMeta('welcome_done', '1');
-                  ref.read(welcomeDoneProvider.notifier).state = true;
-                  if (context.mounted) context.go(Routes.login);
-                },
-                child: const Text('শুরু করুন'),
-              ),
-            ],
-          ),
         ),
       ),
     );

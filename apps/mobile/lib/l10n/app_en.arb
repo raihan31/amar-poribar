@@ -59,5 +59,18 @@
   "voice_fallback_noTtsAction": "Install",
   "voice_fallback_hint": "Please type it",
   "voice_fallback_back": "Back",
-  "voice_fallback_nothing": "Nothing understood"
+  "voice_fallback_nothing": "Nothing understood",
+  "onb_welcome_semBangla": "Bangla language",
+  "onb_welcome_semEnglish": "English language",
+  "onb_welcome_semBanglaNum": "Bangla numerals",
+  "onb_welcome_semLatinNum": "English numerals",
+  "onb_welcome_title": "Welcome",
+  "onb_welcome_langTitle": "Language",
+  "onb_welcome_numTitle": "Numbers",
+  "onb_welcome_simpleTitle": "Simple mode",
+  "onb_welcome_simpleBody": "Big text, pictures and speech. Everything is read out to you.",
+  "onb_welcome_on": "On",
+  "onb_welcome_off": "Off",
+  "onb_welcome_later": "You can change this later in Settings.",
+  "onb_welcome_continue": "Continue"
 }
