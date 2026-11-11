@@ -9,6 +9,7 @@ import 'package:amar_poribar/features/family/ui/join_screen.dart';
 import 'package:amar_poribar/features/onboarding/data/fake_onboarding_repository.dart';
 import 'package:amar_poribar/features/onboarding/data/onboarding_repository.dart';
 import 'package:amar_poribar/features/onboarding/ui/consent_screen.dart';
+import 'package:amar_poribar/features/onboarding/ui/tutorial_screen.dart';
 import 'package:amar_poribar/features/onboarding/ui/welcome_screen.dart';
 import 'package:amar_poribar/features/settings/state/preferences_controller.dart';
 import 'package:amar_poribar/presentation/providers/auth_provider.dart';
@@ -101,6 +102,7 @@ void registerAllScreens() {
       ),
     ],
   );
+  registerScreen('D2', Routes.tutorial, (c) => const TutorialScreen());
 }
 
 /// Routes that exist in the app. Until the `Routes` table of T-MOB-13 lands
@@ -128,5 +130,4 @@ const Set<String> kRoutesAwaitingRegistration = {
   Routes.pendingSms,
   Routes.settings,
   Routes.add,
-  Routes.tutorial,
 };

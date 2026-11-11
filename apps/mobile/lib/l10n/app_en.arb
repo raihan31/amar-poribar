@@ -163,5 +163,18 @@
   "fam_join_roleOwner": "Owner",
   "fam_join_roleAdmin": "Admin",
   "fam_join_roleMember": "Member",
-  "fam_join_roleViewer": "Viewer"
+  "fam_join_roleViewer": "Viewer",
+  "tutorial_title1": "Welcome",
+  "tutorial_title2": "Press the mic and speak",
+  "tutorial_title3": "Press the green button",
+  "tutorial_title4": "Hear your month",
+  "tutorial_counter": "{n} / {total}",
+  "@tutorial_counter": {
+    "placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}
+  },
+  "tutorial_listenAgain": "Listen again",
+  "tutorial_next": "Next step",
+  "tutorial_back": "Back",
+  "tutorial_skip": "Skip",
+  "tutorial_start": "Get started"
 }
