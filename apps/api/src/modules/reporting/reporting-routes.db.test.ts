@@ -72,6 +72,75 @@ describe("reporting routes (db)", () => {
     });
   });
 
+  it("summary includes the caller's own private entries", async () => {
+    await withTestDb(async ({ db, sql }) => {
+      const t = await buildTestApp({ db, sql });
+      const owner = await t.login("01711111111");
+      const familyId = await createFamily(t, owner);
+      await post(t, owner, familyId, {
+        type: "expense",
+        amountPaisa: 5_000,
+        occurredAt: "2026-01-10T06:00:00.000Z",
+        isPrivate: true,
+      });
+      const res = await t.app.inject({
+        method: "GET",
+        url: `/v1/families/${familyId}/reports/summary?month=2026-01`,
+        headers: t.as(owner),
+      });
+      expect(res.json<{ expensePaisa: number }>().expensePaisa).toBe(5_000);
+      await t.close();
+    });
+  });
+
+  it("previous month totals match and byMember and byAccount sum to expense", async () => {
+    await withTestDb(async ({ db, sql }) => {
+      const t = await buildTestApp({ db, sql });
+      const owner = await t.login("01711111111");
+      const familyId = await createFamily(t, owner);
+      await post(t, owner, familyId, { type: "expense", amountPaisa: 3_000, occurredAt: "2025-12-10T06:00:00.000Z" });
+      await post(t, owner, familyId, { type: "income", amountPaisa: 9_000, occurredAt: "2025-12-11T06:00:00.000Z" });
+      await post(t, owner, familyId, { type: "expense", amountPaisa: 1_000, occurredAt: "2026-01-10T06:00:00.000Z" });
+      await post(t, owner, familyId, { type: "expense", amountPaisa: 2_500, occurredAt: "2026-01-12T06:00:00.000Z" });
+      const res = await t.app.inject({
+        method: "GET",
+        url: `/v1/families/${familyId}/reports/summary?month=2026-01`,
+        headers: t.as(owner),
+      });
+      const body = res.json<{
+        expensePaisa: number;
+        previous: { month: string; incomePaisa: number; expensePaisa: number };
+        byMember: { totalPaisa: number }[];
+        byAccount: { totalPaisa: number }[];
+      }>();
+      expect(body.previous).toEqual({ month: "2025-12", incomePaisa: 9_000, expensePaisa: 3_000 });
+      expect(body.expensePaisa).toBe(3_500);
+      expect(body.byMember.reduce((a, m) => a + m.totalPaisa, 0)).toBe(3_500);
+      expect(body.byAccount.reduce((a, m) => a + m.totalPaisa, 0)).toBe(3_500);
+      await t.close();
+    });
+  });
+
+  it("viewer gets summary but not CSV, and family B user gets 404", async () => {
+    await withTestDb(async ({ db, sql }) => {
+      const t = await buildTestApp({ db, sql });
+      const owner = await t.login("01711111111");
+      const viewer = await t.login("01733333333");
+      const outsider = await t.login("01744444444");
+      const familyId = await createFamily(t, owner);
+      await join(t, owner, familyId, viewer, "viewer");
+      const url = (p: string) => `/v1/families/${familyId}/reports/${p}`;
+      expect((await t.app.inject({ method: "GET", url: url("summary"), headers: t.as(viewer) })).statusCode).toBe(200);
+      expect((await t.app.inject({ method: "GET", url: url("export.csv"), headers: t.as(viewer) })).statusCode).toBe(
+        403,
+      );
+      expect((await t.app.inject({ method: "GET", url: url("summary"), headers: t.as(outsider) })).statusCode).toBe(
+        404,
+      );
+      await t.close();
+    });
+  });
+
   it("remittance window defaults to six months", async () => {
     await withTestDb(async ({ db, sql }) => {
       const t = await buildTestApp({ db, sql });

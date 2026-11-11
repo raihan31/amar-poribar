@@ -15,6 +15,7 @@ import {
   listAccounts,
   listCategories,
 } from "./app/queries.js";
+import { getMonthlySeries } from "./app/series.js";
 import { seedDefaults } from "./app/seed-defaults.js";
 import type { Viewer } from "./domain/viewer.js";
 import { visibleTo } from "./infra/visibility.js";
@@ -189,5 +190,20 @@ describe("onFamilyDeleted", () => {
     expect(await storage.head(`receipt/${family}/a.jpg`)).toBeNull();
     expect(await storage.head(`receipt/${other}/b.jpg`)).not.toBeNull();
     await onFamilyDeleted(t.db, storage, family);
+  });
+});
+
+describe("getMonthlySeries", () => {
+  it("getMonthlySeries returns zeros for empty months", async () => {
+    await add({ amountPaisa: 400, occurredAt: new Date("2026-02-10T06:00:00.000Z") });
+    await add({ type: "income", amountPaisa: 900, occurredAt: new Date("2026-02-11T06:00:00.000Z") });
+    await add({ amountPaisa: 77, isPrivate: true, createdBy: OTHER, occurredAt: new Date("2026-02-12T06:00:00.000Z") });
+    const series = await getMonthlySeries(deps, family, { userId: ME }, "2026-01", "2026-03");
+    expect(series.map((p) => p.month)).toEqual(["2026-01", "2026-02", "2026-03"]);
+    expect(series[0]).toEqual({ month: "2026-01", incomePaisa: 0, expensePaisa: 0, byCategoryKey: {} });
+    expect(series[2]?.expensePaisa).toBe(0);
+    expect(series[1]?.expensePaisa).toBe(400);
+    expect(series[1]?.incomePaisa).toBe(900);
+    expect(series[1]?.byCategoryKey["uncategorized"]).toEqual({ incomePaisa: 900, expensePaisa: 400 });
   });
 });

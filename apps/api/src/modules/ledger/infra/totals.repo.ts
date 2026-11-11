@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, lt, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, lt, sql } from "drizzle-orm";
 import { accounts, categories, transactions } from "../schema.js";
 import type { Executor } from "./catalog.repo.js";
 import type { Viewer } from "../domain/viewer.js";
@@ -24,6 +24,28 @@ const inRange = (range: { start: Date; end: Date }) =>
   and(gte(transactions.occurredAt, range.start), lt(transactions.occurredAt, range.end));
 
 export const totalsRepo = {
+  /** Income and expense per Dhaka month and category key in one grouped query. */
+  async monthlySeries(x: Executor, familyId: string, viewer: Viewer, range: { start: Date; end: Date }) {
+    const ym = sql<string>`to_char(${transactions.occurredAt} at time zone 'Asia/Dhaka', 'YYYY-MM')`;
+    const rows = await x
+      .select({
+        month: ym,
+        type: transactions.type,
+        key: categories.key,
+        total: sql<string>`sum(${amountWithFee})`,
+      })
+      .from(transactions)
+      .leftJoin(categories, eq(categories.id, transactions.categoryId))
+      .where(and(visibleTo(familyId, viewer), inRange(range), inArray(transactions.type, ["income", "expense"])))
+      .groupBy(ym, transactions.type, categories.key);
+    return rows.map((r) => ({
+      month: r.month,
+      type: r.type as "income" | "expense",
+      key: r.key,
+      totalPaisa: Number(r.total),
+    }));
+  },
+
   async typeTotals(
     x: Executor,
     familyId: string,
