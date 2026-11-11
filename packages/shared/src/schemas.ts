@@ -23,6 +23,40 @@ export function normalizeBdPhone(phone: string): string {
   return `+88${digits.slice(-11)}`;
 }
 
+/** `POST /v1/auth/otp/request` (T-ID-04). */
+export const OtpRequestSchema = z.object({ phone: BdPhoneSchema });
+export type OtpRequestInput = z.infer<typeof OtpRequestSchema>;
+
+/** `POST /v1/auth/otp/verify` (T-ID-04). */
+export const OtpVerifySchema = z.object({
+  phone: BdPhoneSchema,
+  code: z.string().regex(/^\d{6}$/),
+  deviceId: z.string().min(1).max(200).optional(),
+});
+export type OtpVerifyInput = z.infer<typeof OtpVerifySchema>;
+
+export const OtpRequestResponseSchema = z.object({
+  sent: z.literal(true),
+  resendInSeconds: z.number().int(),
+  /** Only outside production with the fake SMS gateway. */
+  devCode: z.string().optional(),
+});
+
+export const OtpVerifyResponseSchema = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+  user: z.object({
+    id: z.string(),
+    name: z.string().nullable(),
+    locale: z.string(),
+    numeralStyle: z.enum(["bn", "latin"]),
+    simpleMode: z.boolean(),
+  }),
+  isNewUser: z.boolean(),
+  /** Present (true) when the user asked for erasure and may still cancel it. */
+  erasurePending: z.literal(true).optional(),
+});
+
 /** Upper bound per transaction: ৳1 crore, in paisa. */
 export const MAX_AMOUNT_PAISA = 1_00_00_000 * 100;
 

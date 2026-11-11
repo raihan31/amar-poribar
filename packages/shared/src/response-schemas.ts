@@ -138,6 +138,7 @@ export const VECTOR_SCHEMAS = {
   "sync-request": SyncRequestSchema,
   "sync-response": SyncResponseSchema,
   error: ApiErrorSchema,
+  errors: z.array(ApiErrorSchema),
 } as const;
 
 export type VectorName = keyof typeof VECTOR_SCHEMAS;

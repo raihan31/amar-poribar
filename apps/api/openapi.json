@@ -252,8 +252,27 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": {},
-                  "properties": {},
+                  "additionalProperties": false,
+                  "properties": {
+                    "devCode": {
+                      "type": "string"
+                    },
+                    "resendInSeconds": {
+                      "maximum": 9007199254740991,
+                      "minimum": -9007199254740991,
+                      "type": "integer"
+                    },
+                    "sent": {
+                      "enum": [
+                        true
+                      ],
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "sent",
+                    "resendInSeconds"
+                  ],
                   "type": "object"
                 }
               }
@@ -270,8 +289,65 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": {},
-                  "properties": {},
+                  "additionalProperties": false,
+                  "properties": {
+                    "accessToken": {
+                      "type": "string"
+                    },
+                    "erasurePending": {
+                      "enum": [
+                        true
+                      ],
+                      "type": "boolean"
+                    },
+                    "isNewUser": {
+                      "type": "boolean"
+                    },
+                    "refreshToken": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "locale": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "numeralStyle": {
+                          "enum": [
+                            "bn",
+                            "latin"
+                          ],
+                          "type": "string"
+                        },
+                        "simpleMode": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "locale",
+                        "numeralStyle",
+                        "simpleMode"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "accessToken",
+                    "refreshToken",
+                    "user",
+                    "isNewUser"
+                  ],
                   "type": "object"
                 }
               }

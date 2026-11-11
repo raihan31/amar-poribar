@@ -1,0 +1,10 @@
+{
+  "_kind": "response",
+  "_operation": "POST /v1/auth/otp/verify",
+  "_status": 401,
+  "body": [
+    { "error": { "code": "otp_invalid", "details": { "attemptsLeft": 4 }, "message": "Invalid code" } },
+    { "error": { "code": "otp_expired", "message": "Code expired" } },
+    { "error": { "code": "otp_rate_limited", "details": { "retryAfterSeconds": 42 }, "message": "Too many requests" } }
+  ]
+}

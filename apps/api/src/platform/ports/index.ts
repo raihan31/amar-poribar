@@ -13,11 +13,18 @@ export interface Ports {
 }
 
 /** A configured provider whose adapter is not part of this build: it fails loudly on use and never pretends to send. */
+const unavailablePorts = new WeakSet<object>();
+
 function unavailable<T extends object>(what: string): T {
-  return new Proxy({} as T, {
+  const port = new Proxy({} as T, {
     get: () => () => Promise.reject(new Error(`${what} is configured but its adapter is not available`)),
   });
+  unavailablePorts.add(port);
+  return port;
 }
+
+/** True for the placeholder `createPorts` returns when a real provider is configured but has no adapter here. */
+export const isUnavailablePort = (port: object): boolean => unavailablePorts.has(port);
 
 /**
  * Production adapters by configuration (`SMS_GATEWAY`, `PUSH_PROVIDER`, `PAYMENT_PROVIDER`); the in-memory
