@@ -8,6 +8,7 @@ import '../../core/l10n/locale_controller.dart';
 import '../../data/sync/nearby_transport.dart';
 import '../../data/sync/p2p_transport.dart';
 import '../../data/sync/peer_sync_engine.dart';
+import '../../features/family/state/active_family.dart';
 import '../../features/family/state/family_providers.dart';
 import '../providers/auth_provider.dart';
 import '../providers/providers.dart';
@@ -62,7 +63,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       });
       return;
     }
-    final family = ref.read(authProvider).family;
+    final family = ref.read(activeFamilyProvider);
     if (family == null) {
       setState(() => _status = context.l10n.sync_nearby_needLogin);
       return;
@@ -87,7 +88,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _syncServer() async {
-    final family = ref.read(authProvider).family;
+    final family = ref.read(activeFamilyProvider);
     if (family == null) {
       setState(() => _status = context.l10n.sync_server_needLogin);
       return;

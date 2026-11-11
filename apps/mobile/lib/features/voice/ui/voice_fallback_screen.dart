@@ -10,6 +10,7 @@ import '../../../presentation/providers/auth_provider.dart';
 import '../../../presentation/providers/providers.dart';
 import '../../../ui/banner_strip.dart';
 import '../../../ui/big_button.dart';
+import '../../family/state/active_family.dart';
 import '../state/voice_capability_provider.dart';
 
 /// D8: the phone cannot recognise Bangla or has no Bangla voice. Says so plainly, offers the
@@ -129,7 +130,7 @@ class _VoiceFallbackBodyState extends ConsumerState<VoiceFallbackBody>
 
   /// Same parse call as the A3 entry screen.
   Future<void> _parse() async {
-    final family = ref.read(authProvider).family;
+    final family = ref.read(activeFamilyProvider);
     final text = _text.text.trim();
     if (family == null || text.isEmpty) return;
     setState(() {

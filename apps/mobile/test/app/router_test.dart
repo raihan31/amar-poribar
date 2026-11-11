@@ -43,7 +43,7 @@ class FakeAuth extends AuthNotifier {
 
 const _family = FamilyInfo('f1', 'রহিম পরিবার', 'owner');
 const _signedOut = AuthState(loaded: true);
-const _signedIn = AuthState(loaded: true, token: 't', family: _family);
+const _signedIn = AuthState(loaded: true, token: 't', families: [_family]);
 
 /// Scrollable stand-in so tab scroll state can be observed.
 Widget _scrolling(String name) => Scaffold(

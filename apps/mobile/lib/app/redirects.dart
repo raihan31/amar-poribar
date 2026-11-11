@@ -112,7 +112,7 @@ String? redirect(Ref ref, GoRouterState state) {
     return Routes.welcome;
   }
 
-  if (auth.family == null) {
+  if (auth.families.isEmpty) {
     return path == Routes.consent ? null : Routes.consent;
   }
 
