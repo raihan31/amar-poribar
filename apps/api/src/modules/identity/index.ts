@@ -2,6 +2,12 @@ import { HttpError } from "../../platform/errors.js";
 import type { ModuleContext, ModuleDefinition } from "../../platform/module.js";
 import type { UserBasics } from "./app/ports.js";
 import { registerIdentityRoutes } from "./http/routes.js";
+import { devSmsRoutes, smsWebhookRoutes } from "./http/sms-routes.js";
+import { createSmsDeliveryRepo } from "./infra/sms-delivery-repo.js";
+import { FakeSmsGateway } from "./infra/sms/sms-fake.js";
+import { createSmsGateway, type SmsConfig } from "./infra/sms/sms-factory.js";
+import { AlphaSmsGateway } from "./infra/sms/sms-alpha.js";
+import { SslWirelessGateway } from "./infra/sms/sms-sslwireless.js";
 import * as q from "./app/get-user.js";
 import { maskPhone } from "./domain/phone.js";
 import { createOtpService } from "./app/otp-service.js";
@@ -46,6 +52,19 @@ export interface IdentityConfig {
   isProd: boolean;
 }
 
+function smsConfig(ctx: ModuleContext): SmsConfig & { smsWebhookSecret: string | undefined } {
+  const c = (ctx.config ?? {}) as Partial<SmsConfig> & { smsWebhookSecret?: string };
+  return {
+    isProd: c.isProd === true,
+    smsGateway: c.smsGateway ?? "fake",
+    smsSenderId: c.smsSenderId,
+    sslwirelessApiToken: c.sslwirelessApiToken,
+    sslwirelessSid: c.sslwirelessSid,
+    alphaSmsApiKey: c.alphaSmsApiKey,
+    smsWebhookSecret: c.smsWebhookSecret,
+  };
+}
+
 function identityConfig(ctx: ModuleContext): IdentityConfig {
   const c = ctx.config as Partial<IdentityConfig> | undefined;
   if (!c?.jwtSecret) throw new Error("identity: ctx.config.jwtSecret is required");
@@ -68,6 +87,20 @@ export const identityModule: ModuleDefinition<IdentityFacade> = {
     });
     ctx.jobs.register(purgeOtpJob({ db: ctx.db, clock: ctx.clock }));
     registerIdentityRoutes(app, { otp, users, tokens, isProd: config.isProd });
+
+    // SMS delivery (T-ID-03). Built here so production refuses to start with the fake or without credentials.
+    const sms = smsConfig(ctx);
+    const gateway = createSmsGateway(sms);
+    if (!sms.isProd && gateway instanceof FakeSmsGateway) devSmsRoutes(app, gateway);
+    smsWebhookRoutes(app, {
+      secret: sms.smsWebhookSecret,
+      repo: createSmsDeliveryRepo(ctx.db),
+      gateways: {
+        sslwireless: new SslWirelessGateway({ apiToken: "", sid: "" }),
+        alphasms: new AlphaSmsGateway({ apiKey: "" }),
+        ...(sms.isProd ? {} : { fake: new FakeSmsGateway() }),
+      },
+    });
     return {
       name: "identity",
       getUserBasics: (id) => users.getBasics(id),

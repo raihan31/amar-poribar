@@ -31,3 +31,14 @@ export const otpChallenges = identitySchema.table(
   },
   (t) => [index("otp_challenges_phone_created_idx").on(t.phoneHash, t.createdAt.desc())],
 );
+
+/** One row per SMS handed to a gateway; receipts update `status` (T-ID-03). Only the phone digest is stored. */
+export const smsDeliveries = identitySchema.table("sms_deliveries", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  phoneHash: text("phone_hash").notNull(),
+  provider: text("provider").notNull(),
+  providerId: text("provider_id").notNull(),
+  status: text("status").notNull().default("sent"),
+  sentAt: timestamp("sent_at", { withTimezone: true }).defaultNow(),
+  deliveredAt: timestamp("delivered_at", { withTimezone: true }),
+});
