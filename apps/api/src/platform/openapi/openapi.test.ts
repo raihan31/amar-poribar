@@ -47,6 +47,9 @@ describe("openapi", () => {
     expect(registered.size).toBeGreaterThan(10);
     // The openapi route itself is hidden from the document.
     registered.delete("GET /v1/openapi.json");
+    // Test-support routes (PUSH_DRIVER=fake sink) are hidden on purpose.
+    registered.delete("GET /test/push-sink");
+    registered.delete("DELETE /test/push-sink");
     expect([...registered].filter((r) => !documented.has(r))).toEqual([]);
   });
 

@@ -48,6 +48,8 @@ export const ConfigSchema = z.object({
   SMS_SENDER_ID: optStr(),
   FAKES_URL: withDefault("http://localhost:4100"),
   PUSH_PROVIDER: z.preprocess(blank, z.enum(["fake", "fcm"]).default("fake")),
+  PUSH_DRIVER: z.preprocess(blank, z.enum(["fcm", "fake"]).optional()),
+  FCM_CREDENTIALS_JSON: optStr(),
   FCM_PROJECT_ID: optStr(),
   FCM_SERVICE_ACCOUNT_JSON: optStr(),
   STORAGE_ENDPOINT: withDefault("http://localhost:9000"),
@@ -85,6 +87,8 @@ function crossChecks(env: Record<string, string | undefined>): z.core.$ZodIssue[
   }
   if (get("PUSH_PROVIDER") === "fcm" && !get("FCM_PROJECT_ID"))
     issue("FCM_PROJECT_ID", "required when PUSH_PROVIDER=fcm");
+  if (get("PUSH_DRIVER") === "fcm" && !get("FCM_CREDENTIALS_JSON"))
+    issue("FCM_CREDENTIALS_JSON", "required (base64 service-account JSON) when PUSH_DRIVER=fcm");
   if (get("PAYMENT_PROVIDER") === "real") {
     for (const k of PAYMENT_KEYS) if (!get(k)) issue(k, "required when PAYMENT_PROVIDER=real");
   }
@@ -123,6 +127,8 @@ function build(c: z.output<typeof ConfigSchema>) {
     smsSenderId: c.SMS_SENDER_ID,
     fakesUrl: c.FAKES_URL,
     pushProvider: c.PUSH_PROVIDER,
+    pushDriver: c.PUSH_DRIVER ?? (c.NODE_ENV === "production" ? "fcm" : "fake"),
+    fcmCredentialsJson: c.FCM_CREDENTIALS_JSON,
     fcmProjectId: c.FCM_PROJECT_ID,
     fcmServiceAccountJson: c.FCM_SERVICE_ACCOUNT_JSON,
     storageEndpoint: c.STORAGE_ENDPOINT,
