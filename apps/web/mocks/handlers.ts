@@ -30,6 +30,16 @@ export const handlers: HttpHandler[] = [
     return HttpResponse.json({ version: "2026-01", text: locale === "en" ? "Privacy policy" : "গোপনীয়তা নীতি" });
   }),
   http.post("*/api/proxy/v1/me/consents", () => new HttpResponse(null, { status: 204 })),
+  http.get("*/api/proxy/v1/invites/:token", () =>
+    HttpResponse.json({
+      familyName: demo.family.name,
+      memberCount: demo.members.length,
+      inviter: { id: demo.me.id, name: demo.me.name },
+      role: "member",
+      expiresAt: new Date(Date.now() + 6 * 86_400_000).toISOString(),
+    }),
+  ),
+  http.post("*/api/proxy/v1/invites/:token/accept", () => HttpResponse.json({ familyId: demo.family.id })),
   http.get("*/api/proxy/v1/families", () => HttpResponse.json([demo.family])),
   http.post("*/api/proxy/v1/families", () => HttpResponse.json(demo.family, { status: 201 })),
   http.get(`${F}/categories`, () => HttpResponse.json(demo.categories)),
