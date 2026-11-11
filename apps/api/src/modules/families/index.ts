@@ -4,16 +4,18 @@ import type { ModuleDefinition } from "../../platform/module.js";
 import { onInviteCreated } from "./app/on-invite-created.js";
 import type { InvitePorts } from "./app/ports.js";
 import { requireRole } from "./app/require-role.js";
+import { transferOwnership, type TransferActor } from "./app/transfer-ownership.js";
 import { canAssignRole, canEditAll, canManageMember } from "./domain/roles.js";
 import { familiesRoutes } from "./http/families.routes.js";
 import { invitesRoutes } from "./http/invite-routes.js";
 import { purgeInvitesJob } from "./jobs.js";
+import { transferRoutes } from "./http/transfer-routes.js";
 import { membersRoutes } from "./http/members.routes.js";
 import { familiesRepo } from "./infra/families.repo.js";
 import { memberRepo, type FamilySummary, type MembershipSummary } from "./infra/member-repo.js";
 export * from "./events.js";
 
-export type { FamilySummary, MembershipSummary, InvitePorts };
+export type { FamilySummary, MembershipSummary, InvitePorts, TransferActor };
 export { canAssignRole, canEditAll, canManageMember };
 
 /** Public surface of the families module. Other modules may import only this file (SRS R1). */
@@ -38,6 +40,12 @@ export interface FamiliesFacade {
   canEditAll(role: Role): boolean;
   canAssignRole(actor: Role, target: Role): boolean;
   canManageMember(actor: Role, current: Role): boolean;
+  /** FR-FAM-07. Users must be the owner and pick an admin; staff may pick any member (`by: "staff"`). */
+  transferOwnership(
+    familyId: string,
+    toUserId: string,
+    actor: TransferActor,
+  ): Promise<{ familyId: string; owner: string }>;
   /** Called by notifications at registration to supply `notify` for invite delivery (families imports neither). */
   bindInvitePorts(ports: Pick<InvitePorts, "notify">): void;
 }
@@ -74,6 +82,7 @@ export const familiesModule: ModuleDefinition<FamiliesFacade> = {
     familiesRoutes(app, deps);
     invitesRoutes(app, deps);
     membersRoutes(app, deps);
+    transferRoutes(app, deps);
     return {
       name: "families",
       requireRole: (familyId, userId, minRole, opts) => requireRole(ctx.db, familyId, userId, minRole, opts),
@@ -101,6 +110,7 @@ export const familiesModule: ModuleDefinition<FamiliesFacade> = {
         if (!q) throw new HttpError(404, "not_found", "Family not found");
         return q;
       },
+      transferOwnership: (familyId, toUserId, actor) => transferOwnership(deps, { familyId, toUserId, actor }),
       canEditAll,
       canAssignRole,
       canManageMember,

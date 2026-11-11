@@ -19,6 +19,13 @@ export interface MemberRemovedPayload {
   userId: string;
 }
 
+export interface OwnershipTransferredPayload {
+  familyId: string;
+  fromUserId: string;
+  toUserId: string;
+  by: "owner" | "staff";
+}
+
 export interface InviteCreatedPayload {
   inviteId: string;
   familyId: string;
@@ -36,5 +43,6 @@ declare module "../../platform/events/types.js" {
     "families.MemberJoined.v1": MemberJoinedPayload;
     "families.MemberRemoved.v1": MemberRemovedPayload;
     "families.InviteCreated.v1": InviteCreatedPayload;
+    "families.OwnershipTransferred.v1": OwnershipTransferredPayload;
   }
 }
