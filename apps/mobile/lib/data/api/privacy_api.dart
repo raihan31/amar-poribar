@@ -8,6 +8,15 @@ class PrivacyApi {
   Future<Map<String, dynamic>> policy({String locale = 'bn'}) async =>
       await _t.send('GET', '/v1/policy?locale=$locale') as Map<String, dynamic>;
 
+  /// Records acceptance of the privacy policy [version] (FR-AUTH-10).
+  Future<void> acceptConsent(String version, String locale) async {
+    await _t.send(
+      'POST',
+      '/v1/me/consents',
+      body: {'kind': 'privacy', 'version': version, 'locale': locale},
+    );
+  }
+
   Future<PrivacyRequest> requestExport() async => PrivacyRequest.fromJson(
         await _t.send('POST', '/v1/me/export') as Map<String, dynamic>,
       );

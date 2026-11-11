@@ -151,5 +151,31 @@
   "auth_inviteExpired_nudge": "{inviter}কে কম্পন দিন",
   "@auth_inviteExpired_nudge": {
     "placeholders": {"inviter": {"type": "String"}}
-  }
+  },
+  "onb_consent_title": "আপনার পরিবার তৈরি করুন",
+  "onb_consent_step": "ধাপ {n} / {total}",
+  "@onb_consent_step": {
+    "placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}
+  },
+  "onb_consent_nameLabel": "পরিবারের নাম",
+  "onb_consent_nameHint": "রহিম পরিবার",
+  "onb_consent_currencyLabel": "টাকার ধরন",
+  "onb_consent_currencyValue": "৳ বাংলাদেশি টাকা ({code})",
+  "@onb_consent_currencyValue": {
+    "placeholders": {"code": {"type": "String"}}
+  },
+  "onb_consent_useTitle": "আপনার তথ্য কীভাবে ব্যবহার হবে",
+  "onb_consent_use1": "শুধু আপনার পরিবারের সদস্যরা হিসাব দেখবে।",
+  "onb_consent_use2": "কথা আপনার ফোনেই লেখা হয়। রেকর্ড সার্ভারে যায় না।",
+  "onb_consent_use3": "এআই-এর জন্য ফোন নম্বর ও অ্যাকাউন্ট নম্বর পাঠানো হয় না। যেকোনো সময় তথ্য মুছে দিতে পারবেন।",
+  "onb_consent_agree": "আমি রাজি আছি",
+  "onb_consent_policy": "গোপনীয়তা নীতি",
+  "onb_consent_submit": "পরিবার তৈরি করুন",
+  "onb_consent_error": "কিছু একটা ভুল হয়েছে। আবার চেষ্টা করুন।",
+  "onb_consent_step2Title": "পরিবার তৈরি হয়েছে",
+  "onb_consent_step2Body": "কীভাবে ব্যবহার করতে হয়, ছোট করে শুনে নিতে পারেন।",
+  "onb_consent_listen": "শুনে নিই",
+  "onb_consent_notNow": "এখন নয়",
+  "onb_consent_policyError": "নীতি আনা যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।",
+  "onb_consent_retry": "আবার চেষ্টা করুন"
 }

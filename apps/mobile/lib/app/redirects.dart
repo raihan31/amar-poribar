@@ -62,6 +62,14 @@ final welcomeDoneProvider = StateProvider<bool>((ref) => false);
 /// `Meta('tutorial_done')` is set. Defaults to true so nothing forces the tutorial by accident.
 final tutorialDoneProvider = StateProvider<bool>((ref) => true);
 
+/// `Meta` key holding the privacy policy version the user accepted (FR-AUTH-10).
+const consentVersionKey = 'consent_version';
+
+/// The stored consent matches the current policy version. `bootstrap` sets it from
+/// `Meta('consent_version')` and `checkConsent` compares it with `GET /v1/policy`. Defaults to
+/// true so nothing forces the consent screen by accident (tests, signed-out screens).
+final consentCurrentProvider = StateProvider<bool>((ref) => true);
+
 const _signedOutPages = {Routes.welcome, Routes.login, Routes.loginCode};
 
 /// `amarporibar://join/abc` becomes `/join/abc`.
@@ -113,8 +121,9 @@ String? redirect(Ref ref, GoRouterState state) {
     return Routes.welcome;
   }
 
-  if (auth.families.isEmpty) {
-    return path == Routes.consent ? null : Routes.consent;
+  final onConsent = path == Routes.consent || path == Routes.consentPolicy;
+  if (auth.families.isEmpty || !ref.read(consentCurrentProvider)) {
+    return onConsent ? null : Routes.consent;
   }
 
   final onEntryPage = _signedOutPages.contains(path) ||
