@@ -19,6 +19,10 @@ export interface TokenPair {
 export interface SessionService {
   start(userId: string, deviceId?: string | null): Promise<TokenPair>;
   rotate(refreshToken: string, deviceId?: string | null): Promise<TokenPair>;
+  /** Revokes the whole rotation chain of the session (reason `logout`). */
+  logout(sessionId: string): Promise<void>;
+  /** Revokes every session of the user (reason `logout_all`). */
+  logoutAll(userId: string): Promise<void>;
   /** Backed by a 30 second in-process cache; revocations made by this process show immediately. */
   isSessionRevoked(sessionId: string): Promise<boolean>;
 }
@@ -91,6 +95,18 @@ export function createSessionService(deps: {
     for (const id of ids) cache.set(id, { revoked: true, until: now.getTime() + REVOCATION_CACHE_MS });
   }
 
+  async function logout(sessionId: string): Promise<void> {
+    const row = await repo.findById(sessionId);
+    if (!row) return;
+    const now = clock();
+    markRevoked(await repo.revokeChain(row.chainId, "logout", now), now);
+  }
+
+  async function logoutAll(userId: string): Promise<void> {
+    const now = clock();
+    markRevoked(await repo.revokeAllForUser(userId, "logout_all", now), now);
+  }
+
   async function isSessionRevoked(sessionId: string): Promise<boolean> {
     const now = clock();
     const hit = cache.get(sessionId);
@@ -100,5 +116,5 @@ export function createSessionService(deps: {
     return revoked;
   }
 
-  return { start, rotate, isSessionRevoked };
+  return { start, rotate, logout, logoutAll, isSessionRevoked };
 }

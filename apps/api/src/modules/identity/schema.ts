@@ -1,4 +1,4 @@
-import { boolean, index, integer, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, integer, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { pgSchema } from "drizzle-orm/pg-core";
 
 export const identitySchema = pgSchema("identity");
@@ -62,3 +62,19 @@ export const smsDeliveries = identitySchema.table("sms_deliveries", {
   sentAt: timestamp("sent_at", { withTimezone: true }).defaultNow(),
   deliveredAt: timestamp("delivered_at", { withTimezone: true }),
 });
+
+/** Push-token registry (T-ID-09 owns it; declared here so logout can delete a device row). */
+export const devices = identitySchema.table(
+  "devices",
+  {
+    userId: uuid("user_id").notNull(),
+    deviceId: text("device_id").notNull(),
+    platform: text("platform").notNull(),
+    fcmToken: text("fcm_token"),
+    appVersion: text("app_version"),
+    locale: text("locale"),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.deviceId] })],
+);

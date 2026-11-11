@@ -32,6 +32,14 @@ export function createSessionRepo(db: Db): SessionRepo {
         .returning({ id: sessions.id });
       return rows.map((r) => r.id);
     },
+    async revokeAllForUser(userId, reason, now) {
+      const rows = await db
+        .update(sessions)
+        .set({ revokedAt: now, revokedReason: reason })
+        .where(and(eq(sessions.userId, userId), isNull(sessions.revokedAt)))
+        .returning({ id: sessions.id });
+      return rows.map((r) => r.id);
+    },
     async isRevoked(id, now) {
       const [row] = await db
         .select({ revokedAt: sessions.revokedAt, expiresAt: sessions.expiresAt })

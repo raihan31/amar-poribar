@@ -17,6 +17,7 @@ import { createSessionService } from "./app/session-service.js";
 import { createSessionRepo } from "./infra/session-repo.js";
 import { registerAuthenticate } from "./http/authenticate.js";
 import { registerJwt } from "./infra/jwt.js";
+import { createDeviceRemover } from "./infra/device-repo.js";
 import { createUserRepo } from "./infra/user-repo.js";
 export * from "./events.js";
 
@@ -97,7 +98,7 @@ export const identityModule: ModuleDefinition<IdentityFacade> = {
     registerAuthenticate(app, (sid) => sessions.isSessionRevoked(sid));
     ctx.jobs.register(purgeOtpJob({ db: ctx.db, clock: ctx.clock }));
     ctx.jobs.register(purgeSessionsJob({ db: ctx.db, clock: ctx.clock }));
-    registerIdentityRoutes(app, { otp, users, sessions, isProd: config.isProd });
+    registerIdentityRoutes(app, { otp, users, sessions, devices: createDeviceRemover(ctx.db), isProd: config.isProd });
     // SMS delivery (T-ID-03). Built here so production refuses to start with the fake or without credentials.
     const sms = smsConfig(ctx);
     const gateway = createSmsGateway(sms);
