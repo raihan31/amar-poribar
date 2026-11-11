@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { Db } from "../../platform/db.js";
 import { defineJob } from "../../platform/jobs/define.js";
+import { createDeviceRepo } from "./infra/device-repo.js";
 import { createOtpRepo } from "./infra/otp-repo.js";
 import { createSessionRepo } from "./infra/session-repo.js";
 
@@ -25,6 +26,24 @@ export function purgeSessionsJob(deps: { db: Db; clock: () => Date }) {
     cron: "20 3 * * *",
     handler: async () => {
       await purgeSessions(deps.db, deps.clock());
+    },
+  });
+}
+
+const DAYS_120 = 120 * 24 * 3600_000;
+
+/** Deletes devices not seen for 120 days (FR-AUTH-11). Returns the number removed. */
+export function purgeDevices(db: Db, now: Date): Promise<number> {
+  return createDeviceRepo(db).purgeSeenBefore(new Date(now.getTime() - DAYS_120));
+}
+
+export function purgeDevicesJob(deps: { db: Db; clock: () => Date }) {
+  return defineJob({
+    name: "identity.purge-devices",
+    schema: z.object({}).passthrough(),
+    cron: "30 3 * * *",
+    handler: async () => {
+      await purgeDevices(deps.db, deps.clock());
     },
   });
 }

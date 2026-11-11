@@ -38,7 +38,8 @@ const allowlist = (
 /** Path parameters that name a family-scoped resource: any `...Id` (a user id on its own is not one). */
 function scopedParams(path: string): string[] {
   const ids = [...path.matchAll(/\{(\w+)\}/g)].map((m) => m[1]!).filter((n) => /Id$/.test(n));
-  return ids.length === 1 && ids[0] === "userId" ? [] : ids;
+  // `userId` and `deviceId` (`/v1/me/devices/{deviceId}`) are scoped to the caller, not to a family.
+  return ids.length === 1 && (ids[0] === "userId" || ids[0] === "deviceId") ? [] : ids;
 }
 
 const operations: Operation[] = Object.entries(openapi.paths).flatMap(([path, item]) =>
