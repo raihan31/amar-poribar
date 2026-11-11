@@ -38,7 +38,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -56,6 +56,17 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(
               cachedAccounts,
               cachedAccounts.openingBalancePaisa,
+            );
+          }
+          if (from < 5) {
+            await m.addColumn(transactions, transactions.familyId);
+            await m.addColumn(transactions, transactions.splitGroupId);
+            await m.addColumn(transactions, transactions.attachmentKey);
+            await m.addColumn(transactions, transactions.paidByUserId);
+            await m.addColumn(transactions, transactions.createdBy);
+            await m.createIndex(txnFamilyTime);
+            await customStatement(
+              "UPDATE transactions SET family_id = COALESCE((SELECT value FROM meta WHERE key='active_family'), '') WHERE family_id=''",
             );
           }
         },
