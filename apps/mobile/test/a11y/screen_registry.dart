@@ -12,10 +12,13 @@ import 'package:amar_poribar/features/onboarding/ui/consent_screen.dart';
 import 'package:amar_poribar/features/onboarding/ui/tutorial_screen.dart';
 import 'package:amar_poribar/features/onboarding/ui/welcome_screen.dart';
 import 'package:amar_poribar/features/settings/state/preferences_controller.dart';
+import 'package:amar_poribar/features/transactions/data/fake_transaction_repository.dart';
+import 'package:amar_poribar/features/transactions/ui/add_expense_screen.dart';
 import 'package:amar_poribar/presentation/providers/auth_provider.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/transactions/add_expense_fixtures.dart';
 import '../helpers/fake_auth.dart';
 
 typedef ScreenFactory = Widget Function(BuildContext context);
@@ -103,6 +106,12 @@ void registerAllScreens() {
     ],
   );
   registerScreen('D2', Routes.tutorial, (c) => const TutorialScreen());
+  registerScreen(
+    'D4',
+    Routes.add,
+    (c) => const AddExpenseScreen(),
+    needs: addExpenseOverrides(FakeTransactionRepository()),
+  );
 }
 
 /// Routes that exist in the app. Until the `Routes` table of T-MOB-13 lands
@@ -118,6 +127,7 @@ const List<String> kAllRoutes = [
   Routes.sessionExpired,
   Routes.join,
   Routes.add,
+  Routes.addVoice,
   Routes.tutorial,
 ];
 
@@ -129,5 +139,5 @@ const Set<String> kRoutesAwaitingRegistration = {
   Routes.transactions,
   Routes.pendingSms,
   Routes.settings,
-  Routes.add,
+  Routes.addVoice,
 };
