@@ -29,6 +29,13 @@
       "when": 1794354933004,
       "tag": "0003_privacy_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794374156906,
+      "tag": "0004_notifications_init",
+      "breakpoints": true
     }
   ]
 }
