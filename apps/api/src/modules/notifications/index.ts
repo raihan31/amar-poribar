@@ -3,6 +3,7 @@ import type { ModuleContext, ModuleDefinition } from "../../platform/module.js";
 import { createNotifier, type Notifier, type NotifierIdentity } from "./app/notifier.js";
 import type { NotifyInput, NotifyResult, Preferences } from "./app/notify-types.js";
 import { isQuietNowFor, readPreferences } from "./app/preferences.js";
+import { inboxRoutes } from "./http/inbox-routes.js";
 import { preferencesRoutes } from "./http/preferences-routes.js";
 import { notificationsRoutes } from "./http/routes.js";
 import { testSinkRoutes } from "./http/test-sink-routes.js";
@@ -66,6 +67,7 @@ export const notificationsModule: ModuleDefinition<NotificationsFacade> = {
   async register(app, ctx) {
     notificationsRoutes(app);
     preferencesRoutes(app, { db: ctx.db });
+    inboxRoutes(app, { db: ctx.db, clock: ctx.clock });
     // Chosen by PUSH_DRIVER; handed to app/notifier.ts below.
     const cfg = (ctx.config ?? {}) as { pushDriver?: "fcm" | "fake"; fcmCredentialsJson?: string };
     let sender: PushSender;
