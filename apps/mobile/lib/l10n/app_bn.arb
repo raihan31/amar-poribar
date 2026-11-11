@@ -215,5 +215,18 @@
   "tutorial_next": "পরের ধাপ",
   "tutorial_back": "পেছনে",
   "tutorial_skip": "বাদ দিন",
-  "tutorial_start": "শুরু করুন"
+  "tutorial_start": "শুরু করুন",
+  "push_channel_nudge_name": "কম্পন",
+  "push_channel_nudge_desc": "পরিবারের কেউ কম্পন পাঠালে",
+  "push_channel_chat_name": "কথা",
+  "push_channel_chat_desc": "পরিবারের কথাবার্তার বার্তা",
+  "push_channel_alerts_name": "বাজেট সতর্কতা",
+  "push_channel_alerts_desc": "বাজেট প্রায় শেষ হলে সতর্কতা",
+  "push_channel_reminders_name": "মনে করানো",
+  "push_channel_reminders_desc": "রোজকার ও বিলের মনে করানো",
+  "push_channel_calls_name": "ভিডিও কল",
+  "push_channel_calls_desc": "পরিবারের ভিডিও কল আসলে",
+  "push_permission_title": "খবর পেতে অনুমতি দিন",
+  "push_permission_body": "বাজেট সতর্কতা, কম্পন আর মনে করানো ফোনে পেতে নোটিফিকেশনের অনুমতি দরকার।",
+  "push_permission_allow": "অনুমতি দিন"
 }

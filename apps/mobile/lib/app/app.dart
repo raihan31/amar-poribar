@@ -7,6 +7,7 @@ import '../core/theme/ui_scale.dart';
 import '../features/settings/state/preferences_controller.dart';
 import '../features/voice/state/voice_capability_provider.dart';
 import '../l10n/gen/app_localizations.dart';
+import 'push_wiring.dart';
 import 'router.dart';
 
 class AmarPoribarApp extends ConsumerWidget {
@@ -18,6 +19,7 @@ class AmarPoribarApp extends ConsumerWidget {
     ref.watch(voiceCapabilityProvider);
     final scale = ref.watch(uiScaleProvider);
     ref.watch(preferencesProvider); // loads the saved preferences
+    ref.watch(pushWiringProvider); // channels, device registration, tap routing
     return MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context).common_appName,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

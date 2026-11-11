@@ -7,7 +7,7 @@ import '../presentation/providers/auth_provider.dart';
 import '../presentation/providers/providers.dart';
 import 'redirects.dart';
 
-/// Starts Firebase. Left null until the Firebase packages are added (push, T-NOTIF client tasks).
+/// Starts Firebase (`initFirebase` in main.dart).
 /// Debug builds without `google-services.json` must still run, so a failure here is swallowed.
 typedef FirebaseInit = Future<void> Function();
 
