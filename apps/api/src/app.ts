@@ -47,6 +47,8 @@ export interface AppDeps {
   clock?: () => Date;
   /** Drain the outbox continuously (ROLE=worker|all in the server). Needs `sql`. */
   outboxLoop?: boolean;
+  /** Share an event bus the caller can drain (tests); the app creates its own when absent. */
+  bus?: EventBus;
 }
 
 export interface BuildAppOptions {
@@ -66,7 +68,7 @@ export async function buildApp({ config, db, deps = {} }: BuildAppOptions) {
 
   // Platform services (SRS §3.4).
   const logger = app.log;
-  const bus = new EventBus();
+  const bus = deps.bus ?? new EventBus();
   const metrics = createMetrics();
   const jobs =
     deps.jobs ??

@@ -41,6 +41,20 @@ export const familiesRepo = {
     return rows.length > 0;
   },
 
+  /** Claims the one-time delivery of an invite; false when it was already delivered or does not exist. */
+  async claimInviteDelivery(x: Executor, id: string, at: Date): Promise<boolean> {
+    const rows = await x
+      .update(familyInvites)
+      .set({ deliveredAt: at })
+      .where(and(eq(familyInvites.id, id), isNull(familyInvites.deliveredAt)))
+      .returning({ id: familyInvites.id });
+    return rows.length > 0;
+  },
+
+  async releaseInviteDelivery(x: Executor, id: string): Promise<void> {
+    await x.update(familyInvites).set({ deliveredAt: null }).where(eq(familyInvites.id, id));
+  },
+
   async familyById(x: Executor, id: string): Promise<FamilyRow | null> {
     const [row] = await x.select().from(families).where(eq(families.id, id));
     return row ?? null;
