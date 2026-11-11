@@ -1,4 +1,4 @@
-CREATE TABLE "identity"."sms_deliveries" (
+CREATE TABLE IF NOT EXISTS "identity"."sms_deliveries" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"phone_hash" text NOT NULL,
 	"provider" text NOT NULL,
