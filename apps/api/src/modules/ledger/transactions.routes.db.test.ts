@@ -165,7 +165,7 @@ describe("ledger routes (db)", () => {
       expect((await send()).statusCode).toBe(201);
       const dup = await send();
       expect(dup.statusCode).toBe(409);
-      expect(dup.json<{ error: { code: string } }>().error.code).toBe("duplicate");
+      expect(dup.json<{ error: { code: string } }>().error.code).toBe("duplicate_trx_id");
       const events = await sql`select 1 from platform.outbox where name = 'ledger.TransactionCreated.v1'`;
       expect(events).toHaveLength(1);
       await t.close();

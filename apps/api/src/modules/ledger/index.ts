@@ -71,7 +71,7 @@ export interface LedgerFacade {
   /** `max(updated_at)` over the family's transactions, or null when it has none. */
   getLastActivity(familyId: string): Promise<Date | null>;
   countTransactions(familyId: string): Promise<number>;
-  /** The caller has already checked the member role (for example recurring confirm). */
+  /** Same rules as POST: member role, refs, HLC stamp and event. A retry with the same client id returns the row. */
   createTransaction(familyId: string, actor: { userId: string }, input: CreateTransactionInput): Promise<Transaction>;
   /** 400 `invalid_category` / `invalid_account` unless the category and account belong to this family. */
   assertRefs(
@@ -125,7 +125,10 @@ export const ledgerModule: ModuleDefinition<LedgerFacade> = {
       getCategoriesByKeys: (familyId, keys) => getCategoriesByKeys(deps, familyId, keys),
       getLastActivity: (familyId) => getLastActivity(deps, familyId),
       countTransactions: (familyId) => countTransactions(deps, familyId),
-      createTransaction: (familyId, actor, data) => createTransaction(deps, { familyId, actorId: actor.userId, data }),
+      createTransaction: async (familyId, actor, data) => {
+        const { role } = await deps.families.requireRole(familyId, actor.userId, "member", { write: true });
+        return (await createTransaction(deps, { familyId, actor: { userId: actor.userId, role }, data })).row;
+      },
       assertRefs: (familyId, refs) => assertRefs(ctx.db, familyId, refs),
       listForExport: (familyId, userId, range) => totalsRepo.exportRows(ctx.db, familyId, { userId }, range),
       remittanceByMonth: (familyId, userId, from, to) => remittanceByMonth(deps, familyId, userId, from, to),

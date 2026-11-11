@@ -36,14 +36,22 @@ export const transactionsRepo = {
     return row ?? null;
   },
 
-  /** Null when the id or the family's TrxID already exists. */
-  async insert(x: Executor, values: NewTransaction): Promise<Transaction | null> {
-    const [row] = await x.insert(transactions).values(values).onConflictDoNothing().returning();
+  /** Any family, deleted or not: the caller decides what the row's owner may learn. */
+  async findById(x: Executor, txnId: string): Promise<Transaction | null> {
+    const [row] = await x.select().from(transactions).where(eq(transactions.id, txnId));
     return row ?? null;
   },
 
-  /** Plain insert for the sync merge, where a duplicate TrxID must surface as a unique violation. */
-  async insertStrict(x: Executor, values: NewTransaction): Promise<Transaction> {
+  async findVisibleByTrxId(x: Executor, familyId: string, userId: string, trxId: string): Promise<Transaction | null> {
+    const [row] = await x
+      .select()
+      .from(transactions)
+      .where(and(eq(transactions.trxId, trxId), visibleTo(familyId, { userId })));
+    return row ?? null;
+  },
+
+  /** Plain insert: a duplicate id or TrxID surfaces as a unique violation for the caller to translate. */
+  async insert(x: Executor, values: NewTransaction): Promise<Transaction> {
     const [row] = await x.insert(transactions).values(values).returning();
     return row!;
   },

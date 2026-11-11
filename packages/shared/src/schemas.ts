@@ -78,6 +78,8 @@ export const CreateTransactionSchema = z.object({
   source: TransactionSourceSchema.default("manual"),
   aiConfidence: z.number().min(0).max(1).optional(),
   isPrivate: z.boolean().default(false),
+  /** Admins may record an entry on behalf of another member (T-LED-04); defaults to the caller. */
+  paidByUserId: z.uuid().optional(),
 });
 export type CreateTransactionInput = z.infer<typeof CreateTransactionSchema>;
 
