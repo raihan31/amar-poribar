@@ -1,3 +1,5 @@
+import { EventBus } from "../../src/platform/events/bus.js";
+import { drainOnce } from "../../src/platform/events/drain.js";
 import { buildApp } from "../../src/app.js";
 import type { Db, Sql } from "../../src/platform/db.js";
 import { createJobs } from "../../src/platform/jobs/jobs.js";
@@ -62,6 +64,7 @@ export async function buildTestApp(opts: BuildTestAppOptions) {
         : new SteppingLimiter()) as Limiter,
     clock: opts.clock ?? (() => FIXED_NOW),
   };
+  const bus = new EventBus();
   const app = await buildApp({
     config: testConfig(),
     db: opts.db,
@@ -72,6 +75,7 @@ export async function buildTestApp(opts: BuildTestAppOptions) {
       jobs: createJobs({ inline: true }),
       fanout: new LocalFanout(),
       clock: fakes.clock,
+      bus,
     },
   });
   await app.ready();
@@ -90,7 +94,10 @@ export async function buildTestApp(opts: BuildTestAppOptions) {
   /** Authorization headers for a logged-in user. */
   const as = (user: Tokens) => ({ authorization: `Bearer ${user.accessToken}` });
 
-  return { app, db: opts.db, fakes, login, as, close: () => app.close() };
+  /** Deliver pending outbox events to their handlers (the app has no background loop in tests). */
+  const drain = () => drainOnce(opts.db, bus);
+
+  return { app, db: opts.db, fakes, drain, login, as, close: () => app.close() };
 }
 
 export type TestApp = Awaited<ReturnType<typeof buildTestApp>>;

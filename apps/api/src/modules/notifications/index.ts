@@ -95,6 +95,18 @@ export const notificationsModule: ModuleDefinition<NotificationsFacade> = {
     });
     ctx.jobs.register(notifier.retryJob);
     notifiers.set(ctx.db, notifier);
+    // Invite delivery (T-FAM-05): families asks for an inbox item through this port, never importing us.
+    ctx.facades.families?.bindInvitePorts({
+      notify: async (a) => {
+        await notify(ctx, {
+          userIds: [a.userId],
+          kind: a.kind,
+          params: a.params,
+          data: a.data,
+          dedupeKey: `invite:${a.data.token}`,
+        });
+      },
+    });
     return { name: "notifications", notify, getPreferences, isQuietNow };
   },
 };

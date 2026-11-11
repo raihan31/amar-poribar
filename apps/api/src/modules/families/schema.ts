@@ -57,5 +57,7 @@ export const familyInvites = familiesSchema.table("family_invites", {
   acceptedBy: uuid("accepted_by"),
   acceptedAt: timestamp("accepted_at", { withTimezone: true }),
   revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  /** Set once the phone invite was delivered (inbox item or SMS); makes the delivery handler idempotent. */
+  deliveredAt: timestamp("delivered_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

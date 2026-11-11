@@ -18,13 +18,33 @@ export async function createInvite(
 ) {
   const { role: actor } = await requireRole(deps.db, input.familyId, input.actorId, "admin", { write: true });
   if (!canAssignRole(actor, input.role)) throw new HttpError(403, "forbidden", "Cannot invite with this role");
-  const invite = await familiesRepo.insertInvite(deps.db, {
-    familyId: input.familyId,
-    token: randomBytes(24).toString("base64url"),
-    role: input.role,
-    phone: input.phone ? normalizeBdPhone(input.phone) : null,
-    createdBy: input.actorId,
-    expiresAt: new Date(deps.clock().getTime() + INVITE_TTL_MS),
+  const invite = await deps.db.transaction(async (tx) => {
+    const row = await familiesRepo.insertInvite(tx, {
+      familyId: input.familyId,
+      token: randomBytes(24).toString("base64url"),
+      role: input.role,
+      phone: input.phone ? normalizeBdPhone(input.phone) : null,
+      createdBy: input.actorId,
+      expiresAt: new Date(deps.clock().getTime() + INVITE_TTL_MS),
+    });
+    // FR-FAM-06: a phone invite is delivered by the InviteCreated handler (inbox item or SMS).
+    if (row.phone) {
+      await deps.bus.publish(
+        tx,
+        "families.InviteCreated.v1",
+        {
+          inviteId: row.id,
+          familyId: row.familyId,
+          token: row.token,
+          phone: row.phone,
+          role: row.role,
+          inviterUserId: input.actorId,
+          expiresAt: row.expiresAt.toISOString(),
+        },
+        { familyId: row.familyId },
+      );
+    }
+    return row;
   });
   return {
     id: invite.id,

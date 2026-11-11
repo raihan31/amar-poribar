@@ -1,6 +1,8 @@
 import type { Role } from "@amar-poribar/shared";
 import { HttpError } from "../../platform/errors.js";
 import type { ModuleDefinition } from "../../platform/module.js";
+import { onInviteCreated } from "./app/on-invite-created.js";
+import type { InvitePorts } from "./app/ports.js";
 import { requireRole } from "./app/require-role.js";
 import { canAssignRole, canEditAll, canManageMember } from "./domain/roles.js";
 import { familiesRoutes } from "./http/families.routes.js";
@@ -11,7 +13,7 @@ import { familiesRepo } from "./infra/families.repo.js";
 import { memberRepo, type FamilySummary } from "./infra/member-repo.js";
 export * from "./events.js";
 
-export type { FamilySummary };
+export type { FamilySummary, InvitePorts };
 export { canAssignRole, canEditAll, canManageMember };
 
 /** Public surface of the families module. Other modules may import only this file (SRS R1). */
@@ -35,6 +37,8 @@ export interface FamiliesFacade {
   canEditAll(role: Role): boolean;
   canAssignRole(actor: Role, target: Role): boolean;
   canManageMember(actor: Role, current: Role): boolean;
+  /** Called by notifications at registration to supply `notify` for invite delivery (families imports neither). */
+  bindInvitePorts(ports: Pick<InvitePorts, "notify">): void;
 }
 
 declare module "../../platform/module.js" {
@@ -52,6 +56,19 @@ export const familiesModule: ModuleDefinition<FamiliesFacade> = {
     const bus = ctx.bus;
     const publicWebUrl = (ctx.config as { publicWebUrl?: string } | undefined)?.publicWebUrl ?? "http://localhost:3000";
     const deps = { db: ctx.db, bus, identity, clock: ctx.clock, publicWebUrl };
+    let notify: InvitePorts["notify"] | undefined;
+    const invitePorts = (): InvitePorts | undefined =>
+      notify
+        ? {
+            notify,
+            smsSend: async (phone, text) => {
+              await ctx.ports.sms.send({ to: phone, text, kind: "invite" });
+            },
+          }
+        : undefined;
+    ctx.bus.on("families.InviteCreated.v1", "families.deliver-invite", (e) =>
+      onInviteCreated({ db: ctx.db, identity, ports: invitePorts, publicWebUrl }, e),
+    );
     ctx.jobs.register(purgeInvitesJob({ db: ctx.db, clock: ctx.clock }));
     familiesRoutes(app, deps);
     invitesRoutes(app, deps);
@@ -86,6 +103,9 @@ export const familiesModule: ModuleDefinition<FamiliesFacade> = {
       canEditAll,
       canAssignRole,
       canManageMember,
+      bindInvitePorts: (ports) => {
+        notify = ports.notify;
+      },
     };
   },
 };
