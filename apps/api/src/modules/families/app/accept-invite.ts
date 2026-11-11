@@ -1,4 +1,5 @@
 import { HttpError } from "../../../platform/errors.js";
+import { memberRepo } from "../infra/member-repo.js";
 import { familiesRepo } from "../infra/families.repo.js";
 import type { FamiliesDeps } from "./deps.js";
 
@@ -19,7 +20,7 @@ export async function acceptInvite(deps: FamiliesDeps, input: { token: string; u
     if (!(await familiesRepo.markInviteAccepted(tx, invite.id, input.userId, now))) {
       throw new HttpError(404, "not_found", "Invite not found or expired");
     }
-    const joined = await familiesRepo.insertMember(tx, invite.familyId, input.userId, invite.role);
+    const joined = await memberRepo.insertMember(tx, invite.familyId, input.userId, invite.role);
     if (joined) {
       await deps.bus.publish(
         tx,

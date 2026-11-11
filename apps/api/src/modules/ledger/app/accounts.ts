@@ -6,7 +6,7 @@ import type { LedgerDeps } from "./deps.js";
 /** An account owner must belong to the same family (FR-ACC-02). */
 async function assertMember(deps: LedgerDeps, familyId: string, userId: string | null | undefined) {
   if (!userId) return;
-  if (!(await deps.families.getMemberIds(familyId)).includes(userId)) {
+  if (!(await deps.families.listMemberIds(familyId)).includes(userId)) {
     throw new HttpError(400, "invalid_request", "Account owner must be a family member");
   }
 }

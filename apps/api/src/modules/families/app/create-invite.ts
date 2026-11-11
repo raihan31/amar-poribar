@@ -13,7 +13,7 @@ export async function createInvite(
   deps: FamiliesDeps,
   input: { familyId: string; actorId: string; role: Role; phone?: string | undefined },
 ) {
-  const actor = await requireRole(deps.db, input.familyId, input.actorId, "admin");
+  const { role: actor } = await requireRole(deps.db, input.familyId, input.actorId, "admin");
   if (!canAssignRole(actor, input.role)) throw new HttpError(403, "forbidden", "Cannot invite with this role");
   const invite = await familiesRepo.insertInvite(deps.db, {
     familyId: input.familyId,
