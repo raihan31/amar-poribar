@@ -26,7 +26,16 @@ export interface UserBasics {
   erasedAt: Date | null;
 }
 
+export interface ProfilePatch {
+  name?: string | null;
+  locale?: string;
+  bnDigits?: boolean;
+  simpleMode?: boolean;
+}
+
 export interface UserRepo {
+  /** Updates the given profile columns and `updated_at`; null when the user does not exist or is erased. */
+  updateProfile(userId: string, patch: ProfilePatch): Promise<UserBasics | null>;
   upsertByPhone(phone: string): Promise<{ id: string }>;
   findByPhone(phone: string): Promise<{ id: string } | null>;
   getBasics(userId: string): Promise<UserBasics | null>;
