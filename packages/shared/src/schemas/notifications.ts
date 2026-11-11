@@ -62,3 +62,53 @@ export const INBOX_KINDS = [
 ] as const;
 
 export type InboxKind = (typeof INBOX_KINDS)[number];
+
+export const InboxKindSchema = z.enum(INBOX_KINDS);
+
+/** One inbox card (FR-NOTIF-04). */
+export const InboxItemSchema = z.object({
+  id: z.string(),
+  kind: InboxKindSchema,
+  familyId: z.string().nullable(),
+  title: z.string(),
+  body: z.string(),
+  speechText: z.string(),
+  data: z.record(z.string(), z.unknown()),
+  createdAt: z.string(),
+  readAt: z.string().nullable(),
+  seq: z.number().int(),
+});
+export type InboxItem = z.infer<typeof InboxItemSchema>;
+
+/** `GET /v1/inbox` response. */
+export const InboxListSchema = z.object({
+  items: z.array(InboxItemSchema),
+  nextCursor: z.string().nullable(),
+  unread: z.number().int().nonnegative(),
+});
+export type InboxList = z.infer<typeof InboxListSchema>;
+
+/** `GET /v1/inbox/changes` response (polling fallback, FR-NOTIF-08). */
+export const InboxChangesSchema = z.object({
+  items: z.array(InboxItemSchema),
+  lastSeq: z.number().int().nonnegative(),
+});
+export type InboxChanges = z.infer<typeof InboxChangesSchema>;
+
+export const InboxListQuerySchema = z.object({
+  cursor: z.string().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(50).default(30),
+});
+
+export const InboxChangesQuerySchema = z.object({
+  afterSeq: z.coerce.number().int().min(0).optional(),
+  limit: z.coerce.number().int().min(1).max(50).default(30),
+});
+
+/** `POST /v1/inbox/read` body: exactly one of `ids` or `all`. */
+export const InboxMarkReadSchema = z
+  .object({
+    ids: z.array(z.string().uuid()).min(1).max(200).optional(),
+    all: z.literal(true).optional(),
+  })
+  .refine((b) => (b.ids === undefined) !== (b.all === undefined), "Provide exactly one of ids or all");
