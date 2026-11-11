@@ -69,3 +69,129 @@
 .back-header {
   justify-content: flex-start;
 }
+.family-page,
+.switch-page {
+  padding-bottom: 24px;
+}
+.family-page .page-header h1 {
+  font-size: 26px;
+  color: var(--green-700);
+}
+.family-sub,
+.family-note {
+  margin: 0;
+  padding: 0 16px 12px;
+  color: var(--muted);
+}
+.member-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 16px;
+  display: grid;
+  gap: 10px;
+}
+.member-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.member-row--pending {
+  border-style: dashed;
+}
+.member-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.role-pill {
+  align-self: flex-start;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 3px 8px;
+  background: var(--green-100);
+  color: var(--ink);
+}
+.role-select {
+  min-height: 48px;
+  font: inherit;
+}
+.member-act {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--green-700);
+  color: var(--bg);
+}
+.member-act--buzz {
+  background: var(--amber);
+  color: var(--ink);
+}
+.member-act--danger {
+  background: var(--danger);
+}
+.family-actions {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+.family-cards {
+  display: grid;
+  gap: 12px;
+  padding: 0 16px;
+}
+.family-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 84px;
+  padding: 12px;
+  text-align: start;
+  font: inherit;
+  color: var(--ink);
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+}
+.family-card--active {
+  border-color: var(--green-700);
+}
+.family-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.family-card-meta,
+.family-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.family-card-active {
+  color: var(--green-700);
+  font-weight: 600;
+}
+.badge {
+  padding: 2px 10px;
+  border-radius: var(--r-pill);
+  background: var(--danger);
+  color: var(--bg);
+  font-size: 13px;
+}
+.badge--warn {
+  background: var(--amber);
+  color: var(--ink);
+}
