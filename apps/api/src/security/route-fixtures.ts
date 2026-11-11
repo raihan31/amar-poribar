@@ -80,6 +80,10 @@ export const ROUTE_FIXTURES: Record<string, RouteFixture> = {
     body: { name: "Hijacked" },
   }),
   "POST /v1/families/{familyId}/invites": (c) => ({ params: fam(c), body: { role: "member" } }),
+  "GET /v1/families/{familyId}/invites": (c) => ({ params: fam(c) }),
+  "DELETE /v1/families/{familyId}/invites/{inviteId}": (c) => ({
+    params: { ...fam(c), inviteId: "00000000-0000-4000-8000-000000000000" },
+  }),
   "GET /v1/families/{familyId}/members": (c) => ({ params: fam(c) }),
   "DELETE /v1/families/{familyId}/members/{userId}": (c) => ({ params: { ...fam(c), userId: c.userId } }),
   "PATCH /v1/families/{familyId}/members/{userId}": (c) => ({

@@ -50,6 +50,13 @@
       "when": 1794378206842,
       "tag": "0006_great_silvermane",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794378300000,
+      "tag": "0007_families_invite_revoked",
+      "breakpoints": true
     }
   ]
 }
