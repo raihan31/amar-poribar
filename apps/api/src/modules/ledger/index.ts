@@ -23,6 +23,9 @@ export * from "./events.js";
 
 export type {
   Account,
+  Account as AccountDto,
+  Category as CategoryDto,
+  Transaction as TransactionDto,
   ApplyResult,
   AskQueries,
   Category,

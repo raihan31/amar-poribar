@@ -79,7 +79,9 @@ export const transactions = ledgerSchema.table(
   },
   (t) => [
     index("txn_family_seq_idx").on(t.familyId, t.syncSeq),
-    index("txn_family_time_idx").on(t.familyId, t.occurredAt.desc()),
+    index("txn_family_time_idx")
+      .on(t.familyId, t.occurredAt.desc(), t.id.desc())
+      .where(sql`${t.deletedAt} is null`),
     // SRS FR-TXN-04: no duplicate MFS transactions.
     uniqueIndex("txn_family_trx_uidx")
       .on(t.familyId, t.trxId)
