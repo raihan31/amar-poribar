@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { t } from "@amar-poribar/shared";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api/client";
 import type { Family, Member, RoleName } from "@/lib/types";
 
 const ROLE_LABEL: Record<RoleName, "roleOwner" | "roleAdmin" | "roleMember" | "roleViewer"> = {

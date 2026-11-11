@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { t } from "@amar-poribar/shared";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api/client";
 import { FamilyHome } from "../family/FamilyHome";
 import { LoginForm } from "./LoginForm";
 

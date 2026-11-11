@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { draftToSpeech, formatBDT, t, type ParseResponse, type TransactionDraft } from "@amar-poribar/shared";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api/client";
 import { speak, stopSpeaking, useSpeechRecognition } from "@/lib/voice";
 import type { Account, Category, Family } from "@/lib/types";
 import { CategoryPicker } from "./CategoryPicker";

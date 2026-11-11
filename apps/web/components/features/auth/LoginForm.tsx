@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api/client";
 
 export function LoginForm({ onLogin }: { onLogin: () => void }) {
   const [phone, setPhone] = useState("");

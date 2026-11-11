@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { t, type MonthlyAiSummary, type MonthSummary } from "@amar-poribar/shared";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api/client";
+import { ApiProblem } from "@/lib/api/errors";
 import type { Account, Category, Family } from "@/lib/types";
 import { BudgetList } from "../budget/BudgetList";
 import { QuickAdd } from "../entry/QuickAdd";
@@ -27,7 +28,7 @@ export function FamilyHome({ onLogout }: { onLogout: () => void }) {
 
   const handle = useCallback(
     (e: unknown) => {
-      if (e instanceof ApiError && e.status === 401) onLogout();
+      if (e instanceof ApiProblem && e.status === 401) onLogout();
       else setError((e as Error).message);
     },
     [onLogout],
