@@ -1,11 +1,17 @@
 import 'package:amar_poribar/app/redirects.dart';
+import 'package:amar_poribar/domain/models/api/me.dart';
 import 'package:amar_poribar/features/auth/data/auth_repository.dart';
 import 'package:amar_poribar/features/auth/data/fake_auth_repository.dart';
 import 'package:amar_poribar/features/auth/ui/login_screen.dart';
 import 'package:amar_poribar/features/auth/ui/session_expired_screen.dart';
+import 'package:amar_poribar/features/family/data/fake_family_repository.dart';
 import 'package:amar_poribar/features/family/data/invite_repository.dart';
+import 'package:amar_poribar/features/family/state/active_family.dart';
 import 'package:amar_poribar/features/family/state/family_providers.dart';
 import 'package:amar_poribar/features/family/ui/join_screen.dart';
+import 'package:amar_poribar/features/home/data/home_repository.dart';
+import 'package:amar_poribar/features/home/state/home_providers.dart';
+import 'package:amar_poribar/features/home/ui/home_screen.dart';
 import 'package:amar_poribar/features/onboarding/data/fake_onboarding_repository.dart';
 import 'package:amar_poribar/features/onboarding/data/onboarding_repository.dart';
 import 'package:amar_poribar/features/onboarding/ui/consent_screen.dart';
@@ -112,6 +118,21 @@ void registerAllScreens() {
     (c) => const AddExpenseScreen(),
     needs: addExpenseOverrides(FakeTransactionRepository()),
   );
+  registerScreen(
+    'Main',
+    Routes.home,
+    (c) => const HomeScreen(),
+    needs: [
+      activeFamilyProvider.overrideWithValue(
+        const FamilyInfo(
+          FakeFamilyRepository.familyId,
+          'রহিম পরিবার',
+          'owner',
+        ),
+      ),
+      homeRepositoryProvider.overrideWithValue(FakeHomeRepository()),
+    ],
+  );
 }
 
 /// Routes that exist in the app. Until the `Routes` table of T-MOB-13 lands
@@ -135,7 +156,6 @@ const List<String> kAllRoutes = [
 /// route from this list when it registers the screen. The list may only
 /// shrink: `registry_complete_test.dart` fails if a route is in neither place.
 const Set<String> kRoutesAwaitingRegistration = {
-  Routes.home,
   Routes.transactions,
   Routes.pendingSms,
   Routes.settings,

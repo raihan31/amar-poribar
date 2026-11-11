@@ -29,12 +29,6 @@
   "auth_otp_rateLimited": "Too many tries. Try again after {time}.",
   "auth_otp_serverDown": "Cannot connect right now. Please try again in a little while.",
   "auth_otp_networkDown": "No internet. Check your connection and try again.",
-  "home_welcome": "Welcome back, {role}",
-  "home_dashboard_totalBalance": "Total balance",
-  "home_dashboard_spent": "Spent: ৳{amount}",
-  "home_dashboard_analytics": "Monthly analytics",
-  "home_dashboard_recent": "Recent transactions",
-  "txn_dashboard_add": "Add transaction",
   "settings_title": "Settings",
   "settings_role_title": "Current role",
   "settings_pair_title": "Pair a new phone",
@@ -54,7 +48,6 @@
   "sync_nearby_failed": "Could not start nearby sync: allow permissions (Bluetooth, location).",
   "sync_nearby_askTitle": "Sync with nearby phone?",
   "sync_nearby_askBody": "Phone: {name}\nCode: {code}\n\nTap \"Yes\" if both phones show the same code.",
-  "txn_dashboard_count": "{count, plural, =0{No transactions} =1{1 transaction} other{{count} transactions}}",
   "voice_fallback_title": "Cannot speak",
   "voice_fallback_heading": "This phone has no Bangla voice",
   "voice_fallback_body": "No worry. You can type your expenses. You can also install the Bangla voice.",
@@ -213,5 +206,66 @@
   "txn_add_errAmount": "Enter an amount first.",
   "txn_add_errMax": "The amount cannot be more than one crore taka.",
   "txn_add_errCategory": "Pick a category.",
-  "txn_add_backspace": "Delete last digit"
+  "txn_add_backspace": "Delete last digit",
+  "home_greetMorning": "Good morning, {name}",
+  "@home_greetMorning": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "home_greetNoon": "Good afternoon, {name}",
+  "@home_greetNoon": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "home_greetEvening": "Good evening, {name}",
+  "@home_greetEvening": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "home_greetNight": "Good night, {name}",
+  "@home_greetNight": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "home_settings": "Settings",
+  "home_monthSpent": "Spent in {month}",
+  "@home_monthSpent": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "home_changeMore": "{amount} more than last month",
+  "@home_changeMore": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "home_changeLess": "{amount} less than last month",
+  "@home_changeLess": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "home_changeSame": "Same as last month",
+  "home_summarySpeech": "{month}: {amount} spent. {change}",
+  "@home_summarySpeech": {
+    "placeholders": {"month": {"type": "String"}, "amount": {"type": "String"}, "change": {"type": "String"}}
+  },
+  "home_budgetWarning": "{name} budget {percent} used",
+  "@home_budgetWarning": {
+    "placeholders": {"name": {"type": "String"}, "percent": {"type": "String"}}
+  },
+  "home_notify": "Tell {name}",
+  "@home_notify": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "home_budgetPhrase": "Budget finished",
+  "home_speakExpense": "Speak an expense",
+  "home_tileBuzz": "Buzz",
+  "home_tileTalk": "Talk",
+  "home_tileVideo": "Video",
+  "home_legend": "Green = online · Grey = offline",
+  "home_activityVoice": "{name} sent a voice note · {duration}",
+  "@home_activityVoice": {
+    "placeholders": {"name": {"type": "String"}, "duration": {"type": "String"}}
+  },
+  "home_activityExpense": "{name} wrote: {note}",
+  "@home_activityExpense": {
+    "placeholders": {"name": {"type": "String"}, "note": {"type": "String"}}
+  },
+  "home_activityEmpty": "Nothing yet",
+  "home_remitTitle": "Money sent from abroad",
+  "home_remitOpen": "Open",
+  "home_offline": "No internet. Your accounts stay on this phone.",
+  "home_somebody": "Someone"
 }
