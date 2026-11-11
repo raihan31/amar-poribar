@@ -42,19 +42,19 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-ID-01 | M1 | done | fc6d9f6e9 | 2026-11-11 |  |
 | T-ID-02 | M1 | done | 9177c86c1 | 2026-11-11 |  |
 | T-ID-03 | M1 | done | 8ff96dfa7 | 2026-11-11 |  |
-| T-ID-04 | M1 | todo |  |  |  |
+| T-ID-04 | M1 | done | d00d1cf62 | 2026-11-11 |  |
 | T-ID-05 | M1 | done | bd3d023a5 | 2026-11-11 |  |
-| T-ID-06 | M1 | todo |  |  |  |
+| T-ID-06 | M1 | done | 52952d09b | 2026-11-11 |  |
 | T-ID-07 | M1 | done | 33cdf07f8 | 2026-11-11 |  |
 | T-ID-08 | M1 | todo |  |  |  |
-| T-ID-09 | M1 | todo |  |  |  |
+| T-ID-09 | M1 | done | 146a0cc1b | 2026-11-11 |  |
 | T-ID-10 | M5 | todo |  |  |  |
 | T-FAM-01 | M1 | done | f253746b0 | 2026-11-11 |  |
 | T-FAM-02 | M1 | done | c5c3bb1d1 | 2026-11-11 |  |
 | T-FAM-03 | M1 | done | 23a0d58f7 | 2026-11-11 |  |
 | T-FAM-04 | M1 | done | 627e10552 | 2026-11-11 |  |
 | T-FAM-05 | M1 | done | 9590af9b3 | 2026-11-11 |  |
-| T-FAM-06 | M1 | todo |  |  |  |
+| T-FAM-06 | M1 | done | a12bedca5 | 2026-11-11 |  |
 | T-FAM-07 | M5 | todo |  |  |  |
 | T-FAM-08 | M5 | todo |  |  |  |
 | T-FAM-09 | M5 | todo |  |  |  |
@@ -237,10 +237,10 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-WEB-04 | M2 | done | a69fda748 | 2026-11-11 |  |
 | T-WEB-05 | M2 | done | 4319833f0 | 2026-11-11 |  |
 | T-WEB-06 | M2 | done | 56a94a0fe | 2026-11-11 |  |
-| T-WEB-07 | M2 | todo |  |  |  |
+| T-WEB-07 | M2 | done | e1b898ad3 | 2026-11-11 |  |
 | T-WEB-08 | M2 | todo |  |  |  |
 | T-WEB-09 | M2 | todo |  |  |  |
-| T-WEB-10 | M1 | todo |  |  |  |
+| T-WEB-10 | M1 | done | b370d3fa4 | 2026-11-11 |  |
 | T-WEB-11 | M1 | todo |  |  |  |
 | T-WEB-12 | M1 | todo |  |  |  |
 | T-WEB-13 | M2 | todo |  |  |  |
