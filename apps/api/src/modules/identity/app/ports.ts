@@ -1,11 +1,23 @@
 export type TokenType = "access" | "refresh";
 
-/** Stores one-time codes. The DB-backed implementation arrives in T-ID-01. */
-export interface OtpStore {
-  /** Creates and remembers a six-digit code for `phone`, replacing any earlier one. */
-  issue(phone: string): Promise<string>;
-  /** True once for the right code; false when wrong, expired or after too many attempts. */
-  verify(phone: string, code: string): Promise<boolean>;
+export interface OtpChallengeRow {
+  id: string;
+  codeHash: string;
+  attempts: number;
+  expiresAt: Date;
+}
+
+/** Persistence of sign-in challenges. Works on digests only; the service does the hashing. */
+export interface OtpRepo {
+  /** In one transaction: marks the phone's open challenges consumed, then inserts the new one. */
+  replaceChallenge(c: { phoneHash: string; codeHash: string; ip: string; now: Date; expiresAt: Date }): Promise<void>;
+  /** The newest unconsumed challenge for the phone. */
+  findActive(phoneHash: string): Promise<OtpChallengeRow | null>;
+  /** Atomically adds one try while `attempts < max`; returns the new count, or null when none is left. */
+  bumpAttempts(id: string, max: number): Promise<number | null>;
+  /** True only for the caller that consumed the row. */
+  consume(id: string, now: Date): Promise<boolean>;
+  purgeCreatedBefore(cutoff: Date): Promise<number>;
 }
 
 export interface TokenService {

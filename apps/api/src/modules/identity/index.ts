@@ -4,7 +4,9 @@ import type { UserBasics } from "./app/ports.js";
 import { registerIdentityRoutes } from "./http/routes.js";
 import * as q from "./app/get-user.js";
 import { maskPhone } from "./domain/phone.js";
-import { MemoryOtpStore } from "./infra/otp-store.memory.js";
+import { createOtpService } from "./app/otp-service.js";
+import { createOtpRepo } from "./infra/otp-repo.js";
+import { purgeOtpJob } from "./jobs.js";
 import { registerJwt } from "./infra/jwt.js";
 import { createUserRepo } from "./infra/user-repo.js";
 export * from "./events.js";
@@ -40,13 +42,15 @@ declare module "../../platform/module.js" {
 /** The part of `ModuleContext.config` identity needs, until the typed config lands (T-PLAT-31). */
 export interface IdentityConfig {
   jwtSecret: string;
+  otpPepper: string;
   isProd: boolean;
 }
 
 function identityConfig(ctx: ModuleContext): IdentityConfig {
   const c = ctx.config as Partial<IdentityConfig> | undefined;
   if (!c?.jwtSecret) throw new Error("identity: ctx.config.jwtSecret is required");
-  return { jwtSecret: c.jwtSecret, isProd: c.isProd === true };
+  if (!c.otpPepper) throw new Error("identity: ctx.config.otpPepper is required");
+  return { jwtSecret: c.jwtSecret, otpPepper: c.otpPepper, isProd: c.isProd === true };
 }
 
 export const identityModule: ModuleDefinition<IdentityFacade> = {
@@ -56,8 +60,14 @@ export const identityModule: ModuleDefinition<IdentityFacade> = {
     const config = identityConfig(ctx);
     const tokens = await registerJwt(app, config.jwtSecret);
     const users = createUserRepo(ctx.db);
-    // The real DB-backed store arrives in T-ID-01.
-    registerIdentityRoutes(app, { otp: new MemoryOtpStore(), users, tokens, isProd: config.isProd });
+    const otp = createOtpService({
+      repo: createOtpRepo(ctx.db),
+      limiter: ctx.limiter,
+      clock: ctx.clock,
+      pepper: config.otpPepper,
+    });
+    ctx.jobs.register(purgeOtpJob({ db: ctx.db, clock: ctx.clock }));
+    registerIdentityRoutes(app, { otp, users, tokens, isProd: config.isProd });
     return {
       name: "identity",
       getUserBasics: (id) => users.getBasics(id),

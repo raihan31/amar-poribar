@@ -57,6 +57,13 @@
       "when": 1794378300000,
       "tag": "0007_families_invite_revoked",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794378371480,
+      "tag": "0008_otp_challenges",
+      "breakpoints": true
     }
   ]
 }

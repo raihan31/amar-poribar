@@ -5,7 +5,14 @@ import { LocalFanout } from "../../src/platform/realtime/fanout.js";
 import { testConfig } from "./config.js";
 import { MemoryPush } from "../../src/platform/ports/fakes/memory-push.js";
 import { MemorySms } from "../../src/platform/ports/fakes/memory-sms.js";
-import { DbLimiter, MemoryLimiter, type Limiter } from "../../src/platform/rate-limit/limiter.js";
+import {
+  DbLimiter,
+  MemoryLimiter,
+  type HitManyResult,
+  type HitResult,
+  type Limiter,
+} from "../../src/platform/rate-limit/limiter.js";
+import type { RateRule } from "../../src/platform/rate-limit/limits.js";
 
 export const FIXED_NOW = new Date("2026-01-15T06:00:00.000Z");
 
@@ -14,11 +21,32 @@ export interface Tokens {
   refreshToken: string;
 }
 
+/**
+ * In-memory limiter whose clock jumps 13 minutes for every OTP request, so helpers such as `login` can sign the
+ * same number in repeatedly without meeting the 60 second gap or the hourly cap (never more than 5 per hour).
+ * Tests of the OTP limits themselves pass `realOtpLimits`.
+ */
+class SteppingLimiter implements Limiter {
+  private offsetMs = 0;
+  private readonly inner = new MemoryLimiter(() => Date.now() + this.offsetMs);
+
+  hit(key: string, rule: RateRule): Promise<HitResult> {
+    if (key.startsWith("otp:hour:")) this.offsetMs += 13 * 60_000;
+    return this.inner.hit(key, rule);
+  }
+
+  hitMany(key: string, rules: readonly RateRule[]): Promise<HitManyResult> {
+    return this.inner.hitMany(key, rules);
+  }
+}
+
 export interface BuildTestAppOptions {
   db: Db;
   sql: Sql;
   /** Use the PostgreSQL-backed limiter instead of the in-memory one. */
   dbLimiter?: boolean;
+  /** Keep the real OTP windows (the default limiter skips ahead between OTP requests; see `SteppingLimiter`). */
+  realOtpLimits?: boolean;
   clock?: () => Date;
 }
 
@@ -27,7 +55,11 @@ export async function buildTestApp(opts: BuildTestAppOptions) {
   const fakes = {
     sms: new MemorySms(),
     push: new MemoryPush(),
-    limiter: (opts.dbLimiter ? new DbLimiter(opts.sql) : new MemoryLimiter()) as Limiter,
+    limiter: (opts.dbLimiter
+      ? new DbLimiter(opts.sql)
+      : opts.realOtpLimits
+        ? new MemoryLimiter()
+        : new SteppingLimiter()) as Limiter,
     clock: opts.clock ?? (() => FIXED_NOW),
   };
   const app = await buildApp({

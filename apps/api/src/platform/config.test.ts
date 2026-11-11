@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { loadConfig } from "./config.js";
 
-const prod = { NODE_ENV: "production", JWT_SECRET: "a".repeat(40), SMS_GATEWAY: "sslwireless" };
+const prod = {
+  NODE_ENV: "production",
+  JWT_SECRET: "a".repeat(40),
+  OTP_PEPPER: "b".repeat(40),
+  SMS_GATEWAY: "sslwireless",
+};
 
 describe("config", () => {
   it("defaults work in development", () => {
@@ -15,6 +20,12 @@ describe("config", () => {
     expect(c.turnTtlSeconds).toBe(3600);
     expect(c.role).toBe("all");
     expect(Object.isFrozen(c)).toBe(true);
+  });
+
+  it("production requires OTP_PEPPER of at least 32 characters", () => {
+    expect(() => loadConfig({ ...prod, OTP_PEPPER: undefined })).toThrow(/OTP_PEPPER/);
+    expect(() => loadConfig({ ...prod, OTP_PEPPER: "x".repeat(31) })).toThrow(/OTP_PEPPER/);
+    expect(loadConfig({ ...prod, OTP_PEPPER: "x".repeat(32) }).otpPepper).toBe("x".repeat(32));
   });
 
   it("production rejects short JWT_SECRET", () => {

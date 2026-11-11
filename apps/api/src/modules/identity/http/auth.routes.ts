@@ -4,14 +4,15 @@ import { BdPhoneSchema } from "@amar-poribar/shared";
 import { parseOr400 } from "../../../platform/errors.js";
 import { refreshTokens } from "../app/refresh.js";
 import { requestOtp } from "../app/request-otp.js";
-import type { OtpStore, TokenService, UserRepo } from "../app/ports.js";
+import type { OtpService } from "../app/otp-service.js";
+import type { TokenService, UserRepo } from "../app/ports.js";
 import { verifyOtp } from "../app/verify-otp.js";
 import { docs } from "../../../platform/http/responses.js";
 
 const VerifySchema = z.object({ phone: BdPhoneSchema, code: z.string().regex(/^\d{6}$/) });
 
 export interface AuthRouteDeps {
-  otp: OtpStore;
+  otp: OtpService;
   users: UserRepo;
   tokens: TokenService;
   isProd: boolean;
@@ -20,7 +21,7 @@ export interface AuthRouteDeps {
 export function authRoutes(app: FastifyInstance, deps: AuthRouteDeps) {
   app.post("/v1/auth/otp/request", { schema: docs.object }, async (req) => {
     const { phone } = parseOr400(z.object({ phone: BdPhoneSchema }), req.body);
-    return requestOtp(deps, phone);
+    return requestOtp(deps, phone, req.ip);
   });
 
   app.post("/v1/auth/otp/verify", { schema: docs.object }, async (req) =>
