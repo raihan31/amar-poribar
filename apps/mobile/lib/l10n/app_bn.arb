@@ -89,6 +89,7 @@
   "onb_welcome_off": "বন্ধ",
   "onb_welcome_later": "পরে সেটিং থেকে বদলাতে পারবেন।",
   "onb_welcome_continue": "এগিয়ে চলুন",
+<<<<<<< HEAD
   "profile_title": "আমার প্রোফাইল",
   "profile_back": "পেছনে",
   "profile_edit": "বদলান",
@@ -118,5 +119,21 @@
   "profile_time": "{period} {time}",
   "@profile_time": {
     "placeholders": {"period": {"type": "String"}, "time": {"type": "String"}}
+||||||| 3164f40
+  "onb_welcome_continue": "এগিয়ে চলুন"
+=======
+  "auth_expired_title": "আবার ঢুকুন",
+  "auth_expired_body": "আপনার নিরাপত্তার জন্য কিছুদিন পর আবার ঢুকতে হয়। আপনার হিসাব ঠিকই আছে।",
+  "auth_expired_button": "নম্বর দিয়ে ঢুকুন",
+  "auth_expired_footer": "সাহায্য লাগলে বাড়ির কাউকে ফোন দিন।",
+  "auth_expired_otherUser": "এটি অন্য নম্বর। এই ফোনের আগের তথ্য মুছে ফেলব?",
+  "auth_expired_otherUserWipe": "হ্যাঁ, মুছে ফেলুন",
+  "auth_expired_otherUserKeep": "না",
+  "auth_inviteExpired_title": "আমন্ত্রণের মেয়াদ শেষ",
+  "auth_inviteExpired_body": "কোনো সমস্যা নেই। যিনি ডেকেছিলেন, তাঁকে নতুন লিংক পাঠাতে বলুন।",
+  "auth_inviteExpired_nudge": "{inviter}কে কম্পন দিন",
+  "@auth_inviteExpired_nudge": {
+    "placeholders": {"inviter": {"type": "String"}}
+>>>>>>> task/T-MOB-16-a1
   }
 }

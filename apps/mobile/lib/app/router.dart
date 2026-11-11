@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/auth/ui/login_screen.dart';
+import '../features/auth/ui/session_expired_screen.dart';
 import '../features/onboarding/ui/welcome_screen.dart';
 import '../features/settings/ui/profile_screen.dart';
 import '../features/voice/ui/voice_fallback_screen.dart';

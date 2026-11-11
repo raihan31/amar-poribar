@@ -66,6 +66,7 @@ Future<(GoRouter, FakeAuth, ProviderContainer)> _pump(
     overrides: [
       localStoreProvider.overrideWithValue(store),
       authProvider.overrideWith((ref) => fake),
+      tokenStoreProvider.overrideWithValue(_MemoryTokens()),
       welcomeDoneProvider.overrideWith((ref) => welcomeDone),
       placeholderBuilderProvider.overrideWithValue(_scrolling),
     ],
@@ -146,7 +147,7 @@ void main() {
     expect(uri.path, '/session-expired');
     expect(uri.queryParameters['from'], '/budget');
 
-    await tester.tap(find.text('আবার লগইন করুন'));
+    await tester.tap(find.byKey(const Key('session_expired_sign_in')));
     await tester.pumpAndSettle();
     expect(_loc(router), startsWith('/login'));
     auth.set(_signedIn);
