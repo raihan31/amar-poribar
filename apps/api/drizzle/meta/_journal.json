@@ -36,6 +36,13 @@
       "when": 1794374156906,
       "tag": "0004_notifications_init",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794376524403,
+      "tag": "0005_families_schema",
+      "breakpoints": true
     }
   ]
 }

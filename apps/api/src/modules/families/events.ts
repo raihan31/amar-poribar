@@ -2,8 +2,10 @@ import type { Role } from "@amar-poribar/shared";
 
 export interface FamilyCreatedPayload {
   familyId: string;
-  createdBy: string;
+  ownerUserId: string;
   name: string;
+  /** ISO-8601 */
+  createdAt: string;
 }
 export interface MemberJoinedPayload {
   familyId: string;

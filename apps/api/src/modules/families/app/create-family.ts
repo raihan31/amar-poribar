@@ -10,7 +10,12 @@ export async function createFamily(deps: FamiliesDeps, input: { name: string; us
     await deps.bus.publish(
       tx,
       "families.FamilyCreated.v1",
-      { familyId: family.id, createdBy: input.userId, name: input.name },
+      {
+        familyId: family.id,
+        ownerUserId: input.userId,
+        name: family.name,
+        createdAt: family.createdAt.toISOString(),
+      },
       { familyId: family.id },
     );
     return family;

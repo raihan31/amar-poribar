@@ -94,7 +94,7 @@ export const ParseResponseSchema = z.object({
 export type ParseResponse = z.infer<typeof ParseResponseSchema>;
 
 export const CreateFamilySchema = z.object({
-  name: z.string().min(1).max(80),
+  name: z.string().trim().min(1).max(80),
 });
 export type CreateFamilyInput = z.infer<typeof CreateFamilySchema>;
 

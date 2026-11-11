@@ -215,7 +215,12 @@ describe("ledger routes (db)", () => {
       const userId = "22222222-2222-4222-8222-222222222222";
       await expect(
         db.transaction(async (tx) => {
-          await bus.publish(tx, "families.FamilyCreated.v1", { familyId, createdBy: userId, name: "x" });
+          await bus.publish(tx, "families.FamilyCreated.v1", {
+            familyId,
+            ownerUserId: userId,
+            name: "x",
+            createdAt: new Date().toISOString(),
+          });
           const seeded = await tx.execute<{ n: number }>(
             q`select count(*)::int as n from ledger.categories where family_id = ${familyId}`,
           );
