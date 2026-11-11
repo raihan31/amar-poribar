@@ -11,6 +11,16 @@ export const webBn = {
   "category.label": "ক্যাটাগরি",
   "category.pick": "ক্যাটাগরি বাছাই করুন",
   "relative.now": "এইমাত্র",
+  "nav.home": "হোম",
+  "nav.chat": "কথা",
+  "nav.list": "তালিকা",
+  "nav.budget": "বাজেট",
+  "nav.family": "পরিবার",
+  "nav.main": "প্রধান মেনু",
+  "nav.unread": "{n}টি নতুন",
+  "nav.back": "পেছনে",
+  "nav.settings": "সেটিংস",
+  "role.readOnly": "আপনি শুধু দেখতে পারবেন।",
 } as const;
 
 export type WebKey = keyof typeof webBn;
@@ -27,4 +37,14 @@ export const webEn: Record<WebKey, string> = {
   "category.label": "Category",
   "category.pick": "Choose a category",
   "relative.now": "just now",
+  "nav.home": "Home",
+  "nav.chat": "Chat",
+  "nav.list": "List",
+  "nav.budget": "Budget",
+  "nav.family": "Family",
+  "nav.main": "Main menu",
+  "nav.unread": "{n} new",
+  "nav.back": "Back",
+  "nav.settings": "Settings",
+  "role.readOnly": "You can only view this.",
 };
