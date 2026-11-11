@@ -11,6 +11,7 @@ export const PUBLIC_ROUTE_PATTERNS: readonly RegExp[] = [
   /^\/v1\/auth\//,
   /^\/v1\/flags(\/|$)/,
   /^\/v1\/invites\/[^/]+\/preview$/,
+  /^\/v1\/webhooks\//,
 ];
 
 export const isPublicRoute = (url: string) => PUBLIC_ROUTE_PATTERNS.some((p) => p.test(url));

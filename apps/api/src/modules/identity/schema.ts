@@ -51,3 +51,14 @@ export const sessions = identitySchema.table(
   },
   (t) => [index("sessions_user_id_idx").on(t.userId), index("sessions_chain_id_idx").on(t.chainId)],
 );
+
+/** One row per SMS handed to a gateway; receipts update `status` (T-ID-03). Only the phone digest is stored. */
+export const smsDeliveries = identitySchema.table("sms_deliveries", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  phoneHash: text("phone_hash").notNull(),
+  provider: text("provider").notNull(),
+  providerId: text("provider_id").notNull(),
+  status: text("status").notNull().default("sent"),
+  sentAt: timestamp("sent_at", { withTimezone: true }).defaultNow(),
+  deliveredAt: timestamp("delivered_at", { withTimezone: true }),
+});

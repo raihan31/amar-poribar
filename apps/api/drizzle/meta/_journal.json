@@ -71,6 +71,13 @@
       "when": 1794380479208,
       "tag": "0009_identity_sessions",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794381467727,
+      "tag": "0010_sms_deliveries",
+      "breakpoints": true
     }
   ]
 }

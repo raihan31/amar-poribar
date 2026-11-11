@@ -50,6 +50,8 @@ describe("openapi", () => {
     // Test-support routes (PUSH_DRIVER=fake sink) are hidden on purpose.
     registered.delete("GET /test/push-sink");
     registered.delete("DELETE /test/push-sink");
+    // Fake SMS gateway inspection (non-production only).
+    registered.delete("GET /v1/dev/sms/last");
     expect([...registered].filter((r) => !documented.has(r))).toEqual([]);
   });
 
