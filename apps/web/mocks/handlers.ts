@@ -60,6 +60,16 @@ export const handlers: HttpHandler[] = [
       usedAi: false,
     });
   }),
+  // Mock-mode sign-in: code 123456 works, anything else is a wrong code (5 tries).
+  http.post("*/api/auth/otp/request", () => HttpResponse.json({ sent: true, devCode: "123456" })),
+  http.post("*/api/auth/otp/verify", async ({ request }) => {
+    const { code } = (await request.json()) as { code?: string };
+    if (code === "123456") return HttpResponse.json({ ok: true, user: demo.me, families: [demo.family] });
+    return HttpResponse.json(
+      { error: { code: "otp_invalid", message: "Invalid code", details: { attemptsLeft: 4 } } },
+      { status: 401 },
+    );
+  }),
 ];
 
 /**
