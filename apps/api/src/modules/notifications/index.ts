@@ -1,5 +1,7 @@
 import type { InboxKind } from "@amar-poribar/shared";
 import type { ModuleContext, ModuleDefinition } from "../../platform/module.js";
+import { createNotifier, type Notifier, type NotifierIdentity } from "./app/notifier.js";
+import type { NotifyInput, NotifyResult, Preferences } from "./app/notify-types.js";
 import { isQuietNowFor, readPreferences } from "./app/preferences.js";
 import { preferencesRoutes } from "./http/preferences-routes.js";
 import { notificationsRoutes } from "./http/routes.js";
@@ -19,51 +21,19 @@ export class NotImplemented extends Error {
   }
 }
 
-export type NotifyInput = {
-  userIds: string[];
-  familyId?: string;
-  kind: InboxKind;
-  /** Template parameters. */
-  params: Record<string, string | number>;
-  data?: Record<string, unknown>;
-  dedupeKey?: string;
-  push?: {
-    priority: "high" | "normal";
-    channel: "nudge" | "chat" | "alerts" | "reminders" | "calls";
-  };
-  skipInbox?: boolean;
-};
+export type { DeliveryChannel, InboxItemDto, NotifyInput, NotifyResult, Preferences } from "./app/notify-types.js";
 
-export type InboxItemDto = {
-  id: string;
-  kind: InboxKind;
-  familyId: string | null;
-  title: string;
-  body: string;
-  speechText: string;
-  data: Record<string, unknown>;
-  createdAt: string;
-  readAt: string | null;
-  seq: number;
-};
+/** One notifier per database handle, set in `register`. */
+const notifiers = new WeakMap<object, Notifier>();
 
-export type Preferences = {
-  /** Kind to enabled; a missing kind is enabled. */
-  kinds: Partial<Record<InboxKind, boolean>>;
-  /** "HH:mm" in Asia/Dhaka. */
-  quietStart: string;
-  quietEnd: string;
-  dailyReminderTime: string;
-  dailyReminderEnabled: boolean;
-  hidePresence: boolean;
-};
-
-export type NotifyResult = { delivered: Record<string, "socket" | "push" | "inbox_only"> };
-
-/** Delivers a notification to inbox, socket and push. Implemented in a later T-NOTIF task. */
+/**
+ * Delivers a notification: socket if the user is connected, else push, and always an inbox row
+ * (FR-NOTIF-07). Every module calls this one function so delivery behaves the same everywhere.
+ */
 export function notify(ctx: ModuleContext, input: NotifyInput): Promise<NotifyResult> {
-  void [ctx, input];
-  return Promise.reject(new NotImplemented("notify"));
+  const notifier = notifiers.get(ctx.db);
+  if (!notifier) return Promise.reject(new NotImplemented("notify (notifications module is not registered)"));
+  return notifier.notify(input);
 }
 
 /** Reads a user's preferences, with defaults when no row exists. */
@@ -96,7 +66,7 @@ export const notificationsModule: ModuleDefinition<NotificationsFacade> = {
   async register(app, ctx) {
     notificationsRoutes(app);
     preferencesRoutes(app, { db: ctx.db });
-    // Chosen by PUSH_DRIVER; handed to app/notifier.ts in a later task.
+    // Chosen by PUSH_DRIVER; handed to app/notifier.ts below.
     const cfg = (ctx.config ?? {}) as { pushDriver?: "fcm" | "fake"; fcmCredentialsJson?: string };
     let sender: PushSender;
     if (cfg.pushDriver === "fcm") {
@@ -112,7 +82,36 @@ export const notificationsModule: ModuleDefinition<NotificationsFacade> = {
       testSinkRoutes(app, fake);
       sender = fake;
     }
-    void sender;
+    const identity = notifierIdentity(ctx);
+    const notifier = createNotifier({
+      db: ctx.db,
+      identity,
+      sender,
+      getPreferences: (userId) => readPreferences(ctx.db, userId),
+      hub: ctx.realtime,
+      jobs: ctx.jobs,
+      clock: ctx.clock,
+      onError: (err, what) => ctx.logger.warn({ err }, `notifications: ${what} failed`),
+    });
+    ctx.jobs.register(notifier.retryJob);
+    notifiers.set(ctx.db, notifier);
     return { name: "notifications", notify, getPreferences, isQuietNow };
   },
 };
+
+/** Device directory calls that identity gains in T-ID-09; until then there are no push targets. */
+interface DeviceDirectory {
+  listPushTargets: NotifierIdentity["listPushTargets"];
+  removeDeviceToken: NotifierIdentity["removeDeviceToken"];
+}
+
+function notifierIdentity(ctx: ModuleContext): NotifierIdentity {
+  const identity = ctx.facades.identity;
+  if (!identity) throw new Error("notifications: identity facade is required");
+  const devices = identity as Partial<DeviceDirectory>;
+  return {
+    getProfile: (id) => identity.getUser(id),
+    listPushTargets: (ids) => devices.listPushTargets?.(ids) ?? Promise.resolve([]),
+    removeDeviceToken: (token) => devices.removeDeviceToken?.(token) ?? Promise.resolve(),
+  };
+}

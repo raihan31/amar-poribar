@@ -4,9 +4,12 @@ import {
   bigint,
   boolean,
   check,
+  date,
   index,
+  integer,
   jsonb,
   pgSchema,
+  primaryKey,
   text,
   time,
   timestamp,
@@ -60,3 +63,17 @@ export const preferences = notificationsSchema.table("preferences", {
   hidePresence: boolean("hide_presence").notNull().default(false),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/** Per-day delivery counters by channel and kind, read by the admin dashboard (T-ADM-12). */
+export const deliveryStats = notificationsSchema.table(
+  "delivery_stats",
+  {
+    day: date("day").notNull(),
+    /** "socket" | "push" | "inbox_only". */
+    channel: text("channel").notNull(),
+    kind: text("kind").notNull(),
+    ok: integer("ok").notNull().default(0),
+    failed: integer("failed").notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.day, t.channel, t.kind] })],
+);

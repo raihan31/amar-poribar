@@ -6,8 +6,8 @@ describe("notifications module", () => {
     expect(notificationsModule.name).toBe("notifications");
   });
 
-  it("stubs throw NotImplemented", async () => {
-    const ctx = {} as never;
+  it("notify rejects before the module is registered", async () => {
+    const ctx = { db: {} } as never;
     await expect(notify(ctx, { userIds: [], kind: "system", params: {} })).rejects.toBeInstanceOf(NotImplemented);
   });
 });
