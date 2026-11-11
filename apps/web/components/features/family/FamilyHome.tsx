@@ -28,7 +28,6 @@ export function FamilyHome({ onLogout }: { onLogout: () => void }) {
   // Selected month lives in a ref so changing it does not re-run the initial load below.
   const monthRef = useRef<string | null>(null);
   const [meId, setMeId] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
 
   const handle = useCallback(
     (e: unknown) => {
@@ -54,25 +53,10 @@ export function FamilyHome({ onLogout }: { onLogout: () => void }) {
 
   useEffect(() => {
     (async () => {
-      // An invite link looks like /?invite=TOKEN; accept it once the user is signed in.
-      let joinedId: string | null = null;
-      const inviteToken = new URLSearchParams(window.location.search).get("invite");
-      if (inviteToken) {
-        try {
-          const res = await api<{ familyId: string }>(`/v1/invites/${encodeURIComponent(inviteToken)}/accept`, {
-            method: "POST",
-            body: {},
-          });
-          joinedId = res.familyId;
-          setNotice(t("joined"));
-        } catch (e) {
-          setError((e as Error).message);
-        }
-        window.history.replaceState(null, "", window.location.pathname);
-      }
+      // Invite links are handled by /join/[token]; the legacy /?invite=T redirects there.
       const me = await api<{ user: { id: string }; families: Family[] }>("/v1/me", {});
       setMeId(me.user.id);
-      const fam = me.families.find((f) => f.id === joinedId) ?? me.families[0] ?? null;
+      const fam = me.families[0] ?? null;
       setFamily(fam);
       if (fam) await refresh(fam);
     })()
@@ -140,7 +124,6 @@ export function FamilyHome({ onLogout }: { onLogout: () => void }) {
           }}
         />
       )}
-      {notice && <p className="notice">{notice}</p>}
       {error && <p className="error">{error}</p>}
       <button className="secondary" onClick={onLogout}>
         {t("common.logout")}
