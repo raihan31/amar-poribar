@@ -16,7 +16,7 @@ function readFid(): string | null {
   return m?.[1] ? decodeURIComponent(m[1]) : null;
 }
 
-function writeFid(id: string) {
+export function writeFid(id: string) {
   document.cookie = `${FID_COOKIE}=${encodeURIComponent(id)}; path=/; max-age=31536000; samesite=lax`;
 }
 
