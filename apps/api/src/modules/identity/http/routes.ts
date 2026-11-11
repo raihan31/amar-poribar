@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { authRoutes } from "./auth.routes.js";
+import { authRoutes } from "./auth-routes.js";
 import { meRoutes } from "./me-routes.js";
 
 /** Identity's HTTP routes. More arrive with T-ID-04..08. */

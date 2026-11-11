@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { Db } from "../../../platform/db.js";
 import type { UserRepo } from "../app/ports.js";
 import { users } from "../schema.js";
@@ -24,6 +24,24 @@ export function createUserRepo(db: Db): UserRepo {
         .onConflictDoUpdate({ target: users.phone, set: { updatedAt: new Date() } })
         .returning({ id: users.id });
       return { id: row!.id };
+    },
+    async signInByPhone(phone) {
+      const [row] = await db
+        .insert(users)
+        .values({ phone })
+        .onConflictDoUpdate({ target: users.phone, set: { updatedAt: new Date() } })
+        .returning({
+          id: users.id,
+          erasedAt: users.erasedAt,
+          erasureRequestedAt: users.erasureRequestedAt,
+          isNew: sql<boolean>`(xmax = 0)`,
+        });
+      return {
+        id: row!.id,
+        isNew: row!.isNew,
+        erasedAt: row!.erasedAt,
+        erasurePending: row!.erasureRequestedAt !== null,
+      };
     },
     async findByPhone(phone) {
       const [row] = await db.select({ id: users.id }).from(users).where(eq(users.phone, phone));

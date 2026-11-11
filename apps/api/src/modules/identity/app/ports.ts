@@ -65,6 +65,8 @@ export interface UserRepo {
   /** Updates the given profile columns and `updated_at`; null when the user does not exist or is erased. */
   updateProfile(userId: string, patch: ProfilePatch): Promise<UserBasics | null>;
   upsertByPhone(phone: string): Promise<{ id: string }>;
+  /** Sign-in upsert: creates the user or touches `updated_at`, and reports whether it was created and the erasure state. */
+  signInByPhone(phone: string): Promise<{ id: string; isNew: boolean; erasedAt: Date | null; erasurePending: boolean }>;
   findByPhone(phone: string): Promise<{ id: string } | null>;
   getBasics(userId: string): Promise<UserBasics | null>;
   getManyBasics(ids: readonly string[]): Promise<UserBasics[]>;

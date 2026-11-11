@@ -105,6 +105,7 @@ const META: Record<VectorName, Meta> = {
   "sync-request": { op: `POST ${FAMILY_PATH}/sync`, kind: "request", status: 200 },
   "sync-response": { op: `POST ${FAMILY_PATH}/sync`, kind: "response", status: 200 },
   error: { op: `PATCH ${FAMILY_PATH}/transactions/{txnId}`, kind: "response", status: 404 },
+  errors: { op: "POST /v1/auth/otp/verify", kind: "response", status: 401 },
 };
 
 const BODIES: Record<VectorName, unknown> = {
@@ -219,6 +220,12 @@ const BODIES: Record<VectorName, unknown> = {
     },
   },
   error: { error: { code: "not_found", message: "Transaction not found" } },
+  // Sign-in failures the mobile client maps to messages (T-ID-04).
+  errors: [
+    { error: { code: "otp_invalid", message: "Invalid code", details: { attemptsLeft: 4 } } },
+    { error: { code: "otp_expired", message: "Code expired" } },
+    { error: { code: "otp_rate_limited", message: "Too many requests", details: { retryAfterSeconds: 42 } } },
+  ],
 };
 
 function sortKeys(v: unknown): unknown {

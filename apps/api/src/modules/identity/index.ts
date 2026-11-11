@@ -1,3 +1,7 @@
+import { isUnavailablePort } from "../../platform/ports/index.js";
+import type { SmsGateway as SmsPort } from "../../platform/ports/sms-gateway.js";
+import type { SmsGateway as ProviderGateway } from "./infra/sms/sms-gateway.js";
+import { randomUUID } from "node:crypto";
 import { HttpError } from "../../platform/errors.js";
 import type { ModuleContext, ModuleDefinition } from "../../platform/module.js";
 import type { UserBasics } from "./app/ports.js";
@@ -82,6 +86,16 @@ function smsConfig(ctx: ModuleContext): SmsConfig & { smsWebhookSecret: string |
   };
 }
 
+/** Adapts a provider gateway to the platform SMS port. */
+function portFor(gateway: ProviderGateway): SmsPort {
+  return {
+    async send(msg) {
+      const { providerId } = await gateway.send({ to: msg.to, text: msg.text, reference: randomUUID() });
+      return { providerId, status: "sent" };
+    },
+  };
+}
+
 function identityConfig(ctx: ModuleContext): IdentityConfig {
   const c = ctx.config as Partial<IdentityConfig> | undefined;
   if (!c?.jwtSecret) throw new Error("identity: ctx.config.jwtSecret is required");
@@ -108,11 +122,19 @@ export const identityModule: ModuleDefinition<IdentityFacade> = {
     ctx.jobs.register(purgeSessionsJob({ db: ctx.db, clock: ctx.clock }));
     const devices = createDeviceRepo(ctx.db);
     ctx.jobs.register(purgeDevicesJob({ db: ctx.db, clock: ctx.clock }));
-    registerIdentityRoutes(app, { otp, users, sessions, isProd: config.isProd });
     deviceRoutes(app, { devices, clock: ctx.clock });
     // SMS delivery (T-ID-03). Built here so production refuses to start with the fake or without credentials.
     const sms = smsConfig(ctx);
     const gateway = createSmsGateway(sms);
+    // The platform port (memory fake in tests, injectable) unless a real provider is configured without an injected one.
+    const otpSms = isUnavailablePort(ctx.ports.sms) ? portFor(gateway) : ctx.ports.sms;
+    registerIdentityRoutes(app, {
+      otp,
+      users,
+      sessions,
+      sms: otpSms,
+      exposeDevCode: !sms.isProd && sms.smsGateway === "fake",
+    });
     if (!sms.isProd && gateway instanceof FakeSmsGateway) devSmsRoutes(app, gateway);
     smsWebhookRoutes(app, {
       secret: sms.smsWebhookSecret,
