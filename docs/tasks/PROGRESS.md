@@ -241,8 +241,8 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-WEB-08 | M2 | todo |  |  |  |
 | T-WEB-09 | M2 | todo |  |  |  |
 | T-WEB-10 | M1 | done | b370d3fa4 | 2026-11-11 |  |
-| T-WEB-11 | M1 | todo |  |  |  |
-| T-WEB-12 | M1 | todo |  |  |  |
+| T-WEB-11 | M1 | done | abf4271 | 2026-11-11 |  |
+| T-WEB-12 | M1 | done | 98b1709 | 2026-11-11 |  |
 | T-WEB-13 | M2 | todo |  |  |  |
 | T-WEB-14 | M2 | todo |  |  |  |
 | T-WEB-15 | M2 | todo |  |  |  |
