@@ -65,6 +65,10 @@ export const handlers: HttpHandler[] = [
       byAccount: [],
     });
   }),
+  http.get(`${F}/presence`, () =>
+    HttpResponse.json(demo.members.map((m, i) => ({ userId: m.userId, online: i % 2 === 0, lastSeenAt: null }))),
+  ),
+  http.get(`${F}/activity`, () => HttpResponse.json([])),
   http.get(`${F}/ai/summary`, ({ request }) => {
     const month = new URL(request.url).searchParams.get("month") ?? "2026-01";
     return HttpResponse.json({
