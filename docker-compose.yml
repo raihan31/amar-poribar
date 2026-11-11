@@ -4,7 +4,7 @@
 #   db    -> localhost:5432          (host port: DB_PORT)
 #   fakes -> http://localhost:4100   (host port: FAKES_PORT)
 #   minio -> :9000 API, :9001 console (MINIO_PORT, MINIO_CONSOLE_PORT); coturn -> :3478
-#   admin -> http://localhost:3100   (profile "admin": docker compose --profile admin up)
+#   admin -> http://localhost:3100   (host port: ADMIN_PORT)
 # If a port is taken, pick another, e.g.: API_PORT=4001 WEB_PORT=3001 DB_PORT=5434 docker compose up --build
 services:
   db:
@@ -166,10 +166,10 @@ services:
       timeout: 3s
       retries: 40
 
-  # Profile "admin" until the admin console exists (T-ADMUI).
   admin:
-    profiles: ["admin"]
     build: { context: ., target: admin }
+    environment:
+      API_URL: http://api:4000
     ports:
       - "${ADMIN_PORT:-3100}:3100"
     depends_on:

@@ -44,12 +44,11 @@ WORKDIR /repo/apps/web
 EXPOSE 3000
 CMD ["pnpm", "start"]
 
-# Placeholder server until T-ADMUI-01 replaces apps/admin with the Next standalone build.
 FROM build AS admin
-ENV NODE_ENV=production PORT=3100
+ENV NODE_ENV=production
 WORKDIR /repo/apps/admin
 EXPOSE 3100
-CMD ["node", "server.mjs"]
+CMD ["pnpm", "start"]
 
 FROM build AS fakes
 ENV NODE_ENV=production

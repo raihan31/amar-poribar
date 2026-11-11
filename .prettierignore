@@ -12,3 +12,4 @@ tools/orchestrate/graph.json
 apps/api/openapi.json
 coverage
 apps/web/lib/api/schema.d.ts
+apps/admin/lib/api/schema.d.ts
