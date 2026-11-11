@@ -1,3 +1,4 @@
+import { MemorySms } from "../../platform/ports/fakes/memory-sms.js";
 import Fastify from "fastify";
 import { describe, expect, it } from "vitest";
 import { buildTestApp, type Tokens } from "../../../tests/support/app-test.js";
@@ -75,6 +76,7 @@ describe("device registry (db)", () => {
         config: testConfig(),
         limiter: new MemoryLimiter(),
         jobs: createJobs({ inline: true }),
+        ports: { sms: new MemorySms() },
         clock: () => new Date(),
       } as unknown as ModuleContext;
       const f = await identityModule.register(app, ctx);
