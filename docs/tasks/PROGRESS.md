@@ -56,7 +56,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-FAM-05 | M1 | done | 9590af9b3 | 2026-11-11 |  |
 | T-FAM-06 | M1 | done | a12bedca5 | 2026-11-11 |  |
 | T-FAM-07 | M5 | todo |  |  |  |
-| T-FAM-08 | M5 | todo |  |  |  |
+| T-FAM-08 | M5 | done | c0d6745 | 2026-11-11 |  |
 | T-FAM-09 | M5 | todo |  |  |  |
 | T-LED-01 | M2 | done | 5eb8b42 | 2026-11-11 |  |
 | T-LED-02 | M2 | todo |  |  |  |
@@ -69,21 +69,21 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-LED-09 | M7 | todo |  |  |  |
 | T-LED-10 | M7 | todo |  |  |  |
 | T-LED-11 | M7 | todo |  |  |  |
-| T-BUD-01 | M2 | todo |  |  |  |
+| T-BUD-01 | M2 | done | 714fcb0 | 2026-11-11 |  |
 | T-BUD-02 | M2 | todo |  |  |  |
 | T-BUD-03 | M2 | todo |  |  |  |
 | T-BUD-04 | M7 | todo |  |  |  |
 | T-REC-01 | M7 | todo |  |  |  |
 | T-REC-02 | M7 | todo |  |  |  |
 | T-REC-03 | M7 | todo |  |  |  |
-| T-AI-01 | M2 | todo |  |  |  |
+| T-AI-01 | M2 | done | 00a3169 | 2026-11-11 |  |
 | T-AI-02 | M2 | todo |  |  |  |
 | T-AI-03 | M2 | todo |  |  |  |
 | T-AI-04 | M7 | todo |  |  |  |
 | T-AI-05 | M7 | todo |  |  |  |
 | T-AI-06 | M7 | todo |  |  |  |
 | T-AI-07 | M5 | todo |  |  |  |
-| T-REP-01 | M2 | todo |  |  |  |
+| T-REP-01 | M2 | done | 2c3538f | 2026-11-11 |  |
 | T-REP-02 | M7 | todo |  |  |  |
 | T-REP-03 | M7 | todo |  |  |  |
 | T-REP-04 | M7 | todo |  |  |  |
@@ -182,7 +182,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-MOB-26 | M2 | done | 6db3b76bd | 2026-11-11 |  |
 | T-MOB-27 | M2 | todo |  |  |  |
 | T-MOB-28 | M2 | todo |  |  |  |
-| T-MOB-29 | M2 | todo |  |  |  |
+| T-MOB-29 | M2 | done | b325748 | 2026-11-11 |  |
 | T-MOB-30 | M2 | todo |  |  |  |
 | T-MOB-31 | M2 | todo |  |  |  |
 | T-MOB-32 | M2 | todo |  |  |  |
@@ -275,7 +275,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-ADMUI-01 | M5 | done | 5893f47 | 2026-11-11 |  |
 | T-ADMUI-02 | M5 | done | e8a055bb4 | 2026-11-11 |  |
 | T-ADMUI-03 | M5 | todo |  |  |  |
-| T-ADMUI-04 | M5 | todo |  |  |  |
+| T-ADMUI-04 | M5 | done | 0b9273e | 2026-11-11 |  |
 | T-ADMUI-05 | M5 | todo |  |  |  |
 | T-ADMUI-06 | M5 | todo |  |  |  |
 | T-ADMUI-07 | M5 | todo |  |  |  |
