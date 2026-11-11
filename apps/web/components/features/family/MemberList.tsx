@@ -13,14 +13,8 @@ const ROLE_LABEL: Record<RoleName, "roleOwner" | "roleAdmin" | "roleMember" | "r
 };
 
 /** Members, roles and invite links (FR-FAM-02, FR-FAM-03). */
-export function MemberList(props: {
-  token: string;
-  family: Family;
-  meId: string;
-  onError: (e: unknown) => void;
-  onLeft: () => void;
-}) {
-  const { token, family, meId, onError, onLeft } = props;
+export function MemberList(props: { family: Family; meId: string; onError: (e: unknown) => void; onLeft: () => void }) {
+  const { family, meId, onError, onLeft } = props;
   const [members, setMembers] = useState<Member[]>([]);
   const [role, setRole] = useState<RoleName>("member");
   const [link, setLink] = useState<string | null>(null);
@@ -29,8 +23,8 @@ export function MemberList(props: {
   const base = `/v1/families/${family.id}`;
 
   const load = useCallback(() => {
-    api<Member[]>(`${base}/members`, { token }).then(setMembers).catch(onError);
-  }, [base, token, onError]);
+    api<Member[]>(`${base}/members`, {}).then(setMembers).catch(onError);
+  }, [base, onError]);
   useEffect(load, [load]);
 
   /** Mirrors the server rules: only the owner manages admins; the owner is never changed. */
@@ -39,7 +33,7 @@ export function MemberList(props: {
 
   async function invite() {
     try {
-      const res = await api<{ token: string }>(`${base}/invites`, { token, body: { role } });
+      const res = await api<{ token: string }>(`${base}/invites`, { body: { role } });
       setLink(`${window.location.origin}/?invite=${res.token}`);
     } catch (e) {
       onError(e);
@@ -47,7 +41,7 @@ export function MemberList(props: {
   }
   async function changeRole(m: Member, next: RoleName) {
     try {
-      await api(`${base}/members/${m.userId}`, { method: "PATCH", token, body: { role: next } });
+      await api(`${base}/members/${m.userId}`, { method: "PATCH", body: { role: next } });
       load();
     } catch (e) {
       onError(e);
@@ -55,7 +49,7 @@ export function MemberList(props: {
   }
   async function remove(m: Member) {
     try {
-      await api(`${base}/members/${m.userId}`, { method: "DELETE", token });
+      await api(`${base}/members/${m.userId}`, { method: "DELETE" });
       if (m.userId === meId) onLeft();
       else load();
     } catch (e) {

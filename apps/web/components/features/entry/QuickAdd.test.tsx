@@ -40,7 +40,7 @@ describe("QuickAdd", () => {
   it("voice transcript is parsed and read back", async () => {
     let sentText = "";
     server.use(
-      http.post("http://localhost:4000/v1/families/f1/ai/parse", async ({ request }) => {
+      http.post("http://localhost:3000/api/proxy/v1/families/f1/ai/parse", async ({ request }) => {
         sentText = ((await request.json()) as { text: string }).text;
         return HttpResponse.json({
           drafts: [
@@ -63,7 +63,6 @@ describe("QuickAdd", () => {
     );
     render(
       <QuickAdd
-        token="tok"
         family={{ id: "f1", name: "F", role: "owner" }}
         categories={[{ id: "c1", key: "grocery", kind: "expense", nameBn: "বাজার", nameEn: "Grocery", icon: "🛒" }]}
         accounts={[]}

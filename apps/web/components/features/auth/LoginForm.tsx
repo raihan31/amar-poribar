@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { api } from "@/lib/api";
 
-export function LoginForm({ onLogin }: { onLogin: (token: string) => void }) {
+export function LoginForm({ onLogin }: { onLogin: () => void }) {
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [sent, setSent] = useState(false);
@@ -13,7 +13,7 @@ export function LoginForm({ onLogin }: { onLogin: (token: string) => void }) {
   async function requestOtp() {
     setError(null);
     try {
-      const res = await api<{ devCode?: string }>("/v1/auth/otp/request", { body: { phone } });
+      const res = await api<{ devCode?: string }>("/api/auth/otp/request", { body: { phone } });
       setSent(true);
       setHint(res.devCode ? `Dev OTP: ${res.devCode}` : null);
     } catch (e) {
@@ -24,8 +24,8 @@ export function LoginForm({ onLogin }: { onLogin: (token: string) => void }) {
   async function verify() {
     setError(null);
     try {
-      const res = await api<{ accessToken: string }>("/v1/auth/otp/verify", { body: { phone, code } });
-      onLogin(res.accessToken);
+      await api<{ ok: true }>("/api/auth/otp/verify", { body: { phone, code } });
+      onLogin();
     } catch (e) {
       setError((e as Error).message);
     }

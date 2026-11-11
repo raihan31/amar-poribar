@@ -8,7 +8,7 @@ import { BudgetList } from "./BudgetList";
 describe("BudgetList", () => {
   it("exceeded level shows the budgetExceeded word", async () => {
     server.use(
-      http.get("http://localhost:4000/v1/families/f1/budgets", () =>
+      http.get("http://localhost:3000/api/proxy/v1/families/f1/budgets", () =>
         HttpResponse.json({
           budgets: [
             {
@@ -26,7 +26,6 @@ describe("BudgetList", () => {
     );
     render(
       <BudgetList
-        token="tok"
         family={{ id: "f1", name: "F", role: "member" }}
         month="2026-03"
         categories={[]}

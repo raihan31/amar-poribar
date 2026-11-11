@@ -13,10 +13,8 @@ const members = [
 ];
 
 function setup(role: Family["role"], meId: string) {
-  server.use(http.get("http://localhost:4000/v1/families/f1/members", () => HttpResponse.json(members)));
-  render(
-    <MemberList token="tok" family={{ id: "f1", name: "F", role }} meId={meId} onError={() => {}} onLeft={() => {}} />,
-  );
+  server.use(http.get("http://localhost:3000/api/proxy/v1/families/f1/members", () => HttpResponse.json(members)));
+  render(<MemberList family={{ id: "f1", name: "F", role }} meId={meId} onError={() => {}} onLeft={() => {}} />);
 }
 
 describe("MemberList", () => {

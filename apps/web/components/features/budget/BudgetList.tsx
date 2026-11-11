@@ -7,7 +7,6 @@ import type { BudgetRow, Category, Family } from "@/lib/types";
 
 /** Monthly budgets with spend, 80%/100% alerts and (for owners and admins) editing (FR-BUD-01..03). */
 export function BudgetList(props: {
-  token: string;
   family: Family;
   month: string;
   categories: Category[];
@@ -15,7 +14,7 @@ export function BudgetList(props: {
   spentKey: number;
   onError: (e: unknown) => void;
 }) {
-  const { token, family, month, categories, spentKey, onError } = props;
+  const { family, month, categories, spentKey, onError } = props;
   const [rows, setRows] = useState<BudgetRow[]>([]);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<Record<string, string>>({});
@@ -24,10 +23,10 @@ export function BudgetList(props: {
   const OVERALL = "overall";
 
   const load = useCallback(() => {
-    api<{ budgets: BudgetRow[] }>(`/v1/families/${family.id}/budgets?month=${month}`, { token })
+    api<{ budgets: BudgetRow[] }>(`/v1/families/${family.id}/budgets?month=${month}`, {})
       .then((r) => setRows(r.budgets))
       .catch(onError);
-  }, [family.id, month, token, onError]);
+  }, [family.id, month, onError]);
   useEffect(load, [load, spentKey]);
 
   function startEdit() {
@@ -50,7 +49,7 @@ export function BudgetList(props: {
     }
     try {
       if (budgets.length) {
-        await api(`/v1/families/${family.id}/budgets?month=${month}`, { method: "PUT", token, body: { budgets } });
+        await api(`/v1/families/${family.id}/budgets?month=${month}`, { method: "PUT", body: { budgets } });
       }
       setEditing(false);
       load();

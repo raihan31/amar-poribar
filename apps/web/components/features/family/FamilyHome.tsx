@@ -12,7 +12,7 @@ import { SpokenSummary } from "../reports/SpokenSummary";
 import { CreateFamilyForm } from "./CreateFamilyForm";
 import { MemberList } from "./MemberList";
 
-export function FamilyHome({ token, onLogout }: { token: string; onLogout: () => void }) {
+export function FamilyHome({ onLogout }: { onLogout: () => void }) {
   const [family, setFamily] = useState<Family | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -33,22 +33,19 @@ export function FamilyHome({ token, onLogout }: { token: string; onLogout: () =>
     [onLogout],
   );
 
-  const refresh = useCallback(
-    async (fam: Family, m: string | null = monthRef.current) => {
-      const q = m ? `month=${m}` : "";
-      const [cats, accs, sum, ai] = await Promise.all([
-        api<Category[]>(`/v1/families/${fam.id}/categories`, { token }),
-        api<Account[]>(`/v1/families/${fam.id}/accounts`, { token }),
-        api<MonthSummary>(`/v1/families/${fam.id}/reports/summary?${q}`, { token }),
-        api<MonthlyAiSummary>(`/v1/families/${fam.id}/ai/summary?locale=bn${q ? `&${q}` : ""}`, { token }),
-      ]);
-      setCategories(cats);
-      setAccounts(accs);
-      setSummary(sum);
-      setAiSummary(ai);
-    },
-    [token],
-  );
+  const refresh = useCallback(async (fam: Family, m: string | null = monthRef.current) => {
+    const q = m ? `month=${m}` : "";
+    const [cats, accs, sum, ai] = await Promise.all([
+      api<Category[]>(`/v1/families/${fam.id}/categories`, {}),
+      api<Account[]>(`/v1/families/${fam.id}/accounts`, {}),
+      api<MonthSummary>(`/v1/families/${fam.id}/reports/summary?${q}`, {}),
+      api<MonthlyAiSummary>(`/v1/families/${fam.id}/ai/summary?locale=bn${q ? `&${q}` : ""}`, {}),
+    ]);
+    setCategories(cats);
+    setAccounts(accs);
+    setSummary(sum);
+    setAiSummary(ai);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -59,7 +56,6 @@ export function FamilyHome({ token, onLogout }: { token: string; onLogout: () =>
         try {
           const res = await api<{ familyId: string }>(`/v1/invites/${encodeURIComponent(inviteToken)}/accept`, {
             method: "POST",
-            token,
             body: {},
           });
           joinedId = res.familyId;
@@ -69,7 +65,7 @@ export function FamilyHome({ token, onLogout }: { token: string; onLogout: () =>
         }
         window.history.replaceState(null, "", window.location.pathname);
       }
-      const me = await api<{ user: { id: string }; families: Family[] }>("/v1/me", { token });
+      const me = await api<{ user: { id: string }; families: Family[] }>("/v1/me", {});
       setMeId(me.user.id);
       const fam = me.families.find((f) => f.id === joinedId) ?? me.families[0] ?? null;
       setFamily(fam);
@@ -77,13 +73,12 @@ export function FamilyHome({ token, onLogout }: { token: string; onLogout: () =>
     })()
       .catch(handle)
       .finally(() => setLoaded(true));
-  }, [token, refresh, handle]);
+  }, [refresh, handle]);
 
   if (!loaded) return <p className="muted">লোড হচ্ছে…</p>;
   if (!family)
     return (
       <CreateFamilyForm
-        token={token}
         onCreated={(f) => {
           setFamily(f);
           refresh(f).catch(handle);
@@ -94,7 +89,6 @@ export function FamilyHome({ token, onLogout }: { token: string; onLogout: () =>
   return (
     <>
       <QuickAdd
-        token={token}
         family={family}
         categories={categories}
         accounts={accounts}
@@ -113,7 +107,6 @@ export function FamilyHome({ token, onLogout }: { token: string; onLogout: () =>
       )}
       {summary && (
         <BudgetList
-          token={token}
           family={family}
           month={summary.month}
           categories={categories}
@@ -123,7 +116,6 @@ export function FamilyHome({ token, onLogout }: { token: string; onLogout: () =>
       )}
       {(family.role === "owner" || family.role === "admin") && (
         <ManageLists
-          token={token}
           family={family}
           categories={categories}
           accounts={accounts}
@@ -133,7 +125,6 @@ export function FamilyHome({ token, onLogout }: { token: string; onLogout: () =>
       )}
       {meId && (
         <MemberList
-          token={token}
           family={family}
           meId={meId}
           onError={handle}
