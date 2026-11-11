@@ -70,5 +70,35 @@
   "onb_welcome_on": "On",
   "onb_welcome_off": "Off",
   "onb_welcome_later": "You can change this later in Settings.",
-  "onb_welcome_continue": "Continue"
+  "onb_welcome_continue": "Continue",
+  "profile_title": "My profile",
+  "profile_back": "Back",
+  "profile_edit": "Edit",
+  "profile_nameLabel": "Your name",
+  "profile_language": "Language",
+  "profile_numbers": "Numbers",
+  "profile_simple": "Simple mode",
+  "profile_simpleBody": "Big text, pictures, everything read aloud",
+  "profile_remind": "Daily reminder",
+  "profile_changeTime": "Change time",
+  "profile_hide": "Hide my status",
+  "profile_hideBody": "Others will always see me as offline.",
+  "profile_privacy": "Privacy policy",
+  "profile_delete": "Delete my data",
+  "profile_saveFailed": "Could not save. Please try again.",
+  "profile_periodDawn": "AM",
+  "profile_periodSmallHours": "AM",
+  "profile_periodMorning": "AM",
+  "profile_periodNoon": "PM",
+  "profile_periodAfternoon": "PM",
+  "profile_periodEvening": "PM",
+  "profile_periodNight": "PM",
+  "profile_reminderAt": "at {time}",
+  "@profile_reminderAt": {
+    "placeholders": {"time": {"type": "String"}}
+  },
+  "profile_time": "{time} {period}",
+  "@profile_time": {
+    "placeholders": {"period": {"type": "String"}, "time": {"type": "String"}}
+  }
 }

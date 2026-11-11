@@ -88,5 +88,35 @@
   "onb_welcome_on": "চালু",
   "onb_welcome_off": "বন্ধ",
   "onb_welcome_later": "পরে সেটিং থেকে বদলাতে পারবেন।",
-  "onb_welcome_continue": "এগিয়ে চলুন"
+  "onb_welcome_continue": "এগিয়ে চলুন",
+  "profile_title": "আমার প্রোফাইল",
+  "profile_back": "পেছনে",
+  "profile_edit": "বদলান",
+  "profile_nameLabel": "আপনার নাম",
+  "profile_language": "ভাষা",
+  "profile_numbers": "সংখ্যা",
+  "profile_simple": "সহজ মোড",
+  "profile_simpleBody": "বড় লেখা, ছবি, সব শুনিয়ে দেবে",
+  "profile_remind": "রোজ মনে করান",
+  "profile_changeTime": "সময় বদলান",
+  "profile_hide": "আমার অবস্থা লুকাই",
+  "profile_hideBody": "অন্যরা আমাকে সবসময় অফলাইন দেখবে।",
+  "profile_privacy": "গোপনীয়তা নীতি",
+  "profile_delete": "আমার তথ্য মুছুন",
+  "profile_saveFailed": "বদলানো যায়নি। আবার চেষ্টা করুন।",
+  "profile_periodDawn": "ভোর",
+  "profile_periodSmallHours": "রাত",
+  "profile_periodMorning": "সকাল",
+  "profile_periodNoon": "দুপুর",
+  "profile_periodAfternoon": "বিকাল",
+  "profile_periodEvening": "সন্ধ্যা",
+  "profile_periodNight": "রাত",
+  "profile_reminderAt": "{time} টায়",
+  "@profile_reminderAt": {
+    "placeholders": {"time": {"type": "String"}}
+  },
+  "profile_time": "{period} {time}",
+  "@profile_time": {
+    "placeholders": {"period": {"type": "String"}, "time": {"type": "String"}}
+  }
 }
