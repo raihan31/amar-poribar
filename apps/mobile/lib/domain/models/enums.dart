@@ -1,16 +1,3 @@
-enum Role {
-  father,
-  mother,
-  child;
-
-  static Role fromString(String val) {
-    return Role.values.firstWhere(
-      (e) => e.name == val,
-      orElse: () => Role.child,
-    );
-  }
-}
-
 enum TransactionType {
   income,
   expense;

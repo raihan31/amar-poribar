@@ -8,7 +8,7 @@ import '../../core/l10n/locale_controller.dart';
 import '../../data/sync/nearby_transport.dart';
 import '../../data/sync/p2p_transport.dart';
 import '../../data/sync/peer_sync_engine.dart';
-import '../../domain/models/enums.dart';
+import '../../features/family/state/family_providers.dart';
 import '../providers/auth_provider.dart';
 import '../providers/providers.dart';
 
@@ -37,9 +37,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         title: Text(ctx.l10n.sync_nearby_askTitle),
-        content: Text(
-          ctx.l10n.sync_nearby_askBody(peer.name, peer.authCode),
-        ),
+        content: Text(ctx.l10n.sync_nearby_askBody(peer.name, peer.authCode)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -110,7 +108,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(appStateProvider);
+    final role = ref.watch(currentRoleProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.settings_title)),
@@ -119,12 +117,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.person),
             title: Text(context.l10n.settings_role_title),
-            subtitle: Text(state.activeRole.name.toUpperCase()),
+            subtitle: Text(role.name.toUpperCase()),
             trailing: const Icon(Icons.chevron_right),
           ),
           const Divider(),
-          if (state.activeRole == Role.father ||
-              state.activeRole == Role.mother) ...[
+          if (role.canManageMembers) ...[
             ListTile(
               leading: const Icon(Icons.qr_code),
               title: Text(context.l10n.settings_pair_title),
@@ -175,9 +172,7 @@ class PendingSmsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.settings_bankApprovals_title)),
-      body: Center(
-        child: Text(context.l10n.settings_bankApprovals_empty),
-      ),
+      body: Center(child: Text(context.l10n.settings_bankApprovals_empty)),
     );
   }
 }
