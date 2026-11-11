@@ -3,6 +3,10 @@ import type { ModuleContext, ModuleDefinition } from "../../platform/module.js";
 import { isQuietNowFor, readPreferences } from "./app/preferences.js";
 import { preferencesRoutes } from "./http/preferences-routes.js";
 import { notificationsRoutes } from "./http/routes.js";
+import { testSinkRoutes } from "./http/test-sink-routes.js";
+import { createFcmSender } from "./infra/fcm-sender.js";
+import { FakePushSender } from "./infra/fake-sender.js";
+import type { PushSender } from "./infra/push-sender.js";
 export * from "./events.js";
 
 export type { InboxKind };
@@ -89,9 +93,26 @@ declare module "../../platform/module.js" {
 export const notificationsModule: ModuleDefinition<NotificationsFacade> = {
   name: "notifications",
   dependsOn: ["identity", "families"],
-  register(app, ctx) {
+  async register(app, ctx) {
     notificationsRoutes(app);
     preferencesRoutes(app, { db: ctx.db });
+    // Chosen by PUSH_DRIVER; handed to app/notifier.ts in a later task.
+    const cfg = (ctx.config ?? {}) as { pushDriver?: "fcm" | "fake"; fcmCredentialsJson?: string };
+    let sender: PushSender;
+    if (cfg.pushDriver === "fcm") {
+      if (cfg.fcmCredentialsJson) {
+        sender = await createFcmSender(cfg.fcmCredentialsJson);
+      } else {
+        // An explicit PUSH_DRIVER=fcm without credentials is rejected by loadConfig; this is the production default.
+        ctx.logger.error("notifications: FCM_CREDENTIALS_JSON is not set; push sending is unavailable");
+        sender = { send: () => Promise.reject(new Error("push sender is not configured")) };
+      }
+    } else {
+      const fake = new FakePushSender(ctx.clock);
+      testSinkRoutes(app, fake);
+      sender = fake;
+    }
+    void sender;
     return { name: "notifications", notify, getPreferences, isQuietNow };
   },
 };
