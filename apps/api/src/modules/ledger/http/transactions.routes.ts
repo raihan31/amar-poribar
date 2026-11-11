@@ -30,10 +30,10 @@ export function transactionsRoutes(app: FastifyInstance, deps: LedgerDeps) {
     { ...opts, schema: docs.object },
     async (req, reply) => {
       const { familyId } = req.params;
-      await deps.families.requireRole(familyId, req.user.sub, "member", { write: true });
+      const { role } = await deps.families.requireRole(familyId, req.user.sub, "member", { write: true });
       const data = parseOr400(CreateTransactionSchema, req.body);
-      const row = await createTransaction(deps, { familyId, actorId: req.user.sub, data });
-      return reply.status(201).send(row);
+      const { row, created } = await createTransaction(deps, { familyId, actor: { userId: req.user.sub, role }, data });
+      return reply.status(created ? 201 : 200).send(row);
     },
   );
 

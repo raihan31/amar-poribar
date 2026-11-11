@@ -3,7 +3,7 @@ import { HttpError } from "../../../platform/errors.js";
 import { stampChange } from "../infra/stamp-change.js";
 import { transactionsRepo, type Transaction } from "../infra/transactions.repo.js";
 import type { LedgerDeps } from "./deps.js";
-import { publishTransaction } from "./publish.js";
+import { publishUpdated } from "./publish.js";
 import { assertRefs } from "./queries.js";
 
 /** FR-TXN-03: members edit their own entries; admins and owners edit any. */
@@ -25,7 +25,7 @@ export async function updateTransaction(
       ...(occurredAt ? { occurredAt: new Date(occurredAt) } : {}),
       ...stampChange(txn.hlc),
     });
-    await publishTransaction(deps.bus, tx, "ledger.TransactionUpdated.v1", row);
+    await publishUpdated(deps.bus, tx, row, txn);
     return row;
   });
 }
