@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/ui/login_screen.dart';
 import '../features/onboarding/ui/welcome_screen.dart';
+import '../features/settings/ui/profile_screen.dart';
 import '../features/voice/ui/voice_fallback_screen.dart';
 import '../presentation/providers/auth_provider.dart';
 import '../presentation/screens/ai_entry_screen.dart';
@@ -106,7 +107,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       stub(Routes.summary),
       stub(Routes.ask),
       simple(Routes.settings, (_) => const SettingsScreen()),
-      stub(Routes.profile),
+      simple(Routes.profile, (_) => const ProfileScreen()),
+      stub(Routes.consentPolicy),
       stub(Routes.accounts),
       stub(Routes.categories),
       stub(Routes.recurring),

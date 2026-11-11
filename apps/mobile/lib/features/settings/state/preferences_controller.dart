@@ -5,9 +5,8 @@ import '../../../core/l10n/locale_controller.dart';
 import '../../../core/money/money_format.dart';
 import '../../../core/money/numeral_style_provider.dart';
 import '../../../core/theme/ui_scale.dart';
-import '../../../data/api/api_providers.dart';
-import '../../../presentation/providers/auth_provider.dart';
 import '../../../presentation/providers/providers.dart';
+import '../data/profile_repository.dart';
 
 /// The person's own settings (FR-AUTH-04, FR-VOICE-09, FR-PRES-02, FR-NOT-02).
 class Preferences {
@@ -56,17 +55,12 @@ class PrefKeys {
   static const hidePresence = 'pref_hide_presence';
 }
 
-/// Pushes changed fields to the server when signed in. Tests override it.
+/// Sends changed fields to the server, or queues them (see `ProfileSync`). False when the server
+/// rejected the change. Tests override it.
 final preferencesPushProvider =
-    Provider<Future<void> Function(Map<String, dynamic> patch)>((ref) {
-  return (patch) async {
-    if (!ref.read(authProvider).signedIn) return;
-    try {
-      await ref.read(authApiProvider).updateProfile(patch);
-    } catch (_) {
-      // Stays local; the profile screen's queue (T-MOB-20) retries later.
-    }
-  };
+    Provider<Future<bool> Function(Map<String, dynamic> patch)>((ref) {
+  return (patch) =>
+      ref.read(profileSyncProvider).send(ProfilePatch.fromJson(patch));
 });
 
 /// Holds the preferences, keeps the app-wide providers (language, numerals, sizing) in step,
@@ -118,53 +112,52 @@ class PreferencesController extends StateNotifier<Preferences> {
         p.simpleMode ? UiScale.simple : UiScale.normal;
   }
 
-  Future<void> _push(Map<String, dynamic> patch) =>
-      _ref.read(preferencesPushProvider)(patch);
+  /// Applies [next] everywhere, stores it, then sends [patch]. If the server rejects the change
+  /// the previous values come back (optimistic update with rollback). Returns false on rollback.
+  Future<bool> _commit(Preferences next, Map<String, dynamic> patch) async {
+    final prev = state;
+    await _set(next);
+    final ok = await _ref.read(preferencesPushProvider)(patch);
+    if (!ok && mounted) await _set(prev);
+    return ok;
+  }
 
-  Future<void> setLocale(Locale locale) async {
-    if (locale.languageCode != 'bn' && locale.languageCode != 'en') return;
+  Future<void> _set(Preferences p) async {
+    state = p;
+    _apply(p);
+    final store = _ref.read(localStoreProvider);
+    await _ref.read(localeProvider.notifier).setLocale(p.locale);
+    await store.setMeta(PrefKeys.locale, p.locale.languageCode);
+    await store.setMeta(
+      PrefKeys.numerals,
+      p.numeralStyle == NumeralStyle.latin ? 'latin' : 'bangla',
+    );
+    await store.setMeta(PrefKeys.simple, p.simpleMode ? '1' : '0');
+    await store.setMeta(PrefKeys.reminder, p.reminderTime);
+    await store.setMeta(PrefKeys.hidePresence, p.hidePresence ? '1' : '0');
+  }
+
+  Future<bool> setLocale(Locale locale) async {
+    if (locale.languageCode != 'bn' && locale.languageCode != 'en') {
+      return true;
+    }
     final l = Locale(locale.languageCode);
-    state = state.copyWith(locale: l);
-    await _ref.read(localeProvider.notifier).setLocale(l);
-    await _ref
-        .read(localStoreProvider)
-        .setMeta(PrefKeys.locale, l.languageCode);
-    await _push({'locale': l.languageCode});
+    return _commit(state.copyWith(locale: l), {'locale': l.languageCode});
   }
 
-  Future<void> setNumeralStyle(NumeralStyle style) async {
-    state = state.copyWith(numeralStyle: style);
-    _ref.read(numeralStyleProvider.notifier).state = style;
-    await _ref.read(localStoreProvider).setMeta(
-          PrefKeys.numerals,
-          style == NumeralStyle.latin ? 'latin' : 'bangla',
-        );
-    await _push({'bnDigits': style == NumeralStyle.bangla});
-  }
+  Future<bool> setNumeralStyle(NumeralStyle style) => _commit(
+        state.copyWith(numeralStyle: style),
+        {'bnDigits': style == NumeralStyle.bangla},
+      );
 
-  Future<void> setSimpleMode(bool on) async {
-    state = state.copyWith(simpleMode: on);
-    _ref.read(uiScaleProvider.notifier).state =
-        on ? UiScale.simple : UiScale.normal;
-    await _ref
-        .read(localStoreProvider)
-        .setMeta(PrefKeys.simple, on ? '1' : '0');
-    await _push({'simpleMode': on});
-  }
+  Future<bool> setSimpleMode(bool on) =>
+      _commit(state.copyWith(simpleMode: on), {'simpleMode': on});
 
-  Future<void> setReminderTime(String hhmm) async {
-    state = state.copyWith(reminderTime: hhmm);
-    await _ref.read(localStoreProvider).setMeta(PrefKeys.reminder, hhmm);
-    await _push({'reminderTime': hhmm});
-  }
+  Future<bool> setReminderTime(String hhmm) =>
+      _commit(state.copyWith(reminderTime: hhmm), {'reminderTime': hhmm});
 
-  Future<void> setHidePresence(bool hide) async {
-    state = state.copyWith(hidePresence: hide);
-    await _ref
-        .read(localStoreProvider)
-        .setMeta(PrefKeys.hidePresence, hide ? '1' : '0');
-    await _push({'hidePresence': hide});
-  }
+  Future<bool> setHidePresence(bool hide) =>
+      _commit(state.copyWith(hidePresence: hide), {'hidePresence': hide});
 }
 
 final preferencesProvider =

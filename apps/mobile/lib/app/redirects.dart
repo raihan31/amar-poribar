@@ -11,6 +11,7 @@ class Routes {
   static const login = '/login';
   static const loginCode = '/login/code';
   static const consent = '/consent';
+  static const consentPolicy = '/consent/policy';
   static const join = '/join/:token';
   static const tutorial = '/tutorial';
   static const sessionExpired = '/session-expired';
