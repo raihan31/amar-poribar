@@ -89,7 +89,6 @@
   "onb_welcome_off": "বন্ধ",
   "onb_welcome_later": "পরে সেটিং থেকে বদলাতে পারবেন।",
   "onb_welcome_continue": "এগিয়ে চলুন",
-<<<<<<< HEAD
   "profile_title": "আমার প্রোফাইল",
   "profile_back": "পেছনে",
   "profile_edit": "বদলান",
@@ -119,9 +118,7 @@
   "profile_time": "{period} {time}",
   "@profile_time": {
     "placeholders": {"period": {"type": "String"}, "time": {"type": "String"}}
-||||||| 3164f40
-  "onb_welcome_continue": "এগিয়ে চলুন"
-=======
+  },
   "auth_expired_title": "আবার ঢুকুন",
   "auth_expired_body": "আপনার নিরাপত্তার জন্য কিছুদিন পর আবার ঢুকতে হয়। আপনার হিসাব ঠিকই আছে।",
   "auth_expired_button": "নম্বর দিয়ে ঢুকুন",
@@ -134,6 +131,5 @@
   "auth_inviteExpired_nudge": "{inviter}কে কম্পন দিন",
   "@auth_inviteExpired_nudge": {
     "placeholders": {"inviter": {"type": "String"}}
->>>>>>> task/T-MOB-16-a1
   }
 }
