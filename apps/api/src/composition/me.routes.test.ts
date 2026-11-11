@@ -1,34 +1,47 @@
-import { readFileSync } from "node:fs";
 import Fastify from "fastify";
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { describe, expect, it } from "vitest";
 import { registerErrorHandler } from "../platform/errors.js";
 import type { IdentityFacade } from "../modules/identity/index.js";
 import type { FamiliesFacade } from "../modules/families/index.js";
+import type { PrivacyFacade } from "../modules/privacy/index.js";
 import type { ModuleContext } from "../platform/module.js";
 import { meRoutes } from "./me.routes.js";
 
-const vector = JSON.parse(
-  readFileSync(new URL("../../../../packages/shared/test-vectors/api/me.json", import.meta.url), "utf8"),
-) as { body: { user: Record<string, unknown>; families: unknown[] } };
+const USER = {
+  id: "00000000-0000-4000-8000-0000000000a1",
+  phone: "+8801700000001",
+  name: "রহিম",
+  locale: "bn",
+  bnDigits: true,
+  createdAt: new Date("2026-10-05T08:22:00.000Z"),
+  updatedAt: new Date("2026-10-05T08:22:00.000Z"),
+};
+const FAMILY = {
+  id: "00000000-0000-4000-8000-000000000001",
+  name: "রহিম পরিবার",
+  role: "owner",
+  status: "active",
+  memberLimit: 3,
+  memberCount: 2,
+};
 
-async function build(user: Record<string, unknown> | null) {
+async function build(user: typeof USER | null, accepted = true) {
   const app = Fastify();
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
   registerErrorHandler(app);
   app.decorate("authenticate", async (req: { user: { sub: string } }) => {
-    req.user = { sub: String(vector.body.user.id) };
+    req.user = { sub: USER.id };
   });
-  const u = user && {
-    ...user,
-    createdAt: new Date(String(user.createdAt)),
-    updatedAt: new Date(String(user.updatedAt)),
-  };
   const ctx = {
     facades: {
-      identity: { getUserBasics: async () => u } as unknown as IdentityFacade,
-      families: { listMemberships: async () => vector.body.families } as unknown as FamiliesFacade,
+      identity: {
+        getUserBasics: async () => user,
+        hasAcceptedCurrentPolicy: async () => accepted,
+      } as unknown as IdentityFacade,
+      families: { listMemberships: async () => [FAMILY] } as unknown as FamiliesFacade,
+      privacy: { getCurrentPolicyVersion: () => "2026-11-01" } as unknown as PrivacyFacade,
     },
   } as unknown as ModuleContext;
   meRoutes(app, ctx);
@@ -37,11 +50,22 @@ async function build(user: Record<string, unknown> | null) {
 }
 
 describe("GET /v1/me", () => {
-  it("returns exactly the stored test vector", async () => {
-    const app = await build(vector.body.user);
+  it("composes the profile, the memberships and the consent state", async () => {
+    const app = await build(USER);
     const res = await app.inject({ method: "GET", url: "/v1/me" });
     expect(res.statusCode).toBe(200);
-    expect(res.json()).toEqual(vector.body);
+    expect(res.json()).toEqual({
+      user: { ...USER, createdAt: "2026-10-05T08:22:00.000Z", updatedAt: "2026-10-05T08:22:00.000Z" },
+      families: [FAMILY],
+      consents: { policyVersion: "2026-11-01", needsAcceptance: false },
+    });
+    await app.close();
+  });
+
+  it("needsAcceptance is true when the policy was not accepted", async () => {
+    const app = await build(USER, false);
+    const res = await app.inject({ method: "GET", url: "/v1/me" });
+    expect(res.json().consents.needsAcceptance).toBe(true);
     await app.close();
   });
 

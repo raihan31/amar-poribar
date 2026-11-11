@@ -46,6 +46,11 @@ export const familiesRepo = {
     return row ?? null;
   },
 
+  async rename(x: Executor, id: string, name: string, at: Date): Promise<FamilyRow | null> {
+    const [row] = await x.update(families).set({ name, updatedAt: at }).where(eq(families.id, id)).returning();
+    return row ?? null;
+  },
+
   /** Not accepted, not revoked and not expired. */
   async listPendingInvites(x: Executor, familyId: string, now: Date): Promise<InviteRow[]> {
     return x

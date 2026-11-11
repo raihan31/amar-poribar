@@ -8,10 +8,10 @@ import { invitesRoutes } from "./http/invite-routes.js";
 import { purgeInvitesJob } from "./jobs.js";
 import { membersRoutes } from "./http/members.routes.js";
 import { familiesRepo } from "./infra/families.repo.js";
-import { memberRepo, type FamilySummary } from "./infra/member-repo.js";
+import { memberRepo, type FamilySummary, type MembershipSummary } from "./infra/member-repo.js";
 export * from "./events.js";
 
-export type { FamilySummary };
+export type { FamilySummary, MembershipSummary };
 export { canAssignRole, canEditAll, canManageMember };
 
 /** Public surface of the families module. Other modules may import only this file (SRS R1). */
@@ -24,7 +24,8 @@ export interface FamiliesFacade {
     minRole: Role,
     opts?: { write?: boolean },
   ): Promise<{ role: Role; family: FamilySummary }>;
-  listMemberships(userId: string): Promise<FamilySummary[]>;
+  /** The user's families with role, status, member limit and member count (family switcher, F2). */
+  listMemberships(userId: string): Promise<MembershipSummary[]>;
   listMemberIds(familyId: string): Promise<string[]>;
   isMember(familyId: string, userId: string): Promise<boolean>;
   getMemberRoles(familyId: string): Promise<Map<string, Role>>;

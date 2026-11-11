@@ -29,6 +29,11 @@ export interface IdentityFacade {
   /** Throws `HttpError(401, "unauthorized")` when the user is missing or erased. */
   requireUser(id: q.UserId): Promise<q.UserSummary>;
   maskPhone(phone: string): string;
+  /**
+   * Whether the user accepted `policyVersion`. The consents table arrives with T-ID-08; until then nobody
+   * has accepted anything, so this is false and `GET /v1/me` reports `needsAcceptance: true`.
+   */
+  hasAcceptedCurrentPolicy(userId: string, policyVersion: string): Promise<boolean>;
   getUsersBasics(ids: readonly string[]): Promise<Map<string, { id: string; name: string | null }>>;
   /** Throws `HttpError` 401 for an invalid, expired or non-access token (used by the WebSocket hub). */
   verifyAccessToken(token: string): { userId: string };
@@ -83,6 +88,8 @@ export const identityModule: ModuleDefinition<IdentityFacade> = {
       findUserByPhone: (phone) => q.findUserByPhone(users, phone),
       requireUser: (id) => q.requireUser(users, id),
       maskPhone,
+      // TODO(T-ID-08): read identity.consents.
+      hasAcceptedCurrentPolicy: async () => false,
       getUsersBasics: (ids) => users.getManyNames(ids),
       verifyAccessToken(token) {
         let payload;
