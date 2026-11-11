@@ -10,6 +10,7 @@ import '../features/onboarding/ui/policy_screen.dart';
 import '../features/onboarding/ui/tutorial_screen.dart';
 import '../features/onboarding/ui/welcome_screen.dart';
 import '../features/settings/ui/profile_screen.dart';
+import '../features/transactions/ui/add_expense_screen.dart';
 import '../features/voice/ui/voice_fallback_screen.dart';
 import '../presentation/providers/auth_provider.dart';
 import '../presentation/screens/ai_entry_screen.dart';
@@ -107,7 +108,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       stub(Routes.conversation),
       stub(Routes.voiceNote),
       stub(Routes.call),
-      simple(Routes.add, (_) => const AiEntryScreen()),
+      simple(Routes.add, (_) => const AddExpenseScreen()),
+      // Until T-MOB-28 builds the voice screen, the old entry screen stays reachable here.
+      simple(Routes.addVoice, (_) => const AiEntryScreen()),
       stub(Routes.txn),
       stub(Routes.receipt),
       stub(Routes.ruleLearn),
