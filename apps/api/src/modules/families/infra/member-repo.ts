@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import type { Role } from "@amar-poribar/shared";
 import type { Db } from "../../../platform/db.js";
 import type { Tx } from "../../../platform/events/bus.js";
@@ -49,6 +49,11 @@ export const memberRepo = {
       .select({ userId: familyMembers.userId, role: familyMembers.role })
       .from(familyMembers)
       .where(eq(familyMembers.familyId, familyId));
+  },
+
+  async countMembers(x: Executor, familyId: string): Promise<number> {
+    const [row] = await x.select({ n: count() }).from(familyMembers).where(eq(familyMembers.familyId, familyId));
+    return row?.n ?? 0;
   },
 
   /** Membership joined with the family row; null when the user is not a member. */

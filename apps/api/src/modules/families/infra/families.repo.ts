@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, asc, eq, gt, isNull, lt, or } from "drizzle-orm";
 import { familyInvites, families } from "../schema.js";
 
 import type { Executor } from "./member-repo.js";
@@ -39,5 +39,57 @@ export const familiesRepo = {
       .where(and(eq(familyInvites.id, id), isNull(familyInvites.acceptedAt)))
       .returning({ id: familyInvites.id });
     return rows.length > 0;
+  },
+
+  async familyById(x: Executor, id: string): Promise<FamilyRow | null> {
+    const [row] = await x.select().from(families).where(eq(families.id, id));
+    return row ?? null;
+  },
+
+  /** Not accepted, not revoked and not expired. */
+  async listPendingInvites(x: Executor, familyId: string, now: Date): Promise<InviteRow[]> {
+    return x
+      .select()
+      .from(familyInvites)
+      .where(
+        and(
+          eq(familyInvites.familyId, familyId),
+          isNull(familyInvites.acceptedAt),
+          isNull(familyInvites.revokedAt),
+          gt(familyInvites.expiresAt, now),
+        ),
+      )
+      .orderBy(asc(familyInvites.createdAt), asc(familyInvites.id));
+  },
+
+  /** Revokes a still-pending invite of the family; returns false when there is none. */
+  async revokeInvite(x: Executor, familyId: string, inviteId: string, at: Date): Promise<boolean> {
+    const rows = await x
+      .update(familyInvites)
+      .set({ revokedAt: at })
+      .where(
+        and(
+          eq(familyInvites.id, inviteId),
+          eq(familyInvites.familyId, familyId),
+          isNull(familyInvites.acceptedAt),
+          isNull(familyInvites.revokedAt),
+        ),
+      )
+      .returning({ id: familyInvites.id });
+    return rows.length > 0;
+  },
+
+  /** Deletes unused invites that expired, or were revoked, before `cutoff`. Used invites stay as history. */
+  async purgeInvites(x: Executor, cutoff: Date): Promise<number> {
+    const rows = await x
+      .delete(familyInvites)
+      .where(
+        and(
+          isNull(familyInvites.acceptedAt),
+          or(lt(familyInvites.expiresAt, cutoff), lt(familyInvites.revokedAt, cutoff)),
+        ),
+      )
+      .returning({ id: familyInvites.id });
+    return rows.length;
   },
 };

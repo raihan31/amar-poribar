@@ -39,6 +39,7 @@ export async function buildTestApp(opts: BuildTestAppOptions) {
       limiter: fakes.limiter,
       jobs: createJobs({ inline: true }),
       fanout: new LocalFanout(),
+      clock: fakes.clock,
     },
   });
   await app.ready();

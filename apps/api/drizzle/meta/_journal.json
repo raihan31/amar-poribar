@@ -43,6 +43,13 @@
       "when": 1794376524403,
       "tag": "0005_families_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794378199762,
+      "tag": "0006_families_invite_revoked",
+      "breakpoints": true
     }
   ]
 }

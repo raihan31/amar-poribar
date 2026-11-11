@@ -11,6 +11,8 @@ export interface MemberJoinedPayload {
   familyId: string;
   userId: string;
   role: Role;
+  /** identity.users.id of the person who created the invite. */
+  invitedBy: string;
 }
 export interface MemberRemovedPayload {
   familyId: string;

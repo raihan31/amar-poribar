@@ -77,9 +77,14 @@ describe.skipIf(!hasAppTables)("fixtures", () => {
   });
 
   it("seed-dev is idempotent", async () => {
-    await withApi(async (api) => {
-      const first = await seedDemoFamily(api, { now: FIXED_NOW });
-      const second = await seedDemoFamily(api, { now: FIXED_NOW });
+    await withTestDb(async ({ db, sql }) => {
+      const t = await buildTestApp({ db, sql });
+      const api = injectClient(t.app, () => Promise.resolve(/\d{6}/.exec(t.fakes.sms.last()?.text ?? "")?.[0]));
+      const prepareFamily = async (id: string) => {
+        await sql`update families.families set member_limit = 8 where id = ${id}`;
+      };
+      const first = await seedDemoFamily(api, { now: FIXED_NOW, prepareFamily });
+      const second = await seedDemoFamily(api, { now: FIXED_NOW, prepareFamily });
       expect(first.created).toBe(true);
       expect(second.created).toBe(false);
       expect(second.family.id).toBe(first.family.id);
@@ -89,6 +94,7 @@ describe.skipIf(!hasAppTables)("fixtures", () => {
         token: first.owner.accessToken,
       });
       expect(members.body).toHaveLength(DEMO_MEMBERS.length);
+      await t.close();
     });
   });
 });
