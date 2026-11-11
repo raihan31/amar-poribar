@@ -3,6 +3,7 @@ import 'package:amar_poribar/features/auth/data/auth_repository.dart';
 import 'package:amar_poribar/features/auth/data/fake_auth_repository.dart';
 import 'package:amar_poribar/features/auth/ui/login_screen.dart';
 import 'package:amar_poribar/features/auth/ui/session_expired_screen.dart';
+import 'package:amar_poribar/features/onboarding/ui/tutorial_screen.dart';
 import 'package:amar_poribar/features/onboarding/ui/welcome_screen.dart';
 import 'package:amar_poribar/features/settings/state/preferences_controller.dart';
 import 'package:flutter/widgets.dart';
@@ -70,6 +71,7 @@ void registerAllScreens() {
       ),
     ],
   );
+  registerScreen('D2', Routes.tutorial, (c) => const TutorialScreen());
 }
 
 /// Routes that exist in the app. Until the `Routes` table of T-MOB-13 lands
@@ -95,5 +97,4 @@ const Set<String> kRoutesAwaitingRegistration = {
   Routes.pendingSms,
   Routes.settings,
   Routes.add,
-  Routes.tutorial,
 };

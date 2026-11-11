@@ -110,5 +110,18 @@
   "auth_expired_otherUserKeep": "No",
   "auth_inviteExpired_title": "Invitation expired",
   "auth_inviteExpired_body": "No problem. Ask the person who invited you to send a new link.",
-  "auth_inviteExpired_nudge": "Buzz {inviter}"
+  "auth_inviteExpired_nudge": "Buzz {inviter}",
+  "tutorial_title1": "Welcome",
+  "tutorial_title2": "Press the mic and speak",
+  "tutorial_title3": "Press the green button",
+  "tutorial_title4": "Hear your month",
+  "tutorial_counter": "{n} / {total}",
+  "@tutorial_counter": {
+    "placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}
+  },
+  "tutorial_listenAgain": "Listen again",
+  "tutorial_next": "Next step",
+  "tutorial_back": "Back",
+  "tutorial_skip": "Skip",
+  "tutorial_start": "Get started"
 }

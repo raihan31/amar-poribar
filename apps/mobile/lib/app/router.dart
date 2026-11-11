@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/ui/login_screen.dart';
 import '../features/auth/ui/session_expired_screen.dart';
+import '../features/onboarding/ui/tutorial_screen.dart';
 import '../features/onboarding/ui/welcome_screen.dart';
 import '../features/settings/ui/profile_screen.dart';
 import '../features/voice/ui/voice_fallback_screen.dart';
@@ -12,7 +13,6 @@ import '../presentation/screens/ai_entry_screen.dart';
 import '../presentation/screens/dashboard_screen.dart';
 import '../presentation/screens/settings_screen.dart';
 import '../presentation/screens/transaction_screen.dart';
-import '../presentation/screens/tutorial_screen.dart'; // contains PendingSmsScreen too
 import 'redirects.dart';
 import 'screens.dart';
 import 'shell.dart';

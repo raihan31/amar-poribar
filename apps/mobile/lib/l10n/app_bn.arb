@@ -131,5 +131,18 @@
   "auth_inviteExpired_nudge": "{inviter}কে কম্পন দিন",
   "@auth_inviteExpired_nudge": {
     "placeholders": {"inviter": {"type": "String"}}
-  }
+  },
+  "tutorial_title1": "স্বাগতম",
+  "tutorial_title2": "মাইক চেপে বলুন",
+  "tutorial_title3": "সবুজ বোতাম চাপুন",
+  "tutorial_title4": "মাসের কথা শুনুন",
+  "tutorial_counter": "{n} / {total}",
+  "@tutorial_counter": {
+    "placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}
+  },
+  "tutorial_listenAgain": "আবার শুনুন",
+  "tutorial_next": "পরের ধাপ",
+  "tutorial_back": "পেছনে",
+  "tutorial_skip": "বাদ দিন",
+  "tutorial_start": "শুরু করুন"
 }
