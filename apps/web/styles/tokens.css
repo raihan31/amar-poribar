@@ -1,0 +1,57 @@
+:root {
+  --bg: #fff8ee;
+  --card: #ffffff;
+  --ink: #2a2118;
+  --muted: #5a4b3b;
+  --green-700: #1b5e20;
+  --green-100: #e6f2e3;
+  --amber: #f2a33a;
+  --danger: #b3261e;
+  --border: #e8dcc8;
+  --on-green: #ffffff;
+  --on-amber: #2a2118;
+  --on-danger: #ffffff;
+  --r-card: 22px;
+  --r-pill: 999px;
+  /* Legacy aliases used by existing screens. */
+  --surface: var(--card);
+  --text: var(--ink);
+  --accent: var(--green-700);
+  --text-scale: 1;
+  --primary-height: 48px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #151614;
+    --card: #1f201d;
+    --ink: #ecebe6;
+    --muted: #b7b6ae;
+    --green-700: #4caf50;
+    --green-100: #1e3a21;
+    --amber: #f2a33a;
+    --danger: #f2827a;
+    --border: #33342f;
+    --on-green: #151614;
+    --on-amber: #2a2118;
+    --on-danger: #151614;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #151614;
+  --card: #1f201d;
+  --ink: #ecebe6;
+  --muted: #b7b6ae;
+  --green-700: #4caf50;
+  --green-100: #1e3a21;
+  --amber: #f2a33a;
+  --danger: #f2827a;
+  --border: #33342f;
+  --on-green: #151614;
+  --on-amber: #2a2118;
+  --on-danger: #151614;
+}
+/* Simple mode (FR-VOICE-09). */
+html[data-simple="1"] {
+  --text-scale: 1.3;
+  --primary-height: 72px;
+}
