@@ -1,4 +1,5 @@
 import { http, HttpResponse, type HttpHandler } from "msw";
+import { overviewFixture } from "../components/overview/types";
 import { demoStaff } from "./fixtures";
 
 /** One handler per route a screen uses; later tasks add the admin routes. */
@@ -16,4 +17,5 @@ export const handlers: HttpHandler[] = [
   }),
   http.post("*/admin/v1/auth/logout", () => new HttpResponse(null, { status: 204 })),
   http.get("*/admin/v1/me", () => HttpResponse.json(demoStaff())),
+  http.get("*/admin/v1/overview", () => HttpResponse.json(overviewFixture)),
 ];
