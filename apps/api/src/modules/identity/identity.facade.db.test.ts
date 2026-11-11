@@ -2,12 +2,20 @@ import Fastify from "fastify";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import { withTestDb } from "../../../tests/support/db-test.js";
 import { testConfig } from "../../../tests/support/config.js";
+import { createJobs } from "../../platform/jobs/jobs.js";
 import type { ModuleContext } from "../../platform/module.js";
+import { MemoryLimiter } from "../../platform/rate-limit/limiter.js";
 import { identityModule, maskPhone, type UserSummary } from "./index.js";
 
 async function facade(db: ModuleContext["db"]) {
   const app = Fastify();
-  const ctx = { db, config: testConfig() } as unknown as ModuleContext;
+  const ctx = {
+    db,
+    config: testConfig(),
+    limiter: new MemoryLimiter(),
+    jobs: createJobs({ inline: true }),
+    clock: () => new Date(),
+  } as unknown as ModuleContext;
   return identityModule.register(app, ctx);
 }
 

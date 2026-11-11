@@ -40,6 +40,7 @@ export const ConfigSchema = z.object({
   DB_POOL_MAX: z.preprocess(blank, z.coerce.number().int().min(1).max(200).default(10)),
   MIGRATE_ON_START: z.preprocess(blank, z.enum(["true", "false"]).default("true")),
   JWT_SECRET: optStr(),
+  OTP_PEPPER: optStr(),
   CORS_ORIGIN: list(),
   ANTHROPIC_API_KEY: optStr(),
   AI_MODEL: optStr(),
@@ -83,6 +84,9 @@ function crossChecks(env: Record<string, string | undefined>): z.core.$ZodIssue[
     if (!s || s.length < 32 || /change-?me/i.test(s)) {
       issue("JWT_SECRET", "JWT_SECRET must be a random value of at least 32 characters in production");
     }
+    if ((get("OTP_PEPPER") ?? "").length < 32) {
+      issue("OTP_PEPPER", "OTP_PEPPER must be a random value of at least 32 characters in production");
+    }
     if ((get("SMS_GATEWAY") ?? "fake") === "fake") issue("SMS_GATEWAY", "SMS_GATEWAY must not be fake in production");
   }
   if (get("PUSH_PROVIDER") === "fcm" && !get("FCM_PROJECT_ID"))
@@ -119,6 +123,7 @@ function build(c: z.output<typeof ConfigSchema>) {
     dbPoolMax: c.DB_POOL_MAX,
     migrateOnStart: c.MIGRATE_ON_START === "true",
     jwtSecret: c.JWT_SECRET ?? "dev-secret-change-me",
+    otpPepper: c.OTP_PEPPER ?? "dev-otp-pepper-change-me-00000000",
     corsOrigins: c.CORS_ORIGIN,
     anthropicApiKey: c.ANTHROPIC_API_KEY,
     aiModel: c.AI_MODEL,
