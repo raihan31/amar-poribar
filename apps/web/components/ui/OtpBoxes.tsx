@@ -10,9 +10,11 @@ export interface OtpBoxesProps {
   /** Accessible name of the box at 1-based position i. */
   boxLabel: (position: number) => string;
   disabled?: boolean;
+  /** Marks every box as wrong (3 px danger border via aria-invalid). */
+  invalid?: boolean;
 }
 
-export function OtpBoxes({ onChange, onComplete, boxLabel, disabled }: OtpBoxesProps) {
+export function OtpBoxes({ onChange, onComplete, boxLabel, disabled, invalid }: OtpBoxesProps) {
   const [digits, setDigits] = useState<string[]>(() => Array<string>(LENGTH).fill(""));
   const refs = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -69,6 +71,7 @@ export function OtpBoxes({ onChange, onComplete, boxLabel, disabled }: OtpBoxesP
           maxLength={1}
           value={d}
           disabled={disabled}
+          aria-invalid={invalid ? true : undefined}
           aria-label={boxLabel(i + 1)}
           onChange={(e) => onInput(i, e.target.value)}
           onKeyDown={(e) => onKeyDown(i, e)}
