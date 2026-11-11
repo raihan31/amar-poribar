@@ -22,3 +22,5 @@ coverage/
 apps/mobile/test/goldens/failures/
 
 !.env.compose
+apps/web/e2e/test-results/
+apps/web/e2e/playwright-report/
