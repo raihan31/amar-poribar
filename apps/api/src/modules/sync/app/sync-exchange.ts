@@ -49,7 +49,10 @@ export async function syncExchange(
   body: SyncRequest,
 ): Promise<SyncResponse> {
   // Viewers are summary-only (FR-FAM-05): they neither push nor receive individual entries.
-  const { role } = await deps.families.requireRole(familyId, userId, "member");
+  // A suspended family may still pull (read-only); pushing changes answers 423 (FR-FAM-09).
+  const { role } = await deps.families.requireRole(familyId, userId, "member", {
+    write: body.changes.transactions.length > 0,
+  });
   const cursor = parseCursor(body.cursor);
 
   // Validate each pushed row on its own so one bad row doesn't discard the batch.

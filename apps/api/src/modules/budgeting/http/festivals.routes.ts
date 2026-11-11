@@ -25,7 +25,7 @@ export function festivalsRoutes(app: FastifyInstance, deps: BudgetingDeps) {
     "/v1/families/:familyId/festival-budgets",
     { ...opts, schema: docs.object },
     async (req, reply) => {
-      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
+      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin", { write: true });
       const body = parseOr400(CreateFestivalBudgetSchema, req.body);
       return reply.status(201).send(await createFestivalBudget(deps, req.params.familyId, body));
     },
@@ -35,7 +35,7 @@ export function festivalsRoutes(app: FastifyInstance, deps: BudgetingDeps) {
     "/v1/families/:familyId/festival-budgets/:festivalId",
     { ...opts, schema: docs.object },
     async (req) => {
-      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
+      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin", { write: true });
       const body = parseOr400(UpdateFestivalBudgetSchema, req.body);
       return updateFestivalBudget(deps, req.params.familyId, req.params.festivalId, body);
     },
@@ -45,7 +45,7 @@ export function festivalsRoutes(app: FastifyInstance, deps: BudgetingDeps) {
     "/v1/families/:familyId/festival-budgets/:festivalId",
     { ...opts, schema: docs.noContent },
     async (req, reply) => {
-      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
+      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin", { write: true });
       await deleteFestivalBudget(deps, req.params.familyId, req.params.festivalId);
       return reply.status(204).send();
     },

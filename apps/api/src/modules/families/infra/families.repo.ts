@@ -19,6 +19,23 @@ export const familiesRepo = {
     return row!;
   },
 
+  async status(x: Executor, familyId: string): Promise<string | null> {
+    const [row] = await x.select({ status: families.status }).from(families).where(eq(families.id, familyId));
+    return row?.status ?? null;
+  },
+
+  /** Sets the suspension columns; returns the previous status, or null when the family does not exist. */
+  async setSuspension(
+    x: Executor,
+    familyId: string,
+    v: { status: "active" | "suspended"; suspendedAt: Date | null; suspendedReason: string | null },
+  ): Promise<string | null> {
+    const [before] = await x.select({ status: families.status }).from(families).where(eq(families.id, familyId));
+    if (!before) return null;
+    await x.update(families).set(v).where(eq(families.id, familyId));
+    return before.status;
+  },
+
   async aiQuota(x: Executor, familyId: string): Promise<{ quotaMonth: number; plan: string } | null> {
     const [row] = await x
       .select({ quotaMonth: families.aiQuotaMonth, plan: families.plan })

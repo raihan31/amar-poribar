@@ -37,6 +37,14 @@ export interface InviteCreatedPayload {
   expiresAt: string;
 }
 
+export interface FamilySuspendedPayload {
+  familyId: string;
+  reason: string;
+}
+export interface FamilyUnsuspendedPayload {
+  familyId: string;
+}
+
 declare module "../../platform/events/types.js" {
   interface EventMap {
     "families.FamilyCreated.v1": FamilyCreatedPayload;
@@ -44,5 +52,7 @@ declare module "../../platform/events/types.js" {
     "families.MemberRemoved.v1": MemberRemovedPayload;
     "families.InviteCreated.v1": InviteCreatedPayload;
     "families.OwnershipTransferred.v1": OwnershipTransferredPayload;
+    "families.FamilySuspended.v1": FamilySuspendedPayload;
+    "families.FamilyUnsuspended.v1": FamilyUnsuspendedPayload;
   }
 }
