@@ -8,14 +8,13 @@ import type { Account, Category, Family } from "@/lib/types";
 import { CategoryPicker } from "./CategoryPicker";
 
 export function QuickAdd(props: {
-  token: string;
   family: Family;
   categories: Category[];
   accounts: Account[];
   onSaved: () => void;
   onError: (e: unknown) => void;
 }) {
-  const { token, family, categories, accounts, onSaved, onError } = props;
+  const { family, categories, accounts, onSaved, onError } = props;
   const [text, setText] = useState("");
   const [drafts, setDrafts] = useState<TransactionDraft[] | null>(null);
   const [busy, setBusy] = useState(false);
@@ -34,7 +33,6 @@ export function QuickAdd(props: {
     setBusy(true);
     try {
       const res = await api<ParseResponse>(`/v1/families/${family.id}/ai/parse`, {
-        token,
         body: { text: input, now: new Date().toISOString() },
       });
       // Voice entries come back marked as voice, so reports can tell them apart.
@@ -59,7 +57,6 @@ export function QuickAdd(props: {
   async function confirm(d: TransactionDraft, i: number) {
     try {
       await api(`/v1/families/${family.id}/transactions`, {
-        token,
         body: {
           type: d.type,
           amountPaisa: d.amountPaisa,

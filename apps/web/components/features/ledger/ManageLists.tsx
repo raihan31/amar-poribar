@@ -7,14 +7,13 @@ import type { Account, Category, Family } from "@/lib/types";
 
 /** Add, rename, hide and archive accounts and categories (FR-ACC-01, FR-CAT-02). Owners and admins only. */
 export function ManageLists(props: {
-  token: string;
   family: Family;
   categories: Category[];
   accounts: Account[];
   onChanged: () => void;
   onError: (e: unknown) => void;
 }) {
-  const { token, family, categories, accounts, onChanged, onError } = props;
+  const { family, categories, accounts, onChanged, onError } = props;
   const base = `/v1/families/${family.id}`;
   const [accName, setAccName] = useState("");
   const [accType, setAccType] = useState<(typeof ACCOUNT_TYPES)[number]>("cash");
@@ -30,7 +29,7 @@ export function ManageLists(props: {
   }
   const rename = (path: string, field: string, value: string, current: string) =>
     value.trim() && value.trim() !== current
-      ? run(() => api(path, { method: "PATCH", token, body: { [field]: value.trim() } }))
+      ? run(() => api(path, { method: "PATCH", body: { [field]: value.trim() } }))
       : undefined;
 
   return (
@@ -49,9 +48,7 @@ export function ManageLists(props: {
           />
           <button
             className="secondary"
-            onClick={() =>
-              run(() => api(`${base}/accounts/${a.id}`, { method: "PATCH", token, body: { archived: true } }))
-            }
+            onClick={() => run(() => api(`${base}/accounts/${a.id}`, { method: "PATCH", body: { archived: true } }))}
           >
             {t("archive")}
           </button>
@@ -70,7 +67,7 @@ export function ManageLists(props: {
           disabled={!accName.trim()}
           onClick={() =>
             run(async () => {
-              await api(`${base}/accounts`, { token, body: { name: accName.trim(), type: accType } });
+              await api(`${base}/accounts`, { body: { name: accName.trim(), type: accType } });
               setAccName("");
             })
           }
@@ -95,7 +92,7 @@ export function ManageLists(props: {
           <button
             className="secondary"
             onClick={() =>
-              run(() => api(`${base}/categories/${c.id}`, { method: "PATCH", token, body: { isHidden: !c.isHidden } }))
+              run(() => api(`${base}/categories/${c.id}`, { method: "PATCH", body: { isHidden: !c.isHidden } }))
             }
           >
             {c.isHidden ? t("unhide") : t("hide")}
@@ -129,7 +126,6 @@ export function ManageLists(props: {
           onClick={() =>
             run(async () => {
               await api(`${base}/categories`, {
-                token,
                 body: {
                   kind: cat.kind,
                   nameBn: cat.nameBn.trim(),
