@@ -1,5 +1,5 @@
 import { http, HttpResponse, type HttpHandler } from "msw";
-import { demoStaff } from "./fixtures";
+import { demoStaff, privacyFixture } from "./fixtures";
 
 /** One handler per route a screen uses; later tasks add the admin routes. */
 export const handlers: HttpHandler[] = [
@@ -16,4 +16,11 @@ export const handlers: HttpHandler[] = [
   }),
   http.post("*/admin/v1/auth/logout", () => new HttpResponse(null, { status: 204 })),
   http.get("*/admin/v1/me", () => HttpResponse.json(demoStaff())),
+  http.get("*/admin/v1/privacy-requests", ({ request }) => {
+    const status = new URL(request.url).searchParams.get("status") ?? "open";
+    const f = privacyFixture();
+    return HttpResponse.json(status === "open" ? f : { items: [], counts: f.counts });
+  }),
+  http.post("*/admin/v1/privacy-requests/:id/advance", () => HttpResponse.json({ ok: true })),
+  http.post("*/admin/v1/privacy-requests/:id/reject", () => HttpResponse.json({ ok: true })),
 ];
