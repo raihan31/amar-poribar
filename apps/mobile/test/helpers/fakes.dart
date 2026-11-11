@@ -1,6 +1,7 @@
 import 'package:amar_poribar/data/auth/token_store.dart';
 import 'package:amar_poribar/data/database/local_store.dart';
 import 'package:amar_poribar/features/family/data/fake_family_repository.dart';
+import 'package:amar_poribar/features/family/data/invite_repository.dart';
 import 'package:amar_poribar/features/family/state/family_providers.dart';
 import 'package:amar_poribar/presentation/providers/auth_provider.dart';
 import 'package:amar_poribar/presentation/providers/providers.dart';
@@ -32,5 +33,7 @@ List<Override> defaultFakes({
       voiceServiceProvider.overrideWithValue(voice),
       familyRepositoryProvider.overrideWithValue(FakeFamilyRepository()),
       myUserIdProvider.overrideWith((ref) async => FakeFamilyRepository.meId),
+      inviteRepositoryProvider.overrideWithValue(FakeInviteRepository()),
+      inviteClockProvider.overrideWithValue(() => DateTime.utc(2026, 11, 9, 4)),
       // <feature fakes go here>
     ];

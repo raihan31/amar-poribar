@@ -37,9 +37,15 @@ class FamilyApi {
       await _t.send('POST', '/v1/families/$familyId/invites', body: body)
           as Map<String, dynamic>;
 
-  Future<void> acceptInvite(String token) async {
-    await _t.send('POST', '/v1/invites/$token/accept');
-  }
+  /// `GET /v1/invites/:token` (public preview).
+  Future<Map<String, dynamic>> invitePreview(String token) async =>
+      await _t.send('GET', '/v1/invites/$token') as Map<String, dynamic>;
+
+  /// `POST /v1/invites/:token/accept`; the body is `{familyId, role}`.
+  Future<Map<String, dynamic>> acceptInvite(String token) async =>
+      (await _t.send('POST', '/v1/invites/$token/accept'))
+          as Map<String, dynamic>? ??
+      const {};
 
   Future<void> removeMember(String familyId, String userId) async {
     await _t.send('DELETE', '/v1/families/$familyId/members/$userId');

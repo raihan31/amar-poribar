@@ -131,5 +131,30 @@
   "auth_inviteExpired_nudge": "{inviter}কে কম্পন দিন",
   "@auth_inviteExpired_nudge": {
     "placeholders": {"inviter": {"type": "String"}}
-  }
+  },
+  "fam_join_invitedBy": "{inviter} আপনাকে ডেকেছেন",
+  "@fam_join_invitedBy": {
+    "placeholders": {"inviter": {"type": "String"}}
+  },
+  "fam_join_summary": "{members} জন সদস্য · আপনি হবেন {role}",
+  "@fam_join_summary": {
+    "placeholders": {"members": {"type": "String"}, "role": {"type": "String"}}
+  },
+  "fam_join_canTitle": "যোগ দিলে আপনি পারবেন",
+  "fam_join_bulletLedger": "খরচ লিখতে ও দেখতে",
+  "fam_join_bulletViewer": "পরিবারের হিসাব দেখতে (শুধু সারাংশ)",
+  "fam_join_bulletTalk": "পরিবারের সাথে কথা বলতে",
+  "fam_join_bulletPrivate": "ব্যক্তিগত খরচ শুধু নিজে দেখতে",
+  "fam_join_expiresIn": "আমন্ত্রণের মেয়াদ আছে আর {days} দিন।",
+  "@fam_join_expiresIn": {
+    "placeholders": {"days": {"type": "String"}}
+  },
+  "fam_join_accept": "যোগ দিন",
+  "fam_join_notNow": "এখন নয়",
+  "fam_join_wrongNumber": "এই আমন্ত্রণ অন্য নম্বরের জন্য।",
+  "fam_join_failed": "যোগ দেওয়া গেল না। আবার চেষ্টা করুন।",
+  "fam_join_roleOwner": "মালিক",
+  "fam_join_roleAdmin": "অ্যাডমিন",
+  "fam_join_roleMember": "সদস্য",
+  "fam_join_roleViewer": "দর্শক"
 }

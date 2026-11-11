@@ -116,19 +116,18 @@ void main() {
     final (router, auth, _) = await _pump(tester, welcomeDone: true);
     router.go('amarporibar://join/abc');
     await tester.pumpAndSettle();
-    expect(_loc(router), '/join/abc');
-
     // The join screen sends a signed-out person to log in and remembers where they were.
-    router.go('/login?from=${Uri.encodeQueryComponent('/join/abc')}');
-    await tester.pumpAndSettle();
-    expect(_loc(router), startsWith('/login'));
+    expect(
+      _loc(router),
+      '/login?from=${Uri.encodeQueryComponent('/join/abc')}',
+    );
     auth.set(_signedIn);
     await tester.pumpAndSettle();
     expect(_loc(router), '/join/abc');
   });
 
   testWidgets('an https invite link is always allowed', (tester) async {
-    final (router, _, _) = await _pump(tester);
+    final (router, _, _) = await _pump(tester, auth: _signedIn);
     router.go('/join/xyz');
     await tester.pumpAndSettle();
     expect(_loc(router), '/join/xyz');

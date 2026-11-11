@@ -3,10 +3,16 @@ import 'package:amar_poribar/features/auth/data/auth_repository.dart';
 import 'package:amar_poribar/features/auth/data/fake_auth_repository.dart';
 import 'package:amar_poribar/features/auth/ui/login_screen.dart';
 import 'package:amar_poribar/features/auth/ui/session_expired_screen.dart';
+import 'package:amar_poribar/features/family/data/invite_repository.dart';
+import 'package:amar_poribar/features/family/state/family_providers.dart';
+import 'package:amar_poribar/features/family/ui/join_screen.dart';
 import 'package:amar_poribar/features/onboarding/ui/welcome_screen.dart';
 import 'package:amar_poribar/features/settings/state/preferences_controller.dart';
+import 'package:amar_poribar/presentation/providers/auth_provider.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../helpers/fake_auth.dart';
 
 typedef ScreenFactory = Widget Function(BuildContext context);
 
@@ -61,6 +67,18 @@ void registerAllScreens() {
     (c) => const SessionExpiredScreen(),
   );
   registerScreen(
+    'A6',
+    Routes.join,
+    (c) => const JoinScreen(token: 'abc'),
+    needs: [
+      authProvider.overrideWith(
+        (ref) => FakeAuthNotifier(const AuthState(loaded: true, token: 't')),
+      ),
+      inviteRepositoryProvider.overrideWithValue(FakeInviteRepository()),
+      inviteClockProvider.overrideWithValue(() => DateTime.utc(2026, 11, 9, 4)),
+    ],
+  );
+  registerScreen(
     'D1',
     Routes.welcome,
     (c) => const WelcomeScreen(),
@@ -82,6 +100,7 @@ const List<String> kAllRoutes = [
   Routes.settings,
   Routes.login,
   Routes.sessionExpired,
+  Routes.join,
   Routes.add,
   Routes.tutorial,
 ];
