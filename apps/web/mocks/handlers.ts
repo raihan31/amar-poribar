@@ -25,6 +25,11 @@ export const handlers: HttpHandler[] = [
       families: [demo.family],
     }),
   ),
+  http.get("*/api/proxy/v1/policy", ({ request }) => {
+    const locale = new URL(request.url).searchParams.get("locale") === "en" ? "en" : "bn";
+    return HttpResponse.json({ version: "2026-01", text: locale === "en" ? "Privacy policy" : "গোপনীয়তা নীতি" });
+  }),
+  http.post("*/api/proxy/v1/me/consents", () => new HttpResponse(null, { status: 204 })),
   http.get("*/api/proxy/v1/families", () => HttpResponse.json([demo.family])),
   http.post("*/api/proxy/v1/families", () => HttpResponse.json(demo.family, { status: 201 })),
   http.get(`${F}/categories`, () => HttpResponse.json(demo.categories)),
