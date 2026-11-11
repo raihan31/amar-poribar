@@ -11,8 +11,8 @@ export async function parse(deps: AiDeps, familyId: string, text: string, now?: 
     const result = await parseInput(text, {
       categories,
       now: now ? new Date(now) : deps.clock(),
-      client: deps.client && (await hasAiQuota(deps, familyId)) ? deps.client : undefined,
-      model: deps.model,
+      client: deps.claude.enabled && (await hasAiQuota(deps, familyId)) ? deps.claude.client : undefined,
+      model: deps.claude.model,
     });
     if (result.usedAi) await recordAiUse(deps, familyId);
     return result;
