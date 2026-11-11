@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ACCOUNT_TYPES, t } from "@amar-poribar/shared";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api/client";
 import type { Account, Category, Family } from "@/lib/types";
 
 /** Add, rename, hide and archive accounts and categories (FR-ACC-01, FR-CAT-02). Owners and admins only. */

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { formatBDT, parseAmountToPaisa, t } from "@amar-poribar/shared";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api/client";
 import type { BudgetRow, Category, Family } from "@/lib/types";
 
 /** Monthly budgets with spend, 80%/100% alerts and (for owners and admins) editing (FR-BUD-01..03). */

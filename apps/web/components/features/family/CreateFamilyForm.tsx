@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { api } from "@/lib/api";
+import { api } from "@/lib/api/client";
 import type { Family } from "@/lib/types";
 
 export function CreateFamilyForm({ onCreated }: { onCreated: (f: Family) => void }) {
