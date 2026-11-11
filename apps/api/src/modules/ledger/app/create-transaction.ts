@@ -4,7 +4,7 @@ import { stampChange } from "../infra/stamp-change.js";
 import { transactionsRepo, type Transaction } from "../infra/transactions.repo.js";
 import type { LedgerDeps } from "./deps.js";
 import { publishTransaction } from "./publish.js";
-import { assertOwnedRefs } from "./refs.js";
+import { assertRefs } from "./queries.js";
 
 /** The caller has already checked the member role. */
 export async function createTransaction(
@@ -12,7 +12,7 @@ export async function createTransaction(
   input: { familyId: string; actorId: string; data: CreateTransactionInput },
 ): Promise<Transaction> {
   const { familyId, actorId, data } = input;
-  await assertOwnedRefs(deps.db, familyId, data);
+  await assertRefs(deps.db, familyId, data);
   return deps.db.transaction(async (tx) => {
     const row = await transactionsRepo.insert(tx, {
       ...data,

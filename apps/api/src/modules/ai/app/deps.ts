@@ -27,7 +27,7 @@ export interface AiStore {
 export interface AiDeps {
   store: AiStore;
   families: Pick<FamiliesFacade, "requireRole" | "getAiQuota">;
-  ledger: Pick<LedgerFacade, "listCategories" | "monthTotals" | "askQueries">;
+  ledger: Pick<LedgerFacade, "listCategories" | "getMonthTotals" | "askQueries">;
   /** Undefined when no API key is configured; only deterministic paths run then. */
   client?: AiClient | undefined;
   model?: string | undefined;

@@ -1,7 +1,7 @@
 import { monthRange } from "../../../platform/time/month.js";
 import { totalsRepo } from "../infra/totals.repo.js";
 import type { LedgerDeps } from "./deps.js";
-import { monthTotals } from "./month-totals.js";
+import { getMonthTotals } from "./month-totals.js";
 
 export interface AskQueries {
   sumByCategory(month: string): Promise<{ name: string; totalPaisa: number }[]>;
@@ -30,14 +30,14 @@ const LIST_CAP = 200;
 export function askQueries(deps: LedgerDeps, familyId: string, userId: string): AskQueries {
   return {
     sumByCategory: async (month) =>
-      (await monthTotals(deps, familyId, userId, month)).byCategory.map((c) => ({
+      (await getMonthTotals(deps, familyId, { userId }, month)).byCategory.map((c) => ({
         name: `${c.nameEn} / ${c.name}`,
         totalPaisa: c.totalPaisa,
       })),
     compareMonths: async (a, b) => {
       const [ta, tb] = await Promise.all([
-        monthTotals(deps, familyId, userId, a),
-        monthTotals(deps, familyId, userId, b),
+        getMonthTotals(deps, familyId, { userId }, a),
+        getMonthTotals(deps, familyId, { userId }, b),
       ]);
       return {
         a: { month: a, incomePaisa: ta.incomePaisa, expensePaisa: ta.expensePaisa },
@@ -45,7 +45,7 @@ export function askQueries(deps: LedgerDeps, familyId: string, userId: string): 
       };
     },
     listTransactions: async ({ month, categoryName, limit }) => {
-      const rows = await totalsRepo.listWithCategory(deps.db, familyId, userId, monthRange(month), LIST_CAP);
+      const rows = await totalsRepo.listWithCategory(deps.db, familyId, { userId }, monthRange(month), LIST_CAP);
       return rows
         .filter((r) => !categoryName || [r.nameEn, r.nameBn, `${r.nameEn} / ${r.nameBn}`].includes(categoryName))
         .slice(0, limit)

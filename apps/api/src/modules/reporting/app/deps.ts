@@ -3,5 +3,5 @@ import type { LedgerFacade } from "../../ledger/index.js";
 
 export interface ReportingDeps {
   families: Pick<FamiliesFacade, "requireRole">;
-  ledger: Pick<LedgerFacade, "monthTotals" | "remittanceByMonth" | "listForExport">;
+  ledger: Pick<LedgerFacade, "getMonthTotals" | "remittanceByMonth" | "listForExport">;
 }

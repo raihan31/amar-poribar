@@ -13,7 +13,7 @@ export async function receipt(
   if (!deps.client) throw new HttpError(503, "ai_unavailable", "Receipt reading is not available right now");
   if (!(await hasAiQuota(deps, familyId)))
     throw new HttpError(429, "ai_quota", "This month's AI limit has been reached");
-  const categories = (await deps.ledger.listCategories(familyId)).filter((c) => !c.isHidden);
+  const categories = await deps.ledger.listCategories(familyId, { includeHidden: false });
   try {
     const drafts = await parseReceipt(
       { base64: image.imageBase64, mediaType: image.mediaType },

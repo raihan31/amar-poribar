@@ -19,7 +19,7 @@ export async function listFestivalBudgets(
       .sort((a, b) => a.startsOn.localeCompare(b.startsOn))
       .map(async (f) => {
         const { start, end } = dayRange(f.startsOn, f.endsOn);
-        const spentPaisa = await deps.ledger.expenseTotalBetween(familyId, userId, start, end);
+        const spentPaisa = (await deps.ledger.getRangeTotals(familyId, { userId }, start, end)).expensePaisa;
         return { ...f, spentPaisa, level: budgetLevel(spentPaisa, f.limitPaisa) };
       }),
   );

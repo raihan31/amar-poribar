@@ -17,7 +17,7 @@ export async function remittanceByMonth(
   to: string,
 ): Promise<RemittanceByMonth> {
   const range = { start: monthRange(from).start, end: monthRange(to).end };
-  const { remitted, spent, senders } = await totalsRepo.remittanceAndSpend(deps.db, familyId, userId, range);
+  const { remitted, spent, senders } = await totalsRepo.remittanceAndSpend(deps.db, familyId, { userId }, range);
   return {
     months: monthsBetween(from, to).map((month) => ({
       month,

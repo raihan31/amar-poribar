@@ -6,7 +6,7 @@ import { hasAiQuota, recordAiUse } from "./quota.js";
 
 /** Text, voice transcript or MFS SMS → drafts (FR-AI-01, FR-AI-02, FR-VOICE-02). */
 export async function parse(deps: AiDeps, familyId: string, text: string, now?: string): Promise<ParseResponse> {
-  const categories = (await deps.ledger.listCategories(familyId)).filter((c) => !c.isHidden);
+  const categories = await deps.ledger.listCategories(familyId, { includeHidden: false });
   try {
     const result = await parseInput(text, {
       categories,
