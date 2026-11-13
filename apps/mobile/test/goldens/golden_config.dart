@@ -71,6 +71,7 @@ void goldenScreen(
   List<Override> overrides = const [],
   bool dark = false,
   UiScale scale = UiScale.normal,
+  String? acTag,
 }) {
   final fileName = dark ? '${name}_dark' : name;
   late LocalStore store;
@@ -81,7 +82,7 @@ void goldenScreen(
     ),
     run: () {
       goldenTest(
-        fileName,
+        acTag == null ? fileName : '$acTag: $fileName',
         fileName: fileName,
         constraints: BoxConstraints.tight(kGoldenSize),
         pumpWidget: (tester, widget) async {

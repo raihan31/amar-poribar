@@ -34,7 +34,8 @@ List<Override> _overrides({
     ];
 
 void main() {
-  testWidgets('read-back sentence is exact and starts within 3 s (NFR-14)',
+  testWidgets(
+      'AC-08: read-back sentence is exact and starts within 3 s (NFR-14)',
       (t) async {
     final voice = FakeVoiceService(listen: [_said]);
     final entries = FakeEntryRepository();
@@ -69,7 +70,8 @@ void main() {
     expect(voice.spoken, [_readBack, _readBack]);
   });
 
-  testWidgets('unknown category speaks the question and opens the picker',
+  testWidgets(
+      'AC-09: unknown category speaks the question and opens the picker',
       (t) async {
     final voice = FakeVoiceService(listen: ['পাঁচশো টাকা দিলাম']);
     Object? pickerExtra;

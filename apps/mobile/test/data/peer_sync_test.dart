@@ -88,7 +88,7 @@ Future<Set<String>> ids(LocalStore s) async => {
     };
 
 void main() {
-  test('two phones with no internet end up with each other\'s entries',
+  test('AC-24: two phones with no internet end up with each other\'s entries',
       () async {
     final a = await phone('fam');
     final b = await phone('fam');

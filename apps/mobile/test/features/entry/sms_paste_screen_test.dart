@@ -44,7 +44,7 @@ void _clipboard(WidgetTester t, String? text) {
 }
 
 void main() {
-  testWidgets('a template match shows the card with no API call (AC-03)',
+  testWidgets('AC-03: a template match shows the card with no API call',
       (t) async {
     final entries = FakeEntryRepository();
     await pumpApp(
@@ -121,7 +121,7 @@ void main() {
     expect(repo.rows.single.categoryId, 'c-other_expense');
   });
 
-  testWidgets('a TrxID already on the phone is a duplicate (AC-04)', (t) async {
+  testWidgets('AC-04: a TrxID already on the phone is a duplicate', (t) async {
     final repo = FakeTransactionRepository();
     await pumpApp(
       t,

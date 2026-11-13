@@ -40,7 +40,7 @@ void main() {
     expect(find.textContaining('AI ব্যবহার'), findsNothing);
   });
 
-  testWidgets('Listen speaks the speechText with amounts in words (AC-10)', (
+  testWidgets('AC-10: Listen speaks the speechText with amounts in words', (
     t,
   ) async {
     await pumpApp(
