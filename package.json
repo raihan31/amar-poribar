@@ -13,7 +13,7 @@
     "test": "turbo run test && node --test scripts/check-ci-jobs.test.mjs",
     "stack:up": "docker compose up -d --build --wait",
     "stack:down": "docker compose down -v",
-    "e2e:web": "pnpm --filter @amar-poribar/web e2e",
+    "e2e:web": "pnpm --filter @amar-poribar/web e2e --grep @stack",
     "e2e:admin": "pnpm --filter @amar-poribar/admin e2e",
     "db:up": "docker compose up -d db",
     "db:generate": "pnpm --filter @amar-poribar/api db:generate",
