@@ -257,8 +257,8 @@ jobs:
         if: steps.detect.outputs.run == 'true'
       - run: pnpm --filter @amar-poribar/web exec playwright install --with-deps chromium
         if: steps.detect.outputs.run == 'true'
-      # The e2e specs import @amar-poribar/fixtures (and its dependencies) through their built dist.
-      - run: pnpm --filter "@amar-poribar/fixtures..." build
+      # The e2e specs import @amar-poribar/shared and @amar-poribar/fixtures through their built dist.
+      - run: pnpm --filter "@amar-poribar/web^..." build
       - run: pnpm e2e:web
         env:
           AP_BASE_URL: http://localhost:3000
@@ -278,10 +278,14 @@ jobs:
       - name: Detect Playwright tests
         id: detect
         run: |
-          if [ -n "$(find apps/admin/e2e -type f 2>/dev/null | head -1)" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
+          if [ -z "$(find apps/admin/e2e -type f 2>/dev/null | head -1)" ]; then
             echo "::notice::No apps/admin/e2e yet; nothing to run."
+          elif ! grep -rq "ADMIN_E2E_STAFF" tools/fixtures/src 2>/dev/null; then
+            # Staff accounts with TOTP come from the stack seed (T-ADM-02, M5). Until it exists the Compose
+            # suite cannot sign in; the same specs run against mocks in the `admin` job (verify:admin).
+            echo "::warning::Admin Compose e2e skipped: tools/fixtures does not seed staff yet (M5 T-ADM). Mock e2e still runs in the admin job."
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
           fi
       - uses: pnpm/action-setup@v4
         if: steps.detect.outputs.run == 'true'
@@ -296,8 +300,9 @@ jobs:
         if: steps.detect.outputs.run == 'true'
       - run: pnpm --filter @amar-poribar/admin exec playwright install --with-deps chromium
         if: steps.detect.outputs.run == 'true'
-      # The e2e specs import @amar-poribar/fixtures (and its dependencies) through their built dist.
-      - run: pnpm --filter "@amar-poribar/fixtures..." build
+      # The e2e specs import @amar-poribar/shared and @amar-poribar/fixtures through their built dist.
+      - run: pnpm --filter "@amar-poribar/admin^..." build
+        if: steps.detect.outputs.run == 'true'
       - run: pnpm e2e:admin
         env:
           ADMIN_E2E_STACK_URL: http://localhost:3100
@@ -378,8 +383,8 @@ jobs:
         if: steps.pw-cache.outputs.cache-hit != 'true'
       - run: pnpm --filter @amar-poribar/web exec playwright install-deps chromium
         if: steps.pw-cache.outputs.cache-hit == 'true'
-      # The e2e specs import @amar-poribar/fixtures (and its dependencies) through their built dist.
-      - run: pnpm --filter "@amar-poribar/fixtures..." build
+      # The e2e specs import @amar-poribar/shared and @amar-poribar/fixtures through their built dist.
+      - run: pnpm --filter "@amar-poribar/web^..." build
       - run: pnpm --filter @amar-poribar/web e2e --grep "@stack|comms-" --pass-with-no-tests
         env:
           AP_BASE_URL: http://localhost:3000
