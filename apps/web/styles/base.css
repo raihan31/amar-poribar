@@ -698,3 +698,28 @@ details.card summary {
   margin: 0;
   text-align: center;
 }
+.ui-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 88px;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 32px);
+  padding: 12px 20px;
+  border-radius: 16px;
+  background: var(--ink);
+  color: var(--card);
+  font-weight: 600;
+  z-index: 60;
+}
+.offline-banner {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 8px 16px 0;
+}
+.error-view {
+  min-height: 60vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+}

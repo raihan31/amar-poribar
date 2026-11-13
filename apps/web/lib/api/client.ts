@@ -1,6 +1,7 @@
 import createClient, { type Middleware } from "openapi-fetch";
 import type { paths } from "./schema";
 import { toProblem } from "./errors";
+import { notifyNetworkError, notifyNetworkOk } from "./network";
 
 const PROXY = "/api/proxy/";
 
@@ -22,6 +23,14 @@ const headers: Middleware = {
     request.headers.set("x-ap-csrf", "1");
     request.headers.set("Accept-Language", locale());
     return request;
+  },
+  onResponse({ response }) {
+    notifyNetworkOk();
+    return response;
+  },
+  onError({ error }) {
+    notifyNetworkError();
+    return error instanceof Error ? error : new Error(String(error));
   },
 };
 
