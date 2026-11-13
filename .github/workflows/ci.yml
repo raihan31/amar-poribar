@@ -298,6 +298,131 @@ jobs:
         if: always() && steps.detect.outputs.run == 'true'
         run: pnpm stack:down
 
+  web:
+    name: web
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @amar-poribar/web gen:api:check
+      - run: pnpm --filter @amar-poribar/web lint
+      - run: pnpm --filter @amar-poribar/web typecheck
+      # Thresholds (lines/functions >= 70) live in the vitest config (NFR-11).
+      - run: pnpm --filter @amar-poribar/web test --run --coverage --coverage.thresholds.lines=70 --coverage.thresholds.functions=70
+      - run: pnpm --filter @amar-poribar/web build
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(pnpm --filter @amar-poribar/web exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        id: pw-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - run: pnpm --filter @amar-poribar/web exec playwright install --with-deps chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+      - run: pnpm --filter @amar-poribar/web exec playwright install-deps chromium
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+      - run: pnpm --filter @amar-poribar/web e2e:mock
+      - name: Upload traces and screenshot diffs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-e2e-failures
+          path: |
+            apps/web/test-results/
+            apps/web/playwright-report/
+          if-no-files-found: ignore
+
+  web-stack:
+    name: web-stack
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: docker compose up -d --build --wait
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(pnpm --filter @amar-poribar/web exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        id: pw-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - run: pnpm --filter @amar-poribar/web exec playwright install --with-deps chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+      - run: pnpm --filter @amar-poribar/web exec playwright install-deps chromium
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+      - run: pnpm --filter @amar-poribar/web e2e --grep "@stack|comms-" --pass-with-no-tests
+      - name: Upload traces and screenshot diffs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-stack-e2e-failures
+          path: |
+            apps/web/test-results/
+            apps/web/playwright-report/
+          if-no-files-found: ignore
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
+      - name: Stop
+        if: always()
+        run: docker compose down -v
+
+  admin:
+    name: admin
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @amar-poribar/admin gen:api:check
+      - run: pnpm --filter @amar-poribar/admin lint
+      - run: pnpm --filter @amar-poribar/admin typecheck
+      # Thresholds (lines/functions >= 70) live in the vitest config (NFR-11).
+      - run: pnpm --filter @amar-poribar/admin test --run --coverage --coverage.thresholds.lines=70 --coverage.thresholds.functions=70
+      - run: pnpm --filter @amar-poribar/admin build
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(pnpm --filter @amar-poribar/admin exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        id: pw-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - run: pnpm --filter @amar-poribar/admin exec playwright install --with-deps chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+      - run: pnpm --filter @amar-poribar/admin exec playwright install-deps chromium
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+      - run: pnpm --filter @amar-poribar/admin e2e:mock
+      - name: Upload traces and screenshot diffs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-e2e-failures
+          path: |
+            apps/admin/test-results/
+            apps/admin/playwright-report/
+          if-no-files-found: ignore
+
   docs:
     name: docs
     runs-on: ubuntu-latest
