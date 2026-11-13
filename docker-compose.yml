@@ -3,7 +3,7 @@
 #   api   -> http://localhost:4000   (host port: API_PORT)
 #   db    -> localhost:5432          (host port: DB_PORT)
 #   fakes -> http://localhost:4100   (host port: FAKES_PORT)
-#   minio -> :9000 API, :9001 console (MINIO_PORT, MINIO_CONSOLE_PORT); coturn -> :3478
+#   minio (adobe/s3mock) -> :9000 (MINIO_PORT); coturn -> :3478
 #   admin -> http://localhost:3100   (host port: ADMIN_PORT)
 # If a port is taken, pick another, e.g.: API_PORT=4001 WEB_PORT=3001 DB_PORT=5434 docker compose up --build
 services:
@@ -42,50 +42,33 @@ services:
       timeout: 3s
       retries: 20
 
-  # Object store for tests.
+  # Object store for tests. MinIO stopped publishing community images, so the stack uses
+  # adobe/s3mock: an S3-compatible server that ignores credentials and creates buckets on start.
   minio-test:
     profiles: ["test"]
-    image: minio/minio:latest
-    command: ["server", "/data"]
+    image: ${S3_IMAGE:-adobe/s3mock:latest}
     environment:
-      MINIO_ROOT_USER: amar
-      MINIO_ROOT_PASSWORD: amar-secret
+      initialBuckets: amar-test
     ports:
-      - "${MINIO_TEST_PORT:-9100}:9000"
-    tmpfs:
-      - /data
+      - "${MINIO_TEST_PORT:-9100}:9090"
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:9090/ >/dev/null || exit 1"]
       interval: 3s
       timeout: 3s
-      retries: 20
+      retries: 30
 
+  # Object store for the local stack (service name kept so existing env and docs still match).
   minio:
-    image: ${MINIO_IMAGE:-minio/minio:latest}
-    command: ["server", "/data", "--console-address", ":9001"]
+    image: ${S3_IMAGE:-adobe/s3mock:latest}
     environment:
-      MINIO_ROOT_USER: amar
-      MINIO_ROOT_PASSWORD: amarsecret
+      initialBuckets: amar
     ports:
-      - "${MINIO_PORT:-9000}:9000"
-      - "${MINIO_CONSOLE_PORT:-9001}:9001"
-    volumes:
-      - minio-data:/data
+      - "${MINIO_PORT:-9000}:9090"
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:9090/ >/dev/null || exit 1"]
       interval: 3s
       timeout: 3s
-      retries: 20
-
-  # One-shot: creates the bucket the API uses, then exits.
-  minio-init:
-    image: ${MINIO_MC_IMAGE:-minio/mc:latest}
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - mc alias set local http://minio:9000 amar amarsecret && mc mb --ignore-existing local/amar
-    depends_on:
-      minio: { condition: service_healthy }
-    restart: "no"
+      retries: 30
 
   coturn:
     image: coturn/coturn:latest
@@ -127,7 +110,7 @@ services:
       - "${API_PORT:-4000}:4000"
     depends_on:
       db: { condition: service_healthy }
-      minio-init: { condition: service_completed_successfully }
+      minio: { condition: service_healthy }
       fakes: { condition: service_started }
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4000/ready >/dev/null || exit 1"]
@@ -182,4 +165,3 @@ services:
 
 volumes:
   db-data:
-  minio-data:
