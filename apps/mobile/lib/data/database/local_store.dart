@@ -624,6 +624,20 @@ class LocalStore {
     return rows.isEmpty ? null : rows.first.id;
   }
 
+  /// True when a live (not deleted) entry of [familyId] already carries this MFS TrxID (AC-04).
+  Future<bool> existsTrxId(String familyId, String trxId) async {
+    final rows = await (db.select(db.transactions)
+          ..where(
+            (t) =>
+                t.familyId.equals(familyId) &
+                t.trxId.equals(trxId) &
+                t.deletedAt.isNull(),
+          )
+          ..limit(1))
+        .get();
+    return rows.isNotEmpty;
+  }
+
   Future<List<CachedCategory>> categories() =>
       db.select(db.cachedCategories).get();
   Future<List<CachedAccount>> accounts() => db.select(db.cachedAccounts).get();

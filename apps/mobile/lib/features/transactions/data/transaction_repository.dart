@@ -20,6 +20,7 @@ abstract class TransactionRepository {
     String? accountId,
     String? note,
     String? counterparty,
+    String? trxId,
     String source = 'manual',
     bool isPrivate = false,
     String? splitGroupId,

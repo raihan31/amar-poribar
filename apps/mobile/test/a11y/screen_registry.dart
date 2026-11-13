@@ -11,7 +11,9 @@ import 'package:amar_poribar/features/budgets/state/budget_providers.dart';
 import 'package:amar_poribar/features/budgets/ui/budgets_screen.dart';
 import 'package:amar_poribar/features/entry/data/fake_entry_repository.dart';
 import 'package:amar_poribar/features/entry/state/entry_controller.dart';
+import 'package:amar_poribar/features/entry/state/sms_paste_controller.dart';
 import 'package:amar_poribar/features/entry/ui/category_picker_screen.dart';
+import 'package:amar_poribar/features/entry/ui/sms_paste_screen.dart';
 import 'package:amar_poribar/features/entry/ui/voice_entry_screen.dart';
 import 'package:amar_poribar/features/family/data/fake_family_repository.dart';
 import 'package:amar_poribar/features/family/data/invite_repository.dart';
@@ -165,6 +167,20 @@ void registerAllScreens() {
     ],
   );
   registerScreen(
+    'A5',
+    Routes.addSms,
+    (c) => const SmsPasteScreen(
+      initialText:
+          'You have sent Tk 2,000.00 to 01XXXXX-789. Fee Tk 0.00. Balance Tk 8,450.00. TrxID 9K4L2M7N at 10/11/2026 14:32',
+    ),
+    needs: [
+      ...addExpenseOverrides(FakeTransactionRepository()),
+      entryRepositoryProvider.overrideWithValue(FakeEntryRepository()),
+      entryClockProvider.overrideWithValue(() => DateTime.utc(2026, 11, 10, 9)),
+      smsTrxIdExistsProvider.overrideWithValue((_, __) async => false),
+    ],
+  );
+  registerScreen(
     'B3',
     Routes.budget,
     (c) => const BudgetsScreen(),
@@ -206,7 +222,6 @@ void registerAllScreens() {
 const List<String> kAllRoutes = [
   Routes.welcome,
   Routes.home,
-  Routes.pendingSms,
   Routes.settings,
   Routes.login,
   Routes.consent,
@@ -214,6 +229,7 @@ const List<String> kAllRoutes = [
   Routes.join,
   Routes.add,
   Routes.addVoice,
+  Routes.addSms,
   Routes.addCategory,
   Routes.tutorial,
   Routes.summary,
@@ -225,6 +241,5 @@ const List<String> kAllRoutes = [
 /// route from this list when it registers the screen. The list may only
 /// shrink: `registry_complete_test.dart` fails if a route is in neither place.
 const Set<String> kRoutesAwaitingRegistration = {
-  Routes.pendingSms,
   Routes.settings,
 };

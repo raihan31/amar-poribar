@@ -30,6 +30,7 @@ class Routes {
   static const call = '/call/:callId';
   static const add = '/add';
   static const addVoice = '/add/voice';
+  static const addSms = '/add/sms';
   static const addCategory = '/add/category';
   static const txn = '/txn/:id';
   static const txnEdit = '/txn/:id/edit';
@@ -56,7 +57,6 @@ class Routes {
   static const simple = '/simple';
 
   /// Temporary: the old screens, kept reachable until their own tasks land.
-  static const pendingSms = '/pending-sms';
 }
 
 /// `Meta('welcome_done')` is set. `main.dart` overrides this with the stored value.
