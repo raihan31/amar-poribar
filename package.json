@@ -13,6 +13,7 @@
     "test": "turbo run test",
     "stack:up": "docker compose up -d --build --wait",
     "stack:down": "docker compose down -v",
+    "e2e:admin": "pnpm --filter @amar-poribar/admin e2e",
     "db:up": "docker compose up -d db",
     "db:generate": "pnpm --filter @amar-poribar/api db:generate",
     "db:migrate": "pnpm --filter @amar-poribar/api db:migrate",
