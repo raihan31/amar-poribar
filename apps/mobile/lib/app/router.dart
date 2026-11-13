@@ -17,10 +17,10 @@ import '../features/onboarding/ui/welcome_screen.dart';
 import '../features/settings/ui/profile_screen.dart';
 import '../features/summary/ui/summary_screen.dart';
 import '../features/transactions/ui/add_expense_screen.dart';
+import '../features/transactions/ui/transactions_screen.dart';
 import '../features/voice/ui/voice_fallback_screen.dart';
 import '../presentation/providers/auth_provider.dart';
 import '../presentation/screens/settings_screen.dart';
-import '../presentation/screens/transaction_screen.dart';
 import 'redirects.dart';
 import 'screens.dart';
 import 'shell.dart';
@@ -97,7 +97,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [tab(Routes.talk, () => placeholder(Routes.talk))],
           ),
           StatefulShellBranch(
-            routes: [tab(Routes.list, () => placeholder(Routes.list))],
+            routes: [tab(Routes.list, () => const TransactionsScreen())],
           ),
           StatefulShellBranch(
             routes: [tab(Routes.budget, () => const BudgetsScreen())],
@@ -150,7 +150,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       stub(Routes.bazaar),
       stub(Routes.deleteAccount),
       stub(Routes.simple),
-      simple(Routes.transactions, (_) => const TransactionScreen()),
       simple(Routes.pendingSms, (_) => const PendingSmsScreen()),
     ],
   );

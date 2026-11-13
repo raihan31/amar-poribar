@@ -55,7 +55,6 @@ class Routes {
   static const simple = '/simple';
 
   /// Temporary: the old screens, kept reachable until their own tasks land.
-  static const transactions = '/transactions';
   static const pendingSms = '/pending-sms';
 }
 

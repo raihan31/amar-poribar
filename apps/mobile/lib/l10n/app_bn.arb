@@ -392,5 +392,22 @@
   "budget_pickCategory": "কোন খাতের বাজেট?",
   "budget_save": "রাখুন",
   "budget_queued": "ইন্টারনেট এলে বাজেট জমা হবে",
-  "budget_saveFailed": "বাজেট রাখা গেল না"
+  "budget_saveFailed": "বাজেট রাখা গেল না",
+  "txn_list_title": "খরচের তালিকা",
+  "txn_list_csv": "CSV নিন",
+  "txn_list_prevMonth": "আগের মাস",
+  "txn_list_nextMonth": "পরের মাস",
+  "txn_list_all": "সবাই",
+  "txn_list_private": "ব্যক্তিগত খরচ",
+  "txn_list_privateSub": "শুধু আপনি দেখছেন",
+  "txn_list_new": "+ নতুন খরচ লিখুন",
+  "txn_list_empty": "এ মাসে কোনো খরচ নেই",
+  "txn_list_emptyAction": "বলে খরচ লিখুন",
+  "txn_list_srcVoice": "কণ্ঠ থেকে",
+  "txn_list_srcSms": "এসএমএস থেকে",
+  "txn_list_srcPhoto": "ছবি থেকে",
+  "txn_list_srcManual": "হাতে",
+  "txn_list_transfer": "স্থানান্তর",
+  "txn_list_other": "অন্যান্য",
+  "txn_list_csvFailed": "CSV বানানো গেল না"
 }
