@@ -9,13 +9,15 @@ import 'tables.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [
-  Transactions,
-  CachedCategories,
-  CachedAccounts,
-  Meta,
-  PendingEntries
-])
+@DriftDatabase(
+  tables: [
+    Transactions,
+    CachedCategories,
+    CachedAccounts,
+    Meta,
+    PendingEntries,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
@@ -25,8 +27,11 @@ class AppDatabase extends _$AppDatabase {
   /// On-device database file.
   static Future<AppDatabase> open() async {
     final dir = await getApplicationDocumentsDirectory();
-    return AppDatabase(NativeDatabase.createInBackground(
-        File(p.join(dir.path, 'amar_poribar.db'))));
+    return AppDatabase(
+      NativeDatabase.createInBackground(
+        File(p.join(dir.path, 'amar_poribar.db')),
+      ),
+    );
   }
 
   @override

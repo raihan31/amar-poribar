@@ -45,7 +45,9 @@ class NearbyTransport implements P2pTransport {
 
   @override
   Future<void> start(
-      String deviceName, Future<bool> Function(PeerInfo peer) approve) async {
+    String deviceName,
+    Future<bool> Function(PeerInfo peer) approve,
+  ) async {
     _name = deviceName;
     _approve = approve;
     if (!await ensurePermissions()) {

@@ -9,71 +9,343 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Every job below is a required check (docs/runbooks/ci.md). Node comes from .node-version,
+# Flutter from .flutter-version, pnpm from the packageManager field.
 jobs:
-  web-api:
-    name: TypeScript (typecheck, test, build)
+  ts-static:
+    name: ts-static
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format:check
       - run: pnpm typecheck
-      - run: pnpm test
-      - run: pnpm build
+      - run: pnpm arch
+      - run: pnpm arch:negative
+      - run: pnpm openapi:check
+      - run: pnpm db:check
+      - run: pnpm exec tsx tools/gen-vectors.ts --check
+      - run: node --test tools/eslint-rules/*.test.mjs
+      - run: node --test tools/verify.test.mjs
+      # Migrations are generated SQL files; schema push is never allowed (T-PLAT-31).
+      - run: pnpm no-drizzle-push
 
-  docker:
-    name: Docker compose stack
+  ts-test:
+    name: ts-test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # The API and web images come from the Dockerfile added with the Compose stack
-      # (PR #2). Until that lands, Compose only has the database, so skip instead of failing.
-      - name: Check for the app images
-        id: stack
-        run: |
-          if [ -f Dockerfile ]; then
-            echo "present=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::No Dockerfile yet; skipping the Docker stack smoke test."
-          fi
-      - name: Start the stack
-        if: steps.stack.outputs.present == 'true'
-        run: docker compose up --build --wait --wait-timeout 300
-      - name: Smoke test
-        if: steps.stack.outputs.present == 'true'
-        # Compose reports the API "running" before Node listens; until then Docker's port
-        # proxy accepts and then resets connections, which --retry-connrefused doesn't retry.
-        run: |
-          curl -fsS --retry 20 --retry-delay 2 --retry-all-errors localhost:4000/health
-          curl -fsS --retry 20 --retry-delay 2 --retry-all-errors -o /dev/null localhost:3000
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Start PostgreSQL 16 and MinIO
+        run: docker compose --profile test up -d --wait db-test minio-test
+      - run: pnpm test
+      - run: pnpm test:db
+      # Thresholds live in the vitest configs: API module domain/app >= 80%, packages/* >= 70% (NFR-11).
+      - run: pnpm coverage
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: |
+            apps/api/coverage/
+            packages/*/coverage/
+          if-no-files-found: ignore
       - name: Logs on failure
-        if: failure() && steps.stack.outputs.present == 'true'
+        if: failure()
+        run: docker compose --profile test logs
+      - name: Stop
+        if: always()
+        run: docker compose --profile test down -v
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+  stack:
+    name: stack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Start the stack
+        run: |
+          echo "STACK_T0=$(date +%s)" >> "$GITHUB_ENV"
+          docker compose up -d --build --wait
+      - name: Smoke test
+        run: bash tools/smoke.sh
+      - name: Logs on failure
+        if: failure()
         run: docker compose logs
       - name: Stop
-        if: always() && steps.stack.outputs.present == 'true'
+        if: always()
         run: docker compose down -v
 
   mobile:
-    name: Flutter (test, analyze)
+    name: mobile
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: apps/mobile
     steps:
       - uses: actions/checkout@v4
+      - name: Read the pinned Flutter version
+        id: flutter
+        working-directory: .
+        run: echo "version=$(tr -d '[:space:]' < .flutter-version)" >> "$GITHUB_OUTPUT"
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: ${{ steps.flutter.outputs.version }}
           cache: true
       - run: flutter pub get
       # Drift's generated code (*.g.dart) is not committed.
       - run: dart run build_runner build --delete-conflicting-outputs
-      - run: flutter test
-      # Known pre-existing errors in the mocked database/sync layer; make this
-      # blocking once they are fixed.
-      - run: flutter analyze
-        continue-on-error: true
+      - run: flutter gen-l10n
+      - run: dart run tool/l10n_check.dart
+      - run: dart run tool/sync_fixtures.dart
+      - run: dart format --output=none --set-exit-if-changed lib test
+      # Blocking: no continue-on-error. Zero issues, infos included.
+      - run: flutter analyze --fatal-infos
+      - run: flutter test --coverage
+      - run: flutter test test/goldens
+      - name: Upload golden failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures
+          path: apps/mobile/test/goldens/failures/**
+          if-no-files-found: ignore
+      - run: bash coverage_gate.sh
+      - name: Contract test
+        run: |
+          if [ -d test/contract ]; then flutter test test/contract; else echo "no contract tests yet"; fi
+
+  mobile-emulator:
+    name: mobile-emulator
+    runs-on: ubuntu-latest
+    # Runs on pushes to main, and on pull requests only when apps/mobile changed.
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check whether apps/mobile changed
+        id: paths
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          elif git diff --name-only "origin/${{ github.base_ref }}...HEAD" -- apps/mobile | grep -q .; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::No apps/mobile changes; skipping the emulator job."
+          fi
+      - name: Read the pinned Flutter version
+        id: flutter
+        run: echo "version=$(tr -d '[:space:]' < .flutter-version)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-java@v4
+        if: steps.paths.outputs.run == 'true'
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        if: steps.paths.outputs.run == 'true'
+        with:
+          channel: stable
+          flutter-version: ${{ steps.flutter.outputs.version }}
+          cache: true
+      - name: Enable KVM
+        if: steps.paths.outputs.run == 'true'
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Prepare
+        if: steps.paths.outputs.run == 'true'
+        working-directory: apps/mobile
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+          flutter gen-l10n
+      - name: Integration tests
+        if: steps.paths.outputs.run == 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          working-directory: apps/mobile
+          # No integration_test folder exists until the first flow lands.
+          script: |
+            if [ -d integration_test ]; then flutter test integration_test; else echo "no integration_test yet"; fi
+
+  mobile-size:
+    name: mobile-size
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read the pinned Flutter version
+        id: flutter
+        working-directory: .
+        run: echo "version=$(tr -d '[:space:]' < .flutter-version)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ steps.flutter.outputs.version }}
+          cache: true
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: flutter gen-l10n
+      # Signed with the debug key: size builds only, never distributed.
+      - run: flutter build apk --release --split-per-abi --target-platform android-arm,android-arm64
+      - run: dart run tool/check_apk_size.dart build/app/outputs/flutter-apk 35
+
+  # The e2e jobs exist now; T-WEB / T-ADMUI add the tests under apps/web/e2e and apps/admin/e2e.
+  e2e-web:
+    name: e2e-web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect Playwright tests
+        id: detect
+        run: |
+          if [ -n "$(find apps/web/e2e -type f 2>/dev/null | head -1)" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::No apps/web/e2e yet; nothing to run."
+          fi
+      - uses: pnpm/action-setup@v4
+        if: steps.detect.outputs.run == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.detect.outputs.run == 'true'
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+        if: steps.detect.outputs.run == 'true'
+      - run: pnpm stack:up
+        if: steps.detect.outputs.run == 'true'
+      - run: pnpm --filter @amar-poribar/web exec playwright install --with-deps chromium
+        if: steps.detect.outputs.run == 'true'
+      - run: pnpm e2e:web
+        if: steps.detect.outputs.run == 'true'
+      - name: Logs on failure
+        if: failure() && steps.detect.outputs.run == 'true'
+        run: docker compose logs
+      - name: Stop
+        if: always() && steps.detect.outputs.run == 'true'
+        run: pnpm stack:down
+
+  e2e-admin:
+    name: e2e-admin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect Playwright tests
+        id: detect
+        run: |
+          if [ -n "$(find apps/admin/e2e -type f 2>/dev/null | head -1)" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::No apps/admin/e2e yet; nothing to run."
+          fi
+      - uses: pnpm/action-setup@v4
+        if: steps.detect.outputs.run == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.detect.outputs.run == 'true'
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+        if: steps.detect.outputs.run == 'true'
+      - run: pnpm stack:up
+        if: steps.detect.outputs.run == 'true'
+      - run: pnpm --filter @amar-poribar/admin exec playwright install --with-deps chromium
+        if: steps.detect.outputs.run == 'true'
+      - run: pnpm e2e:admin
+        if: steps.detect.outputs.run == 'true'
+      - name: Logs on failure
+        if: failure() && steps.detect.outputs.run == 'true'
+        run: docker compose logs
+      - name: Stop
+        if: always() && steps.detect.outputs.run == 'true'
+        run: pnpm stack:down
+
+  docs:
+    name: docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: node --test tools/check-docs.test.mjs
+      - run: node tools/check-docs.mjs --warn
+
+  # One job per milestone gate. A milestone without its tag file milestones/<m>.done is still in
+  # progress: its failure does not block merges. Done milestones block (no human gate).
+  milestone:
+    name: milestone ${{ matrix.m }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        m: [m0, m1, m2, m3, m4, m5, m6, m7, m8]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - name: Read the pinned Flutter version
+        id: flutter
+        run: echo "version=$(tr -d '[:space:]' < .flutter-version)" >> "$GITHUB_OUTPUT"
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ steps.flutter.outputs.version }}
+          cache: true
+      - run: pnpm install --frozen-lockfile
+      - run: docker compose --profile test up -d --wait db-test minio-test
+      - name: Milestone tag
+        id: tag
+        run: |
+          if [ -f "milestones/${{ matrix.m }}.done" ]; then echo "done=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Verify ${{ matrix.m }}
+        id: verify
+        continue-on-error: ${{ steps.tag.outputs.done != 'true' }}
+        run: pnpm verify:${{ matrix.m }}
+      - name: Report
+        if: always()
+        run: |
+          echo "- ${{ matrix.m }}: ${{ steps.verify.outcome }}" >> "$GITHUB_STEP_SUMMARY"
+      - name: Stop
+        if: always()
+        run: docker compose --profile test down -v

@@ -37,24 +37,27 @@ export function useSpeechRecognition(lang = "bn-BD") {
 
   useEffect(() => setSupported(getRecognitionCtor() !== null), []);
 
-  const start = useCallback((onText: (text: string) => void) => {
-    const Ctor = getRecognitionCtor();
-    if (!Ctor) return;
-    const rec = new Ctor();
-    rec.lang = lang;
-    rec.interimResults = false;
-    rec.maxAlternatives = 1;
-    rec.onresult = (e) => {
-      const text = e.results[0]?.[0]?.transcript?.trim();
-      if (text) onText(text);
-    };
-    rec.onerror = (e) => setError(e.error);
-    rec.onend = () => setListening(false);
-    recRef.current = rec;
-    setError(null);
-    setListening(true);
-    rec.start();
-  }, [lang]);
+  const start = useCallback(
+    (onText: (text: string) => void) => {
+      const Ctor = getRecognitionCtor();
+      if (!Ctor) return;
+      const rec = new Ctor();
+      rec.lang = lang;
+      rec.interimResults = false;
+      rec.maxAlternatives = 1;
+      rec.onresult = (e) => {
+        const text = e.results[0]?.[0]?.transcript?.trim();
+        if (text) onText(text);
+      };
+      rec.onerror = (e) => setError(e.error);
+      rec.onend = () => setListening(false);
+      recRef.current = rec;
+      setError(null);
+      setListening(true);
+      rec.start();
+    },
+    [lang],
+  );
 
   const stop = useCallback(() => recRef.current?.stop(), []);
   return { supported, listening, error, start, stop };

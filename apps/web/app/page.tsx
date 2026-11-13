@@ -17,37 +17,83 @@ import { api, ApiError } from "../lib/api";
 import { speak, stopSpeaking, useSpeechRecognition } from "../lib/voice";
 
 type RoleName = "owner" | "admin" | "member" | "viewer";
-interface Family { id: string; name: string; role: RoleName }
-interface Member { userId: string; role: RoleName; name: string | null; phone: string }
-const ROLE_LABEL: Record<RoleName, "roleOwner" | "roleAdmin" | "roleMember" | "roleViewer"> = {
-  owner: "roleOwner", admin: "roleAdmin", member: "roleMember", viewer: "roleViewer",
-};
-interface Category { id: string; key: string; kind: string; nameBn: string; nameEn: string; icon: string | null; isHidden?: boolean }
-interface BudgetRow {
-  categoryId: string | null; nameBn: string; nameEn: string;
-  limitPaisa: number; spentPaisa: number; level: "ok" | "warning" | "exceeded"; inherited: boolean;
+interface Family {
+  id: string;
+  name: string;
+  role: RoleName;
 }
-interface Account { id: string; name: string; type: string }
+interface Member {
+  userId: string;
+  role: RoleName;
+  name: string | null;
+  phone: string;
+}
+const ROLE_LABEL: Record<RoleName, "roleOwner" | "roleAdmin" | "roleMember" | "roleViewer"> = {
+  owner: "roleOwner",
+  admin: "roleAdmin",
+  member: "roleMember",
+  viewer: "roleViewer",
+};
+interface Category {
+  id: string;
+  key: string;
+  kind: string;
+  nameBn: string;
+  nameEn: string;
+  icon: string | null;
+  isHidden?: boolean;
+}
+interface BudgetRow {
+  categoryId: string | null;
+  nameBn: string;
+  nameEn: string;
+  limitPaisa: number;
+  spentPaisa: number;
+  level: "ok" | "warning" | "exceeded";
+  inherited: boolean;
+}
+interface Account {
+  id: string;
+  name: string;
+  type: string;
+}
 
 const TOKEN_KEY = "amar-poribar.token";
 
 function loadToken(): string | null {
-  try { return localStorage.getItem(TOKEN_KEY); } catch { return null; }
+  try {
+    return localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
 }
 function saveToken(token: string | null) {
-  try { token ? localStorage.setItem(TOKEN_KEY, token) : localStorage.removeItem(TOKEN_KEY); } catch { /* storage unavailable */ }
+  try {
+    if (token) localStorage.setItem(TOKEN_KEY, token);
+    else localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    /* storage unavailable */
+  }
 }
 
 export default function Home() {
   const [token, setToken] = useState<string | null>(null);
   useEffect(() => setToken(loadToken()), []);
 
-  const onLogin = (tok: string) => { saveToken(tok); setToken(tok); };
-  const onLogout = () => { saveToken(null); setToken(null); };
+  const onLogin = (tok: string) => {
+    saveToken(tok);
+    setToken(tok);
+  };
+  const onLogout = () => {
+    saveToken(null);
+    setToken(null);
+  };
 
   return (
     <main>
-      <h1>{t("appName")} <span className="muted">· Amar Poribar</span></h1>
+      <h1>
+        {t("appName")} <span className="muted">· Amar Poribar</span>
+      </h1>
       {token ? <FamilyHome token={token} onLogout={onLogout} /> : <Login onLogin={onLogin} />}
     </main>
   );
@@ -66,7 +112,9 @@ function Login({ onLogin }: { onLogin: (token: string) => void }) {
       const res = await api<{ devCode?: string }>("/v1/auth/otp/request", { body: { phone } });
       setSent(true);
       setHint(res.devCode ? `Dev OTP: ${res.devCode}` : null);
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) {
+      setError((e as Error).message);
+    }
   }
 
   async function verify() {
@@ -74,7 +122,9 @@ function Login({ onLogin }: { onLogin: (token: string) => void }) {
     try {
       const res = await api<{ accessToken: string }>("/v1/auth/otp/verify", { body: { phone, code } });
       onLogin(res.accessToken);
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) {
+      setError((e as Error).message);
+    }
   }
 
   return (
@@ -86,7 +136,12 @@ function Login({ onLogin }: { onLogin: (token: string) => void }) {
       </div>
       {sent && (
         <div className="row" style={{ marginTop: 8 }}>
-          <input inputMode="numeric" placeholder="৬ সংখ্যার কোড" value={code} onChange={(e) => setCode(e.target.value)} />
+          <input
+            inputMode="numeric"
+            placeholder="৬ সংখ্যার কোড"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
           <button onClick={verify}>লগইন</button>
         </div>
       )}
@@ -109,21 +164,30 @@ function FamilyHome({ token, onLogout }: { token: string; onLogout: () => void }
   const [meId, setMeId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const handle = useCallback((e: unknown) => {
-    if (e instanceof ApiError && e.status === 401) onLogout();
-    else setError((e as Error).message);
-  }, [onLogout]);
+  const handle = useCallback(
+    (e: unknown) => {
+      if (e instanceof ApiError && e.status === 401) onLogout();
+      else setError((e as Error).message);
+    },
+    [onLogout],
+  );
 
-  const refresh = useCallback(async (fam: Family, m: string | null = monthRef.current) => {
-    const q = m ? `month=${m}` : "";
-    const [cats, accs, sum, ai] = await Promise.all([
-      api<Category[]>(`/v1/families/${fam.id}/categories`, { token }),
-      api<Account[]>(`/v1/families/${fam.id}/accounts`, { token }),
-      api<MonthSummary>(`/v1/families/${fam.id}/reports/summary?${q}`, { token }),
-      api<MonthlyAiSummary>(`/v1/families/${fam.id}/ai/summary?locale=bn${q ? `&${q}` : ""}`, { token }),
-    ]);
-    setCategories(cats); setAccounts(accs); setSummary(sum); setAiSummary(ai);
-  }, [token]);
+  const refresh = useCallback(
+    async (fam: Family, m: string | null = monthRef.current) => {
+      const q = m ? `month=${m}` : "";
+      const [cats, accs, sum, ai] = await Promise.all([
+        api<Category[]>(`/v1/families/${fam.id}/categories`, { token }),
+        api<Account[]>(`/v1/families/${fam.id}/accounts`, { token }),
+        api<MonthSummary>(`/v1/families/${fam.id}/reports/summary?${q}`, { token }),
+        api<MonthlyAiSummary>(`/v1/families/${fam.id}/ai/summary?locale=bn${q ? `&${q}` : ""}`, { token }),
+      ]);
+      setCategories(cats);
+      setAccounts(accs);
+      setSummary(sum);
+      setAiSummary(ai);
+    },
+    [token],
+  );
 
   useEffect(() => {
     (async () => {
@@ -132,10 +196,16 @@ function FamilyHome({ token, onLogout }: { token: string; onLogout: () => void }
       const inviteToken = new URLSearchParams(window.location.search).get("invite");
       if (inviteToken) {
         try {
-          const res = await api<{ familyId: string }>(`/v1/invites/${encodeURIComponent(inviteToken)}/accept`, { method: "POST", token, body: {} });
+          const res = await api<{ familyId: string }>(`/v1/invites/${encodeURIComponent(inviteToken)}/accept`, {
+            method: "POST",
+            token,
+            body: {},
+          });
           joinedId = res.familyId;
           setNotice(t("joined"));
-        } catch (e) { setError((e as Error).message); }
+        } catch (e) {
+          setError((e as Error).message);
+        }
         window.history.replaceState(null, "", window.location.pathname);
       }
       const me = await api<{ user: { id: string }; families: Family[] }>("/v1/me", { token });
@@ -149,32 +219,75 @@ function FamilyHome({ token, onLogout }: { token: string; onLogout: () => void }
   }, [token, refresh, handle]);
 
   if (!loaded) return <p className="muted">লোড হচ্ছে…</p>;
-  if (!family) return <CreateFamily token={token} onCreated={(f) => { setFamily(f); refresh(f).catch(handle); }} />;
+  if (!family)
+    return (
+      <CreateFamily
+        token={token}
+        onCreated={(f) => {
+          setFamily(f);
+          refresh(f).catch(handle);
+        }}
+      />
+    );
 
   return (
     <>
-      <QuickAdd token={token} family={family} categories={categories} accounts={accounts}
-        onSaved={() => refresh(family).catch(handle)} onError={handle} />
+      <QuickAdd
+        token={token}
+        family={family}
+        categories={categories}
+        accounts={accounts}
+        onSaved={() => refresh(family).catch(handle)}
+        onError={handle}
+      />
       {aiSummary && <SpokenSummary summary={aiSummary} />}
       {summary && (
-        <Dashboard summary={summary}
-          onMonth={(m) => { monthRef.current = m; refresh(family, m).catch(handle); }} />
+        <Dashboard
+          summary={summary}
+          onMonth={(m) => {
+            monthRef.current = m;
+            refresh(family, m).catch(handle);
+          }}
+        />
       )}
       {summary && (
-        <Budgets token={token} family={family} month={summary.month} categories={categories}
-          spentKey={summary.expensePaisa} onError={handle} />
+        <Budgets
+          token={token}
+          family={family}
+          month={summary.month}
+          categories={categories}
+          spentKey={summary.expensePaisa}
+          onError={handle}
+        />
       )}
       {(family.role === "owner" || family.role === "admin") && (
-        <ManageLists token={token} family={family} categories={categories} accounts={accounts}
-          onChanged={() => refresh(family).catch(handle)} onError={handle} />
+        <ManageLists
+          token={token}
+          family={family}
+          categories={categories}
+          accounts={accounts}
+          onChanged={() => refresh(family).catch(handle)}
+          onError={handle}
+        />
       )}
       {meId && (
-        <Members token={token} family={family} meId={meId} onError={handle}
-          onLeft={() => { setFamily(null); setLoaded(false); window.location.reload(); }} />
+        <Members
+          token={token}
+          family={family}
+          meId={meId}
+          onError={handle}
+          onLeft={() => {
+            setFamily(null);
+            setLoaded(false);
+            window.location.reload();
+          }}
+        />
       )}
       {notice && <p className="notice">{notice}</p>}
       {error && <p className="error">{error}</p>}
-      <button className="secondary" onClick={onLogout}>লগআউট</button>
+      <button className="secondary" onClick={onLogout}>
+        লগআউট
+      </button>
     </>
   );
 }
@@ -186,15 +299,21 @@ function CreateFamily({ token, onCreated }: { token: string; onCreated: (f: Fami
       <p>আপনার পরিবারের নাম দিন</p>
       <div className="row">
         <input value={name} placeholder="যেমন: রহমান পরিবার" onChange={(e) => setName(e.target.value)} />
-        <button onClick={async () => onCreated(await api<Family>("/v1/families", { body: { name }, token }))}>তৈরি করুন</button>
+        <button onClick={async () => onCreated(await api<Family>("/v1/families", { body: { name }, token }))}>
+          তৈরি করুন
+        </button>
       </div>
     </div>
   );
 }
 
 function QuickAdd(props: {
-  token: string; family: Family; categories: Category[]; accounts: Account[];
-  onSaved: () => void; onError: (e: unknown) => void;
+  token: string;
+  family: Family;
+  categories: Category[];
+  accounts: Account[];
+  onSaved: () => void;
+  onError: (e: unknown) => void;
 }) {
   const { token, family, categories, accounts, onSaved, onError } = props;
   const [text, setText] = useState("");
@@ -215,13 +334,18 @@ function QuickAdd(props: {
     setBusy(true);
     try {
       const res = await api<ParseResponse>(`/v1/families/${family.id}/ai/parse`, {
-        token, body: { text: input, now: new Date().toISOString() },
+        token,
+        body: { text: input, now: new Date().toISOString() },
       });
       // Voice entries come back marked as voice, so reports can tell them apart.
       const list = spoken ? res.drafts.map((d) => ({ ...d, source: "voice" as const })) : res.drafts;
       setDrafts(list);
       if (spoken) readBack(list);
-    } catch (e) { onError(e); } finally { setBusy(false); }
+    } catch (e) {
+      onError(e);
+    } finally {
+      setBusy(false);
+    }
   }
 
   function listen() {
@@ -237,11 +361,17 @@ function QuickAdd(props: {
       await api(`/v1/families/${family.id}/transactions`, {
         token,
         body: {
-          type: d.type, amountPaisa: d.amountPaisa, feePaisa: d.feePaisa, occurredAt: d.occurredAt,
+          type: d.type,
+          amountPaisa: d.amountPaisa,
+          feePaisa: d.feePaisa,
+          occurredAt: d.occurredAt,
           categoryId: categories.find((c) => c.key === d.categoryKey)?.id ?? null,
           accountId: accounts.find((a) => a.type === d.accountType)?.id ?? null,
-          note: d.note, counterparty: d.counterparty ?? undefined, trxId: d.trxId ?? undefined,
-          source: d.source, aiConfidence: d.confidence,
+          note: d.note,
+          counterparty: d.counterparty ?? undefined,
+          trxId: d.trxId ?? undefined,
+          source: d.source,
+          aiConfidence: d.confidence,
         },
       });
       setDrafts((prev) => {
@@ -250,7 +380,9 @@ function QuickAdd(props: {
       });
       setText("");
       onSaved();
-    } catch (e) { onError(e); }
+    } catch (e) {
+      onError(e);
+    }
   }
 
   const categoryName = (key: string | null) => {
@@ -260,15 +392,26 @@ function QuickAdd(props: {
 
   return (
     <div className="card">
-      <button className="mic" onClick={voice.listening ? voice.stop : listen} disabled={!voice.supported || busy}
-        aria-label={t("tapToSpeak")}>
+      <button
+        className="mic"
+        onClick={voice.listening ? voice.stop : listen}
+        disabled={!voice.supported || busy}
+        aria-label={t("tapToSpeak")}
+      >
         <span aria-hidden="true">🎤</span> {voice.listening ? t("listening") : t("tapToSpeak")}
       </button>
       {!voice.supported && <p className="muted">{t("voiceUnsupported")}</p>}
       {voice.error && <p className="error">{voice.error}</p>}
-      <textarea rows={3} placeholder={t("quickAddPlaceholder")} value={text} onChange={(e) => setText(e.target.value)} />
+      <textarea
+        rows={3}
+        placeholder={t("quickAddPlaceholder")}
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
       <div className="row" style={{ marginTop: 8 }}>
-        <button onClick={() => parse()} disabled={busy || !text.trim()}>{busy ? "…" : t("parse")}</button>
+        <button onClick={() => parse()} disabled={busy || !text.trim()}>
+          {busy ? "…" : t("parse")}
+        </button>
       </div>
       {drafts && drafts.length === 0 && <p className="muted">{t("noDrafts")}</p>}
       {drafts && drafts.length > 0 && (
@@ -276,26 +419,50 @@ function QuickAdd(props: {
           {drafts.map((d, i) => (
             <li key={i} className="draft">
               <span className="draft-text">
-                <span className="draft-icon" aria-hidden="true">{categoryOf(d.categoryKey)?.icon ?? "📦"}</span>
+                <span className="draft-icon" aria-hidden="true">
+                  {categoryOf(d.categoryKey)?.icon ?? "📦"}
+                </span>
                 <span>
                   <strong>{formatBDT(d.amountPaisa, { bnDigits: true })}</strong>
                   <br />
-                  <span className="muted">{categoryName(d.categoryKey)} · {d.note}</span>
+                  <span className="muted">
+                    {categoryName(d.categoryKey)} · {d.note}
+                  </span>
                 </span>
               </span>
               {!d.categoryKey && (
-                <CategoryPicker categories={categories.filter((c) => !c.isHidden && c.kind === (d.type === "income" ? "income" : "expense"))}
-                  onPick={(key) => setDrafts((prev) => prev?.map((x, j) => (j === i ? { ...x, categoryKey: key } : x)) ?? null)} />
+                <CategoryPicker
+                  categories={categories.filter(
+                    (c) => !c.isHidden && c.kind === (d.type === "income" ? "income" : "expense"),
+                  )}
+                  onPick={(key) =>
+                    setDrafts((prev) => prev?.map((x, j) => (j === i ? { ...x, categoryKey: key } : x)) ?? null)
+                  }
+                />
               )}
               <span className="row">
-                <button className="icon secondary" aria-label={t("speak")}
-                  onClick={() => speak(draftToSpeech(d, categoryOf(d.categoryKey)?.nameBn ?? null))}>🔊</button>
-                <button className="icon danger" aria-label={t("no")}
-                  onClick={() => setDrafts((prev) => {
-                    const rest = prev?.filter((_, j) => j !== i) ?? [];
-                    return rest.length ? rest : null;
-                  })}>✗</button>
-                <button className="icon" aria-label={t("yes")} onClick={() => confirm(d, i)}>✓</button>
+                <button
+                  className="icon secondary"
+                  aria-label={t("speak")}
+                  onClick={() => speak(draftToSpeech(d, categoryOf(d.categoryKey)?.nameBn ?? null))}
+                >
+                  🔊
+                </button>
+                <button
+                  className="icon danger"
+                  aria-label={t("no")}
+                  onClick={() =>
+                    setDrafts((prev) => {
+                      const rest = prev?.filter((_, j) => j !== i) ?? [];
+                      return rest.length ? rest : null;
+                    })
+                  }
+                >
+                  ✗
+                </button>
+                <button className="icon" aria-label={t("yes")} onClick={() => confirm(d, i)}>
+                  ✓
+                </button>
               </span>
             </li>
           ))}
@@ -335,19 +502,32 @@ function Dashboard({ summary, onMonth }: { summary: MonthSummary; onMonth: (m: s
   const rows: BreakdownRow[] =
     view === "category"
       ? summary.byCategory.map((c) => ({ id: c.categoryId, name: c.name, totalPaisa: c.totalPaisa }))
-      : view === "member" ? summary.byMember : summary.byAccount;
+      : view === "member"
+        ? summary.byMember
+        : summary.byAccount;
   const max = Math.max(1, ...rows.map((r) => r.totalPaisa));
   const net = summary.incomePaisa - summary.expensePaisa;
   const prevNet = summary.previous.incomePaisa - summary.previous.expensePaisa;
   const money = (p: number) => formatBDT(p, { bnDigits: true });
-  const label = new Date(`${summary.month}-01T00:00:00+06:00`).toLocaleDateString("bn-BD", { month: "long", year: "numeric" });
+  const label = new Date(`${summary.month}-01T00:00:00+06:00`).toLocaleDateString("bn-BD", {
+    month: "long",
+    year: "numeric",
+  });
 
   return (
     <div className="card">
       <div className="month-nav">
-        <button className="secondary" aria-label={t("prevMonth")} onClick={() => onMonth(shiftMonth(summary.month, -1))}>‹</button>
+        <button
+          className="secondary"
+          aria-label={t("prevMonth")}
+          onClick={() => onMonth(shiftMonth(summary.month, -1))}
+        >
+          ‹
+        </button>
         <strong>{label}</strong>
-        <button className="secondary" aria-label={t("nextMonth")} onClick={() => onMonth(shiftMonth(summary.month, 1))}>›</button>
+        <button className="secondary" aria-label={t("nextMonth")} onClick={() => onMonth(shiftMonth(summary.month, 1))}>
+          ›
+        </button>
       </div>
       <div className="stats">
         <div className="stat">
@@ -363,7 +543,9 @@ function Dashboard({ summary, onMonth }: { summary: MonthSummary; onMonth: (m: s
         <div className="stat">
           <span className="muted">{t("netSaving")}</span>
           <strong>{money(net)}</strong>
-          <span className="delta">{t("vsLastMonth")}: {money(prevNet)}</span>
+          <span className="delta">
+            {t("vsLastMonth")}: {money(prevNet)}
+          </span>
         </div>
       </div>
       <div className="tabs" role="group">
@@ -373,12 +555,19 @@ function Dashboard({ summary, onMonth }: { summary: MonthSummary; onMonth: (m: s
           </button>
         ))}
       </div>
-      {rows.length === 0 ? <p className="muted">{t("noData")}</p> : (
+      {rows.length === 0 ? (
+        <p className="muted">{t("noData")}</p>
+      ) : (
         <ul>
           {rows.map((r) => (
             <li key={r.id ?? "none"} className="bar-row">
-              <span className="bar-label"><span>{r.name}</span><span>{money(r.totalPaisa)}</span></span>
-              <span className="bar" aria-hidden="true"><span style={{ width: `${(r.totalPaisa / max) * 100}%` }} /></span>
+              <span className="bar-label">
+                <span>{r.name}</span>
+                <span>{money(r.totalPaisa)}</span>
+              </span>
+              <span className="bar" aria-hidden="true">
+                <span style={{ width: `${(r.totalPaisa / max) * 100}%` }} />
+              </span>
             </li>
           ))}
         </ul>
@@ -389,8 +578,12 @@ function Dashboard({ summary, onMonth }: { summary: MonthSummary; onMonth: (m: s
 
 /** Add, rename, hide and archive accounts and categories (FR-ACC-01, FR-CAT-02). Owners and admins only. */
 function ManageLists(props: {
-  token: string; family: Family; categories: Category[]; accounts: Account[];
-  onChanged: () => void; onError: (e: unknown) => void;
+  token: string;
+  family: Family;
+  categories: Category[];
+  accounts: Account[];
+  onChanged: () => void;
+  onError: (e: unknown) => void;
 }) {
   const { token, family, categories, accounts, onChanged, onError } = props;
   const base = `/v1/families/${family.id}`;
@@ -399,7 +592,12 @@ function ManageLists(props: {
   const [cat, setCat] = useState({ kind: "expense", nameBn: "", nameEn: "", icon: "" });
 
   async function run(fn: () => Promise<unknown>) {
-    try { await fn(); onChanged(); } catch (e) { onError(e); }
+    try {
+      await fn();
+      onChanged();
+    } catch (e) {
+      onError(e);
+    }
   }
   const rename = (path: string, field: string, value: string, current: string) =>
     value.trim() && value.trim() !== current
@@ -410,12 +608,22 @@ function ManageLists(props: {
     <details className="card">
       <summary>{t("manage")}</summary>
 
-      <p className="muted" style={{ marginBottom: 0 }}>{t("accounts")}</p>
+      <p className="muted" style={{ marginBottom: 0 }}>
+        {t("accounts")}
+      </p>
       {accounts.map((a) => (
         <div key={a.id} className="manage-row">
-          <input defaultValue={a.name} aria-label={t("accountName")}
-            onBlur={(e) => rename(`${base}/accounts/${a.id}`, "name", e.target.value, a.name)} />
-          <button className="secondary" onClick={() => run(() => api(`${base}/accounts/${a.id}`, { method: "PATCH", token, body: { archived: true } }))}>
+          <input
+            defaultValue={a.name}
+            aria-label={t("accountName")}
+            onBlur={(e) => rename(`${base}/accounts/${a.id}`, "name", e.target.value, a.name)}
+          />
+          <button
+            className="secondary"
+            onClick={() =>
+              run(() => api(`${base}/accounts/${a.id}`, { method: "PATCH", token, body: { archived: true } }))
+            }
+          >
             {t("archive")}
           </button>
         </div>
@@ -423,23 +631,44 @@ function ManageLists(props: {
       <div className="add-row">
         <input placeholder={t("accountName")} value={accName} onChange={(e) => setAccName(e.target.value)} />
         <select value={accType} aria-label="type" onChange={(e) => setAccType(e.target.value as typeof accType)}>
-          {ACCOUNT_TYPES.map((x) => <option key={x} value={x}>{x}</option>)}
+          {ACCOUNT_TYPES.map((x) => (
+            <option key={x} value={x}>
+              {x}
+            </option>
+          ))}
         </select>
-        <button disabled={!accName.trim()} onClick={() =>
-          run(async () => { await api(`${base}/accounts`, { token, body: { name: accName.trim(), type: accType } }); setAccName(""); })}>
+        <button
+          disabled={!accName.trim()}
+          onClick={() =>
+            run(async () => {
+              await api(`${base}/accounts`, { token, body: { name: accName.trim(), type: accType } });
+              setAccName("");
+            })
+          }
+        >
           {t("add")}
         </button>
       </div>
 
-      <p className="muted" style={{ marginBottom: 0, marginTop: 20 }}>{t("categories")}</p>
+      <p className="muted" style={{ marginBottom: 0, marginTop: 20 }}>
+        {t("categories")}
+      </p>
       {categories.map((c) => (
         <div key={c.id} className={`manage-row${c.isHidden ? " hidden-item" : ""}`}>
           <span className="row">
             <span aria-hidden="true">{c.icon}</span>
-            <input defaultValue={c.nameBn} aria-label={t("nameBn")}
-              onBlur={(e) => rename(`${base}/categories/${c.id}`, "nameBn", e.target.value, c.nameBn)} />
+            <input
+              defaultValue={c.nameBn}
+              aria-label={t("nameBn")}
+              onBlur={(e) => rename(`${base}/categories/${c.id}`, "nameBn", e.target.value, c.nameBn)}
+            />
           </span>
-          <button className="secondary" onClick={() => run(() => api(`${base}/categories/${c.id}`, { method: "PATCH", token, body: { isHidden: !c.isHidden } }))}>
+          <button
+            className="secondary"
+            onClick={() =>
+              run(() => api(`${base}/categories/${c.id}`, { method: "PATCH", token, body: { isHidden: !c.isHidden } }))
+            }
+          >
             {c.isHidden ? t("unhide") : t("hide")}
           </button>
         </div>
@@ -449,14 +678,40 @@ function ManageLists(props: {
           <option value="expense">{t("expenseKind")}</option>
           <option value="income">{t("incomeKind")}</option>
         </select>
-        <input placeholder={t("nameBn")} value={cat.nameBn} onChange={(e) => setCat({ ...cat, nameBn: e.target.value })} />
-        <input placeholder={t("nameEn")} value={cat.nameEn} onChange={(e) => setCat({ ...cat, nameEn: e.target.value })} />
-        <input placeholder="🙂" maxLength={4} value={cat.icon} onChange={(e) => setCat({ ...cat, icon: e.target.value })} style={{ flex: "0 1 70px" }} />
-        <button disabled={!cat.nameBn.trim() || !cat.nameEn.trim()} onClick={() =>
-          run(async () => {
-            await api(`${base}/categories`, { token, body: { kind: cat.kind, nameBn: cat.nameBn.trim(), nameEn: cat.nameEn.trim(), ...(cat.icon ? { icon: cat.icon } : {}) } });
-            setCat({ kind: cat.kind, nameBn: "", nameEn: "", icon: "" });
-          })}>
+        <input
+          placeholder={t("nameBn")}
+          value={cat.nameBn}
+          onChange={(e) => setCat({ ...cat, nameBn: e.target.value })}
+        />
+        <input
+          placeholder={t("nameEn")}
+          value={cat.nameEn}
+          onChange={(e) => setCat({ ...cat, nameEn: e.target.value })}
+        />
+        <input
+          placeholder="🙂"
+          maxLength={4}
+          value={cat.icon}
+          onChange={(e) => setCat({ ...cat, icon: e.target.value })}
+          style={{ flex: "0 1 70px" }}
+        />
+        <button
+          disabled={!cat.nameBn.trim() || !cat.nameEn.trim()}
+          onClick={() =>
+            run(async () => {
+              await api(`${base}/categories`, {
+                token,
+                body: {
+                  kind: cat.kind,
+                  nameBn: cat.nameBn.trim(),
+                  nameEn: cat.nameEn.trim(),
+                  ...(cat.icon ? { icon: cat.icon } : {}),
+                },
+              });
+              setCat({ kind: cat.kind, nameBn: "", nameEn: "", icon: "" });
+            })
+          }
+        >
           {t("add")}
         </button>
       </div>
@@ -466,7 +721,11 @@ function ManageLists(props: {
 
 /** Members, roles and invite links (FR-FAM-02, FR-FAM-03). */
 function Members(props: {
-  token: string; family: Family; meId: string; onError: (e: unknown) => void; onLeft: () => void;
+  token: string;
+  family: Family;
+  meId: string;
+  onError: (e: unknown) => void;
+  onLeft: () => void;
 }) {
   const { token, family, meId, onError, onLeft } = props;
   const [members, setMembers] = useState<Member[]>([]);
@@ -489,38 +748,68 @@ function Members(props: {
     try {
       const res = await api<{ token: string }>(`${base}/invites`, { token, body: { role } });
       setLink(`${window.location.origin}/?invite=${res.token}`);
-    } catch (e) { onError(e); }
+    } catch (e) {
+      onError(e);
+    }
   }
   async function changeRole(m: Member, next: RoleName) {
-    try { await api(`${base}/members/${m.userId}`, { method: "PATCH", token, body: { role: next } }); load(); } catch (e) { onError(e); }
+    try {
+      await api(`${base}/members/${m.userId}`, { method: "PATCH", token, body: { role: next } });
+      load();
+    } catch (e) {
+      onError(e);
+    }
   }
   async function remove(m: Member) {
     try {
       await api(`${base}/members/${m.userId}`, { method: "DELETE", token });
-      if (m.userId === meId) onLeft(); else load();
-    } catch (e) { onError(e); }
+      if (m.userId === meId) onLeft();
+      else load();
+    } catch (e) {
+      onError(e);
+    }
   }
 
   return (
     <div className="card">
-      <strong>{t("family")}: {family.name}</strong>
+      <strong>
+        {t("family")}: {family.name}
+      </strong>
       <ul>
         {members.map((m) => (
           <li key={m.userId} className="member">
             <span>
-              {m.name ?? m.phone}{m.userId === meId && <span className="muted"> · {t("you")}</span>}
-              <br /><span className="muted">{m.phone}</span>
+              {m.name ?? m.phone}
+              {m.userId === meId && <span className="muted"> · {t("you")}</span>}
+              <br />
+              <span className="muted">{m.phone}</span>
             </span>
             {isAdmin && canManage(m) ? (
-              <select value={m.role} aria-label={t("members")} onChange={(e) => changeRole(m, e.target.value as RoleName)}>
-                {[...new Set([m.role, ...assignable])].map((r) => <option key={r} value={r}>{t(ROLE_LABEL[r])}</option>)}
+              <select
+                value={m.role}
+                aria-label={t("members")}
+                onChange={(e) => changeRole(m, e.target.value as RoleName)}
+              >
+                {[...new Set([m.role, ...assignable])].map((r) => (
+                  <option key={r} value={r}>
+                    {t(ROLE_LABEL[r])}
+                  </option>
+                ))}
               </select>
-            ) : <span className="muted">{t(ROLE_LABEL[m.role])}</span>}
-            {(isAdmin && canManage(m)) ? (
-              <button className="icon danger" aria-label={t("remove")} onClick={() => remove(m)}>✗</button>
+            ) : (
+              <span className="muted">{t(ROLE_LABEL[m.role])}</span>
+            )}
+            {isAdmin && canManage(m) ? (
+              <button className="icon danger" aria-label={t("remove")} onClick={() => remove(m)}>
+                ✗
+              </button>
             ) : m.userId === meId && m.role !== "owner" ? (
-              <button className="secondary" onClick={() => remove(m)}>{t("leave")}</button>
-            ) : <span />}
+              <button className="secondary" onClick={() => remove(m)}>
+                {t("leave")}
+              </button>
+            ) : (
+              <span />
+            )}
           </li>
         ))}
       </ul>
@@ -528,15 +817,23 @@ function Members(props: {
         <div style={{ marginTop: 12 }}>
           <div className="row">
             <select value={role} aria-label={t("inviteMember")} onChange={(e) => setRole(e.target.value as RoleName)}>
-              {assignable.map((r) => <option key={r} value={r}>{t(ROLE_LABEL[r])}</option>)}
+              {assignable.map((r) => (
+                <option key={r} value={r}>
+                  {t(ROLE_LABEL[r])}
+                </option>
+              ))}
             </select>
             <button onClick={invite}>{t("inviteMember")}</button>
           </div>
           {link && (
             <>
-              <p className="muted" style={{ marginBottom: 0 }}>{t("inviteLink")}</p>
+              <p className="muted" style={{ marginBottom: 0 }}>
+                {t("inviteLink")}
+              </p>
               <div className="invite-link">{link}</div>
-              <button className="secondary" onClick={() => navigator.clipboard?.writeText(link).catch(() => {})}>{t("copy")}</button>
+              <button className="secondary" onClick={() => navigator.clipboard?.writeText(link).catch(() => {})}>
+                {t("copy")}
+              </button>
             </>
           )}
         </div>
@@ -547,9 +844,13 @@ function Members(props: {
 
 /** Monthly budgets with spend, 80%/100% alerts and (for owners and admins) editing (FR-BUD-01..03). */
 function Budgets(props: {
-  token: string; family: Family; month: string; categories: Category[];
+  token: string;
+  family: Family;
+  month: string;
+  categories: Category[];
   /** Changes whenever spending changes, so budgets reload after a new entry. */
-  spentKey: number; onError: (e: unknown) => void;
+  spentKey: number;
+  onError: (e: unknown) => void;
 }) {
   const { token, family, month, categories, spentKey, onError } = props;
   const [rows, setRows] = useState<BudgetRow[]>([]);
@@ -590,7 +891,9 @@ function Budgets(props: {
       }
       setEditing(false);
       load();
-    } catch (e) { onError(e); }
+    } catch (e) {
+      onError(e);
+    }
   }
 
   const expenseCats = categories.filter((c) => c.kind === "expense" && !(c as { isHidden?: boolean }).isHidden);
@@ -601,21 +904,33 @@ function Budgets(props: {
     <div className="card">
       <div className="row" style={{ justifyContent: "space-between" }}>
         <strong>{t("budgets")}</strong>
-        {canEdit && !editing && <button className="secondary" onClick={startEdit}>{t("budgetSet")}</button>}
+        {canEdit && !editing && (
+          <button className="secondary" onClick={startEdit}>
+            {t("budgetSet")}
+          </button>
+        )}
       </div>
       {editing ? (
         <>
-          {[{ key: OVERALL, label: t("budgetOverall") },
-            ...expenseCats.map((c) => ({ key: c.id, label: `${c.icon ?? ""} ${c.nameBn}` }))].map((f) => (
+          {[
+            { key: OVERALL, label: t("budgetOverall") },
+            ...expenseCats.map((c) => ({ key: c.id, label: `${c.icon ?? ""} ${c.nameBn}` })),
+          ].map((f) => (
             <label key={f.key} className="budget-edit">
               <span>{f.label}</span>
-              <input inputMode="decimal" placeholder="৳" value={draft[f.key] ?? ""}
-                onChange={(e) => setDraft((d) => ({ ...d, [f.key]: e.target.value }))} />
+              <input
+                inputMode="decimal"
+                placeholder="৳"
+                value={draft[f.key] ?? ""}
+                onChange={(e) => setDraft((d) => ({ ...d, [f.key]: e.target.value }))}
+              />
             </label>
           ))}
           <div className="row" style={{ marginTop: 8 }}>
             <button onClick={save}>{t("budgetSave")}</button>
-            <button className="secondary" onClick={() => setEditing(false)}>✗</button>
+            <button className="secondary" onClick={() => setEditing(false)}>
+              ✗
+            </button>
           </div>
         </>
       ) : rows.length === 0 ? (
@@ -627,10 +942,17 @@ function Budgets(props: {
             return (
               <li key={r.categoryId ?? OVERALL} className="bar-row">
                 <span className="bar-label">
-                  <span>{r.nameBn}{r.inherited && <span className="muted"> · {t("budgetCarried")}</span>}</span>
-                  <span>{money(r.spentPaisa)} / {money(r.limitPaisa)}</span>
+                  <span>
+                    {r.nameBn}
+                    {r.inherited && <span className="muted"> · {t("budgetCarried")}</span>}
+                  </span>
+                  <span>
+                    {money(r.spentPaisa)} / {money(r.limitPaisa)}
+                  </span>
                 </span>
-                <span className={`bar ${r.level}`} aria-hidden="true"><span style={{ width: `${pct}%` }} /></span>
+                <span className={`bar ${r.level}`} aria-hidden="true">
+                  <span style={{ width: `${pct}%` }} />
+                </span>
                 {status(r.level) && <span className={`budget-status ${r.level}`}>{status(r.level)}</span>}
               </li>
             );
@@ -645,14 +967,20 @@ function Budgets(props: {
 function SpokenSummary({ summary }: { summary: MonthlyAiSummary }) {
   const [speaking, setSpeaking] = useState(false);
   function toggle() {
-    if (speaking) { stopSpeaking(); setSpeaking(false); return; }
+    if (speaking) {
+      stopSpeaking();
+      setSpeaking(false);
+      return;
+    }
     setSpeaking(speak(summary.speechText, summary.locale === "bn" ? "bn-BD" : "en-IN"));
   }
   return (
     <div className="card">
       <div className="row" style={{ justifyContent: "space-between" }}>
         <strong>{t("monthlySummary")}</strong>
-        <button className="secondary" onClick={toggle}>{speaking ? `⏹ ${t("stop")}` : `🔊 ${t("speak")}`}</button>
+        <button className="secondary" onClick={toggle}>
+          {speaking ? `⏹ ${t("stop")}` : `🔊 ${t("speak")}`}
+        </button>
       </div>
       <p className="summary-text">{summary.text}</p>
     </div>
@@ -664,8 +992,14 @@ function CategoryPicker({ categories, onPick }: { categories: Category[]; onPick
   return (
     <div className="picker" role="group" aria-label="ক্যাটাগরি">
       {categories.map((c) => (
-        <button key={c.id} className="picker-item secondary" onClick={() => onPick(c.key)}
-          onFocus={() => speak(c.nameBn)} title={c.nameBn} aria-label={c.nameBn}>
+        <button
+          key={c.id}
+          className="picker-item secondary"
+          onClick={() => onPick(c.key)}
+          onFocus={() => speak(c.nameBn)}
+          title={c.nameBn}
+          aria-label={c.nameBn}
+        >
           <span aria-hidden="true">{c.icon}</span>
           <small>{c.nameBn}</small>
         </button>

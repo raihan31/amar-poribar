@@ -1,265 +1,129 @@
-import 'dart:convert';
-
 import 'package:http/http.dart' as http;
+
+import '../../domain/models/api/draft.dart';
+import '../../domain/models/api/me.dart';
+import '../../domain/models/api/report.dart';
+import '../../domain/models/api/sync.dart';
+import '../auth/session_manager.dart';
+import 'ai_api.dart';
+import 'api_transport.dart';
+import 'auth_api.dart';
+import 'billing_api.dart';
+import 'budget_api.dart';
+import 'comms_api.dart';
+import 'family_api.dart';
+import 'ledger_api.dart';
+import 'lending_api.dart';
+import 'notification_api.dart';
+import 'privacy_api.dart';
+import 'report_api.dart';
+import 'shopping_api.dart';
+import 'sync_api.dart';
+
+export '../../domain/models/api/draft.dart' show TransactionDraft;
+export '../../domain/models/api/me.dart' show FamilyInfo;
+export '../../domain/models/api/report.dart' show MonthlySummary;
+export '../../domain/models/api/sync.dart' show SyncResponse;
+export 'api_exception.dart';
 
 /// Base URL of apps/api. Override with `--dart-define=API_URL=https://...`.
 const String kApiUrl =
     String.fromEnvironment('API_URL', defaultValue: 'http://10.0.2.2:4000');
 
-class ApiException implements Exception {
-  final int status;
-  final String message;
-  ApiException(this.status, this.message);
-
-  bool get isUnauthorized => status == 401;
-
-  @override
-  String toString() => message;
-}
-
-/// A transaction proposed by the parser, waiting for the user to confirm (SRS FR-AI-05).
-class TransactionDraft {
-  final String type; // expense | income | transfer
-  final int amountPaisa;
-  final int feePaisa;
-  final String occurredAt;
-  final String? categoryKey;
-  final String? accountType;
-  final String note;
-  final String? counterparty;
-  final String? trxId;
-  final String source;
-  final double confidence;
-
-  /// Set when this draft came from the offline queue; removing it from the queue is part of confirming it.
-  final String? pendingId;
-
-  const TransactionDraft({
-    required this.type,
-    required this.amountPaisa,
-    required this.feePaisa,
-    required this.occurredAt,
-    required this.categoryKey,
-    required this.accountType,
-    required this.note,
-    required this.counterparty,
-    required this.trxId,
-    required this.source,
-    required this.confidence,
-    this.pendingId,
-  });
-
-  double get amountTaka => amountPaisa / 100;
-
-  TransactionDraft copyWith({String? categoryKey, String? source}) =>
-      TransactionDraft(
-        type: type,
-        amountPaisa: amountPaisa,
-        feePaisa: feePaisa,
-        occurredAt: occurredAt,
-        categoryKey: categoryKey ?? this.categoryKey,
-        accountType: accountType,
-        note: note,
-        counterparty: counterparty,
-        trxId: trxId,
-        source: source ?? this.source,
-        confidence: confidence,
-        pendingId: pendingId,
-      );
-
-  Map<String, dynamic> toJson() => {
-        'type': type,
-        'amountPaisa': amountPaisa,
-        'feePaisa': feePaisa,
-        'occurredAt': occurredAt,
-        'categoryKey': categoryKey,
-        'accountType': accountType,
-        'note': note,
-        'counterparty': counterparty,
-        'trxId': trxId,
-        'source': source,
-        'confidence': confidence,
-      };
-
-  TransactionDraft withPendingId(String id) => TransactionDraft(
-        type: type,
-        amountPaisa: amountPaisa,
-        feePaisa: feePaisa,
-        occurredAt: occurredAt,
-        categoryKey: categoryKey,
-        accountType: accountType,
-        note: note,
-        counterparty: counterparty,
-        trxId: trxId,
-        source: source,
-        confidence: confidence,
-        pendingId: id,
-      );
-
-  factory TransactionDraft.fromJson(Map<String, dynamic> j) => TransactionDraft(
-        type: j['type'] as String,
-        amountPaisa: (j['amountPaisa'] as num).toInt(),
-        feePaisa: ((j['feePaisa'] ?? 0) as num).toInt(),
-        occurredAt: j['occurredAt'] as String,
-        categoryKey: j['categoryKey'] as String?,
-        accountType: j['accountType'] as String?,
-        note: (j['note'] ?? '') as String,
-        counterparty: j['counterparty'] as String?,
-        trxId: j['trxId'] as String?,
-        source: (j['source'] ?? 'ai_text') as String,
-        confidence: ((j['confidence'] ?? 0) as num).toDouble(),
-      );
-}
-
-class FamilyInfo {
-  final String id;
-  final String name;
-  final String role;
-  const FamilyInfo(this.id, this.name, this.role);
-}
-
-class MonthlySummary {
-  final String text;
-  final String speechText;
-  final bool usedAi;
-  const MonthlySummary(this.text, this.speechText, this.usedAi);
-}
-
-class SyncResponse {
-  final String cursor;
-  final bool more;
-  final int applied;
-  final List<({String? id, String reason})> rejected;
-  final List<Map<String, dynamic>> changes;
-  const SyncResponse(
-      this.cursor, this.more, this.applied, this.rejected, this.changes);
-}
-
-/// Thin client for apps/api. Takes an [http.Client] so tests can inject a mock.
+/// Facade over the per-module API classes, so screens keep one dependency.
+/// Takes an [http.Client] so tests can inject a mock. Each class is a thin
+/// layer over the shared [ApiTransport] (auth header, refresh, error mapping).
 class ApiClient {
-  final http.Client _http;
-  final String baseUrl;
-  String? token;
+  final ApiTransport transport;
+  final SessionManager? session;
 
-  ApiClient({http.Client? client, this.baseUrl = kApiUrl, this.token})
-      : _http = client ?? http.Client();
+  final AuthApi auth;
+  final FamilyApi family;
+  final LedgerApi ledger;
+  final AiApi ai;
+  final BudgetApi budget;
+  final ReportApi report;
+  final SyncApi syncApi;
+  final CommsApi comms;
+  final NotificationApi notification;
+  final ShoppingApi shopping;
+  final LendingApi lending;
+  final BillingApi billing;
+  final PrivacyApi privacy;
 
-  Future<dynamic> _send(String method, String path, {Object? body}) async {
-    final req = http.Request(method, Uri.parse('$baseUrl$path'));
-    if (body != null) {
-      req.headers['content-type'] = 'application/json';
-      req.body = jsonEncode(body);
-    }
-    if (token != null) req.headers['authorization'] = 'Bearer $token';
-    final http.Response res;
-    try {
-      res = await http.Response.fromStream(await _http.send(req));
-    } catch (_) {
-      throw ApiException(
-          0, 'সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না / Cannot reach the server');
-    }
-    if (res.statusCode == 204 || res.body.isEmpty) return null;
-    final data = jsonDecode(utf8.decode(res.bodyBytes));
-    if (res.statusCode >= 400) {
-      final msg = (data is Map && data['error'] is Map)
-          ? data['error']['message'] as String?
-          : null;
-      throw ApiException(
-          res.statusCode, msg ?? 'Request failed (${res.statusCode})');
-    }
-    return data;
-  }
+  ApiClient({
+    http.Client? client,
+    String baseUrl = kApiUrl,
+    String? token,
+    SessionManager? session,
+  }) : this._(
+          ApiTransport(
+            client ?? http.Client(),
+            baseUrl,
+            session: session,
+            token: token,
+          ),
+        );
 
-  /// Sends an OTP. Outside production the API also returns the code (`devCode`) for local testing.
-  Future<String?> requestOtp(String phone) async {
-    final r =
-        await _send('POST', '/v1/auth/otp/request', body: {'phone': phone})
-            as Map<String, dynamic>;
-    return r['devCode'] as String?;
-  }
+  ApiClient._(this.transport)
+      : session = transport.session,
+        auth = AuthApi(transport),
+        family = FamilyApi(transport),
+        ledger = LedgerApi(transport),
+        ai = AiApi(transport),
+        budget = BudgetApi(transport),
+        report = ReportApi(transport),
+        syncApi = SyncApi(transport),
+        comms = CommsApi(transport),
+        notification = NotificationApi(transport),
+        shopping = ShoppingApi(transport),
+        lending = LendingApi(transport),
+        billing = BillingApi(transport),
+        privacy = PrivacyApi(transport);
 
-  /// Verifies the OTP and stores the access token on this client.
-  Future<String> verifyOtp(String phone, String code) async {
-    final r = await _send('POST', '/v1/auth/otp/verify',
-        body: {'phone': phone, 'code': code}) as Map<String, dynamic>;
-    token = r['accessToken'] as String;
-    return token!;
-  }
+  String? get token => transport.token;
+  set token(String? v) => transport.token = v;
 
-  Future<List<FamilyInfo>> families() async {
-    final r = await _send('GET', '/v1/me') as Map<String, dynamic>;
-    return (r['families'] as List)
-        .map((f) => FamilyInfo(
-            f['id'] as String, f['name'] as String, f['role'] as String))
-        .toList();
-  }
+  Future<String?> requestOtp(String phone) => auth.requestOtp(phone);
+
+  Future<String> verifyOtp(String phone, String code) =>
+      auth.verifyOtp(phone, code);
+
+  Future<List<FamilyInfo>> families() => family.families();
 
   Future<FamilyInfo> createFamily(String name) async {
-    final r = await _send('POST', '/v1/families', body: {'name': name})
-        as Map<String, dynamic>;
-    return FamilyInfo(r['id'] as String, r['name'] as String, 'owner');
+    final f = await family.createFamily(name);
+    return FamilyInfo(f.id, f.name, 'owner');
   }
 
-  /// Text or a pasted MFS SMS to drafts (SRS FR-AI-01, FR-AI-02).
-  Future<List<TransactionDraft>> parse(String familyId, String text,
-      {DateTime? now}) async {
-    final r = await _send('POST', '/v1/families/$familyId/ai/parse', body: {
-      'text': text,
-      'now': (now ?? DateTime.now()).toUtc().toIso8601String()
-    }) as Map<String, dynamic>;
-    return (r['drafts'] as List)
-        .map((d) => TransactionDraft.fromJson(d as Map<String, dynamic>))
-        .toList();
-  }
+  Future<List<TransactionDraft>> parse(
+    String familyId,
+    String text, {
+    DateTime? now,
+  }) async =>
+      (await ai.parse(familyId, text, now: now)).drafts;
 
-  Future<MonthlySummary> summary(String familyId,
-      {String locale = 'bn'}) async {
-    final r =
-        await _send('GET', '/v1/families/$familyId/ai/summary?locale=$locale')
-            as Map<String, dynamic>;
-    return MonthlySummary(
-        r['text'] as String, r['speechText'] as String, r['usedAi'] as bool);
-  }
+  Future<MonthlySummary> summary(String familyId, {String locale = 'bn'}) =>
+      ai.summary(familyId, locale: locale);
 
-  /// Exchange transaction changes with the server (SRS §4.3.1). [cursor] is the value from the last response.
-  Future<SyncResponse> sync(String familyId, String nodeId, String? cursor,
-      List<Map<String, dynamic>> changes) async {
-    final r = await _send('POST', '/v1/families/$familyId/sync', body: {
-      'nodeId': nodeId,
-      'cursor': cursor,
-      'changes': {'transactions': changes}
-    }) as Map<String, dynamic>;
-    return SyncResponse(
-      r['cursor'] as String,
-      r['more'] as bool,
-      (r['applied'] as num).toInt(),
-      [
-        for (final x in r['rejected'] as List)
-          (id: x['id'] as String?, reason: x['reason'] as String)
-      ],
-      [
-        for (final c
-            in (r['changes'] as Map<String, dynamic>)['transactions'] as List)
-          Map<String, dynamic>.from(c as Map)
-      ],
-    );
-  }
+  Future<SyncResponse> sync(
+    String familyId,
+    String nodeId,
+    String? cursor,
+    List<Map<String, dynamic>> changes,
+  ) =>
+      syncApi.sync(familyId, nodeId, cursor, changes);
 
   Future<List<Map<String, dynamic>>> categories(String familyId) async => [
-        for (final c
-            in await _send('GET', '/v1/families/$familyId/categories') as List)
-          Map<String, dynamic>.from(c as Map),
+        for (final c in await ledger.categories(familyId)) c.toJson(),
       ];
 
   Future<List<Map<String, dynamic>>> accounts(String familyId) async => [
-        for (final c
-            in await _send('GET', '/v1/families/$familyId/accounts') as List)
-          Map<String, dynamic>.from(c as Map),
+        for (final a in await ledger.accounts(familyId)) a.toJson(),
       ];
 
   /// This month's budgets with spend and 80%/100% level.
-  Future<List<Map<String, dynamic>>> budgets(String familyId) async {
-    final r = await _send('GET', '/v1/families/$familyId/budgets') as Map<String, dynamic>;
-    return [for (final b in r['budgets'] as List) Map<String, dynamic>.from(b as Map)];
-  }
+  Future<List<Map<String, dynamic>>> budgets(String familyId) async => [
+        for (final b in (await budget.budgets(familyId)).budgets) b.toJson(),
+      ];
 }

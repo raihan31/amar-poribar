@@ -9,9 +9,9 @@ class TransactionRecord {
   final String note;
   final DateTime timestamp;
   final String? bankMessageId; // Reference to bank SMS if created from it
-  
+
   // CRDT specific fields
-  final int isDeleted; 
+  final int isDeleted;
   final String hlc;
 
   TransactionRecord({
@@ -48,9 +48,9 @@ class TransactionRecord {
       deviceId: map['device_id'] as String,
       amount: (map['amount'] as num).toDouble(),
       categoryId: map['category_id'] as String,
-      type: TransactionType.fromString(map['type']),
+      type: TransactionType.fromString(map['type'] as String),
       note: map['note'] as String,
-      timestamp: DateTime.parse(map['timestamp']),
+      timestamp: DateTime.parse(map['timestamp'] as String),
       bankMessageId: map['bank_message_id'] as String?,
       isDeleted: map['is_deleted'] as int,
       hlc: map['hlc'] as String,

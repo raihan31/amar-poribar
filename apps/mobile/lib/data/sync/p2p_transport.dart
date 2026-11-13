@@ -38,7 +38,9 @@ abstract class P2pTransport {
 
   /// Advertise and look for peers. [approve] is asked before any connection is accepted; return false to refuse.
   Future<void> start(
-      String deviceName, Future<bool> Function(PeerInfo peer) approve);
+    String deviceName,
+    Future<bool> Function(PeerInfo peer) approve,
+  );
   Future<void> send(String peerId, String text);
   Future<void> stop();
 }

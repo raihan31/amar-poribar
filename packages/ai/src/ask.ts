@@ -9,9 +9,19 @@ const MonthArg = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
 export interface AskTools {
   sumByCategory(month: string): Promise<{ name: string; totalPaisa: number }[]>;
   listTransactions(args: { month: string; categoryName?: string; limit: number }): Promise<
-    { date: string; type: string; amountPaisa: number; category: string | null; note: string | null; counterparty: string | null }[]
+    {
+      date: string;
+      type: string;
+      amountPaisa: number;
+      category: string | null;
+      note: string | null;
+      counterparty: string | null;
+    }[]
   >;
-  compareMonths(a: string, b: string): Promise<{
+  compareMonths(
+    a: string,
+    b: string,
+  ): Promise<{
     a: { month: string; incomePaisa: number; expensePaisa: number };
     b: { month: string; incomePaisa: number; expensePaisa: number };
   }>;
@@ -21,16 +31,24 @@ const TOOL_DEFS: Anthropic.Tool[] = [
   {
     name: "sum_by_category",
     description: "Total spending for each category in one month. Amounts are in paisa (100 paisa = 1 taka).",
-    input_schema: { type: "object", properties: { month: { type: "string", description: "YYYY-MM" } }, required: ["month"] },
+    input_schema: {
+      type: "object",
+      properties: { month: { type: "string", description: "YYYY-MM" } },
+      required: ["month"],
+    },
   },
   {
     name: "list_transactions",
-    description: "Individual transactions in one month, newest first, optionally for one category name. Amounts are in paisa.",
+    description:
+      "Individual transactions in one month, newest first, optionally for one category name. Amounts are in paisa.",
     input_schema: {
       type: "object",
       properties: {
         month: { type: "string", description: "YYYY-MM" },
-        category_name: { type: "string", description: "Category name in English or Bangla, exactly as returned by sum_by_category" },
+        category_name: {
+          type: "string",
+          description: "Category name in English or Bangla, exactly as returned by sum_by_category",
+        },
         limit: { type: "integer", description: "1 to 50" },
       },
       required: ["month"],
@@ -41,7 +59,10 @@ const TOOL_DEFS: Anthropic.Tool[] = [
     description: "Total income and spending for two months. Amounts are in paisa.",
     input_schema: {
       type: "object",
-      properties: { month_a: { type: "string", description: "YYYY-MM" }, month_b: { type: "string", description: "YYYY-MM" } },
+      properties: {
+        month_a: { type: "string", description: "YYYY-MM" },
+        month_b: { type: "string", description: "YYYY-MM" },
+      },
       required: ["month_a", "month_b"],
     },
   },
@@ -82,7 +103,11 @@ async function runTool(name: string, input: unknown, tools: AskTools): Promise<u
         limit,
       });
       // Phone numbers in notes are masked before leaving our servers (NFR-07).
-      return rows.map((r) => ({ ...r, note: r.note ? maskPhone(r.note) : null, counterparty: r.counterparty ? maskPhone(r.counterparty) : null }));
+      return rows.map((r) => ({
+        ...r,
+        note: r.note ? maskPhone(r.note) : null,
+        counterparty: r.counterparty ? maskPhone(r.counterparty) : null,
+      }));
     }
     case "compare_months":
       return tools.compareMonths(MonthArg.parse(i.month_a), MonthArg.parse(i.month_b));
@@ -108,7 +133,10 @@ export async function askQuestion(question: string, opts: AskOptions): Promise<s
     });
     if (res.stop_reason === "refusal") throw new AiUnavailableError("AI declined to answer");
     if (res.stop_reason !== "tool_use") {
-      const text = res.content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("\n").trim();
+      const text = res.content
+        .flatMap((b) => (b.type === "text" ? [b.text] : []))
+        .join("\n")
+        .trim();
       if (!text) throw new AiUnavailableError("AI returned no answer");
       return text;
     }
@@ -117,7 +145,11 @@ export async function askQuestion(question: string, opts: AskOptions): Promise<s
     for (const block of res.content) {
       if (block.type !== "tool_use") continue;
       try {
-        results.push({ type: "tool_result", tool_use_id: block.id, content: JSON.stringify(await runTool(block.name, block.input, tools)) });
+        results.push({
+          type: "tool_result",
+          tool_use_id: block.id,
+          content: JSON.stringify(await runTool(block.name, block.input, tools)),
+        });
       } catch (e) {
         // Bad arguments go back to the model so it can correct itself.
         results.push({ type: "tool_result", tool_use_id: block.id, is_error: true, content: (e as Error).message });

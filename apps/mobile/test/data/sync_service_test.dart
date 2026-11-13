@@ -1,9 +1,8 @@
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:amar_poribar/data/api/api_client.dart';
 import 'package:amar_poribar/data/database/database.dart';
 import 'package:amar_poribar/data/database/local_store.dart';
 import 'package:amar_poribar/data/sync/sync_service.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// A tiny in-memory stand-in for apps/api's sync endpoint: per-record greater HLC wins, rows are
 /// delivered by a server sequence cursor, and the page size is small to exercise paging.
@@ -18,8 +17,12 @@ class FakeServerApi extends ApiClient {
   final pushedBatches = <int>[];
 
   @override
-  Future<SyncResponse> sync(String familyId, String nodeId, String? cursor,
-      List<Map<String, dynamic>> changes) async {
+  Future<SyncResponse> sync(
+    String familyId,
+    String nodeId,
+    String? cursor,
+    List<Map<String, dynamic>> changes,
+  ) async {
     if (offline) throw ApiException(0, 'offline');
     calls++;
     pushedBatches.add(changes.length);
@@ -27,8 +30,9 @@ class FakeServerApi extends ApiClient {
     for (final c in changes) {
       final existing = rows[c['id']];
       if (existing != null &&
-          (existing['hlc'] as String).compareTo(c['hlc'] as String) >= 0)
+          (existing['hlc'] as String).compareTo(c['hlc'] as String) >= 0) {
         continue;
+      }
       rows[c['id'] as String] = Map<String, dynamic>.from(c);
       seqOf[c['id'] as String] = ++seq;
       applied++;
@@ -69,7 +73,7 @@ void main() {
 
     Future<Set<String>> ids(LocalStore s) async => {
           for (final r in (await s.changesAfter(0, includePrivate: true)).rows)
-            r['id'] as String
+            r['id'] as String,
         };
     expect(await ids(a), {for (var i = 0; i < 7; i++) 'a$i', 'b0'});
     expect(await ids(b), await ids(a));
@@ -86,9 +90,12 @@ void main() {
     server.pushedBatches.clear();
     final second = await svc.sync('f1');
     expect(second.pushed, 0);
-    expect(second.pulled, 0,
-        reason:
-            'our own entry coming back is the same HLC, so it is not re-applied');
+    expect(
+      second.pulled,
+      0,
+      reason:
+          'our own entry coming back is the same HLC, so it is not re-applied',
+    );
     expect(server.pushedBatches.every((n) => n == 0), isTrue);
   });
 
@@ -113,7 +120,9 @@ void main() {
     await a.addTransaction(id: 'o', type: 'expense', amountPaisa: 1);
     server.offline = true;
     await expectLater(
-        SyncService(a, server).sync('f1'), throwsA(isA<ApiException>()));
+      SyncService(a, server).sync('f1'),
+      throwsA(isA<ApiException>()),
+    );
     server.offline = false;
     final res = await SyncService(a, server).sync('f1');
     expect(res.pushed, 1);
@@ -143,7 +152,7 @@ void main() {
         'nameEn': 'Bazaar',
         'nameBn': 'বাজার',
         'icon': '🛒',
-        'isHidden': false
+        'isHidden': false,
       },
     ]);
     await a.replaceAccounts([

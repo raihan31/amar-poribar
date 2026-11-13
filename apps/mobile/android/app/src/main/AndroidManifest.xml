@@ -22,6 +22,7 @@
     <application
         android:label="amar_poribar"
         android:name="${applicationName}"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
@@ -43,6 +44,21 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <!-- Invite links, buzz taps and incoming calls (T-MOB-08). -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https" android:host="amarporibar.app" android:pathPrefix="/join/"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="amarporibar" android:host="join"/>
+                <data android:scheme="amarporibar" android:host="buzz"/>
+                <data android:scheme="amarporibar" android:host="call"/>
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

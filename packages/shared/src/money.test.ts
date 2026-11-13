@@ -1,27 +1,30 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { bnToLatinDigits, formatBDT, parseAmountToPaisa, takaToPaisa } from "./money.js";
 import { BdPhoneSchema, normalizeBdPhone } from "./schemas.js";
 
+const vectors = JSON.parse(readFileSync(new URL("../test-vectors/money-ts.json", import.meta.url), "utf8")) as {
+  bnToLatinDigits: { input: string; output: string }[];
+  parseAmountToPaisa: { input: string; paisa: number | null }[];
+  takaToPaisa: { taka: number; paisa: number }[];
+  formatBDT: { paisa: number; bnDigits: boolean; text: string }[];
+};
+
 describe("money", () => {
-  it("converts Bangla digits", () => {
-    expect(bnToLatinDigits("৮৫০ টাকা")).toBe("850 টাকা");
+  it.each(vectors.bnToLatinDigits)("converts Bangla digits: $input", ({ input, output }) => {
+    expect(bnToLatinDigits(input)).toBe(output);
   });
 
-  it("parses lakh-grouped and Bangla amounts", () => {
-    expect(parseAmountToPaisa("1,00,000")).toBe(10_000_000);
-    expect(parseAmountToPaisa("৳ ২,৩৪০.৫০")).toBe(234_050);
-    expect(parseAmountToPaisa("no number")).toBeNull();
+  it.each(vectors.parseAmountToPaisa)("parses amount: $input", ({ input, paisa }) => {
+    expect(parseAmountToPaisa(input)).toBe(paisa);
   });
 
-  it("avoids float drift", () => {
-    expect(takaToPaisa(19.99)).toBe(1999);
+  it.each(vectors.takaToPaisa)("avoids float drift: $taka", ({ taka, paisa }) => {
+    expect(takaToPaisa(taka)).toBe(paisa);
   });
 
-  it("formats with lakh grouping", () => {
-    expect(formatBDT(12_500_000)).toBe("৳ 1,25,000");
-    expect(formatBDT(1_000_000_000)).toBe("৳ 1,00,00,000");
-    expect(formatBDT(85_050, { bnDigits: true })).toBe("৳ ৮৫০.৫০");
-    expect(formatBDT(-5000)).toBe("৳ -50");
+  it.each(vectors.formatBDT)("formats $paisa", ({ paisa, bnDigits, text }) => {
+    expect(formatBDT(paisa, { bnDigits })).toBe(text);
   });
 });
 

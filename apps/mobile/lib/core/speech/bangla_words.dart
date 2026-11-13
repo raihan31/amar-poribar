@@ -137,12 +137,16 @@ String amountInWords(int paisa) {
 }
 
 /// Sentence read aloud after an entry so the user can check it by ear (FR-VOICE-03).
-String draftToSpeech(
-    {required String type, required int amountPaisa, String? categoryName}) {
+String draftToSpeech({
+  required String type,
+  required int amountPaisa,
+  String? categoryName,
+}) {
   final amount = amountInWords(amountPaisa);
   final verb =
       type == 'income' ? 'আয়' : (type == 'transfer' ? 'স্থানান্তর' : 'খরচ');
-  if (categoryName == null)
+  if (categoryName == null) {
     return '$amount $verb। কিসের জন্য? নিচের ছবিতে চাপ দিন।';
+  }
   return '$categoryName খাতে $amount $verb। ঠিক আছে?';
 }

@@ -1,0 +1,47 @@
+{
+  "_kind": "response",
+  "_operation": "POST /v1/families/{familyId}/sync",
+  "_status": 200,
+  "body": {
+    "applied": 1,
+    "changes": {
+      "transactions": [
+        {
+          "accountId": "00000000-0000-4000-8000-0000000000b1",
+          "amountPaisa": 150000,
+          "categoryId": "00000000-0000-4000-8000-0000000000c1",
+          "counterparty": null,
+          "deletedAt": null,
+          "feePaisa": 0,
+          "hlc": "2026-11-09T10:00:00.000Z-0001-node-2",
+          "id": "00000000-0000-4000-8000-0000000000d2",
+          "isPrivate": false,
+          "note": "বাজার",
+          "occurredAt": "2026-10-05T08:22:00.000Z",
+          "source": "sms",
+          "trxId": "BJ51AB12CD",
+          "type": "expense"
+        },
+        {
+          "accountId": "00000000-0000-4000-8000-0000000000b1",
+          "amountPaisa": 85000,
+          "categoryId": "00000000-0000-4000-8000-0000000000c1",
+          "counterparty": null,
+          "deletedAt": "2026-11-09T10:00:00.000Z",
+          "feePaisa": 0,
+          "hlc": "2026-11-09T10:00:00.000Z-0002-node-2",
+          "id": "00000000-0000-4000-8000-0000000000d1",
+          "isPrivate": false,
+          "note": "বাজার",
+          "occurredAt": "2026-10-05T08:22:00.000Z",
+          "source": "manual",
+          "trxId": null,
+          "type": "expense"
+        }
+      ]
+    },
+    "cursor": "2",
+    "more": false,
+    "rejected": [{ "id": "00000000-0000-4000-8000-0000000000d2", "reason": "duplicate_trx_id" }]
+  }
+}

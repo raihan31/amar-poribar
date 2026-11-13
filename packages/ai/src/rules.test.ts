@@ -7,13 +7,20 @@ describe("quickParse", () => {
   it("reads spoken Bangla with number words", () => {
     const r = quickParse("আজ বাজারে আটশো পঞ্চাশ টাকা ক্যাশে", now);
     expect(r?.complete).toBe(true);
-    expect(r?.draft).toMatchObject({ type: "expense", amountPaisa: 85_000, categoryKey: "bazaar", accountType: "cash" });
+    expect(r?.draft).toMatchObject({
+      type: "expense",
+      amountPaisa: 85_000,
+      categoryKey: "bazaar",
+      accountType: "cash",
+    });
   });
 
   it("reads Banglish with digits", () => {
     expect(quickParse("rickshaw 40", now)?.draft).toMatchObject({ amountPaisa: 4_000, categoryKey: "transport" });
     expect(quickParse("DESCO bill 2,340 bkash e", now)?.draft).toMatchObject({
-      amountPaisa: 234_000, categoryKey: "electricity", accountType: "bkash",
+      amountPaisa: 234_000,
+      categoryKey: "electricity",
+      accountType: "bkash",
     });
   });
 

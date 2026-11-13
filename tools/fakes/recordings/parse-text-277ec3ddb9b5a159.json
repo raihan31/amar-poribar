@@ -1,0 +1,12 @@
+{
+  "feature": "parse-text",
+  "input": "৫০০ টাকা দিলাম",
+  "response": {
+    "text": "{\"drafts\":[{\"type\":\"expense\",\"feeTaka\":0,\"date\":\"2026-10-06\",\"accountType\":null,\"counterparty\":null,\"confidence\":0.4,\"amountTaka\":500,\"categoryKey\":null,\"note\":\"৫০০ টাকা দিলাম\"}]}",
+    "usage": {
+      "inputTokens": 600,
+      "outputTokens": 80
+    },
+    "stopReason": "end_turn"
+  }
+}

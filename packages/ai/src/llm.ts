@@ -1,12 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk";
+import type Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
-import {
-  ACCOUNT_TYPES,
-  MAX_AMOUNT_PAISA,
-  takaToPaisa,
-  type TransactionDraft,
-} from "@amar-poribar/shared";
+import { ACCOUNT_TYPES, MAX_AMOUNT_PAISA, takaToPaisa, type TransactionDraft } from "@amar-poribar/shared";
 import { maskPhone } from "./sms.js";
 
 export const DEFAULT_MODEL = "claude-opus-5-5";
@@ -86,7 +81,13 @@ export async function parseWithLlm(text: string, opts: LlmParseOptions): Promise
     fallbacks: "default",
     max_tokens: 4000,
     // Stable prefix first (system + categories) so prompt caching can reuse it across requests.
-    system: [{ type: "text", text: `${SYSTEM_PROMPT}\n\nCategory keys:\n${categoryList}`, cache_control: { type: "ephemeral" } }],
+    system: [
+      {
+        type: "text",
+        text: `${SYSTEM_PROMPT}\n\nCategory keys:\n${categoryList}`,
+        cache_control: { type: "ephemeral" },
+      },
+    ],
     messages: [{ role: "user", content: `Today (Asia/Dhaka): ${today}\n\nNote:\n${maskPhone(text)}` }],
     output_config: { effort: "low", format: betaZodOutputFormat(LlmDraftsSchema) },
   });

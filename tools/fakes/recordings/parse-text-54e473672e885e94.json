@@ -1,0 +1,12 @@
+{
+  "feature": "parse-text",
+  "input": "আজ বাজারে ৮৫০ টাকা দিলাম ক্যাশে",
+  "response": {
+    "text": "{\"drafts\":[{\"type\":\"expense\",\"feeTaka\":0,\"date\":\"2026-10-06\",\"accountType\":\"cash\",\"counterparty\":null,\"confidence\":0.9,\"amountTaka\":850,\"categoryKey\":\"bazaar\",\"note\":\"বাজার\"}]}",
+    "usage": {
+      "inputTokens": 600,
+      "outputTokens": 80
+    },
+    "stopReason": "end_turn"
+  }
+}

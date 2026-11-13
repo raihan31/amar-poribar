@@ -1,6 +1,5 @@
 {
   "extends": "@amar-poribar/tsconfig/base.json",
-  "compilerOptions": { "outDir": "dist", "rootDir": "src", "types": ["node"] },
-  "include": ["src"],
-  "exclude": ["src/**/*.test.ts"]
+  "compilerOptions": { "outDir": "dist", "rootDir": ".", "types": ["node"] },
+  "include": ["src", "tests", "scripts/*.ts", "drizzle.config.ts", "vitest.config.ts", "vitest.coverage.config.ts"]
 }

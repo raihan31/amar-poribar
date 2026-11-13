@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../app/redirects.dart';
+import '../../core/l10n/l10n_x.dart';
+import '../../core/l10n/locale_controller.dart';
 import '../../data/sync/nearby_transport.dart';
 import '../../data/sync/p2p_transport.dart';
 import '../../data/sync/peer_sync_engine.dart';
@@ -32,16 +36,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: const Text('কাছের ফোনের সাথে সিঙ্ক?'),
+        title: Text(ctx.l10n.sync_nearby_askTitle),
         content: Text(
-            'ফোন: ${peer.name}\nকোড: ${peer.authCode}\n\nদুই ফোনেই একই কোড দেখালে "হ্যাঁ" চাপুন।'),
+          ctx.l10n.sync_nearby_askBody(peer.name, peer.authCode),
+        ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('না')),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(ctx.l10n.common_no),
+          ),
           FilledButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('হ্যাঁ')),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(ctx.l10n.common_yes),
+          ),
         ],
       ),
     );
@@ -59,8 +66,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
     final family = ref.read(authProvider).family;
     if (family == null) {
-      setState(() =>
-          _status = 'প্রথমে একবার লগইন করে পরিবারে যোগ দিন (ইন্টারনেট লাগবে)।');
+      setState(() => _status = context.l10n.sync_nearby_needLogin);
       return;
     }
     final engine = PeerSyncEngine(
@@ -78,15 +84,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       await engine.start();
       setState(() => _engine = engine);
     } catch (e) {
-      setState(() => _status =
-          'কাছের সিঙ্ক চালু করা যায়নি: অনুমতি দিন (ব্লুটুথ, লোকেশন)।');
+      setState(() => _status = context.l10n.sync_nearby_failed);
     }
   }
 
   Future<void> _syncServer() async {
     final family = ref.read(authProvider).family;
     if (family == null) {
-      setState(() => _status = 'সিঙ্ক করতে লগইন করুন।');
+      setState(() => _status = context.l10n.sync_server_needLogin);
       return;
     }
     try {
@@ -94,8 +99,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       await sync.refreshReferenceData(family.id);
       final r = await sync.sync(family.id);
       await ref.read(appStateProvider.notifier).reload();
-      setState(() => _status =
-          'সার্ভারের সাথে সিঙ্ক হয়েছে: ${r.pushed} পাঠানো, ${r.pulled} পাওয়া');
+      if (!mounted) return;
+      setState(
+        () => _status = context.l10n.sync_server_done(r.pushed, r.pulled),
+      );
     } catch (e) {
       setState(() => _status = e.toString());
     }
@@ -106,40 +113,50 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final state = ref.watch(appStateProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(context.l10n.settings_title)),
       body: ListView(
         children: [
           ListTile(
             leading: const Icon(Icons.person),
-            title: const Text('Current Role'),
+            title: Text(context.l10n.settings_role_title),
             subtitle: Text(state.activeRole.name.toUpperCase()),
             trailing: const Icon(Icons.chevron_right),
           ),
           const Divider(),
           if (state.activeRole == Role.father ||
               state.activeRole == Role.mother) ...[
-            const ListTile(
-              leading: Icon(Icons.qr_code),
-              title: Text('Pair New Device'),
-              subtitle: Text('Generate a QR Code to add Child or partner'),
+            ListTile(
+              leading: const Icon(Icons.qr_code),
+              title: Text(context.l10n.settings_pair_title),
+              subtitle: Text(context.l10n.settings_pair_subtitle),
             ),
             const Divider(),
           ],
           ListTile(
             leading: const Icon(Icons.record_voice_over),
-            title: const Text('কীভাবে ব্যবহার করবেন (শুনুন)'),
-            onTap: () => Navigator.pushNamed(context, '/tutorial'),
+            title: Text(context.l10n.settings_tutorial_title),
+            onTap: () => context.push(Routes.tutorial),
+          ),
+          ListTile(
+            leading: const Icon(Icons.language),
+            title: Text(context.l10n.settings_language_title),
+            subtitle: Text(context.l10n.settings_language_switch),
+            onTap: () => ref.read(localeProvider.notifier).setLocale(
+                  Localizations.localeOf(context).languageCode == 'bn'
+                      ? const Locale('en')
+                      : const Locale('bn'),
+                ),
           ),
           ListTile(
             leading: const Icon(Icons.cloud_sync),
-            title: const Text('সার্ভারের সাথে সিঙ্ক'),
-            subtitle: const Text('ইন্টারনেট থাকলে চাপুন'),
+            title: Text(context.l10n.sync_server_title),
+            subtitle: Text(context.l10n.sync_server_subtitle),
             onTap: _syncServer,
           ),
           SwitchListTile(
             secondary: const Icon(Icons.settings_bluetooth),
-            title: const Text('কাছের ফোনের সাথে সিঙ্ক'),
-            subtitle: const Text('ইন্টারনেট ছাড়াই, একই পরিবারের ফোন'),
+            title: Text(context.l10n.sync_nearby_title),
+            subtitle: Text(context.l10n.sync_nearby_subtitle),
             value: _engine != null,
             onChanged: (_) => _toggleNearby(),
           ),
@@ -157,9 +174,9 @@ class PendingSmsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Bank Approvals')),
-      body: const Center(
-        child: Text('No pending bank transactions detected today.'),
+      appBar: AppBar(title: Text(context.l10n.settings_bankApprovals_title)),
+      body: Center(
+        child: Text(context.l10n.settings_bankApprovals_empty),
       ),
     );
   }

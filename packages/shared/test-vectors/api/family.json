@@ -1,0 +1,15 @@
+{
+  "_kind": "response",
+  "_operation": "POST /v1/families",
+  "_status": 201,
+  "body": {
+    "aiQuotaMonth": 100,
+    "createdAt": "2026-10-05T08:22:00.000Z",
+    "createdBy": "00000000-0000-4000-8000-0000000000a1",
+    "currency": "BDT",
+    "id": "00000000-0000-4000-8000-000000000001",
+    "name": "রহিম পরিবার",
+    "plan": "free",
+    "updatedAt": "2026-10-05T08:22:00.000Z"
+  }
+}

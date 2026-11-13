@@ -43,7 +43,7 @@ Requirements: Node 22+, pnpm 10, Docker (for PostgreSQL).
 pnpm install
 cp .env.example .env          # add ANTHROPIC_API_KEY to enable AI parsing of free text
 pnpm db:up                    # start PostgreSQL in Docker
-pnpm db:push                  # create tables
+pnpm db:migrate               # apply SQL migrations
 pnpm build                    # build shared packages
 pnpm dev                      # api :4000, web :3000
 ```

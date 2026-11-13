@@ -1,0 +1,29 @@
+{
+  "_kind": "request",
+  "_operation": "POST /v1/families/{familyId}/sync",
+  "_status": 200,
+  "body": {
+    "changes": {
+      "transactions": [
+        {
+          "accountId": "00000000-0000-4000-8000-0000000000b1",
+          "amountPaisa": 85000,
+          "categoryId": "00000000-0000-4000-8000-0000000000c1",
+          "counterparty": null,
+          "deletedAt": null,
+          "feePaisa": 0,
+          "hlc": "2026-10-05T08:22:00.000Z-0000-node-1",
+          "id": "00000000-0000-4000-8000-0000000000d1",
+          "isPrivate": false,
+          "note": "বাজার",
+          "occurredAt": "2026-10-05T08:22:00.000Z",
+          "source": "manual",
+          "trxId": null,
+          "type": "expense"
+        }
+      ]
+    },
+    "cursor": null,
+    "nodeId": "node-1"
+  }
+}

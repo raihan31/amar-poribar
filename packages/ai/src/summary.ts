@@ -86,7 +86,8 @@ export function templateSummary(input: SummaryInput): SummaryOutput {
   if (input.locale === "en") {
     if (!input.expensePaisa) parts.push(`No expenses recorded for ${month} yet.`);
     else parts.push(`In ${month} the family spent {TOTAL}.`);
-    if (input.expensePaisa && input.lastMonthExpensePaisa) parts.push(`That is {CHANGE} ${up ? "more" : "less"} than last month.`);
+    if (input.expensePaisa && input.lastMonthExpensePaisa)
+      parts.push(`That is {CHANGE} ${up ? "more" : "less"} than last month.`);
     if (top) parts.push(`The most went on ${top.name}: {C1}.`);
     if (input.incomePaisa) parts.push(`Income this month: {INCOME}.`);
   } else {
