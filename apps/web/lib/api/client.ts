@@ -42,6 +42,8 @@ interface ApiInit {
   body?: unknown;
   /** POST only: attach a fresh `Idempotency-Key` (SRS 5.2). */
   idempotent?: boolean;
+  /** POST only: use this `Idempotency-Key` so a retried request is recognised (offline outbox). */
+  idempotencyKey?: string;
 }
 
 /** Thin path-string helper; throws ApiProblem on non-2xx. Prefer `client` for new code. */
@@ -49,7 +51,9 @@ export async function api<T = unknown>(path: string, init: ApiInit = {}): Promis
   const method = init.method ?? (init.body ? "POST" : "GET");
   const url = path.startsWith("/api/") ? path : `${PROXY.slice(0, -1)}${path}`;
   const reqHeaders: Record<string, string> = {};
-  if (method === "POST" && init.idempotent) reqHeaders["Idempotency-Key"] = crypto.randomUUID();
+  if (method === "POST" && (init.idempotent || init.idempotencyKey)) {
+    reqHeaders["Idempotency-Key"] = init.idempotencyKey ?? crypto.randomUUID();
+  }
   const res = await (
     raw as unknown as {
       request: (m: string, p: string, o: object) => Promise<{ response: Response; data?: unknown; error?: unknown }>;
