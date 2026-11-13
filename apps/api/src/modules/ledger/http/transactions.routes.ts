@@ -1,6 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { z } from "zod";
-import { CreateTransactionSchema, MonthSchema, UpdateTransactionSchema } from "@amar-poribar/shared";
+import { CreateTransactionSchema, ListTransactionsQuerySchema, UpdateTransactionSchema } from "@amar-poribar/shared";
 import { parseOr400 } from "../../../platform/errors.js";
 import { createTransaction } from "../app/create-transaction.js";
 import { deleteTransaction } from "../app/delete-transaction.js";
@@ -12,17 +11,15 @@ import { docs } from "../../../platform/http/responses.js";
 type FamilyParams = { Params: { familyId: string } };
 type TxnParams = { Params: { familyId: string; txnId: string } };
 
-const ListQuerySchema = z.object({ month: MonthSchema.optional() });
-
 export function transactionsRoutes(app: FastifyInstance, deps: LedgerDeps) {
   const opts = { preHandler: app.authenticate };
 
-  app.get<FamilyParams>("/v1/families/:familyId/transactions", { ...opts, schema: docs.list }, async (req) => {
+  app.get<FamilyParams>("/v1/families/:familyId/transactions", { ...opts, schema: docs.object }, async (req) => {
     const { familyId } = req.params;
     // Viewers get summaries only, not individual entries (FR-FAM-05).
     await deps.families.requireRole(familyId, req.user.sub, "member");
-    const { month } = parseOr400(ListQuerySchema, req.query);
-    return listTransactions(deps, { familyId, userId: req.user.sub, month });
+    const query = parseOr400(ListTransactionsQuerySchema, req.query);
+    return listTransactions(deps, { familyId, userId: req.user.sub, query });
   });
 
   app.post<FamilyParams>(
