@@ -53,10 +53,16 @@ void main() {
   test('allowed differences are few and explained', () {
     expect(allowed.length, lessThanOrEqualTo(30));
     for (final a in allowed) {
-      expect((a['reason'] as String?)?.trim() ?? '', isNotEmpty,
-          reason: 'entry for ${a['screen']} needs a reason');
-      expect(design.containsKey(a['screen']), isTrue,
-          reason: 'unknown screen ${a['screen']}');
+      expect(
+        (a['reason'] as String?)?.trim() ?? '',
+        isNotEmpty,
+        reason: 'entry for ${a['screen']} needs a reason',
+      );
+      expect(
+        design.containsKey(a['screen']),
+        isTrue,
+        reason: 'unknown screen ${a['screen']}',
+      );
     }
   });
 
@@ -68,8 +74,11 @@ void main() {
           design.keys.where((k) => !implementedScreens.containsKey(k));
       expect(missing, isEmpty);
       for (final e in implementedScreens.entries) {
-        expect(File(e.value).existsSync(), isTrue,
-            reason: '${e.key}: ${e.value}');
+        expect(
+          File(e.value).existsSync(),
+          isTrue,
+          reason: '${e.key}: ${e.value}',
+        );
       }
     },
     skip: implementedScreens.length < _totalScreens
