@@ -1,6 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import type { TransactionDraft } from "@amar-poribar/shared";
-import { AiUnavailableError, parseWithLlm, type CategoryOption } from "./llm.js";
+import { AiUnavailableError, parseWithLlm, type AiUsage, type CategoryOption } from "./llm.js";
 import { quickParse } from "./rules.js";
 import { parseMfsSms } from "./sms.js";
 
@@ -14,6 +14,7 @@ export interface ParseInputOptions {
   /** When omitted, only the deterministic SMS parser runs. */
   client?: Anthropic;
   model?: string;
+  onUsage?: (u: AiUsage) => void;
 }
 
 /**
@@ -37,6 +38,7 @@ export async function parseInput(
         categories: opts.categories,
         now: opts.now,
         model: opts.model,
+        onUsage: opts.onUsage,
       });
       return { drafts, usedAi: true };
     } catch (err) {

@@ -11,10 +11,6 @@ export async function hasAiQuota(deps: AiDeps, familyId: string): Promise<boolea
   return quotaMonth > used;
 }
 
-export function recordAiUse(deps: AiDeps, familyId: string): Promise<void> {
-  return deps.store.recordUse(familyId, currentDhakaMonth(deps.clock()));
-}
-
 /** Requests used in `month` and the quota, for `GET /ai/usage` and admin. */
 export async function getUsage(
   deps: AiDeps,

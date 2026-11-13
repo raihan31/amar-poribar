@@ -2,7 +2,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
 import { amountInWords, formatBDT, monthName, type Locale } from "@amar-poribar/shared";
-import { AiUnavailableError, DEFAULT_MODEL } from "./llm.js";
+import { AiUnavailableError, DEFAULT_MODEL, withUsage, type AiUsage } from "./llm.js";
 
 /**
  * Monthly summary in plain language, for the screen and for text-to-speech (SRS FR-AI-11).
@@ -114,6 +114,7 @@ const LlmSummarySchema = z.object({ summary: z.string() });
 export interface LlmSummaryOptions {
   client: Anthropic;
   model?: string;
+  onUsage?: (u: AiUsage) => void;
 }
 
 export async function summarizeWithLlm(input: SummaryInput, opts: LlmSummaryOptions): Promise<SummaryOutput> {
@@ -121,20 +122,22 @@ export async function summarizeWithLlm(input: SummaryInput, opts: LlmSummaryOpti
   const factLines = facts.map((f) => `{${f.id}} = ${(f.paisa / 100).toFixed(0)} taka (${f.description})`).join("\n");
   const language = input.locale === "bn" ? "Bangla (Bengali script)" : "simple English";
 
-  const response = await opts.client.beta.messages.parse({
-    model: opts.model ?? DEFAULT_MODEL,
-    max_tokens: 4000,
-    betas: ["server-side-fallback-2026-07-01"],
-    fallbacks: "default",
-    system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
-    messages: [
-      {
-        role: "user",
-        content: `Language: ${language}\nMonth: ${monthName(input.month, input.locale)}\n\nPlaceholders:\n${factLines}`,
-      },
-    ],
-    output_config: { effort: "low", format: betaZodOutputFormat(LlmSummarySchema) },
-  });
+  const response = await withUsage(opts.onUsage, () =>
+    opts.client.beta.messages.parse({
+      model: opts.model ?? DEFAULT_MODEL,
+      max_tokens: 4000,
+      betas: ["server-side-fallback-2026-07-01"],
+      fallbacks: "default",
+      system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
+      messages: [
+        {
+          role: "user",
+          content: `Language: ${language}\nMonth: ${monthName(input.month, input.locale)}\n\nPlaceholders:\n${factLines}`,
+        },
+      ],
+      output_config: { effort: "low", format: betaZodOutputFormat(LlmSummarySchema) },
+    }),
+  );
 
   if (response.stop_reason === "refusal" || response.stop_reason === "max_tokens") {
     throw new AiUnavailableError(`AI stopped with ${response.stop_reason}`);
@@ -164,7 +167,10 @@ export async function monthlySummary(
 ): Promise<SummaryOutput & { usedAi: boolean }> {
   if (opts.client && input.expensePaisa > 0) {
     try {
-      return { ...(await summarizeWithLlm(input, { client: opts.client, model: opts.model })), usedAi: true };
+      return {
+        ...(await summarizeWithLlm(input, { client: opts.client, model: opts.model, onUsage: opts.onUsage })),
+        usedAi: true,
+      };
     } catch (err) {
       if (!(err instanceof AiUnavailableError)) throw err;
     }

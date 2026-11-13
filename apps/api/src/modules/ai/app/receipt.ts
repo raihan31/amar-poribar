@@ -2,7 +2,8 @@ import { AiUnavailableError, parseReceipt } from "@amar-poribar/ai";
 import type { ParseResponse } from "@amar-poribar/shared";
 import { HttpError } from "../../../platform/errors.js";
 import type { AiDeps } from "./deps.js";
-import { hasAiQuota, recordAiUse } from "./quota.js";
+import { withMetering } from "./metering.js";
+import { hasAiQuota } from "./quota.js";
 
 /** Receipt or memo photo → drafts to confirm (FR-AI-09). The image is read once and not stored. */
 export async function receipt(
@@ -16,11 +17,9 @@ export async function receipt(
     throw new HttpError(429, "ai_quota", "This month's AI limit has been reached");
   const categories = await deps.ledger.listCategories(familyId, { includeHidden: false });
   try {
-    const drafts = await parseReceipt(
-      { base64: image.imageBase64, mediaType: image.mediaType },
-      { client, categories, model },
+    const drafts = await withMetering(deps, "receipt", familyId, (onUsage) =>
+      parseReceipt({ base64: image.imageBase64, mediaType: image.mediaType }, { client, categories, model, onUsage }),
     );
-    await recordAiUse(deps, familyId);
     return { drafts, usedAi: true };
   } catch (err) {
     if (err instanceof AiUnavailableError)

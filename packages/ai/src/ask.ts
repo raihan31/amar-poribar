@@ -1,6 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
-import { DEFAULT_MODEL, AiUnavailableError } from "./llm.js";
+import { DEFAULT_MODEL, AiUnavailableError, withUsage, type AiUsage } from "./llm.js";
 import { maskPhone } from "./sms.js";
 
 const MonthArg = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
@@ -88,6 +88,8 @@ export interface AskOptions {
   forSpeech?: boolean;
   /** Safety cap on tool-use rounds. */
   maxRounds?: number;
+  /** Called once per Claude round trip. */
+  onUsage?: (u: AiUsage) => void;
 }
 
 async function runTool(name: string, input: unknown, tools: AskTools): Promise<unknown> {
@@ -118,19 +120,21 @@ async function runTool(name: string, input: unknown, tools: AskTools): Promise<u
 
 /** Answer a question about the family's data with read-only tool calls (SRS FR-AI-10). */
 export async function askQuestion(question: string, opts: AskOptions): Promise<string> {
-  const { client, tools, today, model = DEFAULT_MODEL, forSpeech = false, maxRounds = 5 } = opts;
+  const { client, tools, today, model = DEFAULT_MODEL, forSpeech = false, maxRounds = 5, onUsage } = opts;
   const messages: Anthropic.MessageParam[] = [
     { role: "user", content: `Today (Asia/Dhaka): ${today}\n\nQuestion:\n${maskPhone(question)}` },
   ];
 
   for (let round = 0; round < maxRounds; round++) {
-    const res = await client.messages.create({
-      model,
-      max_tokens: 1500,
-      system: SYSTEM + (forSpeech ? SPEECH_NOTE : ""),
-      tools: TOOL_DEFS,
-      messages,
-    });
+    const res = await withUsage(onUsage, () =>
+      client.messages.create({
+        model,
+        max_tokens: 1500,
+        system: SYSTEM + (forSpeech ? SPEECH_NOTE : ""),
+        tools: TOOL_DEFS,
+        messages,
+      }),
+    );
     if (res.stop_reason === "refusal") throw new AiUnavailableError("AI declined to answer");
     if (res.stop_reason !== "tool_use") {
       const text = res.content
