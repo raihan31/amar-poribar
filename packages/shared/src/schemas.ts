@@ -157,6 +157,20 @@ export const TransactionListItemSchema = z.object({
 });
 export type TransactionListItem = z.infer<typeof TransactionListItemSchema>;
 
+/** One transaction for the detail screen (FR-TXN-10): the list item plus what only the detail needs. */
+export const TransactionDetailSchema = TransactionListItemSchema.extend({
+  trxId: z.string().nullable(),
+  aiConfidence: z.number().nullable(),
+  splitGroupId: z.uuid().nullable(),
+  toAccountId: z.uuid().nullable(),
+  attachmentUrl: z.string().nullable(),
+  canEdit: z.boolean(),
+  canDelete: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+export type TransactionDetail = z.infer<typeof TransactionDetailSchema>;
+
 export const TransactionPageSchema = z.object({
   items: z.array(TransactionListItemSchema),
   nextCursor: z.string().nullable(),

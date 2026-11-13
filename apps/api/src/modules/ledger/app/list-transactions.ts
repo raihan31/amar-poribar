@@ -1,4 +1,5 @@
 import type { ListTransactionsQuery, TransactionListItem, TransactionPage } from "@amar-poribar/shared";
+import type { Transaction } from "../infra/transactions.repo.js";
 import { encodeCursor } from "../domain/cursor.js";
 import { dhakaDayKey, toFilter } from "../domain/filter.js";
 import { queryRepo } from "../infra/query-repo.js";
@@ -16,13 +17,23 @@ export async function listTransactions(
   const rows = fetched.slice(0, filter.limit);
   const last = rows[rows.length - 1];
 
+  const items = await toListItems(deps, rows, input.userId);
+  return { items, nextCursor: fetched.length > filter.limit && last ? encodeCursor(last) : null };
+}
+
+/** Rows as list items: category, account and payer names resolved in three batched lookups. */
+export async function toListItems(
+  deps: LedgerDeps,
+  rows: Transaction[],
+  userId: string,
+): Promise<TransactionListItem[]> {
   const [cats, accs, people] = await Promise.all([
     queryRepo.categoryNames(deps.db, unique(rows.map((r) => r.categoryId))),
     queryRepo.accountNames(deps.db, unique(rows.map((r) => r.accountId))),
     deps.families.getUserLabels(unique(rows.map((r) => r.paidByUserId))),
   ]);
 
-  const items: TransactionListItem[] = rows.map((r) => {
+  return rows.map((r) => {
     const cat = r.categoryId ? cats.get(r.categoryId) : undefined;
     return {
       id: r.id,
@@ -43,10 +54,9 @@ export async function listTransactions(
       counterparty: r.counterparty,
       source: r.source,
       isPrivate: r.isPrivate,
-      isMine: r.createdBy === input.userId,
+      isMine: r.createdBy === userId,
       // Attachments arrive with receipts (M7); no row has one yet.
       hasAttachment: false,
     };
   });
-  return { items, nextCursor: fetched.length > filter.limit && last ? encodeCursor(last) : null };
 }

@@ -128,6 +128,7 @@ export const ROUTE_FIXTURES: Record<string, RouteFixture> = {
       accountId: c.accountId,
     },
   }),
+  "GET /v1/families/{familyId}/transactions/{txnId}": (c) => ({ params: { ...fam(c), txnId: c.txnId } }),
   "DELETE /v1/families/{familyId}/transactions/{txnId}": (c) => ({ params: { ...fam(c), txnId: c.txnId } }),
   "POST /v1/families/{familyId}/transactions/{txnId}/restore": (c) => ({
     params: { ...fam(c), txnId: c.txnId },
