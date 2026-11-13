@@ -32,7 +32,7 @@ class AiApi {
         await _t.send(
           'GET',
           '/v1/families/$familyId/ai/summary?locale=$locale'
-          '${month == null ? '' : '&month=$month'}',
+              '${month == null ? '' : '&month=$month'}',
         ) as Map<String, dynamic>,
       );
 

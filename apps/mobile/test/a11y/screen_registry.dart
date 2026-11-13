@@ -250,5 +250,4 @@ const List<String> kAllRoutes = [
 /// Pre-existing screens not yet in the audit. Each screen task removes its
 /// route from this list when it registers the screen. The list may only
 /// shrink: `registry_complete_test.dart` fails if a route is in neither place.
-const Set<String> kRoutesAwaitingRegistration = {
-};
+const Set<String> kRoutesAwaitingRegistration = {};

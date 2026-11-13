@@ -21,8 +21,10 @@ class ChannelTexts {
         nudge: (l10n.push_channel_nudge_name, l10n.push_channel_nudge_desc),
         chat: (l10n.push_channel_chat_name, l10n.push_channel_chat_desc),
         alerts: (l10n.push_channel_alerts_name, l10n.push_channel_alerts_desc),
-        reminders:
-            (l10n.push_channel_reminders_name, l10n.push_channel_reminders_desc),
+        reminders: (
+          l10n.push_channel_reminders_name,
+          l10n.push_channel_reminders_desc
+        ),
         calls: (l10n.push_channel_calls_name, l10n.push_channel_calls_desc),
       );
 }

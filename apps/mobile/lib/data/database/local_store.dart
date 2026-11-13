@@ -199,9 +199,8 @@ class LocalStore {
             ? const Value.absent()
             : Value(occurredAt.toUtc().toIso8601String()),
         isPrivate: isPrivate == null ? const Value.absent() : Value(isPrivate),
-        paidByUserId: paidByUserId == null
-            ? const Value.absent()
-            : Value(paidByUserId),
+        paidByUserId:
+            paidByUserId == null ? const Value.absent() : Value(paidByUserId),
         hlc: Value(hlc.toString()),
       ),
     );

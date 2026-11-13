@@ -54,13 +54,13 @@ class _BudgetEditSheetState extends ConsumerState<BudgetEditSheet> {
     final scheme = Theme.of(context).colorScheme;
 
     Widget chip(String label, String? id) => ChoiceChip(
-      label: Text(label, style: const TextStyle(fontSize: 16)),
-      selected: _categoryId == id,
-      onSelected: (_) => setState(() => _categoryId = id),
-      materialTapTargetSize: MaterialTapTargetSize.padded,
-      visualDensity: VisualDensity.comfortable,
-      selectedColor: AppTokens.greenTint,
-    );
+          label: Text(label, style: const TextStyle(fontSize: 16)),
+          selected: _categoryId == id,
+          onSelected: (_) => setState(() => _categoryId = id),
+          materialTapTargetSize: MaterialTapTargetSize.padded,
+          visualDensity: VisualDensity.comfortable,
+          selectedColor: AppTokens.greenTint,
+        );
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
@@ -106,9 +106,9 @@ class _BudgetEditSheetState extends ConsumerState<BudgetEditSheet> {
               onPressed: taka <= 0
                   ? null
                   : () => Navigator.pop(
-                      context,
-                      BudgetInput(_categoryId, Money.fromTaka(taka).paisa),
-                    ),
+                        context,
+                        BudgetInput(_categoryId, Money.fromTaka(taka).paisa),
+                      ),
             ),
           ],
         ),

@@ -57,29 +57,28 @@ class BudgetCard extends StatelessWidget {
     final border = exceeded
         ? AppTokens.danger
         : overall
-        ? (dark ? AppTokens.statusOk : AppTokens.green)
-        : scheme.outlineVariant;
+            ? (dark ? AppTokens.statusOk : AppTokens.green)
+            : scheme.outlineVariant;
     final barColor = exceeded
         ? AppTokens.danger
         : warning
-        ? AppTokens.amber
-        : AppTokens.statusOk;
+            ? AppTokens.amber
+            : AppTokens.statusOk;
     final ink = exceeded
         ? (dark ? AppTokens.dangerTint : AppTokens.danger)
         : warning
-        ? (dark ? AppTokens.amber : AppTokens.amberInk)
-        : (dark ? AppTokens.greenTint : AppTokens.deepGreen);
+            ? (dark ? AppTokens.amber : AppTokens.amberInk)
+            : (dark ? AppTokens.greenTint : AppTokens.deepGreen);
     final icon = exceeded
         ? Icons.error_outline
         : warning
-        ? Icons.warning_amber_rounded
-        : Icons.check;
+            ? Icons.warning_amber_rounded
+            : Icons.check;
     final ratio = budget.limitPaisa <= 0
         ? 0.0
         : (budget.spentPaisa / budget.limitPaisa).clamp(0.0, 1.0);
     final title = overall ? l10n.budget_overall : budget.nameBn;
-    final amounts =
-        '${formatMoney(budget.spent, style: style)} / '
+    final amounts = '${formatMoney(budget.spent, style: style)} / '
         '${formatMoney(budget.limit, style: style, showSymbol: false)}';
     final status = budgetStatusText(context, budget, style);
 

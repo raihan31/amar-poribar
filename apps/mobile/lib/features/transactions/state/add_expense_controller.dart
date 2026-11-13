@@ -184,6 +184,7 @@ class AddExpenseController extends StateNotifier<AddExpenseState> {
       editing: t,
     );
   }
+
   void setNote(String note) => state = state.copyWith(note: note);
 
   void setFee(String digits) => state = state.copyWith(

@@ -135,8 +135,7 @@ class FakeTransactionRepository implements TransactionRepository {
       amountPaisa: amountPaisa,
       feePaisa: feePaisa,
       occurredAt: occurredAt?.toUtc().toIso8601String(),
-      categoryId:
-          categoryId == null ? const Value.absent() : Value(categoryId),
+      categoryId: categoryId == null ? const Value.absent() : Value(categoryId),
       accountId: accountId == null ? const Value.absent() : Value(accountId),
       note: note == null ? const Value.absent() : Value(note),
       isPrivate: isPrivate,

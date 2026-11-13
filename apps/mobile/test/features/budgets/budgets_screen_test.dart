@@ -19,15 +19,15 @@ final _budgets = [
 ];
 
 List<Override> _over({FamilyRole role = FamilyRole.owner}) => [
-  budgetRepositoryProvider.overrideWithValue(
-    FakeBudgetRepository(budgets: _budgets),
-  ),
-  currentRoleProvider.overrideWithValue(role),
-  budgetRecipientProvider.overrideWithValue(
-    const Member(userId: 'u-ammu', name: 'আম্মু', role: FamilyRole.admin),
-  ),
-  homeClockProvider.overrideWithValue(() => DateTime.utc(2026, 11, 9, 4)),
-];
+      budgetRepositoryProvider.overrideWithValue(
+        FakeBudgetRepository(budgets: _budgets),
+      ),
+      currentRoleProvider.overrideWithValue(role),
+      budgetRecipientProvider.overrideWithValue(
+        const Member(userId: 'u-ammu', name: 'আম্মু', role: FamilyRole.admin),
+      ),
+      homeClockProvider.overrideWithValue(() => DateTime.utc(2026, 11, 9, 4)),
+    ];
 
 Future<void> _settle(WidgetTester t) async {
   await t.pump();

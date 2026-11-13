@@ -27,16 +27,17 @@ const _rows = [
 List<Override> _overrides(
   List<(String, String)> pushed,
   List<TimeOfDay> picks,
-) => [
-  preferencesPushProvider.overrideWithValue((_) async => true),
-  quietHoursPushProvider.overrideWithValue((s, e) async {
-    pushed.add((s, e));
-    return true;
-  }),
-  settingsTimePickerProvider.overrideWithValue(
-    (context, initial) async => picks.removeAt(0),
-  ),
-];
+) =>
+    [
+      preferencesPushProvider.overrideWithValue((_) async => true),
+      quietHoursPushProvider.overrideWithValue((s, e) async {
+        pushed.add((s, e));
+        return true;
+      }),
+      settingsTimePickerProvider.overrideWithValue(
+        (context, initial) async => picks.removeAt(0),
+      ),
+    ];
 
 void main() {
   testWidgets('rows exact', (tester) async {

@@ -111,11 +111,11 @@ class _BudgetsScreenState extends ConsumerState<BudgetsScreen> {
     VoidCallback? buzz() {
       if (recipient == null) return null;
       return () => context.push(
-        Uri(
-          path: Routes.buzz,
-          queryParameters: {'phrase': 'বাজেট শেষ', 'to': recipient.userId},
-        ).toString(),
-      );
+            Uri(
+              path: Routes.buzz,
+              queryParameters: {'phrase': 'বাজেট শেষ', 'to': recipient.userId},
+            ).toString(),
+          );
     }
 
     final listen = _ListenButton(

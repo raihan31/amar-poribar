@@ -310,6 +310,8 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # The app imports @amar-poribar/shared through its built dist, so build its dependencies first.
+      - run: pnpm --filter "@amar-poribar/web^..." build
       - run: pnpm --filter @amar-poribar/web gen:api:check
       - run: pnpm --filter @amar-poribar/web lint
       - run: pnpm --filter @amar-poribar/web typecheck
@@ -394,6 +396,8 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # The app imports @amar-poribar/shared through its built dist, so build its dependencies first.
+      - run: pnpm --filter "@amar-poribar/admin^..." build
       - run: pnpm --filter @amar-poribar/admin gen:api:check
       - run: pnpm --filter @amar-poribar/admin lint
       - run: pnpm --filter @amar-poribar/admin typecheck

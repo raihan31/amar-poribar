@@ -21,9 +21,9 @@ class BudgetInput {
   final int limitPaisa;
 
   Map<String, dynamic> toJson() => {
-    'categoryId': categoryId,
-    'limitPaisa': limitPaisa,
-  };
+        'categoryId': categoryId,
+        'limitPaisa': limitPaisa,
+      };
 }
 
 /// Budgets of the active family (FR-BUD-01).
@@ -112,7 +112,8 @@ class ApiBudgetRepository implements BudgetRepository {
     if (q.isEmpty) {
       await (_store.db.delete(
         _store.db.meta,
-      )..where((m) => m.key.equals(budgetPatchKey))).go();
+      )..where((m) => m.key.equals(budgetPatchKey)))
+          .go();
     } else {
       await _store.setMeta(budgetPatchKey, jsonEncode(q));
     }
@@ -125,11 +126,10 @@ class ApiBudgetRepository implements BudgetRepository {
       final id = '$_familyId:$month:${i.categoryId ?? 'overall'}';
       final old = await (db.select(
         db.cachedBudgets,
-      )..where((b) => b.id.equals(id))).getSingleOrNull();
+      )..where((b) => b.id.equals(id)))
+          .getSingleOrNull();
       final spent = old?.spentPaisa ?? 0;
-      await db
-          .into(db.cachedBudgets)
-          .insertOnConflictUpdate(
+      await db.into(db.cachedBudgets).insertOnConflictUpdate(
             CachedBudgetsCompanion.insert(
               id: id,
               familyId: _familyId,

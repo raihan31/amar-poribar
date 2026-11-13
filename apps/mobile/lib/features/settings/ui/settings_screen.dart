@@ -16,17 +16,14 @@ import '../state/preferences_controller.dart';
 import 'profile_screen.dart' show dayPeriod, reminderWords;
 
 /// Asks for a time of day; null when cancelled. Tests override it.
-final settingsTimePickerProvider =
-    Provider<
-      Future<TimeOfDay?> Function(BuildContext context, TimeOfDay initial)
-    >(
-      (ref) =>
-          (context, initial) => showTimePicker(
-            context: context,
-            initialTime: initial,
-            initialEntryMode: TimePickerEntryMode.dial,
-          ),
-    );
+final settingsTimePickerProvider = Provider<
+    Future<TimeOfDay?> Function(BuildContext context, TimeOfDay initial)>(
+  (ref) => (context, initial) => showTimePicker(
+        context: context,
+        initialTime: initial,
+        initialEntryMode: TimePickerEntryMode.dial,
+      ),
+);
 
 TimeOfDay _parse(String hhmm, TimeOfDay fallback) {
   final p = hhmm.split(':');
@@ -254,7 +251,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   title: l10n.settings_language,
                   trailing: _Choices(
                     keyPrefix: 'settings_lang',
-                    options: [('bn', 'বাংলা', 'বাংলা'), ('en', 'English', l10n.settings_langEnglishLabel)],
+                    options: [
+                      ('bn', 'বাংলা', 'বাংলা'),
+                      ('en', 'English', l10n.settings_langEnglishLabel)
+                    ],
                     selected: prefs.locale.languageCode,
                     onSelect: (v) => _run(ctl.setLocale(Locale(v))),
                   ),
@@ -263,7 +263,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   title: l10n.settings_numbers,
                   trailing: _Choices(
                     keyPrefix: 'settings_num',
-                    options: [('bangla', '১২৩', '১২৩'), ('latin', '123', l10n.settings_numLatinLabel)],
+                    options: [
+                      ('bangla', '১২৩', '১২৩'),
+                      ('latin', '123', l10n.settings_numLatinLabel)
+                    ],
                     selected: prefs.numeralStyle == NumeralStyle.bangla
                         ? 'bangla'
                         : 'latin',
@@ -466,41 +469,41 @@ class _TimeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: '$label $value',
-    excludeSemantics: true,
-    onTap: onTap,
-    child: InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 72),
-        padding: const EdgeInsets.symmetric(horizontal: 18),
-        decoration: BoxDecoration(
-          color: AppTokens.white,
+        button: true,
+        label: '$label $value',
+        excludeSemantics: true,
+        onTap: onTap,
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppTokens.green, width: 2),
-        ),
-        child: Row(
-          children: [
-            Text(
-              label,
-              style: const TextStyle(fontSize: 18, color: AppTokens.muted),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 72),
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            decoration: BoxDecoration(
+              color: AppTokens.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppTokens.green, width: 2),
             ),
-            const Spacer(),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.w700,
-                color: AppTokens.ink,
-              ),
+            child: Row(
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(fontSize: 18, color: AppTokens.muted),
+                ),
+                const Spacer(),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w700,
+                    color: AppTokens.ink,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
-    ),
-  );
+      );
 }
 
 class _Chevron extends StatelessWidget {
@@ -520,15 +523,15 @@ class _Card extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    margin: const EdgeInsets.symmetric(horizontal: 20),
-    clipBehavior: Clip.antiAlias,
-    decoration: BoxDecoration(
-      color: AppTokens.white,
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: AppTokens.border),
-    ),
-    child: Column(children: children),
-  );
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: AppTokens.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppTokens.border),
+        ),
+        child: Column(children: children),
+      );
 }
 
 class _Row extends StatelessWidget {
@@ -618,43 +621,42 @@ class _Choices extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      for (final (id, label, semantic) in options)
-        Semantics(
-          button: true,
-          selected: id == selected,
-          label: semantic,
-          excludeSemantics: true,
-          onTap: () => onSelect(id),
-          child: GestureDetector(
-            key: Key('${keyPrefix}_$id'),
-            behavior: HitTestBehavior.opaque,
-            onTap: () => onSelect(id),
-            child: Container(
-              constraints: const BoxConstraints(minHeight: 48),
-              alignment: Alignment.center,
-              margin: EdgeInsets.only(left: id == options.first.$1 ? 0 : 6),
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              decoration: BoxDecoration(
-                color: id == selected ? AppTokens.green : AppTokens.border,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: id == selected
-                      ? FontWeight.w700
-                      : FontWeight.w600,
-                  color: id == selected ? AppTokens.white : AppTokens.ink,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final (id, label, semantic) in options)
+            Semantics(
+              button: true,
+              selected: id == selected,
+              label: semantic,
+              excludeSemantics: true,
+              onTap: () => onSelect(id),
+              child: GestureDetector(
+                key: Key('${keyPrefix}_$id'),
+                behavior: HitTestBehavior.opaque,
+                onTap: () => onSelect(id),
+                child: Container(
+                  constraints: const BoxConstraints(minHeight: 48),
+                  alignment: Alignment.center,
+                  margin: EdgeInsets.only(left: id == options.first.$1 ? 0 : 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: id == selected ? AppTokens.green : AppTokens.border,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight:
+                          id == selected ? FontWeight.w700 : FontWeight.w600,
+                      color: id == selected ? AppTokens.white : AppTokens.ink,
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-    ],
-  );
+        ],
+      );
 }
 
 /// The 56 x 32 switch of the board, with a 48 dp tall touch area.
@@ -672,38 +674,38 @@ class _Switch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-    toggled: on,
-    label: label,
-    excludeSemantics: true,
-    onTap: () => onChanged(!on),
-    child: GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () => onChanged(!on),
-      child: SizedBox(
-        width: 56,
-        height: 48,
-        child: Center(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 120),
+        toggled: on,
+        label: label,
+        excludeSemantics: true,
+        onTap: () => onChanged(!on),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => onChanged(!on),
+          child: SizedBox(
             width: 56,
-            height: 32,
-            padding: const EdgeInsets.all(4),
-            alignment: on ? Alignment.centerRight : Alignment.centerLeft,
-            decoration: BoxDecoration(
-              color: on ? AppTokens.green : AppTokens.switchOff,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Container(
-              width: 24,
-              height: 24,
-              decoration: const BoxDecoration(
-                color: AppTokens.white,
-                shape: BoxShape.circle,
+            height: 48,
+            child: Center(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 120),
+                width: 56,
+                height: 32,
+                padding: const EdgeInsets.all(4),
+                alignment: on ? Alignment.centerRight : Alignment.centerLeft,
+                decoration: BoxDecoration(
+                  color: on ? AppTokens.green : AppTokens.switchOff,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: const BoxDecoration(
+                    color: AppTokens.white,
+                    shape: BoxShape.circle,
+                  ),
+                ),
               ),
             ),
           ),
         ),
-      ),
-    ),
-  );
+      );
 }
