@@ -4,6 +4,7 @@ import { parseOr400 } from "../../../platform/errors.js";
 import { createTransaction } from "../app/create-transaction.js";
 import { deleteTransaction } from "../app/delete-transaction.js";
 import type { LedgerDeps } from "../app/deps.js";
+import { getTransaction } from "../app/get-transaction.js";
 import { listTransactions } from "../app/list-transactions.js";
 import { restoreTransaction } from "../app/restore-transaction.js";
 import { updateTransaction } from "../app/update-transaction.js";
@@ -21,6 +22,12 @@ export function transactionsRoutes(app: FastifyInstance, deps: LedgerDeps) {
     await deps.families.requireRole(familyId, req.user.sub, "member");
     const query = parseOr400(ListTransactionsQuerySchema, req.query);
     return listTransactions(deps, { familyId, userId: req.user.sub, query });
+  });
+
+  app.get<TxnParams>("/v1/families/:familyId/transactions/:txnId", { ...opts, schema: docs.object }, async (req) => {
+    const { familyId, txnId } = req.params;
+    const { role } = await deps.families.requireRole(familyId, req.user.sub, "member");
+    return getTransaction(deps, { familyId, txnId, userId: req.user.sub, role });
   });
 
   app.post<FamilyParams>(
