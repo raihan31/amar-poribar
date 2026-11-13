@@ -13,9 +13,10 @@ class MemoryStore implements AiStore {
   used = new Map<string, number>();
   summaries = new Map<string, CachedSummary>();
   requestsUsed = async (familyId: string, month: string) => this.used.get(`${familyId}:${month}`) ?? 0;
-  recordUse = async (familyId: string, month: string) => {
-    this.used.set(`${familyId}:${month}`, (await this.requestsUsed(familyId, month)) + 1);
+  recordMetering = async (familyId: string, month: string, _feature: string, d: { requests: number }) => {
+    this.used.set(`${familyId}:${month}`, (await this.requestsUsed(familyId, month)) + d.requests);
   };
+  recordUse = (familyId: string, month: string) => this.recordMetering(familyId, month, "legacy", { requests: 1 });
   findSummary = async (k: SummaryKey) => this.summaries.get(JSON.stringify(k)) ?? null;
   saveSummary = async (k: SummaryKey, v: CachedSummary) => void this.summaries.set(JSON.stringify(k), v);
 }

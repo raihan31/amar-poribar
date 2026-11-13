@@ -127,6 +127,13 @@
       "when": 1794393526601,
       "tag": "0017_thin_jetstream",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794562935047,
+      "tag": "0018_ai_usage_features",
+      "breakpoints": true
     }
   ]
 }

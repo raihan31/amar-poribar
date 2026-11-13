@@ -7,18 +7,33 @@ export function createAiStore(db: Db): AiStore {
   return {
     async requestsUsed(familyId, month) {
       const [row] = await db
-        .select({ requests: aiUsage.requests })
+        .select({ requests: sql<number>`coalesce(sum(${aiUsage.requests}), 0)::int` })
         .from(aiUsage)
         .where(and(eq(aiUsage.familyId, familyId), eq(aiUsage.month, month)));
       return row?.requests ?? 0;
     },
-    async recordUse(familyId, month) {
+    async recordMetering(familyId, month, feature, d) {
       await db
         .insert(aiUsage)
-        .values({ familyId, month, requests: 1 })
+        .values({
+          familyId,
+          month,
+          feature,
+          requests: d.requests,
+          inputTokens: d.inputTokens,
+          outputTokens: d.outputTokens,
+          latencyMsSum: d.latencyMsSum,
+          errors: d.errors,
+        })
         .onConflictDoUpdate({
-          target: [aiUsage.familyId, aiUsage.month],
-          set: { requests: sql`${aiUsage.requests} + 1` },
+          target: [aiUsage.familyId, aiUsage.month, aiUsage.feature],
+          set: {
+            requests: sql`${aiUsage.requests} + ${d.requests}`,
+            inputTokens: sql`${aiUsage.inputTokens} + ${d.inputTokens}`,
+            outputTokens: sql`${aiUsage.outputTokens} + ${d.outputTokens}`,
+            latencyMsSum: sql`${aiUsage.latencyMsSum} + ${d.latencyMsSum}`,
+            errors: sql`${aiUsage.errors} + ${d.errors}`,
+          },
         });
     },
     async findSummary(key) {
