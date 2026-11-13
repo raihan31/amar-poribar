@@ -337,3 +337,37 @@
   color: var(--muted);
   font-size: 14px;
 }
+
+/* Add by hand (T-WEB-16); design: AddExpense.dc.html. */
+.entry-form .entry-whatfor {
+  margin: 8px 0;
+}
+.entry-catrow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.entry-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.entry-private {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+.entry-private > span {
+  flex: 1;
+}
+.entry-link {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  min-height: 0;
+  color: var(--green-700);
+  text-decoration: underline;
+}
