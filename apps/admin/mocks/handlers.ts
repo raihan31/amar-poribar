@@ -1,6 +1,6 @@
 import { http, HttpResponse, type HttpHandler } from "msw";
 import { overviewFixture } from "../components/overview/types";
-import { demoStaff, privacyFixture } from "./fixtures";
+import { demoStaff, privacyFixture, staffFixture } from "./fixtures";
 
 /** One handler per route a screen uses; later tasks add the admin routes. */
 export const handlers: HttpHandler[] = [
@@ -34,6 +34,9 @@ export const handlers: HttpHandler[] = [
       chain: { ok: true, verifiedThrough: 214 },
     }),
   ),
+  http.get("*/admin/v1/staff", () => HttpResponse.json(staffFixture())),
+  http.post("*/admin/v1/staff", () => HttpResponse.json({ ok: true }, { status: 201 })),
+  http.patch("*/admin/v1/staff/:id", () => HttpResponse.json({ ok: true })),
   http.get("*/admin/v1/me", () => HttpResponse.json(demoStaff())),
   http.get("*/admin/v1/overview", () => HttpResponse.json(overviewFixture)),
   http.get("*/admin/v1/privacy-requests", ({ request }) => {
