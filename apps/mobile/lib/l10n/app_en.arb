@@ -337,5 +337,24 @@
     "placeholders": {"example": {"type": "String"}}
   },
   "summary_captionPlain": "Amounts are read out in words.",
-  "summary_tipPrefix": "A tip"
+  "summary_tipPrefix": "A tip",
+  "budget_title": "This month's budget",
+  "budget_subtitle": "{month} · last month's budget carried over",
+  "budget_overall": "Whole family",
+  "budget_statusOk": "On track",
+  "budget_statusWarning": "{percent}% used · careful",
+  "budget_statusExceeded": "Budget over · {amount} extra",
+  "budget_buzz": "Buzz {name}",
+  "budget_add": "+ Set a budget",
+  "budget_listen": "Listen",
+  "budget_allOk": "All budgets are fine",
+  "budget_empty": "No budget set yet",
+  "budget_festivalTitle": "{name} (festival budget)",
+  "budget_festivalLine": "{range} · {amount}",
+  "budget_festivalNew": "New festival budget",
+  "budget_editTitle": "Set a budget",
+  "budget_pickCategory": "Budget for which category?",
+  "budget_save": "Save",
+  "budget_queued": "The budget will be saved when the internet is back",
+  "budget_saveFailed": "Could not save the budget"
 }

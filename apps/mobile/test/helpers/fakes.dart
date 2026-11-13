@@ -1,5 +1,7 @@
 import 'package:amar_poribar/data/auth/token_store.dart';
 import 'package:amar_poribar/data/database/local_store.dart';
+import 'package:amar_poribar/features/budgets/data/budget_repository.dart';
+import 'package:amar_poribar/features/budgets/state/budget_providers.dart';
 import 'package:amar_poribar/features/family/data/fake_family_repository.dart';
 import 'package:amar_poribar/features/family/data/invite_repository.dart';
 import 'package:amar_poribar/features/family/state/family_providers.dart';
@@ -44,5 +46,8 @@ List<Override> defaultFakes({
       homeRepositoryProvider.overrideWithValue(FakeHomeRepository()),
       topBudgetWarningProvider.overrideWithValue(null),
       inboxRepositoryProvider.overrideWithValue(FakeInboxRepository()),
+      budgetRepositoryProvider.overrideWithValue(FakeBudgetRepository()),
+      // Budgets: the app-wide spoken-alert listener opens a database stream; tests start it by hand.
+      spokenAlertWiringProvider.overrideWith((ref) {}),
       // <feature fakes go here>
     ];

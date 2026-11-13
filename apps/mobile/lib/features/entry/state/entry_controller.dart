@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/speech/bangla_words.dart';
-import '../../../core/speech/budget_alerts.dart';
 import '../../../core/speech/categories.dart';
 import '../../../data/api/api_exception.dart';
 import '../../../domain/models/api/draft.dart';
 import '../../../presentation/providers/auth_provider.dart';
 import '../../../presentation/providers/providers.dart';
+import '../../budgets/state/budget_providers.dart';
 import '../../family/state/family_providers.dart';
 import '../../transactions/state/add_expense_controller.dart';
 import '../../voice/state/voice_capability_provider.dart';
@@ -49,42 +49,15 @@ final entryAfterSaveProvider = Provider<Future<void> Function()>((ref) {
     try {
       final family = await ref.read(currentFamilyProvider.future);
       await ref.read(syncServiceProvider).sync(family.id);
-      await _speakBudgetAlerts(ref, family.id);
+      await _speakBudgetAlerts(ref);
     } catch (_) {
       // Offline is fine: the next sync catches up.
     }
   };
 });
 
-Future<void> _speakBudgetAlerts(Ref ref, String familyId) async {
-  final store = ref.read(localStoreProvider);
-  final month = DateTime.now()
-      .toUtc()
-      .add(const Duration(hours: 6))
-      .toIso8601String()
-      .substring(0, 7);
-  final raw = await ref.read(apiClientProvider).budgets(familyId);
-  final budgets = [
-    for (final b in raw)
-      BudgetStatus(
-        b['categoryId'] as String?,
-        (b['nameBn'] ?? '') as String,
-        (b['limitPaisa'] as num).toInt(),
-        (b['spentPaisa'] as num).toInt(),
-        b['level'] as String,
-      ),
-  ];
-  final last = <String, String>{};
-  for (final b in budgets) {
-    final key = b.categoryId ?? 'overall';
-    final v = await store.getMeta('budget_alert:$month:$key');
-    if (v != null) last[key] = v;
-  }
-  for (final a in alertsToSpeak(budgets, last)) {
-    await ref.read(voiceServiceProvider).speak(a.text);
-    await store.setMeta('budget_alert:$month:${a.key}', a.level);
-  }
-}
+Future<void> _speakBudgetAlerts(Ref ref) =>
+    ref.read(spokenAlertControllerProvider).check();
 
 enum EntryPhase { idle, listening, parsing, drafts, saving }
 

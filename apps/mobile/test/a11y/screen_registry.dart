@@ -1,9 +1,14 @@
 import 'package:amar_poribar/app/redirects.dart';
 import 'package:amar_poribar/domain/models/api/me.dart';
+import 'package:amar_poribar/domain/models/member.dart';
+import 'package:amar_poribar/domain/models/role.dart';
 import 'package:amar_poribar/features/auth/data/auth_repository.dart';
 import 'package:amar_poribar/features/auth/data/fake_auth_repository.dart';
 import 'package:amar_poribar/features/auth/ui/login_screen.dart';
 import 'package:amar_poribar/features/auth/ui/session_expired_screen.dart';
+import 'package:amar_poribar/features/budgets/data/budget_repository.dart';
+import 'package:amar_poribar/features/budgets/state/budget_providers.dart';
+import 'package:amar_poribar/features/budgets/ui/budgets_screen.dart';
 import 'package:amar_poribar/features/entry/data/fake_entry_repository.dart';
 import 'package:amar_poribar/features/entry/state/entry_controller.dart';
 import 'package:amar_poribar/features/entry/ui/category_picker_screen.dart';
@@ -153,6 +158,26 @@ void registerAllScreens() {
     ],
   );
   registerScreen(
+    'B3',
+    Routes.budget,
+    (c) => const BudgetsScreen(),
+    needs: [
+      budgetRepositoryProvider.overrideWithValue(
+        FakeBudgetRepository(
+          budgets: const [
+            BudgetStatus(null, 'মোট', 5000000, 4250000, 'warning'),
+            BudgetStatus('c1', 'বাজার ও মুদি', 1000000, 1050000, 'exceeded'),
+            BudgetStatus('c2', 'যাতায়াত', 300000, 120000, 'ok'),
+          ],
+        ),
+      ),
+      currentRoleProvider.overrideWithValue(FamilyRole.owner),
+      budgetRecipientProvider.overrideWithValue(
+        const Member(userId: 'u-ammu', name: 'আম্মু', role: FamilyRole.admin),
+      ),
+    ],
+  );
+  registerScreen(
     'Main',
     Routes.home,
     (c) => const HomeScreen(),
@@ -186,6 +211,7 @@ const List<String> kAllRoutes = [
   Routes.addCategory,
   Routes.tutorial,
   Routes.summary,
+  Routes.budget,
 ];
 
 /// Pre-existing screens not yet in the audit. Each screen task removes its
