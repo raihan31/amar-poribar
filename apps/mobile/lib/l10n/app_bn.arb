@@ -356,5 +356,16 @@
   "notif_periodEvening": "সন্ধ্যায়",
   "notif_periodNight": "রাতে",
   "notif_reminderTitle": "রোজকার মনে করানো",
-  "notif_reminderBody": "আজকের খরচ লিখেছেন?"
+  "notif_reminderBody": "আজকের খরচ লিখেছেন?",
+  "summary_title": "এ মাস কেমন গেল?",
+  "summary_footnote": "সংখ্যাগুলো আপনার হিসাব থেকে নেওয়া, এআই বানায়নি।",
+  "summary_footnoteAi": "সংখ্যাগুলো আপনার হিসাব থেকে নেওয়া, শুধু কথাগুলো এআই সাজিয়েছে।",
+  "summary_listen": "শুনুন",
+  "summary_stop": "থামুন",
+  "summary_caption": "টাকার অঙ্ক কথায় পড়ে শোনানো হবে: \"{example}\"",
+  "@summary_caption": {
+    "placeholders": {"example": {"type": "String"}}
+  },
+  "summary_captionPlain": "টাকার অঙ্ক কথায় পড়ে শোনানো হবে।",
+  "summary_tipPrefix": "একটা কথা"
 }

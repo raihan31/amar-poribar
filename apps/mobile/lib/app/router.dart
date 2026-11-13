@@ -14,6 +14,7 @@ import '../features/onboarding/ui/policy_screen.dart';
 import '../features/onboarding/ui/tutorial_screen.dart';
 import '../features/onboarding/ui/welcome_screen.dart';
 import '../features/settings/ui/profile_screen.dart';
+import '../features/summary/ui/summary_screen.dart';
 import '../features/transactions/ui/add_expense_screen.dart';
 import '../features/voice/ui/voice_fallback_screen.dart';
 import '../presentation/providers/auth_provider.dart';
@@ -129,7 +130,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       stub(Routes.receipt),
       stub(Routes.ruleLearn),
       simple(Routes.voiceFallback, (_) => const VoiceFallbackScreen()),
-      stub(Routes.summary),
+      simple(Routes.summary, (_) => const SummaryScreen()),
       stub(Routes.ask),
       simple(Routes.settings, (_) => const SettingsScreen()),
       simple(Routes.profile, (_) => const ProfileScreen()),
