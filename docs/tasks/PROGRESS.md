@@ -57,7 +57,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-FAM-06 | M1 | done | a12bedca5 | 2026-11-11 |  |
 | T-FAM-07 | M5 | todo |  |  |  |
 | T-FAM-08 | M5 | done | c0d6745 | 2026-11-11 |  |
-| T-FAM-09 | M5 | todo |  |  |  |
+| T-FAM-09 | M5 | done | c1d05b32d | 2026-11-13 |  |
 | T-LED-01 | M2 | done | 5eb8b42 | 2026-11-11 |  |
 | T-LED-02 | M2 | todo |  |  |  |
 | T-LED-03 | M2 | done | 1d9387e17 | 2026-11-11 |  |
@@ -181,7 +181,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-MOB-25 | M2 | todo |  |  |  |
 | T-MOB-26 | M2 | done | 6db3b76bd | 2026-11-11 |  |
 | T-MOB-27 | M2 | todo |  |  |  |
-| T-MOB-28 | M2 | todo |  |  |  |
+| T-MOB-28 | M2 | done | 0752af64a | 2026-11-13 |  |
 | T-MOB-29 | M2 | done | b325748 | 2026-11-11 |  |
 | T-MOB-30 | M2 | todo |  |  |  |
 | T-MOB-31 | M2 | todo |  |  |  |
@@ -244,7 +244,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-WEB-11 | M1 | done | abf4271 | 2026-11-11 |  |
 | T-WEB-12 | M1 | done | 98b1709 | 2026-11-11 |  |
 | T-WEB-13 | M2 | done | 041f83a80 | 2026-11-11 |  |
-| T-WEB-14 | M2 | todo |  |  |  |
+| T-WEB-14 | M2 | done | 08fcae18d | 2026-11-13 |  |
 | T-WEB-15 | M2 | todo |  |  |  |
 | T-WEB-16 | M2 | todo |  |  |  |
 | T-WEB-17 | M2 | todo |  |  |  |
@@ -278,12 +278,12 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-ADMUI-04 | M5 | done | 0b9273e | 2026-11-11 |  |
 | T-ADMUI-05 | M5 | done | 73657744d | 2026-11-11 |  |
 | T-ADMUI-06 | M5 | done | c7401056b | 2026-11-11 |  |
-| T-ADMUI-07 | M5 | todo |  |  |  |
+| T-ADMUI-07 | M5 | done | 4532677e7 | 2026-11-13 |  |
 | T-ADMUI-08 | M5 | done | 78eef68a7 | 2026-11-11 |  |
 | T-ADMUI-09 | M8 | todo |  |  |  |
 | T-ADMUI-10 | M5 | done | 031ecb577 | 2026-11-11 |  |
-| T-ADMUI-11 | M5 | todo |  |  |  |
-| T-ADMUI-12 | M5 | todo |  |  |  |
+| T-ADMUI-11 | M5 | done | 725401b19 | 2026-11-13 |  |
+| T-ADMUI-12 | M5 | done | ef2be3726 | 2026-11-13 |  |
 | T-ADMUI-13 | M5 | todo |  |  |  |
 | T-ADMUI-14 | M5 | todo |  |  |  |
 | T-WEB-42 | M2 | todo |  |  |  |
