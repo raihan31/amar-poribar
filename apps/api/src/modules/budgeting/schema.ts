@@ -13,8 +13,11 @@ export const budgets = budgetingSchema.table(
     categoryId: uuid("category_id"),
     month: text("month").notNull(),
     limitPaisa: bigint("limit_paisa", { mode: "number" }).notNull(),
+    // 'carried' rows are copied forward by `budgeting.carry-forward` (FR-BUD-03); a manual save makes them 'manual'.
+    source: text("source").notNull().default("manual"),
   },
   (t) => [
+    check("budgets_source_chk", sql`${t.source} in ('manual', 'carried')`),
     // NULL category ids (the overall budget) count as one key, so there is exactly one overall row per month.
     uniqueIndex("budget_family_cat_month_uidx").on(
       t.familyId,

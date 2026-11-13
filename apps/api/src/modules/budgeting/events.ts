@@ -15,11 +15,19 @@ export interface BudgetThresholdCrossedV1 {
   limitPaisa: number;
 }
 
+/** Published once per family by `budgeting.carry-forward` when it stored last month's budgets for `month` (FR-BUD-03). */
+export interface BudgetsCarriedForwardV1 {
+  familyId: string;
+  month: string;
+  count: number;
+}
+
 /** @deprecated Use {@link BudgetThresholdCrossedV1}. */
 export type BudgetThresholdCrossedPayload = BudgetThresholdCrossedV1;
 
 declare module "../../platform/events/types.js" {
   interface EventMap {
     "budgeting.BudgetThresholdCrossed.v1": BudgetThresholdCrossedV1;
+    "budgeting.BudgetsCarriedForward.v1": BudgetsCarriedForwardV1;
   }
 }

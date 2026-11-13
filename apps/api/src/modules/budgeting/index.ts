@@ -2,7 +2,7 @@ import type { ModuleDefinition } from "../../platform/module.js";
 import type { Viewer } from "../ledger/index.js";
 import type { AlertDeps, BudgetingDeps } from "./app/deps.js";
 import { onTransactionChanged } from "./app/on-transaction-changed.js";
-import { purgeAlertsJob } from "./jobs.js";
+import { carryForwardJob, purgeAlertsJob } from "./jobs.js";
 import { listFestivalBudgets, type FestivalBudgetWithSpend } from "./app/festival-usecases.js";
 import { getBudgetStatus, getEffectiveBudgets, type BudgetSummary, type EffectiveBudget } from "./app/get-budgets.js";
 import { budgetsRoutes } from "./http/budget-routes.js";
@@ -44,6 +44,9 @@ export const budgetingModule: ModuleDefinition<BudgetingFacade> = {
       ctx.bus.on(name, "budgeting.evaluate", (event) => onTransactionChanged(alertDeps, event.payload));
     }
     ctx.jobs.register(purgeAlertsJob({ db: ctx.db, clock: ctx.clock, logger: ctx.logger }));
+    ctx.jobs.register(
+      carryForwardJob({ db: ctx.db, bus: ctx.bus, clock: ctx.clock, jobs: ctx.jobs, logger: ctx.logger }),
+    );
     budgetsRoutes(app, deps);
     festivalsRoutes(app, deps);
     return {

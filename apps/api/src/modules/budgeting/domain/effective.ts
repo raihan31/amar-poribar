@@ -2,6 +2,8 @@ export interface BudgetRow {
   categoryId: string | null;
   month: string;
   limitPaisa: number;
+  /** 'carried' when `budgeting.carry-forward` stored the row (absent means manual). */
+  source?: string;
 }
 
 /**
