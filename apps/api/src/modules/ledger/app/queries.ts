@@ -47,12 +47,22 @@ export function countTransactions(deps: LedgerDeps, familyId: string): Promise<n
 export async function assertRefs(
   x: Executor,
   familyId: string,
-  refs: { categoryId?: string | null | undefined; accountId?: string | null | undefined },
+  refs: {
+    categoryId?: string | null | undefined;
+    accountId?: string | null | undefined;
+    toAccountId?: string | null | undefined;
+  },
+  /** On an edit, an account the entry already uses stays valid even if it was archived since. */
+  current: { accountId?: string | null; toAccountId?: string | null } = {},
 ): Promise<void> {
   if (refs.categoryId && !(await catalogRepo.categoryExists(x, familyId, refs.categoryId))) {
     throw new HttpError(400, "invalid_category", "Unknown category");
   }
-  if (refs.accountId && !(await catalogRepo.accountExists(x, familyId, refs.accountId))) {
-    throw new HttpError(400, "invalid_account", "Unknown account");
+  for (const key of ["accountId", "toAccountId"] as const) {
+    const id = refs[key];
+    // Archived accounts cannot be chosen for new entries (FR-ACC-04).
+    if (id && !(await catalogRepo.accountExists(x, familyId, id, { activeOnly: id !== current[key] }))) {
+      throw new HttpError(400, "invalid_account", "Unknown account");
+    }
   }
 }

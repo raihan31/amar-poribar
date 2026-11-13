@@ -65,23 +65,33 @@ export const AmountPaisaSchema = z.number().int().positive().max(MAX_AMOUNT_PAIS
 
 export const MonthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Expected YYYY-MM");
 
-export const CreateTransactionSchema = z.object({
-  id: z.uuid().optional(),
-  type: TransactionTypeSchema,
-  amountPaisa: AmountPaisaSchema,
-  feePaisa: z.number().int().min(0).default(0),
-  occurredAt: z.iso.datetime({ offset: true }),
-  categoryId: z.uuid().nullable().optional(),
-  accountId: z.uuid().nullable().optional(),
-  note: z.string().max(500).optional(),
-  counterparty: z.string().max(120).optional(),
-  trxId: z.string().max(40).optional(),
-  source: TransactionSourceSchema.default("manual"),
-  aiConfidence: z.number().min(0).max(1).optional(),
-  isPrivate: z.boolean().default(false),
-  /** Admins may record an entry on behalf of another member (T-LED-04); defaults to the caller. */
-  paidByUserId: z.uuid().optional(),
-});
+/** A transfer needs a destination different from its source; every other type has none (T-LED-08). */
+const transferShapeOk = (v: { type: string; accountId?: string | null; toAccountId?: string | null }) =>
+  v.type === "transfer" ? Boolean(v.toAccountId) && v.toAccountId !== v.accountId : !v.toAccountId;
+const TRANSFER_SHAPE_MESSAGE =
+  "A transfer needs a destination account different from the source; other types have none";
+
+export const CreateTransactionSchema = z
+  .object({
+    id: z.uuid().optional(),
+    type: TransactionTypeSchema,
+    amountPaisa: AmountPaisaSchema,
+    feePaisa: z.number().int().min(0).default(0),
+    occurredAt: z.iso.datetime({ offset: true }),
+    categoryId: z.uuid().nullable().optional(),
+    accountId: z.uuid().nullable().optional(),
+    /** Destination of a transfer (T-LED-08). */
+    toAccountId: z.uuid().nullable().optional(),
+    note: z.string().max(500).optional(),
+    counterparty: z.string().max(120).optional(),
+    trxId: z.string().max(40).optional(),
+    source: TransactionSourceSchema.default("manual"),
+    aiConfidence: z.number().min(0).max(1).optional(),
+    isPrivate: z.boolean().default(false),
+    /** Admins may record an entry on behalf of another member (T-LED-04); defaults to the caller. */
+    paidByUserId: z.uuid().optional(),
+  })
+  .refine(transferShapeOk, { message: TRANSFER_SHAPE_MESSAGE, path: ["toAccountId"] });
 export type CreateTransactionInput = z.infer<typeof CreateTransactionSchema>;
 
 /** Editable fields only; TrxID and source are fixed once recorded (FR-TXN-03, FR-TXN-04). */
@@ -93,12 +103,18 @@ export const UpdateTransactionSchema = z
     occurredAt: z.iso.datetime({ offset: true }),
     categoryId: z.uuid().nullable(),
     accountId: z.uuid().nullable(),
+    toAccountId: z.uuid().nullable(),
     note: z.string().max(500).nullable(),
     counterparty: z.string().max(120).nullable(),
     isPrivate: z.boolean(),
   })
   .partial()
-  .refine((v) => Object.keys(v).length > 0, "Nothing to update");
+  .refine((v) => Object.keys(v).length > 0, "Nothing to update")
+  // Only what is visible in the body can be checked here; the service checks the merged row.
+  .refine((v) => !v.toAccountId || (v.toAccountId !== v.accountId && v.type !== "expense" && v.type !== "income"), {
+    message: TRANSFER_SHAPE_MESSAGE,
+    path: ["toAccountId"],
+  });
 export type UpdateTransactionInput = z.infer<typeof UpdateTransactionSchema>;
 
 /** Longest range a list may cover, in calendar months (FR-TXN-02). */
@@ -374,6 +390,8 @@ export const SyncTransactionSchema = z.object({
   occurredAt: z.iso.datetime({ offset: true }),
   categoryId: z.uuid().nullable().optional(),
   accountId: z.uuid().nullable().optional(),
+  /** Optional so existing mobile builds keep working (T-LED-08). */
+  toAccountId: z.uuid().nullable().optional(),
   note: z.string().max(500).nullable().optional(),
   counterparty: z.string().max(120).nullable().optional(),
   trxId: z.string().max(40).nullable().optional(),

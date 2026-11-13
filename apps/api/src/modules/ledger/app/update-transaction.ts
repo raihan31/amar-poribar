@@ -17,11 +17,21 @@ export async function updateTransaction(
   if (txn.createdBy !== actorId && !deps.families.canEditAll(role)) {
     throw new HttpError(403, "forbidden", "You can only edit your own entries");
   }
-  await assertRefs(deps.db, familyId, data);
+  await assertRefs(deps.db, familyId, data, { accountId: txn.accountId, toAccountId: txn.toAccountId });
+  // The body alone cannot show the final shape, so check the merged row (T-LED-08).
+  const type = data.type ?? txn.type;
+  const accountId = data.accountId === undefined ? txn.accountId : data.accountId;
+  // Moving away from a transfer clears its destination.
+  const toAccountId =
+    data.toAccountId === undefined ? (type === "transfer" ? txn.toAccountId : null) : data.toAccountId;
+  const shapeOk = type === "transfer" ? Boolean(toAccountId) && toAccountId !== accountId : !toAccountId;
+  if (!shapeOk)
+    throw new HttpError(400, "invalid_request", "A transfer needs a destination account different from the source");
   const { occurredAt, ...fields } = data;
   return deps.db.transaction(async (tx) => {
     const row = await transactionsRepo.update(tx, txnId, {
       ...fields,
+      toAccountId,
       ...(occurredAt ? { occurredAt: new Date(occurredAt) } : {}),
       ...stampChange(txn.hlc),
     });

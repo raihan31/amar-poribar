@@ -33,7 +33,7 @@ export async function getTransaction(
     aiConfidence: row.aiConfidence,
     // Split groups, transfers and attachments arrive with T-LED-08/09 and later; the columns do not exist yet.
     splitGroupId: null,
-    toAccountId: null,
+    toAccountId: row.toAccountId,
     attachmentUrl: null,
     canEdit,
     canDelete: canEdit,
