@@ -31,6 +31,7 @@ jobs:
       - run: pnpm openapi:check
       - run: pnpm db:check
       - run: pnpm exec tsx tools/gen-vectors.ts --check
+      - run: node tools/design/extract-strings.mjs --check
       - run: node --test tools/eslint-rules/*.test.mjs
       - run: node --test tools/verify.test.mjs
       # Migrations are generated SQL files; schema push is never allowed (T-PLAT-31).
