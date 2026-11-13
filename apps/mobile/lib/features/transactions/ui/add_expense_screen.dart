@@ -11,6 +11,7 @@ import '../../../core/money/numeral_style_provider.dart';
 import '../../../core/speech/bangla_words.dart';
 import '../../../core/theme/tokens.dart';
 import '../../../data/database/database.dart';
+import '../../../presentation/providers/providers.dart';
 import '../../../ui/big_button.dart';
 import '../../../ui/listen_button.dart';
 import '../../family/state/family_providers.dart';
@@ -19,9 +20,24 @@ import '../widgets/account_chips.dart';
 import '../widgets/amount_keypad.dart';
 import '../widgets/category_icon_row.dart';
 
+/// Values A3 hands to D4 when the person wants to change the amount or category by hand.
+class AddExpensePrefill {
+  const AddExpensePrefill({
+    required this.amountPaisa,
+    this.categoryKey,
+    this.type = 'expense',
+  });
+
+  final int amountPaisa;
+  final String? categoryKey;
+  final String type;
+}
+
 /// D4 · add an entry by hand (route `/add`). Board: AddExpense.dc.html.
 class AddExpenseScreen extends ConsumerStatefulWidget {
-  const AddExpenseScreen({super.key});
+  const AddExpenseScreen({super.key, this.prefill});
+
+  final AddExpensePrefill? prefill;
 
   @override
   ConsumerState<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -55,6 +71,17 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
       },
       fireImmediately: true,
     );
+    final prefill = widget.prefill;
+    if (prefill != null) Future.microtask(() => _applyPrefill(prefill));
+  }
+
+  Future<void> _applyPrefill(AddExpensePrefill p) async {
+    final c = ref.read(addExpenseControllerProvider.notifier);
+    c.setType(p.type);
+    c.pressDigits('${p.amountPaisa ~/ 100}');
+    final id =
+        await ref.read(localStoreProvider).categoryIdForKey(p.categoryKey);
+    if (id != null && mounted) c.setCategory(id);
   }
 
   @override

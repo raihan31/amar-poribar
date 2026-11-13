@@ -305,5 +305,26 @@
     "placeholders": {"category": {"type": "String"}}
   },
   "entry_picker_listen": "শুনুন",
-  "entry_picker_selected": "বাছা হয়েছে"
+  "entry_picker_selected": "বাছা হয়েছে",
+  "entry_heard": "আপনি বললেন:",
+  "entry_again": "আবার শুনুন",
+  "entry_confirmQ": "ঠিক আছে?",
+  "entry_no": "না",
+  "entry_yes": "হ্যাঁ, রাখুন",
+  "entry_change": "টাকা বা খাত বদলাতে চাই",
+  "entry_speak": "চাপ দিয়ে বলুন",
+  "entry_parsing": "বুঝে নিচ্ছি…",
+  "entry_queued": "ইন্টারনেট নেই। লেখাটি রাখা হয়েছে; নেটওয়ার্ক পেলে নিজে থেকে বুঝে নেওয়া হবে।",
+  "entry_quota": "আজকের এআই সীমা শেষ। হাতে লিখে রাখুন।",
+  "entry_quotaAction": "হাতে লিখুন",
+  "entry_problem": "কিছু বোঝা যায়নি। আবার বলুন।",
+  "entry_typeExpense": "খরচ",
+  "entry_typeIncome": "আয়",
+  "entry_typeTransfer": "স্থানান্তর",
+  "entry_unknownCategory": "খাত বাছুন",
+  "entry_acct_cash": "ক্যাশ",
+  "entry_acct_bkash": "বিকাশ",
+  "entry_acct_nagad": "নগদ",
+  "entry_acct_rocket": "রকেট",
+  "entry_acct_bank": "ব্যাংক"
 }
