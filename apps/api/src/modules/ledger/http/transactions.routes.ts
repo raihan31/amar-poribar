@@ -5,6 +5,7 @@ import { createTransaction } from "../app/create-transaction.js";
 import { deleteTransaction } from "../app/delete-transaction.js";
 import type { LedgerDeps } from "../app/deps.js";
 import { listTransactions } from "../app/list-transactions.js";
+import { restoreTransaction } from "../app/restore-transaction.js";
 import { updateTransaction } from "../app/update-transaction.js";
 import { docs } from "../../../platform/http/responses.js";
 
@@ -49,6 +50,16 @@ export function transactionsRoutes(app: FastifyInstance, deps: LedgerDeps) {
       const { role } = await deps.families.requireRole(familyId, req.user.sub, "member", { write: true });
       await deleteTransaction(deps, { familyId, txnId, actorId: req.user.sub, role });
       return reply.status(204).send();
+    },
+  );
+
+  app.post<TxnParams>(
+    "/v1/families/:familyId/transactions/:txnId/restore",
+    { ...opts, schema: docs.object },
+    async (req) => {
+      const { familyId, txnId } = req.params;
+      const { role } = await deps.families.requireRole(familyId, req.user.sub, "member", { write: true });
+      return restoreTransaction(deps, { familyId, txnId, actorId: req.user.sub, role });
     },
   );
 }

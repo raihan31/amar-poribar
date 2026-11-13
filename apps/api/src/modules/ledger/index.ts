@@ -24,6 +24,7 @@ import { getMonthlySeries, type MonthlyPoint } from "./app/series.js";
 import { seedDefaults } from "./app/seed-defaults.js";
 import { currentDhakaMonth, dayRange, monthRange, monthsBetween, previousMonth } from "../../platform/time/month.js";
 import { nextHlc } from "../../platform/hlc.js";
+import { purgeDeletedJob } from "./jobs.js";
 import { accountsRoutes } from "./http/accounts.routes.js";
 import { categoriesRoutes } from "./http/categories.routes.js";
 import { transactionsRoutes } from "./http/transactions.routes.js";
@@ -100,7 +101,16 @@ export const ledgerModule: ModuleDefinition<LedgerFacade> = {
   register(app, ctx) {
     const families = ctx.facades.families;
     if (!families) throw new Error("ledger: families must be registered first");
-    const deps: LedgerDeps = { db: ctx.db, bus: ctx.bus, families };
+    const deps: LedgerDeps = { db: ctx.db, clock: ctx.clock, bus: ctx.bus, families };
+    ctx.jobs.register(
+      purgeDeletedJob({
+        db: ctx.db,
+        storage: ctx.storage,
+        clock: ctx.clock,
+        logger: ctx.logger,
+        onPurged: (ctx.config as { metrics?: { ledgerPurged?: (n: number) => void } }).metrics?.ledgerPurged,
+      }),
+    );
     families.bindActivityPort({ getLastActivity: (familyId) => getLastActivity(deps, familyId) });
     accountsRoutes(app, deps);
     categoriesRoutes(app, deps);

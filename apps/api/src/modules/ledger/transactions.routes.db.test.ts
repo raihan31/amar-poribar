@@ -207,6 +207,9 @@ describe("ledger routes (db)", () => {
       const ctx = {
         db,
         bus,
+        jobs: { register: () => undefined },
+        clock: () => new Date(),
+        config: {},
         facades: {
           families: {
             requireRole: async () => ({ role: "owner", family: { id: "f", name: "f", role: "owner" } }),

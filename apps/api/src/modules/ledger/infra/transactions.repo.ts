@@ -1,4 +1,4 @@
-import { and, asc, eq, gt } from "drizzle-orm";
+import { and, asc, eq, gt, inArray, isNotNull, lt } from "drizzle-orm";
 import type { PgInsertValue, PgUpdateSetSource } from "drizzle-orm/pg-core";
 import { transactions } from "../schema.js";
 import type { Executor } from "./catalog.repo.js";
@@ -68,5 +68,21 @@ export const transactionsRepo = {
   /** Tombstone: the row stays so that devices learn about the delete (FR-SYNC-05). */
   async softDelete(x: Executor, txnId: string, prevHlc: string): Promise<Transaction> {
     return transactionsRepo.update(x, txnId, { deletedAt: new Date(), ...stampChange(prevHlc) });
+  },
+
+  /** Tombstones deleted before `cutoff` (purge job). */
+  async staleTombstones(x: Executor, cutoff: Date, limit: number): Promise<{ id: string; familyId: string }[]> {
+    return x
+      .select({ id: transactions.id, familyId: transactions.familyId })
+      .from(transactions)
+      .where(and(isNotNull(transactions.deletedAt), lt(transactions.deletedAt, cutoff)))
+      .limit(limit);
+  },
+
+  /** Hard delete; only rows still deleted before `cutoff` (a concurrent restore wins). */
+  async purgeTombstones(x: Executor, ids: string[], cutoff: Date): Promise<void> {
+    await x
+      .delete(transactions)
+      .where(and(inArray(transactions.id, ids), isNotNull(transactions.deletedAt), lt(transactions.deletedAt, cutoff)));
   },
 };
