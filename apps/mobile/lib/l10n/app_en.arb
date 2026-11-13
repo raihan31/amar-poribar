@@ -326,5 +326,16 @@
   "notif_periodEvening": "evening",
   "notif_periodNight": "night",
   "notif_reminderTitle": "Daily reminder",
-  "notif_reminderBody": "Did you note today's spending?"
+  "notif_reminderBody": "Did you note today's spending?",
+  "summary_title": "How was this month?",
+  "summary_footnote": "The numbers come from your records, not made up by AI.",
+  "summary_footnoteAi": "The numbers come from your records; only the wording was written by AI.",
+  "summary_listen": "Listen",
+  "summary_stop": "Stop",
+  "summary_caption": "Amounts are read out in words: \"{example}\"",
+  "@summary_caption": {
+    "placeholders": {"example": {"type": "String"}}
+  },
+  "summary_captionPlain": "Amounts are read out in words.",
+  "summary_tipPrefix": "A tip"
 }

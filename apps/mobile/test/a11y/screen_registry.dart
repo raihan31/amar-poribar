@@ -22,6 +22,9 @@ import 'package:amar_poribar/features/onboarding/ui/consent_screen.dart';
 import 'package:amar_poribar/features/onboarding/ui/tutorial_screen.dart';
 import 'package:amar_poribar/features/onboarding/ui/welcome_screen.dart';
 import 'package:amar_poribar/features/settings/state/preferences_controller.dart';
+import 'package:amar_poribar/features/summary/data/fake_summary_repository.dart';
+import 'package:amar_poribar/features/summary/state/summary_providers.dart';
+import 'package:amar_poribar/features/summary/ui/summary_screen.dart';
 import 'package:amar_poribar/features/transactions/data/fake_transaction_repository.dart';
 import 'package:amar_poribar/features/transactions/ui/add_expense_screen.dart';
 import 'package:amar_poribar/presentation/providers/auth_provider.dart';
@@ -123,6 +126,14 @@ void registerAllScreens() {
     needs: addExpenseOverrides(FakeTransactionRepository()),
   );
   registerScreen(
+    'B2',
+    Routes.summary,
+    (c) => const SummaryScreen(),
+    needs: [
+      summaryRepositoryProvider.overrideWithValue(FakeSummaryRepository()),
+    ],
+  );
+  registerScreen(
     'A4',
     Routes.addCategory,
     (c) => const CategoryPickerScreen(
@@ -174,6 +185,7 @@ const List<String> kAllRoutes = [
   Routes.addVoice,
   Routes.addCategory,
   Routes.tutorial,
+  Routes.summary,
 ];
 
 /// Pre-existing screens not yet in the audit. Each screen task removes its
