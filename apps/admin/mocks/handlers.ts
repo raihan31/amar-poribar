@@ -1,4 +1,5 @@
 import { http, HttpResponse, type HttpHandler } from "msw";
+import { plansFixture } from "../components/plans/types";
 import { familyFixture } from "../components/family/types";
 import { overviewFixture } from "../components/overview/types";
 import { demoStaff, privacyFixture, staffFixture } from "./fixtures";
@@ -43,6 +44,8 @@ export const handlers: HttpHandler[] = [
   http.get("*/admin/v1/staff", () => HttpResponse.json(staffFixture())),
   http.post("*/admin/v1/staff", () => HttpResponse.json({ ok: true }, { status: 201 })),
   http.patch("*/admin/v1/staff/:id", () => HttpResponse.json({ ok: true })),
+  http.get("*/admin/v1/plans", () => HttpResponse.json(plansFixture)),
+  http.put("*/admin/v1/plans/:id", () => HttpResponse.json({ ok: true })),
   http.get("*/admin/v1/me", () => HttpResponse.json(demoStaff())),
   http.get("*/admin/v1/overview", () => HttpResponse.json(overviewFixture)),
   http.get("*/admin/v1/privacy-requests", ({ request }) => {
