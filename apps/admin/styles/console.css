@@ -202,3 +202,8 @@
     justify-content: flex-start;
   }
 }
+
+/* Grid items must be allowed to shrink, so a wide table scrolls inside its card instead of widening the page. */
+.console-main > * > * {
+  min-width: 0;
+}
