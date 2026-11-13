@@ -39,6 +39,12 @@ const PATHS = {
     </>
   ),
   warning: <path d="M12 3 2 21h20L12 3Zm0 6v6m0 3v.5" />,
+  alert: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v6m0 3v.5" />
+    </>
+  ),
   info: (
     <>
       <circle cx="12" cy="12" r="9" />
