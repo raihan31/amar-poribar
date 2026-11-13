@@ -1,32 +1,20 @@
-import { and, asc, desc, eq, gt, gte, lt } from "drizzle-orm";
+import { and, asc, eq, gt, inArray, isNotNull, lt } from "drizzle-orm";
 import type { PgInsertValue, PgUpdateSetSource } from "drizzle-orm/pg-core";
 import { transactions } from "../schema.js";
 import type { Executor } from "./catalog.repo.js";
 import { stampChange } from "./stamp-change.js";
-import { notPrivateToOthers, visibleToCaller } from "./visibility.js";
+import { notPrivateToOthers, visibleTo } from "../infra/visibility.js";
 
 export type Transaction = typeof transactions.$inferSelect;
 export type NewTransaction = PgInsertValue<typeof transactions>;
 export type TransactionChanges = PgUpdateSetSource<typeof transactions>;
 
 export const transactionsRepo = {
-  /** Newest first, at most 200. TODO(P1): cursor pagination (FR-TXN-02, T-LED-01). */
-  list(x: Executor, familyId: string, userId: string, range?: { start: Date; end: Date }): Promise<Transaction[]> {
-    const conditions = [visibleToCaller(familyId, userId)];
-    if (range) conditions.push(gte(transactions.occurredAt, range.start), lt(transactions.occurredAt, range.end));
-    return x
-      .select()
-      .from(transactions)
-      .where(and(...conditions))
-      .orderBy(desc(transactions.occurredAt))
-      .limit(200);
-  },
-
   async findVisible(x: Executor, familyId: string, userId: string, txnId: string): Promise<Transaction | null> {
     const [row] = await x
       .select()
       .from(transactions)
-      .where(and(eq(transactions.id, txnId), visibleToCaller(familyId, userId)));
+      .where(and(eq(transactions.id, txnId), visibleTo(familyId, { userId })));
     return row ?? null;
   },
 
@@ -36,14 +24,22 @@ export const transactionsRepo = {
     return row ?? null;
   },
 
-  /** Null when the id or the family's TrxID already exists. */
-  async insert(x: Executor, values: NewTransaction): Promise<Transaction | null> {
-    const [row] = await x.insert(transactions).values(values).onConflictDoNothing().returning();
+  /** Any family, deleted or not: the caller decides what the row's owner may learn. */
+  async findById(x: Executor, txnId: string): Promise<Transaction | null> {
+    const [row] = await x.select().from(transactions).where(eq(transactions.id, txnId));
     return row ?? null;
   },
 
-  /** Plain insert for the sync merge, where a duplicate TrxID must surface as a unique violation. */
-  async insertStrict(x: Executor, values: NewTransaction): Promise<Transaction> {
+  async findVisibleByTrxId(x: Executor, familyId: string, userId: string, trxId: string): Promise<Transaction | null> {
+    const [row] = await x
+      .select()
+      .from(transactions)
+      .where(and(eq(transactions.trxId, trxId), visibleTo(familyId, { userId })));
+    return row ?? null;
+  },
+
+  /** Plain insert: a duplicate id or TrxID surfaces as a unique violation for the caller to translate. */
+  async insert(x: Executor, values: NewTransaction): Promise<Transaction> {
     const [row] = await x.insert(transactions).values(values).returning();
     return row!;
   },
@@ -72,5 +68,21 @@ export const transactionsRepo = {
   /** Tombstone: the row stays so that devices learn about the delete (FR-SYNC-05). */
   async softDelete(x: Executor, txnId: string, prevHlc: string): Promise<Transaction> {
     return transactionsRepo.update(x, txnId, { deletedAt: new Date(), ...stampChange(prevHlc) });
+  },
+
+  /** Tombstones deleted before `cutoff` (purge job). */
+  async staleTombstones(x: Executor, cutoff: Date, limit: number): Promise<{ id: string; familyId: string }[]> {
+    return x
+      .select({ id: transactions.id, familyId: transactions.familyId })
+      .from(transactions)
+      .where(and(isNotNull(transactions.deletedAt), lt(transactions.deletedAt, cutoff)))
+      .limit(limit);
+  },
+
+  /** Hard delete; only rows still deleted before `cutoff` (a concurrent restore wins). */
+  async purgeTombstones(x: Executor, ids: string[], cutoff: Date): Promise<void> {
+    await x
+      .delete(transactions)
+      .where(and(inArray(transactions.id, ids), isNotNull(transactions.deletedAt), lt(transactions.deletedAt, cutoff)));
   },
 };

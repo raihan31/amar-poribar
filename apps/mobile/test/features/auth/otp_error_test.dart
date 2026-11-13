@@ -102,7 +102,7 @@ void main() {
     await _end(t);
   });
 
-  testWidgets('no attempts left clears the code and disables submit',
+  testWidgets('AC-12: no attempts left clears the code and disables submit',
       (t) async {
     final h = t.ensureSemantics();
     final repo = FakeAuthRepository(

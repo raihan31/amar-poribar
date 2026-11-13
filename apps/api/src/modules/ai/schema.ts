@@ -1,17 +1,23 @@
-import { boolean, integer, pgSchema, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { bigint, boolean, integer, pgSchema, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const aiSchema = pgSchema("ai");
 
-/** Monthly count of AI requests per family (FR-AI-12). */
+/** Monthly AI usage per family and feature: requests, tokens, latency, errors (FR-AI-12, FR-AI-14). Numbers only. */
 export const aiUsage = aiSchema.table(
   "ai_usage",
   {
     // families.families.id (no cross-schema foreign key, DEC-02)
     familyId: uuid("family_id").notNull(),
     month: text("month").notNull(),
+    // parse | receipt | ask | summary | legacy (rows from before metering)
+    feature: text("feature").notNull().default("legacy"),
     requests: integer("requests").notNull().default(0),
+    inputTokens: bigint("input_tokens", { mode: "number" }).notNull().default(0),
+    outputTokens: bigint("output_tokens", { mode: "number" }).notNull().default(0),
+    latencyMsSum: bigint("latency_ms_sum", { mode: "number" }).notNull().default(0),
+    errors: integer("errors").notNull().default(0),
   },
-  (t) => [primaryKey({ columns: [t.familyId, t.month] })],
+  (t) => [primaryKey({ columns: [t.familyId, t.month, t.feature] })],
 );
 
 /** Cached monthly summaries; regenerated only when the underlying totals change. */

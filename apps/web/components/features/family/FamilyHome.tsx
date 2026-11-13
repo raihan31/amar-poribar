@@ -7,9 +7,7 @@ import { useT } from "@/lib/i18n/useT";
 import { useI18n } from "@/lib/i18n/provider";
 import { ApiProblem } from "@/lib/api/errors";
 import type { Account, Category, Family } from "@/lib/types";
-import { BudgetList } from "../budget/BudgetList";
 import { QuickAdd } from "../entry/QuickAdd";
-import { ManageLists } from "../ledger/ManageLists";
 import { MonthSummaryCard } from "../reports/MonthSummaryCard";
 import { SpokenSummary } from "../reports/SpokenSummary";
 import { CreateFamilyForm } from "./CreateFamilyForm";
@@ -92,24 +90,6 @@ export function FamilyHome({ onLogout }: { onLogout: () => void }) {
             monthRef.current = m;
             refresh(family, m).catch(handle);
           }}
-        />
-      )}
-      {summary && (
-        <BudgetList
-          family={family}
-          month={summary.month}
-          categories={categories}
-          spentKey={summary.expensePaisa}
-          onError={handle}
-        />
-      )}
-      {(family.role === "owner" || family.role === "admin") && (
-        <ManageLists
-          family={family}
-          categories={categories}
-          accounts={accounts}
-          onChanged={() => refresh(family).catch(handle)}
-          onError={handle}
         />
       )}
       {meId && (

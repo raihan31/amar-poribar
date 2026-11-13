@@ -1,10 +1,52 @@
 {
   "name": "@amar-poribar/admin",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Placeholder until T-ADMUI-01 creates the admin console; it only serves a status page on port 3100.",
   "scripts": {
-    "start": "node server.mjs"
+    "dev": "next dev -p 3100",
+    "build": "next build",
+    "start": "next start -p 3100",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "gen:api": "openapi-typescript ../api/openapi.json -o lib/api/schema.d.ts",
+    "gen:api:check": "openapi-typescript ../api/openapi.json -o node_modules/.cache/schema.check.d.ts && diff node_modules/.cache/schema.check.d.ts lib/api/schema.d.ts",
+    "e2e": "playwright test -c e2e/playwright.config.ts",
+    "e2e:mock": "MOCK=1 playwright test -c e2e/playwright.config.ts"
+  },
+  "dependencies": {
+    "@amar-poribar/shared": "workspace:*",
+    "@hookform/resolvers": "^3.10.0",
+    "@tanstack/react-query": "^5.107.1",
+    "next": "~16.4.6",
+    "openapi-fetch": "^0.13.8",
+    "qrcode": "^1.5.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-hook-form": "^7.91.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@amar-poribar/fixtures": "workspace:*",
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.9",
+    "@types/node": "^22.0.0",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitest/coverage-v8": "^5.1.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.6",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "jsdom": "^25.0.1",
+    "msw": "^2.15.0",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "~5.9.0",
+    "vitest": "^5.0.3"
   }
 }

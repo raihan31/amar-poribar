@@ -150,11 +150,11 @@ describe("invites (db)", () => {
       const owner = await t.login("01711111111");
       const joiner = await t.login("01722222222");
       const familyId = await createFamily(t, owner);
-      await sql`update families.families set member_limit = 1 where id = ${familyId}`;
       const token = (await invite(t, owner, familyId)).json().token as string;
+      await sql`update families.families set member_limit = 1 where id = ${familyId}`;
       const res = await accept(t, joiner, token);
       expect(res.statusCode).toBe(409);
-      expect(res.json().error.code).toBe("member_limit");
+      expect(res.json().error.code).toBe("plan_member_limit");
       expect(res.json().error.details.limit).toBe(1);
       await t.close();
     });

@@ -8,6 +8,7 @@ import 'package:amar_poribar/data/auth/session_manager.dart';
 import 'package:amar_poribar/data/auth/token_store.dart';
 import 'package:amar_poribar/data/database/database.dart';
 import 'package:amar_poribar/data/database/local_store.dart';
+import 'package:amar_poribar/features/budgets/state/budget_providers.dart';
 import 'package:amar_poribar/presentation/providers/auth_provider.dart';
 import 'package:amar_poribar/presentation/providers/providers.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +70,8 @@ Future<(GoRouter, FakeAuth, ProviderContainer)> _pump(
       tokenStoreProvider.overrideWithValue(_MemoryTokens()),
       welcomeDoneProvider.overrideWith((ref) => welcomeDone),
       placeholderBuilderProvider.overrideWithValue(_scrolling),
+      // No database streams in widget tests (see defaultFakes).
+      spokenAlertWiringProvider.overrideWith((ref) {}),
     ],
   );
   addTearDown(container.dispose);

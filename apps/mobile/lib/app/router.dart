@@ -4,18 +4,25 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/ui/login_screen.dart';
 import '../features/auth/ui/session_expired_screen.dart';
+import '../features/budgets/ui/budgets_screen.dart';
+import '../features/entry/ui/category_picker_screen.dart';
+import '../features/entry/ui/sms_paste_screen.dart';
+import '../features/entry/ui/voice_entry_screen.dart';
 import '../features/family/ui/join_screen.dart';
+import '../features/home/ui/home_screen.dart';
+import '../features/notifications/ui/notifications_screen.dart';
 import '../features/onboarding/ui/consent_screen.dart';
 import '../features/onboarding/ui/policy_screen.dart';
 import '../features/onboarding/ui/tutorial_screen.dart';
 import '../features/onboarding/ui/welcome_screen.dart';
 import '../features/settings/ui/profile_screen.dart';
+import '../features/settings/ui/settings_screen.dart';
+import '../features/summary/ui/summary_screen.dart';
+import '../features/transactions/ui/add_expense_screen.dart';
+import '../features/transactions/ui/transaction_detail_screen.dart';
+import '../features/transactions/ui/transactions_screen.dart';
 import '../features/voice/ui/voice_fallback_screen.dart';
 import '../presentation/providers/auth_provider.dart';
-import '../presentation/screens/ai_entry_screen.dart';
-import '../presentation/screens/dashboard_screen.dart';
-import '../presentation/screens/settings_screen.dart';
-import '../presentation/screens/transaction_screen.dart';
 import 'redirects.dart';
 import 'screens.dart';
 import 'shell.dart';
@@ -86,16 +93,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state, shell) => AppShell(navigationShell: shell),
         branches: [
           StatefulShellBranch(
-            routes: [tab(Routes.home, () => const DashboardScreen())],
+            routes: [tab(Routes.home, () => const HomeScreen())],
           ),
           StatefulShellBranch(
             routes: [tab(Routes.talk, () => placeholder(Routes.talk))],
           ),
           StatefulShellBranch(
-            routes: [tab(Routes.list, () => placeholder(Routes.list))],
+            routes: [tab(Routes.list, () => const TransactionsScreen())],
           ),
           StatefulShellBranch(
-            routes: [tab(Routes.budget, () => placeholder(Routes.budget))],
+            routes: [tab(Routes.budget, () => const BudgetsScreen())],
           ),
           StatefulShellBranch(
             routes: [tab(Routes.family, () => placeholder(Routes.family))],
@@ -107,12 +114,37 @@ final routerProvider = Provider<GoRouter>((ref) {
       stub(Routes.conversation),
       stub(Routes.voiceNote),
       stub(Routes.call),
-      simple(Routes.add, (_) => const AiEntryScreen()),
-      stub(Routes.txn),
+      simple(
+        Routes.add,
+        (s) => AddExpenseScreen(
+          prefill: s.extra is AddExpensePrefill
+              ? s.extra! as AddExpensePrefill
+              : null,
+        ),
+      ),
+      simple(Routes.addVoice, (_) => const VoiceEntryScreen()),
+      simple(
+        Routes.addSms,
+        (s) => SmsPasteScreen(initialText: s.uri.queryParameters['text']),
+      ),
+      simple(
+        Routes.addCategory,
+        (s) => s.extra is CategoryPickerArgs
+            ? CategoryPickerScreen(args: s.extra! as CategoryPickerArgs)
+            : const ErrorScreen(),
+      ),
+      simple(
+        Routes.txn,
+        (s) => TransactionDetailScreen(id: s.pathParameters['id']!),
+      ),
+      simple(
+        Routes.txnEdit,
+        (s) => AddExpenseScreen(editId: s.pathParameters['id']!),
+      ),
       stub(Routes.receipt),
       stub(Routes.ruleLearn),
       simple(Routes.voiceFallback, (_) => const VoiceFallbackScreen()),
-      stub(Routes.summary),
+      simple(Routes.summary, (_) => const SummaryScreen()),
       stub(Routes.ask),
       simple(Routes.settings, (_) => const SettingsScreen()),
       simple(Routes.profile, (_) => const ProfileScreen()),
@@ -126,13 +158,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       stub(Routes.plans),
       stub(Routes.dhar),
       stub(Routes.families),
-      stub(Routes.notifications),
+      simple(Routes.notifications, (_) => const NotificationsScreen()),
       stub(Routes.sync),
       stub(Routes.bazaar),
       stub(Routes.deleteAccount),
       stub(Routes.simple),
-      simple(Routes.transactions, (_) => const TransactionScreen()),
-      simple(Routes.pendingSms, (_) => const PendingSmsScreen()),
     ],
   );
   ref.onDispose(() {

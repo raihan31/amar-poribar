@@ -7,7 +7,7 @@ usage() {
 Usage: tool/verify.sh <M0..M8>
 
 Runs, in order: flutter pub get, build_runner, dart format check,
-flutter analyze --fatal-infos, l10n_check, sync_fixtures,
+flutter analyze --fatal-infos, l10n_check, sync_fixtures, check_ac_tags,
 flutter test --coverage (goldens, a11y, contract), coverage gate (70%),
 for M3 and later `flutter test integration_test -d emulator`,
 for M2 and later the APK size gate.
@@ -58,6 +58,7 @@ step dart format --output=none --set-exit-if-changed lib test
 step flutter analyze --fatal-infos
 step dart run tool/l10n_check.dart
 step dart run tool/sync_fixtures.dart
+step dart run tool/check_ac_tags.dart ../../docs/tasks/ac-mobile.json
 step flutter test --coverage
 step dart run tool/check_coverage.dart 70 lib/domain lib/data lib/core coverage/lcov.info
 

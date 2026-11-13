@@ -1,21 +1,47 @@
 import 'package:amar_poribar/app/redirects.dart';
+import 'package:amar_poribar/domain/models/api/me.dart';
+import 'package:amar_poribar/domain/models/member.dart';
+import 'package:amar_poribar/domain/models/role.dart';
 import 'package:amar_poribar/features/auth/data/auth_repository.dart';
 import 'package:amar_poribar/features/auth/data/fake_auth_repository.dart';
 import 'package:amar_poribar/features/auth/ui/login_screen.dart';
 import 'package:amar_poribar/features/auth/ui/session_expired_screen.dart';
+import 'package:amar_poribar/features/budgets/data/budget_repository.dart';
+import 'package:amar_poribar/features/budgets/state/budget_providers.dart';
+import 'package:amar_poribar/features/budgets/ui/budgets_screen.dart';
+import 'package:amar_poribar/features/entry/data/fake_entry_repository.dart';
+import 'package:amar_poribar/features/entry/state/entry_controller.dart';
+import 'package:amar_poribar/features/entry/state/sms_paste_controller.dart';
+import 'package:amar_poribar/features/entry/ui/category_picker_screen.dart';
+import 'package:amar_poribar/features/entry/ui/sms_paste_screen.dart';
+import 'package:amar_poribar/features/entry/ui/voice_entry_screen.dart';
+import 'package:amar_poribar/features/family/data/fake_family_repository.dart';
 import 'package:amar_poribar/features/family/data/invite_repository.dart';
+import 'package:amar_poribar/features/family/state/active_family.dart';
 import 'package:amar_poribar/features/family/state/family_providers.dart';
 import 'package:amar_poribar/features/family/ui/join_screen.dart';
+import 'package:amar_poribar/features/home/data/home_repository.dart';
+import 'package:amar_poribar/features/home/state/home_providers.dart';
+import 'package:amar_poribar/features/home/ui/home_screen.dart';
 import 'package:amar_poribar/features/onboarding/data/fake_onboarding_repository.dart';
 import 'package:amar_poribar/features/onboarding/data/onboarding_repository.dart';
 import 'package:amar_poribar/features/onboarding/ui/consent_screen.dart';
 import 'package:amar_poribar/features/onboarding/ui/tutorial_screen.dart';
 import 'package:amar_poribar/features/onboarding/ui/welcome_screen.dart';
 import 'package:amar_poribar/features/settings/state/preferences_controller.dart';
+import 'package:amar_poribar/features/settings/ui/settings_screen.dart';
+import 'package:amar_poribar/features/summary/data/fake_summary_repository.dart';
+import 'package:amar_poribar/features/summary/state/summary_providers.dart';
+import 'package:amar_poribar/features/summary/ui/summary_screen.dart';
+import 'package:amar_poribar/features/transactions/data/fake_transaction_repository.dart';
+import 'package:amar_poribar/features/transactions/ui/add_expense_screen.dart';
+import 'package:amar_poribar/features/transactions/ui/transactions_screen.dart';
 import 'package:amar_poribar/presentation/providers/auth_provider.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/transactions/add_expense_fixtures.dart';
+import '../features/transactions/transactions_fixtures.dart';
 import '../helpers/fake_auth.dart';
 
 typedef ScreenFactory = Widget Function(BuildContext context);
@@ -58,7 +84,12 @@ bool _registered = false;
 void registerAllScreens() {
   if (_registered) return;
   _registered = true;
-  // registerScreen('B1', Routes.list, (c) => TransactionsScreen(), needs: [...]);
+  registerScreen(
+    'B1',
+    Routes.list,
+    (c) => const TransactionsScreen(),
+    needs: listOverrides(FakeTransactionRepository(boardRows())),
+  );
   registerScreen(
     'A1',
     Routes.login,
@@ -103,6 +134,98 @@ void registerAllScreens() {
     ],
   );
   registerScreen('D2', Routes.tutorial, (c) => const TutorialScreen());
+  registerScreen(
+    'D4',
+    Routes.add,
+    (c) => const AddExpenseScreen(),
+    needs: addExpenseOverrides(FakeTransactionRepository()),
+  );
+  registerScreen(
+    'B2',
+    Routes.summary,
+    (c) => const SummaryScreen(),
+    needs: [
+      summaryRepositoryProvider.overrideWithValue(FakeSummaryRepository()),
+    ],
+  );
+  registerScreen(
+    'A4',
+    Routes.addCategory,
+    (c) => const CategoryPickerScreen(
+      args: CategoryPickerArgs(amountPaisa: 50000, caption: 'ক্যাশ · আজ'),
+    ),
+    needs: addExpenseOverrides(FakeTransactionRepository()),
+  );
+  registerScreen(
+    'A3',
+    Routes.addVoice,
+    (c) => const VoiceEntryScreen(
+      initialText: 'আজ বাজারে আটশো পঞ্চাশ টাকা ক্যাশে',
+    ),
+    needs: [
+      ...addExpenseOverrides(FakeTransactionRepository()),
+      entryRepositoryProvider.overrideWithValue(FakeEntryRepository()),
+    ],
+  );
+  registerScreen(
+    'A5',
+    Routes.addSms,
+    (c) => const SmsPasteScreen(
+      initialText:
+          'You have sent Tk 2,000.00 to 01XXXXX-789. Fee Tk 0.00. Balance Tk 8,450.00. TrxID 9K4L2M7N at 10/11/2026 14:32',
+    ),
+    needs: [
+      ...addExpenseOverrides(FakeTransactionRepository()),
+      entryRepositoryProvider.overrideWithValue(FakeEntryRepository()),
+      entryClockProvider.overrideWithValue(() => DateTime.utc(2026, 11, 10, 9)),
+      smsTrxIdExistsProvider.overrideWithValue((_, __) async => false),
+    ],
+  );
+  registerScreen(
+    'B3',
+    Routes.budget,
+    (c) => const BudgetsScreen(),
+    needs: [
+      budgetRepositoryProvider.overrideWithValue(
+        FakeBudgetRepository(
+          budgets: const [
+            BudgetStatus(null, 'মোট', 5000000, 4250000, 'warning'),
+            BudgetStatus('c1', 'বাজার ও মুদি', 1000000, 1050000, 'exceeded'),
+            BudgetStatus('c2', 'যাতায়াত', 300000, 120000, 'ok'),
+          ],
+        ),
+      ),
+      currentRoleProvider.overrideWithValue(FamilyRole.owner),
+      budgetRecipientProvider.overrideWithValue(
+        const Member(userId: 'u-ammu', name: 'আম্মু', role: FamilyRole.admin),
+      ),
+    ],
+  );
+  registerScreen(
+    'Main',
+    Routes.home,
+    (c) => const HomeScreen(),
+    needs: [
+      activeFamilyProvider.overrideWithValue(
+        const FamilyInfo(
+          FakeFamilyRepository.familyId,
+          'রহিম পরিবার',
+          'owner',
+        ),
+      ),
+      homeRepositoryProvider.overrideWithValue(FakeHomeRepository()),
+    ],
+  );
+  registerScreen(
+    'B6',
+    Routes.settings,
+    (c) => const SettingsScreen(),
+    needs: [
+      preferencesProvider.overrideWith(
+        (ref) => PreferencesController(ref, autoLoad: false),
+      ),
+    ],
+  );
 }
 
 /// Routes that exist in the app. Until the `Routes` table of T-MOB-13 lands
@@ -110,24 +233,21 @@ void registerAllScreens() {
 const List<String> kAllRoutes = [
   Routes.welcome,
   Routes.home,
-  Routes.transactions,
-  Routes.pendingSms,
-  Routes.settings,
   Routes.login,
   Routes.consent,
   Routes.sessionExpired,
   Routes.join,
   Routes.add,
+  Routes.addVoice,
+  Routes.addSms,
+  Routes.addCategory,
   Routes.tutorial,
+  Routes.summary,
+  Routes.budget,
+  Routes.list,
 ];
 
 /// Pre-existing screens not yet in the audit. Each screen task removes its
 /// route from this list when it registers the screen. The list may only
 /// shrink: `registry_complete_test.dart` fails if a route is in neither place.
-const Set<String> kRoutesAwaitingRegistration = {
-  Routes.home,
-  Routes.transactions,
-  Routes.pendingSms,
-  Routes.settings,
-  Routes.add,
-};
+const Set<String> kRoutesAwaitingRegistration = {};

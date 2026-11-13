@@ -1,7 +1,7 @@
 import type { CreateFestivalBudgetInput, UpdateFestivalBudgetInput } from "@amar-poribar/shared";
 import { HttpError } from "../../../platform/errors.js";
 import { dayRange } from "../../../platform/time/month.js";
-import { budgetLevel, type BudgetLevel } from "../domain/budget-level.js";
+import { budgetLevel, type BudgetLevel } from "../domain/level.js";
 import { budgetsRepo, type FestivalBudget } from "../infra/budgets.repo.js";
 import type { BudgetingDeps } from "./deps.js";
 
@@ -19,7 +19,7 @@ export async function listFestivalBudgets(
       .sort((a, b) => a.startsOn.localeCompare(b.startsOn))
       .map(async (f) => {
         const { start, end } = dayRange(f.startsOn, f.endsOn);
-        const spentPaisa = await deps.ledger.expenseTotalBetween(familyId, userId, start, end);
+        const spentPaisa = (await deps.ledger.getRangeTotals(familyId, { userId }, start, end)).expensePaisa;
         return { ...f, spentPaisa, level: budgetLevel(spentPaisa, f.limitPaisa) };
       }),
   );

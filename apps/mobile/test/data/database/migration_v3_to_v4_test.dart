@@ -22,7 +22,7 @@ void main() {
     await old.close();
 
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 4);
+    await verifier.migrateAndValidate(db, 5);
     await db.close();
 
     // Reopen to read through the real v4 classes.

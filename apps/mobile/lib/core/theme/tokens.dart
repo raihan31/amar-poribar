@@ -31,6 +31,7 @@ class AppTokens {
   static const Color amber = Color(0xFFF2A33A);
   static const Color amberTint = Color(0xFFFDEBCB);
   static const Color amberInk = Color(0xFF6B3F00);
+  static const Color statusOk = Color(0xFF2E9E4F);
   static const Color danger = Color(0xFFB3261E);
   static const Color dangerTint = Color(0xFFF8D7D3);
   static const Color dangerInk = Color(0xFF8A1C14);

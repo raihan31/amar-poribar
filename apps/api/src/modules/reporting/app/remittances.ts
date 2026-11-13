@@ -24,12 +24,25 @@ export async function remittances(
   if (to < from) throw new HttpError(400, "invalid_request", "`to` must not be before `from`");
   if (monthsBetween(from, to).length > 24) throw new HttpError(400, "invalid_request", "Range is limited to 24 months");
 
-  const r = await deps.ledger.remittanceByMonth(familyId, userId, from, to);
+  // Month figures come from the series; the sender split (current shape, dropped by T-REP-03) is not a series.
+  const [series, r] = await Promise.all([
+    deps.ledger.getMonthlySeries(familyId, { userId }, from, to),
+    deps.ledger.remittanceByMonth(familyId, userId, from, to),
+  ]);
+  const months = series.map((m) => {
+    const remittancePaisa = m.byCategoryKey["remittance"]?.incomePaisa ?? 0;
+    return {
+      month: m.month,
+      remittancePaisa,
+      expensePaisa: m.expensePaisa,
+      leftOverPaisa: remittancePaisa - m.expensePaisa,
+    };
+  });
   return {
     from,
     to,
-    months: r.months.map((m) => ({ ...m, leftOverPaisa: m.remittancePaisa - m.expensePaisa })),
-    totalRemittancePaisa: r.totalRemittancePaisa,
+    months,
+    totalRemittancePaisa: months.reduce((a, m) => a + m.remittancePaisa, 0),
     bySender: r.bySender.map((s) => ({ name: s.name || null, totalPaisa: s.totalPaisa })),
   };
 }

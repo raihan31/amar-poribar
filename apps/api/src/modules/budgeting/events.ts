@@ -1,19 +1,33 @@
 /**
- * Declared now so the alert engine (T-BUD-02) can publish it later; nothing emits it yet.
- * `threshold` is the percentage of the limit that was crossed (FR-BUD-02).
+ * Published once per threshold per family, budget and month by the alert engine (FR-BUD-02, FR-BUD-05).
+ * `budgetKey` is `"overall"` or the category uuid.
  */
-export interface BudgetThresholdCrossedPayload {
+export interface BudgetThresholdCrossedV1 {
   familyId: string;
-  budgetId: string;
+  budgetKey: string;
   categoryId: string | null;
+  categoryNameBn: string;
+  categoryNameEn: string;
   month: string;
   threshold: 80 | 100;
+  level: "warning" | "exceeded";
   spentPaisa: number;
   limitPaisa: number;
 }
 
+/** Published once per family by `budgeting.carry-forward` when it stored last month's budgets for `month` (FR-BUD-03). */
+export interface BudgetsCarriedForwardV1 {
+  familyId: string;
+  month: string;
+  count: number;
+}
+
+/** @deprecated Use {@link BudgetThresholdCrossedV1}. */
+export type BudgetThresholdCrossedPayload = BudgetThresholdCrossedV1;
+
 declare module "../../platform/events/types.js" {
   interface EventMap {
-    "budgeting.BudgetThresholdCrossed.v1": BudgetThresholdCrossedPayload;
+    "budgeting.BudgetThresholdCrossed.v1": BudgetThresholdCrossedV1;
+    "budgeting.BudgetsCarriedForward.v1": BudgetsCarriedForwardV1;
   }
 }

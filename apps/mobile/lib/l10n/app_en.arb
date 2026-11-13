@@ -29,32 +29,13 @@
   "auth_otp_rateLimited": "Too many tries. Try again after {time}.",
   "auth_otp_serverDown": "Cannot connect right now. Please try again in a little while.",
   "auth_otp_networkDown": "No internet. Check your connection and try again.",
-  "home_welcome": "Welcome back, {role}",
-  "home_dashboard_totalBalance": "Total balance",
-  "home_dashboard_spent": "Spent: ৳{amount}",
-  "home_dashboard_analytics": "Monthly analytics",
-  "home_dashboard_recent": "Recent transactions",
-  "txn_dashboard_add": "Add transaction",
   "settings_title": "Settings",
-  "settings_role_title": "Current role",
-  "settings_pair_title": "Pair a new phone",
-  "settings_pair_subtitle": "Generate a QR code to add a child or partner",
   "settings_tutorial_title": "How to use (listen)",
-  "settings_language_title": "Language",
-  "settings_language_switch": "Switch to Bangla",
-  "settings_bankApprovals_title": "Bank approvals",
-  "settings_bankApprovals_empty": "No pending bank transactions detected today.",
-  "sync_server_title": "Sync with server",
-  "sync_server_subtitle": "Tap when you are online",
-  "sync_server_needLogin": "Sign in to sync.",
-  "sync_server_done": "Synced with the server: {pushed} sent, {pulled} received",
   "sync_nearby_title": "Sync with nearby phone",
-  "sync_nearby_subtitle": "Without internet, phones of the same family",
   "sync_nearby_needLogin": "Sign in once and join your family first (needs internet).",
   "sync_nearby_failed": "Could not start nearby sync: allow permissions (Bluetooth, location).",
   "sync_nearby_askTitle": "Sync with nearby phone?",
   "sync_nearby_askBody": "Phone: {name}\nCode: {code}\n\nTap \"Yes\" if both phones show the same code.",
-  "txn_dashboard_count": "{count, plural, =0{No transactions} =1{1 transaction} other{{count} transactions}}",
   "voice_fallback_title": "Cannot speak",
   "voice_fallback_heading": "This phone has no Bangla voice",
   "voice_fallback_body": "No worry. You can type your expenses. You can also install the Bangla voice.",
@@ -106,11 +87,22 @@
   "profile_periodNight": "PM",
   "profile_reminderAt": "at {time}",
   "@profile_reminderAt": {
-    "placeholders": {"time": {"type": "String"}}
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "profile_time": "{time} {period}",
   "@profile_time": {
-    "placeholders": {"period": {"type": "String"}, "time": {"type": "String"}}
+    "placeholders": {
+      "period": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "auth_expired_title": "Sign in again",
   "auth_expired_body": "For your safety you sign in again after a while. Your accounts are safe.",
@@ -125,14 +117,25 @@
   "onb_consent_title": "Create your family",
   "onb_consent_step": "Step {n} of {total}",
   "@onb_consent_step": {
-    "placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
   },
   "onb_consent_nameLabel": "Family name",
   "onb_consent_nameHint": "Rahim family",
   "onb_consent_currencyLabel": "Currency",
   "onb_consent_currencyValue": "৳ Bangladeshi taka ({code})",
   "@onb_consent_currencyValue": {
-    "placeholders": {"code": {"type": "String"}}
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
   },
   "onb_consent_useTitle": "How your information is used",
   "onb_consent_use1": "Only the members of your family can see the accounts.",
@@ -170,11 +173,414 @@
   "tutorial_title4": "Hear your month",
   "tutorial_counter": "{n} / {total}",
   "@tutorial_counter": {
-    "placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
   },
   "tutorial_listenAgain": "Listen again",
   "tutorial_next": "Next step",
   "tutorial_back": "Back",
   "tutorial_skip": "Skip",
-  "tutorial_start": "Get started"
+  "tutorial_start": "Get started",
+  "push_channel_nudge_name": "Buzz",
+  "push_channel_nudge_desc": "When someone in the family sends a buzz",
+  "push_channel_chat_name": "Chat",
+  "push_channel_chat_desc": "Family chat messages",
+  "push_channel_alerts_name": "Budget alerts",
+  "push_channel_alerts_desc": "Warnings when a budget is almost used up",
+  "push_channel_reminders_name": "Reminders",
+  "push_channel_reminders_desc": "Daily and bill reminders",
+  "push_channel_calls_name": "Video calls",
+  "push_channel_calls_desc": "Incoming family video calls",
+  "push_permission_title": "Allow notifications",
+  "push_permission_body": "To get budget alerts, buzzes and reminders on your phone, the app needs permission to send notifications.",
+  "push_permission_allow": "Allow",
+  "txn_add_title": "New entry",
+  "txn_add_back": "Back",
+  "txn_add_typeExpense": "Expense",
+  "txn_add_typeIncome": "Income",
+  "txn_add_typeTransfer": "Transfer",
+  "txn_add_amountQ": "How much?",
+  "txn_add_categoryQ": "Which category?",
+  "txn_add_accountQ": "How did you pay?",
+  "txn_add_whoQ": "Who paid?",
+  "txn_add_date": "Date",
+  "txn_add_today": "Today",
+  "txn_add_yesterday": "Yesterday",
+  "txn_add_note": "Note",
+  "txn_add_noteHint": "e.g. fish, rice",
+  "txn_add_fee": "Fee",
+  "txn_add_feeAdd": "Add a fee",
+  "txn_add_private": "Private (only I can see)",
+  "txn_add_save": "Save",
+  "txn_add_saved": "Saved",
+  "txn_add_undo": "Undo",
+  "txn_add_errAmount": "Enter an amount first.",
+  "txn_add_errMax": "The amount cannot be more than one crore taka.",
+  "txn_add_errCategory": "Pick a category.",
+  "txn_add_backspace": "Delete last digit",
+  "home_greetMorning": "Good morning, {name}",
+  "@home_greetMorning": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "home_greetNoon": "Good afternoon, {name}",
+  "@home_greetNoon": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "home_greetEvening": "Good evening, {name}",
+  "@home_greetEvening": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "home_greetNight": "Good night, {name}",
+  "@home_greetNight": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "home_settings": "Settings",
+  "home_monthSpent": "Spent in {month}",
+  "@home_monthSpent": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "home_changeMore": "{amount} more than last month",
+  "@home_changeMore": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "home_changeLess": "{amount} less than last month",
+  "@home_changeLess": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "home_changeSame": "Same as last month",
+  "home_summarySpeech": "{month}: {amount} spent. {change}",
+  "@home_summarySpeech": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "change": {
+        "type": "String"
+      }
+    }
+  },
+  "home_budgetWarning": "{name} budget {percent} used",
+  "@home_budgetWarning": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "home_notify": "Tell {name}",
+  "@home_notify": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "home_budgetPhrase": "Budget finished",
+  "home_speakExpense": "Speak an expense",
+  "home_tileBuzz": "Buzz",
+  "home_tileTalk": "Talk",
+  "home_tileVideo": "Video",
+  "home_legend": "Green = online · Grey = offline",
+  "home_activityVoice": "{name} sent a voice note · {duration}",
+  "@home_activityVoice": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "home_activityExpense": "{name} wrote: {note}",
+  "@home_activityExpense": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "home_activityEmpty": "Nothing yet",
+  "home_remitTitle": "Money sent from abroad",
+  "home_remitOpen": "Open",
+  "home_offline": "No internet. Your accounts stay on this phone.",
+  "home_somebody": "Someone",
+  "entry_picker_title": "What for?",
+  "entry_picker_hint": "Tap a picture to hear its name.",
+  "entry_picker_confirm": "Keep in {category}",
+  "@entry_picker_confirm": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "entry_picker_listen": "Listen",
+  "entry_picker_selected": "Selected",
+  "entry_heard": "You said:",
+  "entry_again": "Listen again",
+  "entry_confirmQ": "Is this right?",
+  "entry_no": "No",
+  "entry_yes": "Yes, keep it",
+  "entry_change": "I want to change the amount or category",
+  "entry_speak": "Tap and speak",
+  "entry_parsing": "Working it out…",
+  "entry_queued": "No internet. Your words are saved and will be understood when the network is back.",
+  "entry_quota": "Today's AI limit is used up. Please type it in.",
+  "entry_quotaAction": "Type it in",
+  "entry_problem": "I did not understand. Please say it again.",
+  "entry_typeExpense": "Expense",
+  "entry_typeIncome": "Income",
+  "entry_typeTransfer": "Transfer",
+  "entry_unknownCategory": "Pick a category",
+  "entry_acct_cash": "Cash",
+  "entry_acct_bkash": "bKash",
+  "entry_acct_nagad": "Nagad",
+  "entry_sms_title": "Add from an SMS",
+  "entry_sms_hint": "Paste a bKash, Nagad or Rocket message.",
+  "entry_sms_paste": "Paste",
+  "entry_sms_read": "Read it",
+  "entry_sms_recognized": "{provider} message recognised · no AI used",
+  "@entry_sms_recognized": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "entry_sms_recognizedAi": "The message was read with AI",
+  "entry_sms_who": "To",
+  "entry_sms_fee": "Fee",
+  "entry_sms_account": "Account",
+  "entry_sms_time": "Time",
+  "entry_sms_trx": "Transaction",
+  "entry_sms_new": "This message was not saved before. Which category?",
+  "entry_sms_duplicate": "This message was already saved",
+  "entry_sms_no": "No",
+  "entry_sms_keep": "✓ Save",
+  "entry_sms_offline": "No internet. We did not recognise this message; paste it again when you are online.",
+  "entry_sms_kind_send": "Send money",
+  "entry_sms_kind_payment": "Payment",
+  "entry_sms_kind_bill": "Bill payment",
+  "entry_sms_kind_recharge": "Mobile recharge",
+  "entry_sms_kind_cashOut": "Cash out",
+  "entry_sms_kind_cashIn": "Cash in",
+  "entry_sms_kind_received": "Money received",
+  "entry_sms_chipFamily": "Help family",
+  "entry_sms_chipBill": "Bill",
+  "entry_sms_chipOther": "Other",
+  "entry_acct_rocket": "Rocket",
+  "entry_acct_bank": "Bank",
+  "notif_title": "News",
+  "notif_listenAll": "Listen to all",
+  "notif_stop": "Stop",
+  "notif_empty": "No news yet",
+  "notif_quietNote": "Quiet hours are on. Vibration and sound are off; news will wait here.",
+  "notif_reminderTime": "Daily reminder time: {time}",
+  "@notif_reminderTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notif_changeSettings": "Settings",
+  "notif_bell": "News, {count} new",
+  "@notif_bell": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "notif_timeToday": "Today {period}",
+  "@notif_timeToday": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "notif_timeYesterday": "Yesterday",
+  "notif_timeDaysAgo": "{days} days ago",
+  "@notif_timeDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "notif_periodMorning": "morning",
+  "notif_periodNoon": "noon",
+  "notif_periodAfternoon": "afternoon",
+  "notif_periodEvening": "evening",
+  "notif_periodNight": "night",
+  "notif_reminderTitle": "Daily reminder",
+  "notif_reminderBody": "Did you note today's spending?",
+  "summary_title": "How was this month?",
+  "summary_footnote": "The numbers come from your records, not made up by AI.",
+  "summary_footnoteAi": "The numbers come from your records; only the wording was written by AI.",
+  "summary_listen": "Listen",
+  "summary_stop": "Stop",
+  "summary_caption": "Amounts are read out in words: \"{example}\"",
+  "@summary_caption": {
+    "placeholders": {
+      "example": {
+        "type": "String"
+      }
+    }
+  },
+  "summary_captionPlain": "Amounts are read out in words.",
+  "summary_tipPrefix": "A tip",
+  "budget_title": "This month's budget",
+  "budget_subtitle": "{month} · last month's budget carried over",
+  "budget_overall": "Whole family",
+  "budget_statusOk": "On track",
+  "budget_statusWarning": "{percent}% used · careful",
+  "budget_statusExceeded": "Budget over · {amount} extra",
+  "budget_buzz": "Buzz {name}",
+  "budget_add": "+ Set a budget",
+  "budget_listen": "Listen",
+  "budget_allOk": "All budgets are fine",
+  "budget_empty": "No budget set yet",
+  "budget_festivalTitle": "{name} (festival budget)",
+  "budget_festivalLine": "{range} · {amount}",
+  "budget_festivalNew": "New festival budget",
+  "budget_editTitle": "Set a budget",
+  "budget_pickCategory": "Budget for which category?",
+  "budget_save": "Save",
+  "budget_queued": "The budget will be saved when the internet is back",
+  "budget_saveFailed": "Could not save the budget",
+  "txn_list_title": "Expense list",
+  "txn_list_csv": "Get CSV",
+  "txn_list_prevMonth": "Previous month",
+  "txn_list_nextMonth": "Next month",
+  "txn_list_all": "Everyone",
+  "txn_list_private": "Private expense",
+  "txn_list_privateSub": "Only you can see this",
+  "txn_list_new": "+ Add an expense",
+  "txn_list_empty": "No expenses this month",
+  "txn_list_emptyAction": "Say an expense",
+  "txn_list_srcVoice": "by voice",
+  "txn_list_srcSms": "from SMS",
+  "txn_list_srcPhoto": "from photo",
+  "txn_list_srcManual": "by hand",
+  "txn_list_transfer": "Transfer",
+  "txn_list_other": "Other",
+  "txn_list_csvFailed": "Could not make the CSV",
+  "txn_detail_title": "Entry details",
+  "txn_detail_editTitle": "Edit entry",
+  "txn_detail_back": "Back",
+  "txn_detail_deleted": "Deleted · you can bring it back for 30 days",
+  "txn_detail_restore": "Bring back",
+  "txn_detail_restoreClosed": "30 days have passed, it cannot be brought back",
+  "txn_detail_account": "Account",
+  "txn_detail_who": "Paid by",
+  "txn_detail_source": "How it was entered",
+  "txn_detail_trxId": "Transaction number",
+  "txn_detail_trxNone": "None",
+  "txn_detail_trxCash": "None (cash)",
+  "txn_detail_trxCopied": "Number copied",
+  "txn_detail_note": "Note",
+  "txn_detail_visibility": "Who can see",
+  "txn_detail_private": "Only me",
+  "txn_detail_family": "Whole family",
+  "txn_detail_attachment": "Receipt photo",
+  "txn_detail_edit": "Edit",
+  "txn_detail_delete": "Delete",
+  "txn_detail_ownOnly": "You can only change your own entries",
+  "txn_detail_srcVoice": "By voice",
+  "txn_detail_srcManual": "Typed by hand",
+  "txn_detail_srcSms": "From an SMS",
+  "txn_detail_srcText": "Typed to the assistant",
+  "txn_detail_srcSync": "From another phone",
+  "txn_detail_morning": "morning",
+  "txn_detail_noon": "noon",
+  "txn_detail_afternoon": "afternoon",
+  "txn_detail_evening": "evening",
+  "txn_detail_night": "night",
+  "txn_detail_notFound": "This entry was not found",
+  "settings_simple": "Simple mode",
+  "settings_simpleBody": "Big text, pictures only, everything read aloud",
+  "settings_language": "Language",
+  "settings_numbers": "Numbers",
+  "settings_langEnglishLabel": "English language",
+  "settings_numLatinLabel": "English digits",
+  "settings_remind": "Daily reminder",
+  "settings_vibration": "Buzz and sound",
+  "settings_quietSubtitle": "Quiet from {start} to {end}",
+  "@settings_quietSubtitle": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_hourSharp": "{hour} {period}",
+  "@settings_hourSharp": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      },
+      "hour": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_quietTitle": "Quiet hours",
+  "settings_quietFrom": "From",
+  "settings_quietTo": "To",
+  "settings_quietSave": "Save",
+  "settings_csv": "Download expense list (CSV)",
+  "settings_catalog": "Categories and accounts",
+  "settings_privacy": "Privacy policy",
+  "settings_delete": "Delete my data",
+  "settings_deleteBody": "You can download it first",
+  "settings_saveFailed": "Could not save. Try again."
 }

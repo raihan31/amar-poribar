@@ -79,7 +79,7 @@ describe("families, invites, accounts and categories (e2e)", () => {
   it("create and hide a custom category", async () => {
     const nc = await e.call("POST", `/v1/families/${F}/categories`, {
       token: A,
-      body: { kind: "expense", nameEn: "Pets", nameBn: "পোষা প্রাণী", icon: "🐈" },
+      body: { kind: "expense", nameEn: "Pets", nameBn: "পোষা প্রাণী", icon: "heart" },
     });
     expect(nc.status).toBe(201);
     expect(nc.json.key.startsWith("custom_")).toBe(true);

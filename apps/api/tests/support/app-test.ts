@@ -1,6 +1,7 @@
 import { EventBus } from "../../src/platform/events/bus.js";
 import { drainOnce } from "../../src/platform/events/drain.js";
 import { buildApp } from "../../src/app.js";
+import type { AiClient } from "../../src/modules/ai/index.js";
 import type { Db, Sql } from "../../src/platform/db.js";
 import { createJobs } from "../../src/platform/jobs/jobs.js";
 import { LocalFanout } from "../../src/platform/realtime/fanout.js";
@@ -50,6 +51,8 @@ export interface BuildTestAppOptions {
   /** Keep the real OTP windows (the default limiter skips ahead between OTP requests; see `SteppingLimiter`). */
   realOtpLimits?: boolean;
   clock?: () => Date;
+  /** Stand-in for the Claude client (see `modules/ai/infra/fake-claude.ts`); absent means AI is unavailable. */
+  anthropic?: AiClient;
 }
 
 /** The full app wired with fakes: memory SMS/push, memory limiter, fixed clock. */
@@ -76,6 +79,7 @@ export async function buildTestApp(opts: BuildTestAppOptions) {
       fanout: new LocalFanout(),
       clock: fakes.clock,
       bus,
+      ...(opts.anthropic ? { anthropic: opts.anthropic } : {}),
     },
   });
   await app.ready();

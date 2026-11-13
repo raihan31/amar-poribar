@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/family/state/family_providers.dart';
 import '../presentation/providers/auth_provider.dart';
 
 /// Route paths. Opaque ids are path parameters (T-MOB-08 contract).
@@ -28,7 +29,11 @@ class Routes {
   static const voiceNote = '/voice-note/:conversationId';
   static const call = '/call/:callId';
   static const add = '/add';
+  static const addVoice = '/add/voice';
+  static const addSms = '/add/sms';
+  static const addCategory = '/add/category';
   static const txn = '/txn/:id';
+  static const txnEdit = '/txn/:id/edit';
   static const receipt = '/receipt';
   static const ruleLearn = '/rule-learn';
   static const voiceFallback = '/voice-fallback';
@@ -52,8 +57,6 @@ class Routes {
   static const simple = '/simple';
 
   /// Temporary: the old screens, kept reachable until their own tasks land.
-  static const transactions = '/transactions';
-  static const pendingSms = '/pending-sms';
 }
 
 /// `Meta('welcome_done')` is set. `main.dart` overrides this with the stored value.
@@ -142,6 +145,12 @@ String? redirect(Ref ref, GoRouterState state) {
   if (onEntryPage) {
     if (!ref.read(tutorialDoneProvider)) return Routes.tutorial;
     return _safeFrom(uri.queryParameters['from']) ?? Routes.home;
+  }
+
+  // A Viewer cannot write to the ledger (FR-FAM-03); the screen checks again when the role loads.
+  if (path == Routes.add) {
+    final role = ref.read(currentRoleFutureProvider).valueOrNull;
+    if (role != null && !role.canWriteLedger) return Routes.home;
   }
   return null;
 }

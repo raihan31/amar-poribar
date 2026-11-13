@@ -1,3 +1,4 @@
+import '../money/money.dart';
 import 'bangla_words.dart';
 
 /// A budget as returned by `GET /budgets` (amounts in paisa).
@@ -14,6 +15,9 @@ class BudgetStatus {
     this.spentPaisa,
     this.level,
   );
+
+  Money get limit => Money(limitPaisa);
+  Money get spent => Money(spentPaisa);
 }
 
 const _rank = {'ok': 0, 'warning': 1, 'exceeded': 2};
@@ -39,8 +43,8 @@ List<SpokenAlert> alertsToSpeak(
     final key = b.categoryId ?? 'overall';
     if ((_rank[level] ?? 0) <= (_rank[lastSpoken[key]] ?? 0)) continue;
     final name = b.categoryId == null ? 'মোট' : b.nameBn;
-    final spent = amountInWords(b.spentPaisa);
-    final limit = amountInWords(b.limitPaisa);
+    final spent = amountInWords(b.spent.paisa);
+    final limit = amountInWords(b.limit.paisa);
     final text = level == 'exceeded'
         ? '$name বাজেট ছাড়িয়ে গেছে। বাজেট ছিল $limit, খরচ হয়েছে $spent।'
         : '$name বাজেটের প্রায় সবটাই খরচ হয়ে গেছে। বাজেট $limit, খরচ হয়েছে $spent।';

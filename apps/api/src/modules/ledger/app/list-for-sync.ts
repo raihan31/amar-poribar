@@ -13,6 +13,7 @@ export function toWire(r: Transaction): SyncTransaction {
     occurredAt: r.occurredAt.toISOString(),
     categoryId: r.categoryId,
     accountId: r.accountId,
+    toAccountId: r.toAccountId,
     note: r.note,
     counterparty: r.counterparty,
     trxId: r.trxId,

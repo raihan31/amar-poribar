@@ -1,0 +1,113 @@
+/* Budgets (T-WEB-21); design: Budgets.dc.html. */
+.bud-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 28px 20px 16px;
+}
+.bud-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--green-700);
+}
+.bud-sub {
+  margin: 0;
+  font-size: 15px;
+  color: var(--muted);
+}
+.bud-list {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bud-card {
+  display: block;
+  padding: 14px;
+  border-radius: var(--r-card);
+  background: var(--card);
+  border: 2px solid var(--border);
+}
+.bud-card--ok {
+  border-color: var(--border);
+}
+.bud-card--warning {
+  border-color: var(--amber);
+}
+.bud-card--exceeded {
+  border-color: var(--danger);
+}
+.bud-card--festival {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-style: dashed;
+  background: var(--bg);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 18px;
+}
+.bud-card--festival span {
+  font-size: 15px;
+  color: var(--muted);
+}
+.bud-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 18px;
+  font-weight: 700;
+}
+.bud-card .ui-progress {
+  height: 14px;
+}
+.bud-card-foot {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.bud-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.bud-status--ok {
+  color: var(--green-700);
+}
+.bud-status--warning {
+  color: var(--ink);
+}
+.bud-status--exceeded {
+  color: var(--danger);
+}
+.bud-buzz {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 14px;
+  border-radius: 24px;
+  background: var(--amber);
+  color: var(--on-amber);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.bud-footer {
+  margin-top: auto;
+  padding-top: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px;
+  gap: 10px;
+}
+.bud-speak {
+  padding: 0;
+}

@@ -19,3 +19,16 @@ export function monthLabel(month: string, locale: string): string {
     timeZone: "Asia/Dhaka",
   });
 }
+
+/** The current "YYYY-MM" in Asia/Dhaka. */
+export function currentMonth(now: number = Date.now()): string {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka", year: "numeric", month: "2-digit" })
+    .formatToParts(new Date(now))
+    .reduce<Record<string, string>>((acc, p) => ({ ...acc, [p.type]: p.value }), {});
+  return `${parts.year}-${parts.month}`;
+}
+
+/** "YYYY-MM-DD" of an instant in Asia/Dhaka. */
+export function dhakaDay(now: number = Date.now()): string {
+  return new Date(now + 6 * 3_600_000).toISOString().slice(0, 10);
+}

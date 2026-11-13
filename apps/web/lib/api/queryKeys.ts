@@ -3,6 +3,7 @@ export type TxnFilters = Record<string, string | number | boolean | undefined>;
 /** Query-key factory; every key is a tuple so `invalidateQueries({ queryKey: qk.family(id).all })` works. */
 export const qk = {
   me: () => ["me"] as const,
+  notificationPrefs: () => ["me", "notification-preferences"] as const,
   family: (id: string) => ({
     all: ["family", id] as const,
     summary: (month?: string) => ["family", id, "summary", month ?? null] as const,

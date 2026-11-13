@@ -137,8 +137,10 @@ describe("ledger routes (db)", () => {
       });
       const id = create.json<{ id: string }>().id;
       const url = `/v1/families/${familyId}/transactions`;
-      expect((await t.app.inject({ method: "GET", url, headers: t.as(owner) })).json<unknown[]>()).toHaveLength(1);
-      expect((await t.app.inject({ method: "GET", url, headers: t.as(member) })).json<unknown[]>()).toHaveLength(0);
+      const items = async (who: Tokens) =>
+        (await t.app.inject({ method: "GET", url, headers: t.as(who) })).json<{ items: unknown[] }>().items;
+      expect(await items(owner)).toHaveLength(1);
+      expect(await items(member)).toHaveLength(0);
       const edit = await t.app.inject({
         method: "PATCH",
         url: `${url}/${id}`,
@@ -165,7 +167,7 @@ describe("ledger routes (db)", () => {
       expect((await send()).statusCode).toBe(201);
       const dup = await send();
       expect(dup.statusCode).toBe(409);
-      expect(dup.json<{ error: { code: string } }>().error.code).toBe("duplicate");
+      expect(dup.json<{ error: { code: string } }>().error.code).toBe("duplicate_trx_id");
       const events = await sql`select 1 from platform.outbox where name = 'ledger.TransactionCreated.v1'`;
       expect(events).toHaveLength(1);
       await t.close();
@@ -205,8 +207,14 @@ describe("ledger routes (db)", () => {
       const ctx = {
         db,
         bus,
+        jobs: { register: () => undefined },
+        clock: () => new Date(),
+        config: {},
         facades: {
-          families: { requireRole: async () => ({ role: "owner", family: { id: "f", name: "f", role: "owner" } }) },
+          families: {
+            requireRole: async () => ({ role: "owner", family: { id: "f", name: "f", role: "owner" } }),
+            bindActivityPort: () => undefined,
+          },
         },
       } as unknown as ModuleContext;
       await ledgerModule.register(app, ctx);

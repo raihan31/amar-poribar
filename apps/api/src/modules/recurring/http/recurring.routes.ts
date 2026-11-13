@@ -25,7 +25,7 @@ export function recurringRoutes(app: FastifyInstance, deps: RecurringDeps) {
   });
 
   app.post<FamilyParams>("/v1/families/:familyId/recurring", { ...opts, schema: docs.object }, async (req, reply) => {
-    await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
+    await deps.families.requireRole(req.params.familyId, req.user.sub, "admin", { write: true });
     const body = parseOr400(CreateRecurringSchema, req.body);
     return reply.status(201).send(await createTemplate(deps, req.params.familyId, req.user.sub, body));
   });
@@ -34,7 +34,7 @@ export function recurringRoutes(app: FastifyInstance, deps: RecurringDeps) {
     "/v1/families/:familyId/recurring/:recurringId",
     { ...opts, schema: docs.object },
     async (req) => {
-      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin");
+      await deps.families.requireRole(req.params.familyId, req.user.sub, "admin", { write: true });
       const body = parseOr400(UpdateRecurringSchema, req.body);
       return updateTemplate(deps, req.params.familyId, req.params.recurringId, body);
     },
@@ -56,7 +56,7 @@ export function recurringRoutes(app: FastifyInstance, deps: RecurringDeps) {
     { ...opts, schema: docs.object },
     async (req, reply) => {
       const { familyId, recurringId } = req.params;
-      await deps.families.requireRole(familyId, req.user.sub, "member");
+      await deps.families.requireRole(familyId, req.user.sub, "member", { write: true });
       const { month = currentDhakaMonth() } = parseOr400(MonthQuery, req.query);
       const txn = await confirmDraft(deps, { familyId, templateId: recurringId, userId: req.user.sub, month });
       return reply.status(201).send(txn);

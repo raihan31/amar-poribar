@@ -1,0 +1,2 @@
+DROP INDEX "ledger"."txn_family_time_idx";--> statement-breakpoint
+CREATE INDEX "txn_family_time_idx" ON "ledger"."transactions" USING btree ("family_id","occurred_at" DESC NULLS LAST,"id" DESC NULLS LAST) WHERE "ledger"."transactions"."deleted_at" is null;

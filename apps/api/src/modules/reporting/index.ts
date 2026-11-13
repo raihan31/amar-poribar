@@ -2,7 +2,7 @@ import type { MonthSummary } from "@amar-poribar/shared";
 import type { ModuleDefinition } from "../../platform/module.js";
 import type { ReportingDeps } from "./app/deps.js";
 import { monthSummary } from "./app/month-summary.js";
-import { reportsRoutes } from "./http/reports.routes.js";
+import { reportsRoutes } from "./http/report-routes.js";
 export * from "./events.js";
 
 /** Public surface of the reporting module. Other modules may import only this file (SRS R1). */

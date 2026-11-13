@@ -1,0 +1,37 @@
+[
+  {
+    "screen": "Main",
+    "string": "নভেম্বরে খরচ",
+    "reason": "Month name is rendered from the current month, not a fixed string."
+  },
+  {
+    "screen": "Members",
+    "string": "দর্শক · রিয়াদ",
+    "reason": "Sample member name; the role word comes from roleViewer and the name from data."
+  },
+  {
+    "screen": "TxnDetail",
+    "string": "আটশো পঞ্চাশ টাকা",
+    "reason": "Amount in words is generated from the paisa amount (sample value in the design)."
+  },
+  {
+    "screen": "VoiceEntry",
+    "string": "আজ বাজারে আটশো পঞ্চাশ টাকা ক্যাশে\"",
+    "reason": "Sample spoken transcript with a stray quote from extraction; the real text is the user's speech."
+  },
+  {
+    "screen": "VoiceEntry",
+    "string": "আটশো পঞ্চাশ টাকা",
+    "reason": "Amount in words is generated from the parsed amount."
+  },
+  {
+    "screen": "VoiceEntry",
+    "string": "খরচ · ক্যাশ · আজ",
+    "reason": "Composed at runtime from kind, account and date parts."
+  },
+  {
+    "screen": "AddExpense",
+    "string": "আটশো পঞ্চাশ টাকা",
+    "reason": "Amount in words is generated from the typed amount."
+  }
+]

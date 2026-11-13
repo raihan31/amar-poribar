@@ -1,5 +1,6 @@
 export * from "./money.js";
 export * from "./categories.js";
+export * from "./icons.js";
 export * from "./schemas.js";
 export * from "./schemas/notifications.js";
 export * from "./i18n/index.js";

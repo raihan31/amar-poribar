@@ -1,0 +1,34 @@
+{
+  "_comment": "Table-driven cases for the Dart SMS engine (SmsParserEngine.parseMfs). `expected` is an exact match on the listed fields; null means the field must be null.",
+  "provider": "rocket",
+  "cases": [
+    {
+      "name": "send money",
+      "text": "Rocket: You have sent Tk 700.00 to 01912345678. Fee Tk 5.00. Balance Tk 1,300.00. TxnId 8844AB12CD at 06/10/2026 08:45",
+      "expected": {
+        "kind": "send",
+        "amountPaisa": 70000,
+        "feePaisa": 500,
+        "counterpartyMasked": "01XXXXXX678",
+        "trxId": "8844AB12CD",
+        "balancePaisa": 130000,
+        "occurredAt": "2026-10-06T08:45:00+06:00",
+        "provider": "rocket"
+      }
+    },
+    {
+      "name": "cash out",
+      "text": "Rocket cash out Tk 2,000.00 Agent: 01912345678. Fee Tk 18.00. Balance Tk 600.00. TxnId 8855CD34EF at 07/10/2026 16:20",
+      "expected": {
+        "kind": "cash_out",
+        "amountPaisa": 200000,
+        "feePaisa": 1800,
+        "counterpartyMasked": "01XXXXXX678",
+        "trxId": "8855CD34EF",
+        "balancePaisa": 60000,
+        "occurredAt": "2026-10-07T16:20:00+06:00",
+        "provider": "rocket"
+      }
+    }
+  ]
+}

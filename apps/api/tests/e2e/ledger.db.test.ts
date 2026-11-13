@@ -60,7 +60,7 @@ describe("ledger (e2e)", () => {
     expect((await e.call("DELETE", `/v1/families/${s.F}/transactions/${extra.json.id}`, { token: s.A })).status).toBe(
       204,
     );
-    const list = (await e.call("GET", `/v1/families/${s.F}/transactions`, { token: s.A })).json;
+    const list = (await e.call("GET", `/v1/families/${s.F}/transactions`, { token: s.A })).json.items;
     expect(list.some((t: { id: string }) => t.id === extra.json.id)).toBe(false);
   });
 

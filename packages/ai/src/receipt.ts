@@ -7,6 +7,8 @@ import {
   LlmDraftsSchema,
   dhakaDate,
   llmDraftsToTransactions,
+  withUsage,
+  type AiUsage,
   type CategoryOption,
 } from "./llm.js";
 
@@ -32,6 +34,7 @@ export interface ReceiptOptions {
   categories: CategoryOption[];
   now?: Date;
   model?: string;
+  onUsage?: (u: AiUsage) => void;
 }
 
 /** Image of a receipt or memo → draft(s) for the user to confirm (SRS FR-AI-09). The image is not stored. */
@@ -39,31 +42,33 @@ export async function parseReceipt(
   image: { base64: string; mediaType: ReceiptMediaType },
   opts: ReceiptOptions,
 ): Promise<TransactionDraft[]> {
-  const { client, categories, now = new Date(), model = DEFAULT_MODEL } = opts;
+  const { client, categories, now = new Date(), model = DEFAULT_MODEL, onUsage } = opts;
   const today = dhakaDate(now);
   const categoryList = categories.map((c) => `${c.key} (${c.kind}): ${c.nameEn} / ${c.nameBn}`).join("\n");
 
-  const response = await client.beta.messages.parse({
-    model,
-    max_tokens: 4000,
-    system: [
-      {
-        type: "text",
-        text: `${RECEIPT_PROMPT}\n\nCategory keys:\n${categoryList}`,
-        cache_control: { type: "ephemeral" },
-      },
-    ],
-    messages: [
-      {
-        role: "user",
-        content: [
-          { type: "image", source: { type: "base64", media_type: image.mediaType, data: image.base64 } },
-          { type: "text", text: `Today (Asia/Dhaka): ${today}\n\nRead this receipt.` },
-        ],
-      },
-    ],
-    output_config: { effort: "low", format: betaZodOutputFormat(LlmDraftsSchema) },
-  });
+  const response = await withUsage(onUsage, () =>
+    client.beta.messages.parse({
+      model,
+      max_tokens: 4000,
+      system: [
+        {
+          type: "text",
+          text: `${RECEIPT_PROMPT}\n\nCategory keys:\n${categoryList}`,
+          cache_control: { type: "ephemeral" },
+        },
+      ],
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "image", source: { type: "base64", media_type: image.mediaType, data: image.base64 } },
+            { type: "text", text: `Today (Asia/Dhaka): ${today}\n\nRead this receipt.` },
+          ],
+        },
+      ],
+      output_config: { effort: "low", format: betaZodOutputFormat(LlmDraftsSchema) },
+    }),
+  );
 
   if (response.stop_reason === "refusal" || response.stop_reason === "max_tokens") {
     throw new AiUnavailableError(`AI stopped with ${response.stop_reason}`);

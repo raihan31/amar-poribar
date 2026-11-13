@@ -2,7 +2,7 @@ import type { Role } from "@amar-poribar/shared";
 import { HttpError } from "../../../platform/errors.js";
 import { transactionsRepo } from "../infra/transactions.repo.js";
 import type { LedgerDeps } from "./deps.js";
-import { publishTransaction } from "./publish.js";
+import { publishDeleted } from "./publish.js";
 
 export async function deleteTransaction(
   deps: LedgerDeps,
@@ -16,6 +16,6 @@ export async function deleteTransaction(
   }
   await deps.db.transaction(async (tx) => {
     const row = await transactionsRepo.softDelete(tx, txnId, txn.hlc);
-    await publishTransaction(deps.bus, tx, "ledger.TransactionDeleted.v1", row);
+    await publishDeleted(deps.bus, tx, row);
   });
 }

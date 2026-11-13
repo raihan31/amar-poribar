@@ -87,6 +87,7 @@ export const ROUTE_FIXTURES: Record<string, RouteFixture> = {
     params: { ...fam(c), inviteId: "00000000-0000-4000-8000-000000000000" },
   }),
   "GET /v1/families/{familyId}/members": (c) => ({ params: fam(c) }),
+  "GET /v1/families/{familyId}/entitlements": (c) => ({ params: fam(c) }),
   "POST /v1/families/{familyId}/transfer-ownership": (c) => ({ params: fam(c), body: { toUserId: c.userId } }),
   "DELETE /v1/families/{familyId}/members/{userId}": (c) => ({ params: { ...fam(c), userId: c.userId } }),
   "PATCH /v1/families/{familyId}/members/{userId}": (c) => ({
@@ -127,7 +128,11 @@ export const ROUTE_FIXTURES: Record<string, RouteFixture> = {
       accountId: c.accountId,
     },
   }),
+  "GET /v1/families/{familyId}/transactions/{txnId}": (c) => ({ params: { ...fam(c), txnId: c.txnId } }),
   "DELETE /v1/families/{familyId}/transactions/{txnId}": (c) => ({ params: { ...fam(c), txnId: c.txnId } }),
+  "POST /v1/families/{familyId}/transactions/{txnId}/restore": (c) => ({
+    params: { ...fam(c), txnId: c.txnId },
+  }),
   "PATCH /v1/families/{familyId}/transactions/{txnId}": (c) => ({
     params: { ...fam(c), txnId: c.txnId },
     body: { note: "Hijacked" },

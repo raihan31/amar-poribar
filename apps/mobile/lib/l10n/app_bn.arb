@@ -11,7 +11,11 @@
   "auth_login_tagline": "পরিবারের সব হিসাব, এক জায়গায়",
   "auth_login_resend": "আবার পাঠান ({time})",
   "@auth_login_resend": {
-    "placeholders": {"time": {"type": "String"}}
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "auth_login_resendNow": "আবার পাঠান",
   "auth_login_resendQuestion": "কোড আসেনি?",
@@ -23,7 +27,11 @@
   "auth_otp_wrongTitle": "কোডটি মেলেনি",
   "auth_otp_wrongBody": "আবার দেখে লিখুন। আর {count} বার চেষ্টা করতে পারবেন।",
   "@auth_otp_wrongBody": {
-    "placeholders": {"count": {"type": "String"}}
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
   },
   "auth_otp_newCode": "নতুন কোড পাঠান",
   "auth_otp_wrongNumber": "নম্বর ভুল? বদলান",
@@ -31,56 +39,40 @@
   "auth_otp_helpBody": "একটু অপেক্ষা করুন। এরপরও না এলে বাড়ির কাউকে ফোন দিন। কোড কাউকে বলবেন না।",
   "auth_otp_limitNote": "এক ঘণ্টায় সর্বোচ্চ ৫ বার কোড চাওয়া যায়। এ নম্বরে {count} বার চাওয়া হয়েছে।",
   "@auth_otp_limitNote": {
-    "placeholders": {"count": {"type": "String"}}
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
   },
   "auth_otp_expiredTitle": "কোডের সময় শেষ",
   "auth_otp_expiredBody": "নতুন কোড নিন।",
   "auth_otp_rateLimited": "অনেকবার চেষ্টা হয়েছে। {time} পরে আবার চেষ্টা করুন।",
   "@auth_otp_rateLimited": {
-    "placeholders": {"time": {"type": "String"}}
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "auth_otp_serverDown": "এখন সংযোগ হচ্ছে না। একটু পরে আবার চেষ্টা করুন।",
   "auth_otp_networkDown": "ইন্টারনেট নেই। সংযোগ দেখে আবার চেষ্টা করুন।",
-  "home_welcome": "স্বাগতম, {role}",
-  "@home_welcome": {
-    "placeholders": {"role": {"type": "String"}}
-  },
-  "home_dashboard_totalBalance": "মোট ব্যালেন্স",
-  "home_dashboard_spent": "খরচ: ৳{amount}",
-  "@home_dashboard_spent": {
-    "placeholders": {"amount": {"type": "String"}}
-  },
-  "home_dashboard_analytics": "মাসের হিসাব",
-  "home_dashboard_recent": "সাম্প্রতিক লেনদেন",
-  "txn_dashboard_add": "লেনদেন যোগ",
-  "settings_title": "সেটিংস",
-  "settings_role_title": "বর্তমান ভূমিকা",
-  "settings_pair_title": "নতুন ফোন যোগ করুন",
-  "settings_pair_subtitle": "সন্তান বা সঙ্গীকে যোগ করতে QR কোড বানান",
+  "settings_title": "সেটিং",
   "settings_tutorial_title": "কীভাবে ব্যবহার করবেন (শুনুন)",
-  "settings_language_title": "ভাষা",
-  "settings_language_switch": "ইংরেজিতে বদলান",
-  "settings_bankApprovals_title": "ব্যাংকের লেনদেন অনুমোদন",
-  "settings_bankApprovals_empty": "আজ কোনো ব্যাংকের লেনদেন অনুমোদনের অপেক্ষায় নেই।",
-  "sync_server_title": "সার্ভারের সাথে সিঙ্ক",
-  "sync_server_subtitle": "ইন্টারনেট থাকলে চাপুন",
-  "sync_server_needLogin": "সিঙ্ক করতে লগইন করুন।",
-  "sync_server_done": "সার্ভারের সাথে সিঙ্ক হয়েছে: {pushed} পাঠানো, {pulled} পাওয়া",
-  "@sync_server_done": {
-    "placeholders": {"pushed": {"type": "int"}, "pulled": {"type": "int"}}
-  },
   "sync_nearby_title": "কাছের ফোনের সাথে সিঙ্ক",
-  "sync_nearby_subtitle": "ইন্টারনেট ছাড়াই, একই পরিবারের ফোন",
   "sync_nearby_needLogin": "প্রথমে একবার লগইন করে পরিবারে যোগ দিন (ইন্টারনেট লাগবে)।",
   "sync_nearby_failed": "কাছের সিঙ্ক চালু করা যায়নি: অনুমতি দিন (ব্লুটুথ, লোকেশন)।",
   "sync_nearby_askTitle": "কাছের ফোনের সাথে সিঙ্ক?",
   "sync_nearby_askBody": "ফোন: {name}\nকোড: {code}\n\nদুই ফোনেই একই কোড দেখালে \"হ্যাঁ\" চাপুন।",
   "@sync_nearby_askBody": {
-    "placeholders": {"name": {"type": "String"}, "code": {"type": "String"}}
-  },
-  "txn_dashboard_count": "{count, plural, =0{কোনো লেনদেন নেই} =1{১টি লেনদেন} other{{count}টি লেনদেন}}",
-  "@txn_dashboard_count": {
-    "placeholders": {"count": {"type": "int"}}
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
   },
   "voice_fallback_title": "কথা বলা যাচ্ছে না",
   "voice_fallback_heading": "এই ফোনে বাংলা ভয়েস নেই",
@@ -133,11 +125,22 @@
   "profile_periodNight": "রাত",
   "profile_reminderAt": "{time} টায়",
   "@profile_reminderAt": {
-    "placeholders": {"time": {"type": "String"}}
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "profile_time": "{period} {time}",
   "@profile_time": {
-    "placeholders": {"period": {"type": "String"}, "time": {"type": "String"}}
+    "placeholders": {
+      "period": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "auth_expired_title": "আবার ঢুকুন",
   "auth_expired_body": "আপনার নিরাপত্তার জন্য কিছুদিন পর আবার ঢুকতে হয়। আপনার হিসাব ঠিকই আছে।",
@@ -150,19 +153,34 @@
   "auth_inviteExpired_body": "কোনো সমস্যা নেই। যিনি ডেকেছিলেন, তাঁকে নতুন লিংক পাঠাতে বলুন।",
   "auth_inviteExpired_nudge": "{inviter}কে কম্পন দিন",
   "@auth_inviteExpired_nudge": {
-    "placeholders": {"inviter": {"type": "String"}}
+    "placeholders": {
+      "inviter": {
+        "type": "String"
+      }
+    }
   },
   "onb_consent_title": "আপনার পরিবার তৈরি করুন",
   "onb_consent_step": "ধাপ {n} / {total}",
   "@onb_consent_step": {
-    "placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
   },
   "onb_consent_nameLabel": "পরিবারের নাম",
   "onb_consent_nameHint": "রহিম পরিবার",
   "onb_consent_currencyLabel": "টাকার ধরন",
   "onb_consent_currencyValue": "৳ বাংলাদেশি টাকা ({code})",
   "@onb_consent_currencyValue": {
-    "placeholders": {"code": {"type": "String"}}
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
   },
   "onb_consent_useTitle": "আপনার তথ্য কীভাবে ব্যবহার হবে",
   "onb_consent_use1": "শুধু আপনার পরিবারের সদস্যরা হিসাব দেখবে।",
@@ -180,11 +198,22 @@
   "onb_consent_retry": "আবার চেষ্টা করুন",
   "fam_join_invitedBy": "{inviter} আপনাকে ডেকেছেন",
   "@fam_join_invitedBy": {
-    "placeholders": {"inviter": {"type": "String"}}
+    "placeholders": {
+      "inviter": {
+        "type": "String"
+      }
+    }
   },
   "fam_join_summary": "{members} জন সদস্য · আপনি হবেন {role}",
   "@fam_join_summary": {
-    "placeholders": {"members": {"type": "String"}, "role": {"type": "String"}}
+    "placeholders": {
+      "members": {
+        "type": "String"
+      },
+      "role": {
+        "type": "String"
+      }
+    }
   },
   "fam_join_canTitle": "যোগ দিলে আপনি পারবেন",
   "fam_join_bulletLedger": "খরচ লিখতে ও দেখতে",
@@ -193,7 +222,11 @@
   "fam_join_bulletPrivate": "ব্যক্তিগত খরচ শুধু নিজে দেখতে",
   "fam_join_expiresIn": "আমন্ত্রণের মেয়াদ আছে আর {days} দিন।",
   "@fam_join_expiresIn": {
-    "placeholders": {"days": {"type": "String"}}
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
   },
   "fam_join_accept": "যোগ দিন",
   "fam_join_notNow": "এখন নয়",
@@ -209,11 +242,459 @@
   "tutorial_title4": "মাসের কথা শুনুন",
   "tutorial_counter": "{n} / {total}",
   "@tutorial_counter": {
-    "placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
   },
   "tutorial_listenAgain": "আবার শুনুন",
   "tutorial_next": "পরের ধাপ",
   "tutorial_back": "পেছনে",
   "tutorial_skip": "বাদ দিন",
-  "tutorial_start": "শুরু করুন"
+  "tutorial_start": "শুরু করুন",
+  "push_channel_nudge_name": "কম্পন",
+  "push_channel_nudge_desc": "পরিবারের কেউ কম্পন পাঠালে",
+  "push_channel_chat_name": "কথা",
+  "push_channel_chat_desc": "পরিবারের কথাবার্তার বার্তা",
+  "push_channel_alerts_name": "বাজেট সতর্কতা",
+  "push_channel_alerts_desc": "বাজেট প্রায় শেষ হলে সতর্কতা",
+  "push_channel_reminders_name": "মনে করানো",
+  "push_channel_reminders_desc": "রোজকার ও বিলের মনে করানো",
+  "push_channel_calls_name": "ভিডিও কল",
+  "push_channel_calls_desc": "পরিবারের ভিডিও কল আসলে",
+  "push_permission_title": "খবর পেতে অনুমতি দিন",
+  "push_permission_body": "বাজেট সতর্কতা, কম্পন আর মনে করানো ফোনে পেতে নোটিফিকেশনের অনুমতি দরকার।",
+  "push_permission_allow": "অনুমতি দিন",
+  "txn_add_title": "নতুন লেখা",
+  "txn_add_back": "পেছনে",
+  "txn_add_typeExpense": "খরচ",
+  "txn_add_typeIncome": "আয়",
+  "txn_add_typeTransfer": "স্থানান্তর",
+  "txn_add_amountQ": "কত টাকা?",
+  "txn_add_categoryQ": "কোন খাতে?",
+  "txn_add_accountQ": "কীভাবে দিলেন?",
+  "txn_add_whoQ": "কে দিলেন?",
+  "txn_add_date": "তারিখ",
+  "txn_add_today": "আজ",
+  "txn_add_yesterday": "গতকাল",
+  "txn_add_note": "নোট",
+  "txn_add_noteHint": "যেমন: ইলিশ, চাল",
+  "txn_add_fee": "ফি",
+  "txn_add_feeAdd": "ফি যোগ করুন",
+  "txn_add_private": "ব্যক্তিগত (শুধু আমি দেখব)",
+  "txn_add_save": "রাখুন",
+  "txn_add_saved": "রাখা হয়েছে",
+  "txn_add_undo": "বাতিল করুন",
+  "txn_add_errAmount": "আগে টাকার অঙ্ক লিখুন।",
+  "txn_add_errMax": "এক কোটি টাকার বেশি রাখা যায় না।",
+  "txn_add_errCategory": "কোন খাতে, বেছে নিন।",
+  "txn_add_backspace": "একটি মুছুন",
+  "home_greetMorning": "সুপ্রভাত, {name}",
+  "@home_greetMorning": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "home_greetNoon": "শুভ দুপুর, {name}",
+  "@home_greetNoon": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "home_greetEvening": "শুভ সন্ধ্যা, {name}",
+  "@home_greetEvening": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "home_greetNight": "শুভ রাত্রি, {name}",
+  "@home_greetNight": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "home_settings": "সেটিং",
+  "home_monthSpent": "{month} খরচ",
+  "@home_monthSpent": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "home_changeMore": "গত মাসের চেয়ে {amount} বেশি",
+  "@home_changeMore": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "home_changeLess": "গত মাসের চেয়ে {amount} কম",
+  "@home_changeLess": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "home_changeSame": "গত মাসের সমান",
+  "home_summarySpeech": "{month} {amount} খরচ হয়েছে। {change}",
+  "@home_summarySpeech": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "change": {
+        "type": "String"
+      }
+    }
+  },
+  "home_budgetWarning": "{name} বাজেট {percent} শেষ",
+  "@home_budgetWarning": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "home_notify": "{name}কে জানান",
+  "@home_notify": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "home_budgetPhrase": "বাজেট শেষ",
+  "home_speakExpense": "বলে খরচ লিখুন",
+  "home_tileBuzz": "কম্পন",
+  "home_tileTalk": "কথা",
+  "home_tileVideo": "ভিডিও",
+  "home_legend": "সবুজ = অনলাইন · ধূসর = অফলাইন",
+  "home_activityVoice": "{name} ভয়েস পাঠিয়েছেন · {duration}",
+  "@home_activityVoice": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "home_activityExpense": "{name} লিখেছেন: {note}",
+  "@home_activityExpense": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "home_activityEmpty": "এখনো কিছু নেই",
+  "home_remitTitle": "বিদেশ থেকে পাঠানো টাকা",
+  "home_remitOpen": "দেখুন",
+  "home_offline": "ইন্টারনেট নেই। হিসাব ফোনেই থাকছে।",
+  "home_somebody": "কেউ",
+  "entry_picker_title": "কিসের জন্য?",
+  "entry_picker_hint": "ছবিতে চাপ দিন, নামটি শোনা যাবে।",
+  "entry_picker_confirm": "{category}য় রাখুন",
+  "@entry_picker_confirm": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "entry_picker_listen": "শুনুন",
+  "entry_picker_selected": "বাছা হয়েছে",
+  "entry_heard": "আপনি বললেন:",
+  "entry_again": "আবার শুনুন",
+  "entry_confirmQ": "ঠিক আছে?",
+  "entry_no": "না",
+  "entry_yes": "হ্যাঁ, রাখুন",
+  "entry_change": "টাকা বা খাত বদলাতে চাই",
+  "entry_speak": "চাপ দিয়ে বলুন",
+  "entry_parsing": "বুঝে নিচ্ছি…",
+  "entry_queued": "ইন্টারনেট নেই। লেখাটি রাখা হয়েছে; নেটওয়ার্ক পেলে নিজে থেকে বুঝে নেওয়া হবে।",
+  "entry_quota": "আজকের এআই সীমা শেষ। হাতে লিখে রাখুন।",
+  "entry_quotaAction": "হাতে লিখুন",
+  "entry_problem": "কিছু বোঝা যায়নি। আবার বলুন।",
+  "entry_typeExpense": "খরচ",
+  "entry_typeIncome": "আয়",
+  "entry_typeTransfer": "স্থানান্তর",
+  "entry_unknownCategory": "খাত বাছুন",
+  "entry_acct_cash": "ক্যাশ",
+  "entry_acct_bkash": "বিকাশ",
+  "entry_acct_nagad": "নগদ",
+  "entry_acct_rocket": "রকেট",
+  "entry_acct_bank": "ব্যাংক",
+  "entry_sms_title": "এসএমএস থেকে লিখুন",
+  "entry_sms_hint": "বিকাশ, নগদ বা রকেটের মেসেজ পেস্ট করুন।",
+  "entry_sms_paste": "পেস্ট করুন",
+  "entry_sms_read": "পড়ুন",
+  "entry_sms_recognized": "{provider} মেসেজ চেনা গেছে · এআই লাগেনি",
+  "@entry_sms_recognized": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "entry_sms_recognizedAi": "মেসেজটি এআই দিয়ে পড়া হয়েছে",
+  "entry_sms_who": "কাকে",
+  "entry_sms_fee": "ফি",
+  "entry_sms_account": "অ্যাকাউন্ট",
+  "entry_sms_time": "সময়",
+  "entry_sms_trx": "ট্রানজ্যাকশন",
+  "entry_sms_new": "এই মেসেজ আগে রাখা হয়নি। কোন খাত?",
+  "entry_sms_duplicate": "এই মেসেজ আগেই রাখা হয়েছে",
+  "entry_sms_no": "না",
+  "entry_sms_keep": "✓ রাখুন",
+  "entry_sms_offline": "ইন্টারনেট নেই। এই মেসেজ আমরা চিনতে পারিনি, নেটওয়ার্ক পেলে আবার পেস্ট করুন।",
+  "entry_sms_kind_send": "টাকা পাঠানো",
+  "entry_sms_kind_payment": "পেমেন্ট",
+  "entry_sms_kind_bill": "বিল পরিশোধ",
+  "entry_sms_kind_recharge": "মোবাইল রিচার্জ",
+  "entry_sms_kind_cashOut": "ক্যাশ আউট",
+  "entry_sms_kind_cashIn": "ক্যাশ ইন",
+  "entry_sms_kind_received": "টাকা পাওয়া",
+  "entry_sms_chipFamily": "পরিবারকে সাহায্য",
+  "entry_sms_chipBill": "বিল",
+  "entry_sms_chipOther": "অন্যান্য",
+  "notif_title": "খবর",
+  "notif_listenAll": "সব শুনুন",
+  "notif_stop": "থামুন",
+  "notif_empty": "এখনো কোনো খবর নেই",
+  "notif_quietNote": "এখন চুপ সময়। কম্পন আর শব্দ বন্ধ, খবর এখানে জমা থাকবে।",
+  "notif_reminderTime": "রোজকার মনে করানোর সময়: {time}",
+  "@notif_reminderTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notif_changeSettings": "সেটিং",
+  "notif_bell": "খবর, {count}টি নতুন",
+  "@notif_bell": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "notif_timeToday": "আজ {period}",
+  "@notif_timeToday": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "notif_timeYesterday": "গতকাল",
+  "notif_timeDaysAgo": "{days} দিন আগে",
+  "@notif_timeDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "notif_periodMorning": "সকালে",
+  "notif_periodNoon": "দুপুরে",
+  "notif_periodAfternoon": "বিকেলে",
+  "notif_periodEvening": "সন্ধ্যায়",
+  "notif_periodNight": "রাতে",
+  "notif_reminderTitle": "রোজকার মনে করানো",
+  "notif_reminderBody": "আজকের খরচ লিখেছেন?",
+  "summary_title": "এ মাস কেমন গেল?",
+  "summary_footnote": "সংখ্যাগুলো আপনার হিসাব থেকে নেওয়া, এআই বানায়নি।",
+  "summary_footnoteAi": "সংখ্যাগুলো আপনার হিসাব থেকে নেওয়া, শুধু কথাগুলো এআই সাজিয়েছে।",
+  "summary_listen": "শুনুন",
+  "summary_stop": "থামুন",
+  "summary_caption": "টাকার অঙ্ক কথায় পড়ে শোনানো হবে: \"{example}\"",
+  "@summary_caption": {
+    "placeholders": {
+      "example": {
+        "type": "String"
+      }
+    }
+  },
+  "summary_captionPlain": "টাকার অঙ্ক কথায় পড়ে শোনানো হবে।",
+  "summary_tipPrefix": "একটা কথা",
+  "budget_title": "মাসের বাজেট",
+  "budget_subtitle": "{month} · গত মাসের বাজেট নিজে থেকেই চলে এসেছে",
+  "@budget_subtitle": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "budget_overall": "পুরো পরিবার",
+  "budget_statusOk": "ঠিক আছে",
+  "budget_statusWarning": "{percent}% পার হয়েছে · সাবধান",
+  "@budget_statusWarning": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "budget_statusExceeded": "বাজেট শেষ · {amount} বেশি",
+  "@budget_statusExceeded": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "budget_buzz": "{name}কে কম্পন দিন",
+  "@budget_buzz": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "budget_add": "+ বাজেট দিন",
+  "budget_listen": "শুনুন",
+  "budget_allOk": "সব বাজেট ঠিক আছে",
+  "budget_empty": "এখনো কোনো বাজেট দেওয়া হয়নি",
+  "budget_festivalTitle": "{name} (উৎসবের বাজেট)",
+  "@budget_festivalTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "budget_festivalLine": "{range} · {amount}",
+  "@budget_festivalLine": {
+    "placeholders": {
+      "range": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "budget_festivalNew": "নতুন উৎসব বাজেট",
+  "budget_editTitle": "বাজেট দিন",
+  "budget_pickCategory": "কোন খাতের বাজেট?",
+  "budget_save": "রাখুন",
+  "budget_queued": "ইন্টারনেট এলে বাজেট জমা হবে",
+  "budget_saveFailed": "বাজেট রাখা গেল না",
+  "txn_list_title": "খরচের তালিকা",
+  "txn_list_csv": "CSV নিন",
+  "txn_list_prevMonth": "আগের মাস",
+  "txn_list_nextMonth": "পরের মাস",
+  "txn_list_all": "সবাই",
+  "txn_list_private": "ব্যক্তিগত খরচ",
+  "txn_list_privateSub": "শুধু আপনি দেখছেন",
+  "txn_list_new": "+ নতুন খরচ লিখুন",
+  "txn_list_empty": "এ মাসে কোনো খরচ নেই",
+  "txn_list_emptyAction": "বলে খরচ লিখুন",
+  "txn_list_srcVoice": "কণ্ঠ থেকে",
+  "txn_list_srcSms": "এসএমএস থেকে",
+  "txn_list_srcPhoto": "ছবি থেকে",
+  "txn_list_srcManual": "হাতে",
+  "txn_list_transfer": "স্থানান্তর",
+  "txn_list_other": "অন্যান্য",
+  "txn_list_csvFailed": "CSV বানানো গেল না",
+  "txn_detail_title": "খরচের বিস্তারিত",
+  "txn_detail_editTitle": "লেখা বদলান",
+  "txn_detail_back": "পেছনে",
+  "txn_detail_deleted": "মুছে ফেলা হয়েছে · ৩০ দিন পর্যন্ত ফেরত পাবেন",
+  "txn_detail_restore": "ফেরত আনুন",
+  "txn_detail_restoreClosed": "৩০ দিন পার হয়ে গেছে, আর ফেরত আনা যায় না",
+  "txn_detail_account": "অ্যাকাউন্ট",
+  "txn_detail_who": "কে দিলেন",
+  "txn_detail_source": "কীভাবে লেখা",
+  "txn_detail_trxId": "ট্রানজ্যাকশন নম্বর",
+  "txn_detail_trxNone": "নেই",
+  "txn_detail_trxCash": "নেই (নগদ টাকা)",
+  "txn_detail_trxCopied": "নম্বর কপি হয়েছে",
+  "txn_detail_note": "লেখা",
+  "txn_detail_visibility": "কে দেখবে",
+  "txn_detail_private": "শুধু আমি",
+  "txn_detail_family": "পুরো পরিবার",
+  "txn_detail_attachment": "রসিদের ছবি",
+  "txn_detail_edit": "বদলান",
+  "txn_detail_delete": "মুছুন",
+  "txn_detail_ownOnly": "আপনি শুধু নিজের খরচ বদলাতে পারেন",
+  "txn_detail_srcVoice": "কণ্ঠ থেকে",
+  "txn_detail_srcManual": "হাতে লেখা",
+  "txn_detail_srcSms": "এসএমএস থেকে",
+  "txn_detail_srcText": "লিখে বলা",
+  "txn_detail_srcSync": "অন্য ফোন থেকে",
+  "txn_detail_morning": "সকাল",
+  "txn_detail_noon": "দুপুর",
+  "txn_detail_afternoon": "বিকাল",
+  "txn_detail_evening": "সন্ধ্যা",
+  "txn_detail_night": "রাত",
+  "txn_detail_notFound": "এই লেখাটি পাওয়া যায়নি",
+  "settings_simple": "সহজ মোড",
+  "settings_simpleBody": "বড় লেখা, শুধু ছবি, সব কিছু শুনিয়ে দেবে",
+  "settings_language": "ভাষা",
+  "settings_numbers": "সংখ্যা",
+  "settings_langEnglishLabel": "ইংরেজি ভাষা",
+  "settings_numLatinLabel": "ইংরেজি সংখ্যা",
+  "settings_remind": "রোজ মনে করান",
+  "settings_vibration": "কম্পন ও আওয়াজ",
+  "settings_quietSubtitle": "{start} থেকে {end} চুপ",
+  "@settings_quietSubtitle": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_hourSharp": "{period} {hour}টা",
+  "@settings_hourSharp": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      },
+      "hour": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_quietTitle": "চুপ থাকার সময়",
+  "settings_quietFrom": "শুরু",
+  "settings_quietTo": "শেষ",
+  "settings_quietSave": "রাখুন",
+  "settings_csv": "খরচের তালিকা নামান (CSV)",
+  "settings_catalog": "খাত ও অ্যাকাউন্ট",
+  "settings_privacy": "গোপনীয়তা নীতি",
+  "settings_delete": "আমার তথ্য মুছে দিন",
+  "settings_deleteBody": "আগে ডাউনলোড করে নিতে পারবেন",
+  "settings_saveFailed": "বদলানো যায়নি। আবার চেষ্টা করুন।"
 }

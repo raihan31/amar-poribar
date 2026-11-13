@@ -26,10 +26,14 @@ class AiApi {
   Future<MonthlySummary> summary(
     String familyId, {
     String locale = 'bn',
+    String? month,
   }) async =>
       MonthlySummary.fromJson(
-        await _t.send('GET', '/v1/families/$familyId/ai/summary?locale=$locale')
-            as Map<String, dynamic>,
+        await _t.send(
+          'GET',
+          '/v1/families/$familyId/ai/summary?locale=$locale'
+              '${month == null ? '' : '&month=$month'}',
+        ) as Map<String, dynamic>,
       );
 
   Future<Map<String, dynamic>> ask(String familyId, String question) async =>

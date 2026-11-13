@@ -51,10 +51,29 @@ export interface LlmParseOptions {
   /** Current time, used for relative dates. */
   now?: Date;
   model?: string;
+  onUsage?: (u: AiUsage) => void;
 }
 
 export function dhakaDate(now: Date): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(now);
+}
+
+/** Tokens and wall time of one Claude request (FR-AI-14). Never contains prompt or answer text. */
+export type AiUsage = { inputTokens: number; outputTokens: number; latencyMs: number };
+
+/** Runs one Claude request and reports its usage once. */
+export async function withUsage<T extends { usage?: { input_tokens?: number; output_tokens?: number } | null }>(
+  onUsage: ((u: AiUsage) => void) | undefined,
+  call: () => Promise<T>,
+): Promise<T> {
+  const started = Date.now();
+  const response = await call();
+  onUsage?.({
+    inputTokens: response.usage?.input_tokens ?? 0,
+    outputTokens: response.usage?.output_tokens ?? 0,
+    latencyMs: Date.now() - started,
+  });
+  return response;
 }
 
 export class AiUnavailableError extends Error {
@@ -69,28 +88,30 @@ export class AiUnavailableError extends Error {
  * Drafts are never saved directly; the user confirms them (FR-AI-05).
  */
 export async function parseWithLlm(text: string, opts: LlmParseOptions): Promise<TransactionDraft[]> {
-  const { client, categories, now = new Date(), model = DEFAULT_MODEL } = opts;
+  const { client, categories, now = new Date(), model = DEFAULT_MODEL, onUsage } = opts;
   const validKeys = new Set(categories.map((c) => c.key));
   const categoryList = categories.map((c) => `${c.key} (${c.kind}): ${c.nameEn} / ${c.nameBn}`).join("\n");
   const today = dhakaDate(now);
 
-  const response = await client.beta.messages.parse({
-    model,
-    // If the model declines, the API retries on a fallback model it picks by refusal category.
-    betas: ["server-side-fallback-2026-07-01"],
-    fallbacks: "default",
-    max_tokens: 4000,
-    // Stable prefix first (system + categories) so prompt caching can reuse it across requests.
-    system: [
-      {
-        type: "text",
-        text: `${SYSTEM_PROMPT}\n\nCategory keys:\n${categoryList}`,
-        cache_control: { type: "ephemeral" },
-      },
-    ],
-    messages: [{ role: "user", content: `Today (Asia/Dhaka): ${today}\n\nNote:\n${maskPhone(text)}` }],
-    output_config: { effort: "low", format: betaZodOutputFormat(LlmDraftsSchema) },
-  });
+  const response = await withUsage(onUsage, () =>
+    client.beta.messages.parse({
+      model,
+      // If the model declines, the API retries on a fallback model it picks by refusal category.
+      betas: ["server-side-fallback-2026-07-01"],
+      fallbacks: "default",
+      max_tokens: 4000,
+      // Stable prefix first (system + categories) so prompt caching can reuse it across requests.
+      system: [
+        {
+          type: "text",
+          text: `${SYSTEM_PROMPT}\n\nCategory keys:\n${categoryList}`,
+          cache_control: { type: "ephemeral" },
+        },
+      ],
+      messages: [{ role: "user", content: `Today (Asia/Dhaka): ${today}\n\nNote:\n${maskPhone(text)}` }],
+      output_config: { effort: "low", format: betaZodOutputFormat(LlmDraftsSchema) },
+    }),
+  );
 
   if (response.stop_reason === "refusal" || response.stop_reason === "max_tokens") {
     throw new AiUnavailableError(`AI stopped with ${response.stop_reason}`);

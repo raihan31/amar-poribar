@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CATEGORY_ICON_IDS } from "./icons.js";
 
 export const ACCOUNT_TYPES = ["cash", "bkash", "nagad", "rocket", "upay", "bank", "card", "other"] as const;
 export const AccountTypeSchema = z.enum(ACCOUNT_TYPES);
@@ -64,21 +65,33 @@ export const AmountPaisaSchema = z.number().int().positive().max(MAX_AMOUNT_PAIS
 
 export const MonthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Expected YYYY-MM");
 
-export const CreateTransactionSchema = z.object({
-  id: z.uuid().optional(),
-  type: TransactionTypeSchema,
-  amountPaisa: AmountPaisaSchema,
-  feePaisa: z.number().int().min(0).default(0),
-  occurredAt: z.iso.datetime({ offset: true }),
-  categoryId: z.uuid().nullable().optional(),
-  accountId: z.uuid().nullable().optional(),
-  note: z.string().max(500).optional(),
-  counterparty: z.string().max(120).optional(),
-  trxId: z.string().max(40).optional(),
-  source: TransactionSourceSchema.default("manual"),
-  aiConfidence: z.number().min(0).max(1).optional(),
-  isPrivate: z.boolean().default(false),
-});
+/** A transfer needs a destination different from its source; every other type has none (T-LED-08). */
+const transferShapeOk = (v: { type: string; accountId?: string | null; toAccountId?: string | null }) =>
+  v.type === "transfer" ? Boolean(v.toAccountId) && v.toAccountId !== v.accountId : !v.toAccountId;
+const TRANSFER_SHAPE_MESSAGE =
+  "A transfer needs a destination account different from the source; other types have none";
+
+export const CreateTransactionSchema = z
+  .object({
+    id: z.uuid().optional(),
+    type: TransactionTypeSchema,
+    amountPaisa: AmountPaisaSchema,
+    feePaisa: z.number().int().min(0).default(0),
+    occurredAt: z.iso.datetime({ offset: true }),
+    categoryId: z.uuid().nullable().optional(),
+    accountId: z.uuid().nullable().optional(),
+    /** Destination of a transfer (T-LED-08). */
+    toAccountId: z.uuid().nullable().optional(),
+    note: z.string().max(500).optional(),
+    counterparty: z.string().max(120).optional(),
+    trxId: z.string().max(40).optional(),
+    source: TransactionSourceSchema.default("manual"),
+    aiConfidence: z.number().min(0).max(1).optional(),
+    isPrivate: z.boolean().default(false),
+    /** Admins may record an entry on behalf of another member (T-LED-04); defaults to the caller. */
+    paidByUserId: z.uuid().optional(),
+  })
+  .refine(transferShapeOk, { message: TRANSFER_SHAPE_MESSAGE, path: ["toAccountId"] });
 export type CreateTransactionInput = z.infer<typeof CreateTransactionSchema>;
 
 /** Editable fields only; TrxID and source are fixed once recorded (FR-TXN-03, FR-TXN-04). */
@@ -90,13 +103,95 @@ export const UpdateTransactionSchema = z
     occurredAt: z.iso.datetime({ offset: true }),
     categoryId: z.uuid().nullable(),
     accountId: z.uuid().nullable(),
+    toAccountId: z.uuid().nullable(),
     note: z.string().max(500).nullable(),
     counterparty: z.string().max(120).nullable(),
     isPrivate: z.boolean(),
   })
   .partial()
-  .refine((v) => Object.keys(v).length > 0, "Nothing to update");
+  .refine((v) => Object.keys(v).length > 0, "Nothing to update")
+  // Only what is visible in the body can be checked here; the service checks the merged row.
+  .refine((v) => !v.toAccountId || (v.toAccountId !== v.accountId && v.type !== "expense" && v.type !== "income"), {
+    message: TRANSFER_SHAPE_MESSAGE,
+    path: ["toAccountId"],
+  });
 export type UpdateTransactionInput = z.infer<typeof UpdateTransactionSchema>;
+
+/** Longest range a list may cover, in calendar months (FR-TXN-02). */
+export const MAX_LIST_RANGE_MONTHS = 24;
+const DaySchema = z.iso.date();
+
+/** Query of `GET /v1/families/:id/transactions` (T-LED-05). `from`/`to` are Asia/Dhaka days, both inclusive. */
+export const ListTransactionsQuerySchema = z
+  .object({
+    month: MonthSchema.optional(),
+    from: DaySchema.optional(),
+    to: DaySchema.optional(),
+    categoryId: z.uuid().optional(),
+    memberId: z.uuid().optional(),
+    accountId: z.uuid().optional(),
+    type: TransactionTypeSchema.optional(),
+    source: TransactionSourceSchema.optional(),
+    q: z.string().trim().max(50).optional(),
+    limit: z.coerce.number().int().min(1).max(100).default(50),
+    cursor: z.string().min(1).max(300).optional(),
+  })
+  .superRefine((v, ctx) => {
+    if (v.month && (v.from || v.to)) ctx.addIssue({ code: "custom", message: "Use month or from/to, not both" });
+    if (v.from && v.to) {
+      if (v.to < v.from) ctx.addIssue({ code: "custom", message: "to is before from", path: ["to"] });
+      const limit = new Date(`${v.from}T00:00:00Z`);
+      limit.setUTCMonth(limit.getUTCMonth() + MAX_LIST_RANGE_MONTHS);
+      if (new Date(`${v.to}T00:00:00Z`) >= limit)
+        ctx.addIssue({ code: "custom", message: `Range is longer than ${MAX_LIST_RANGE_MONTHS} months`, path: ["to"] });
+    }
+  });
+export type ListTransactionsQuery = z.infer<typeof ListTransactionsQuerySchema>;
+
+export const TransactionListItemSchema = z.object({
+  id: z.uuid(),
+  type: TransactionTypeSchema,
+  amountPaisa: z.number().int(),
+  feePaisa: z.number().int(),
+  occurredAt: z.string(),
+  /** `YYYY-MM-DD` in Asia/Dhaka, for grouping by day. */
+  dayKey: z.string(),
+  categoryId: z.uuid().nullable(),
+  categoryNameBn: z.string().nullable(),
+  categoryNameEn: z.string().nullable(),
+  accountId: z.uuid().nullable(),
+  accountName: z.string().nullable(),
+  paidByUserId: z.uuid().nullable(),
+  paidByName: z.string().nullable(),
+  createdBy: z.uuid(),
+  note: z.string().nullable(),
+  counterparty: z.string().nullable(),
+  source: TransactionSourceSchema,
+  isPrivate: z.boolean(),
+  isMine: z.boolean(),
+  hasAttachment: z.boolean(),
+});
+export type TransactionListItem = z.infer<typeof TransactionListItemSchema>;
+
+/** One transaction for the detail screen (FR-TXN-10): the list item plus what only the detail needs. */
+export const TransactionDetailSchema = TransactionListItemSchema.extend({
+  trxId: z.string().nullable(),
+  aiConfidence: z.number().nullable(),
+  splitGroupId: z.uuid().nullable(),
+  toAccountId: z.uuid().nullable(),
+  attachmentUrl: z.string().nullable(),
+  canEdit: z.boolean(),
+  canDelete: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+export type TransactionDetail = z.infer<typeof TransactionDetailSchema>;
+
+export const TransactionPageSchema = z.object({
+  items: z.array(TransactionListItemSchema),
+  nextCursor: z.string().nullable(),
+});
+export type TransactionPage = z.infer<typeof TransactionPageSchema>;
 
 /** A transaction proposed by the SMS parser or the AI, awaiting user confirmation (SRS FR-AI-05). */
 export const TransactionDraftSchema = z.object({
@@ -124,6 +219,8 @@ export type ParseRequest = z.infer<typeof ParseRequestSchema>;
 export const ParseResponseSchema = z.object({
   drafts: z.array(TransactionDraftSchema),
   usedAi: z.boolean(),
+  /** True when AI was skipped only because the family's monthly quota is used up (FR-AI-12). */
+  quotaExhausted: z.boolean().optional(),
 });
 export type ParseResponse = z.infer<typeof ParseResponseSchema>;
 
@@ -156,7 +253,7 @@ export const CreateCategorySchema = z.object({
   kind: z.enum(["expense", "income"]),
   nameEn: z.string().min(1).max(60),
   nameBn: z.string().min(1).max(60),
-  icon: z.string().max(16).optional(),
+  icon: z.enum(CATEGORY_ICON_IDS).optional(),
 });
 export type CreateCategoryInput = z.infer<typeof CreateCategorySchema>;
 
@@ -164,7 +261,7 @@ export const UpdateCategorySchema = z
   .object({
     nameEn: z.string().min(1).max(60),
     nameBn: z.string().min(1).max(60),
-    icon: z.string().max(16).nullable(),
+    icon: z.enum(CATEGORY_ICON_IDS).nullable(),
     isHidden: z.boolean(),
   })
   .partial()
@@ -293,6 +390,8 @@ export const SyncTransactionSchema = z.object({
   occurredAt: z.iso.datetime({ offset: true }),
   categoryId: z.uuid().nullable().optional(),
   accountId: z.uuid().nullable().optional(),
+  /** Optional so existing mobile builds keep working (T-LED-08). */
+  toAccountId: z.uuid().nullable().optional(),
   note: z.string().max(500).nullable().optional(),
   counterparty: z.string().max(120).nullable().optional(),
   trxId: z.string().max(40).nullable().optional(),

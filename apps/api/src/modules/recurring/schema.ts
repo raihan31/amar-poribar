@@ -12,7 +12,7 @@ export const recurringTemplates = recurringSchema.table("recurring_templates", {
     .notNull()
     .default("expense"),
   amountPaisa: bigint("amount_paisa", { mode: "number" }).notNull(),
-  // ledger.categories.id and ledger.accounts.id, checked through `ledger.assertOwnedRefs`
+  // ledger.categories.id and ledger.accounts.id, checked through `ledger.assertRefs`
   categoryId: uuid("category_id"),
   accountId: uuid("account_id"),
   dayOfMonth: integer("day_of_month").notNull(),

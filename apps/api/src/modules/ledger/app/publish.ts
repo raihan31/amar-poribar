@@ -1,23 +1,57 @@
 import type { EventBus, Tx } from "../../../platform/events/bus.js";
+import type { TransactionBefore, TransactionCreatedV1 } from "../events.js";
 import type { Transaction } from "../infra/transactions.repo.js";
 
-type Name = "ledger.TransactionCreated.v1" | "ledger.TransactionUpdated.v1" | "ledger.TransactionDeleted.v1";
+/** Never includes `counterparty` or `trxId` (T-LED-04). */
+function payloadOf(row: Transaction): TransactionCreatedV1 {
+  return {
+    familyId: row.familyId,
+    transactionId: row.id,
+    type: row.type,
+    amountPaisa: row.amountPaisa,
+    feePaisa: row.feePaisa,
+    categoryId: row.categoryId,
+    accountId: row.accountId,
+    occurredAt: row.occurredAt.toISOString(),
+    isPrivate: row.isPrivate,
+    createdBy: row.createdBy,
+    paidByUserId: row.paidByUserId,
+    source: row.source,
+    note: row.note,
+  };
+}
+
+function beforeOf(row: Transaction): TransactionBefore {
+  return {
+    type: row.type,
+    amountPaisa: row.amountPaisa,
+    feePaisa: row.feePaisa,
+    categoryId: row.categoryId,
+    occurredAt: row.occurredAt.toISOString(),
+    isPrivate: row.isPrivate,
+  };
+}
 
 /** Publish inside the writer's transaction, so the outbox row commits or rolls back with the change. */
-export function publishTransaction(bus: EventBus, tx: Tx, name: Name, row: Transaction): Promise<unknown> {
+export function publishCreated(bus: EventBus, tx: Tx, row: Transaction): Promise<unknown> {
+  return bus.publish(tx, "ledger.TransactionCreated.v1", payloadOf(row), { familyId: row.familyId });
+}
+
+export function publishUpdated(
+  bus: EventBus,
+  tx: Tx,
+  row: Transaction,
+  before: Transaction,
+  kind: "edit" | "restore" = "edit",
+): Promise<unknown> {
   return bus.publish(
     tx,
-    name,
-    {
-      familyId: row.familyId,
-      transactionId: row.id,
-      type: row.type,
-      amountPaisa: row.amountPaisa,
-      categoryId: row.categoryId,
-      occurredAt: row.occurredAt.toISOString(),
-      isPrivate: row.isPrivate,
-      createdBy: row.createdBy,
-    },
+    "ledger.TransactionUpdated.v1",
+    { ...payloadOf(row), kind, before: beforeOf(before) },
     { familyId: row.familyId },
   );
+}
+
+export function publishDeleted(bus: EventBus, tx: Tx, row: Transaction): Promise<unknown> {
+  return bus.publish(tx, "ledger.TransactionDeleted.v1", payloadOf(row), { familyId: row.familyId });
 }

@@ -1,8 +1,14 @@
 import 'package:amar_poribar/data/auth/token_store.dart';
 import 'package:amar_poribar/data/database/local_store.dart';
+import 'package:amar_poribar/features/budgets/data/budget_repository.dart';
+import 'package:amar_poribar/features/budgets/state/budget_providers.dart';
 import 'package:amar_poribar/features/family/data/fake_family_repository.dart';
 import 'package:amar_poribar/features/family/data/invite_repository.dart';
 import 'package:amar_poribar/features/family/state/family_providers.dart';
+import 'package:amar_poribar/features/home/data/home_repository.dart';
+import 'package:amar_poribar/features/home/state/home_providers.dart';
+import 'package:amar_poribar/features/notifications/data/inbox_repository.dart';
+import 'package:amar_poribar/features/notifications/state/inbox_providers.dart';
 import 'package:amar_poribar/presentation/providers/auth_provider.dart';
 import 'package:amar_poribar/presentation/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,5 +41,13 @@ List<Override> defaultFakes({
       myUserIdProvider.overrideWith((ref) async => FakeFamilyRepository.meId),
       inviteRepositoryProvider.overrideWithValue(FakeInviteRepository()),
       inviteClockProvider.overrideWithValue(() => DateTime.utc(2026, 11, 9, 4)),
+      // Home: no database streams in widget tests; a test that needs budgets overrides the last one
+      // with `topBudgetWarningProvider.overrideWith(realTopBudgetWarning)`.
+      homeRepositoryProvider.overrideWithValue(FakeHomeRepository()),
+      topBudgetWarningProvider.overrideWithValue(null),
+      inboxRepositoryProvider.overrideWithValue(FakeInboxRepository()),
+      budgetRepositoryProvider.overrideWithValue(FakeBudgetRepository()),
+      // Budgets: the app-wide spoken-alert listener opens a database stream; tests start it by hand.
+      spokenAlertWiringProvider.overrideWith((ref) {}),
       // <feature fakes go here>
     ];

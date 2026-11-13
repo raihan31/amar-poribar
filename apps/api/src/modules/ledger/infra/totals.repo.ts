@@ -1,7 +1,8 @@
-import { and, asc, desc, eq, gte, lt, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, lt, sql } from "drizzle-orm";
 import { accounts, categories, transactions } from "../schema.js";
 import type { Executor } from "./catalog.repo.js";
-import { visibleToCaller } from "./visibility.js";
+import type { Viewer } from "../domain/viewer.js";
+import { visibleTo } from "./visibility.js";
 
 export interface ExportRow {
   occurredAt: Date;
@@ -23,21 +24,43 @@ const inRange = (range: { start: Date; end: Date }) =>
   and(gte(transactions.occurredAt, range.start), lt(transactions.occurredAt, range.end));
 
 export const totalsRepo = {
+  /** Income and expense per Dhaka month and category key in one grouped query. */
+  async monthlySeries(x: Executor, familyId: string, viewer: Viewer, range: { start: Date; end: Date }) {
+    const ym = sql<string>`to_char(${transactions.occurredAt} at time zone 'Asia/Dhaka', 'YYYY-MM')`;
+    const rows = await x
+      .select({
+        month: ym,
+        type: transactions.type,
+        key: categories.key,
+        total: sql<string>`sum(${amountWithFee})`,
+      })
+      .from(transactions)
+      .leftJoin(categories, eq(categories.id, transactions.categoryId))
+      .where(and(visibleTo(familyId, viewer), inRange(range), inArray(transactions.type, ["income", "expense"])))
+      .groupBy(ym, transactions.type, categories.key);
+    return rows.map((r) => ({
+      month: r.month,
+      type: r.type as "income" | "expense",
+      key: r.key,
+      totalPaisa: Number(r.total),
+    }));
+  },
+
   async typeTotals(
     x: Executor,
     familyId: string,
-    userId: string,
+    viewer: Viewer,
     range: { start: Date; end: Date },
   ): Promise<{ type: string; total: number }[]> {
     const rows = await x
       .select({ type: transactions.type, total: sql<string>`coalesce(sum(${amountWithFee}), 0)` })
       .from(transactions)
-      .where(and(visibleToCaller(familyId, userId), inRange(range)))
+      .where(and(visibleTo(familyId, viewer), inRange(range)))
       .groupBy(transactions.type);
     return rows.map((r) => ({ type: r.type, total: Number(r.total) }));
   },
 
-  async expenseByCategory(x: Executor, familyId: string, userId: string, range: { start: Date; end: Date }) {
+  async expenseByCategory(x: Executor, familyId: string, viewer: Viewer, range: { start: Date; end: Date }) {
     const rows = await x
       .select({
         categoryId: transactions.categoryId,
@@ -47,23 +70,23 @@ export const totalsRepo = {
       })
       .from(transactions)
       .leftJoin(categories, eq(categories.id, transactions.categoryId))
-      .where(and(visibleToCaller(familyId, userId), inRange(range), eq(transactions.type, "expense")))
+      .where(and(visibleTo(familyId, viewer), inRange(range), eq(transactions.type, "expense")))
       .groupBy(transactions.categoryId, categories.nameBn, categories.nameEn)
       .orderBy(sql`4 desc`);
     return rows.map((r) => ({ ...r, totalPaisa: Number(r.total) }));
   },
 
-  async expenseByPayer(x: Executor, familyId: string, userId: string, range: { start: Date; end: Date }) {
+  async expenseByPayer(x: Executor, familyId: string, viewer: Viewer, range: { start: Date; end: Date }) {
     const rows = await x
       .select({ id: transactions.paidByUserId, total: sql<string>`sum(${amountWithFee})` })
       .from(transactions)
-      .where(and(visibleToCaller(familyId, userId), inRange(range), eq(transactions.type, "expense")))
+      .where(and(visibleTo(familyId, viewer), inRange(range), eq(transactions.type, "expense")))
       .groupBy(transactions.paidByUserId)
       .orderBy(sql`2 desc`);
     return rows.map((r) => ({ id: r.id, totalPaisa: Number(r.total) }));
   },
 
-  async expenseByAccount(x: Executor, familyId: string, userId: string, range: { start: Date; end: Date }) {
+  async expenseByAccount(x: Executor, familyId: string, viewer: Viewer, range: { start: Date; end: Date }) {
     const rows = await x
       .select({
         id: transactions.accountId,
@@ -72,30 +95,17 @@ export const totalsRepo = {
       })
       .from(transactions)
       .leftJoin(accounts, eq(accounts.id, transactions.accountId))
-      .where(and(visibleToCaller(familyId, userId), inRange(range), eq(transactions.type, "expense")))
+      .where(and(visibleTo(familyId, viewer), inRange(range), eq(transactions.type, "expense")))
       .groupBy(transactions.accountId, accounts.name)
       .orderBy(sql`3 desc`);
     return rows.map((r) => ({ id: r.id, name: r.name, totalPaisa: Number(r.total) }));
-  },
-
-  async expenseTotalBetween(
-    x: Executor,
-    familyId: string,
-    userId: string,
-    range: { start: Date; end: Date },
-  ): Promise<number> {
-    const [row] = await x
-      .select({ total: sql<string>`coalesce(sum(${amountWithFee}), 0)` })
-      .from(transactions)
-      .where(and(visibleToCaller(familyId, userId), inRange(range), eq(transactions.type, "expense")));
-    return Number(row?.total ?? 0);
   },
 
   /** Newest first, at most `limit` visible rows in the range, with category names (Ask tool). */
   async listWithCategory(
     x: Executor,
     familyId: string,
-    userId: string,
+    viewer: Viewer,
     range: { start: Date; end: Date },
     limit: number,
   ) {
@@ -103,7 +113,7 @@ export const totalsRepo = {
       .select({ t: transactions, nameEn: categories.nameEn, nameBn: categories.nameBn })
       .from(transactions)
       .leftJoin(categories, eq(categories.id, transactions.categoryId))
-      .where(and(visibleToCaller(familyId, userId), inRange(range)))
+      .where(and(visibleTo(familyId, viewer), inRange(range)))
       .orderBy(desc(transactions.occurredAt))
       .limit(limit);
   },
@@ -112,7 +122,7 @@ export const totalsRepo = {
   async *exportRows(
     x: Executor,
     familyId: string,
-    userId: string,
+    viewer: Viewer,
     range: { start: Date; end: Date },
   ): AsyncGenerator<ExportRow> {
     for (let offset = 0; ; offset += EXPORT_PAGE) {
@@ -126,7 +136,7 @@ export const totalsRepo = {
         .from(transactions)
         .leftJoin(categories, eq(categories.id, transactions.categoryId))
         .leftJoin(accounts, eq(accounts.id, transactions.accountId))
-        .where(and(visibleToCaller(familyId, userId), inRange(range)))
+        .where(and(visibleTo(familyId, viewer), inRange(range)))
         .orderBy(asc(transactions.occurredAt), asc(transactions.id))
         .limit(EXPORT_PAGE)
         .offset(offset);
@@ -149,8 +159,8 @@ export const totalsRepo = {
   },
 
   /** Income in the `remittance` category and all spending, per Dhaka month (BR-13). */
-  async remittanceAndSpend(x: Executor, familyId: string, userId: string, range: { start: Date; end: Date }) {
-    const visible = and(visibleToCaller(familyId, userId), inRange(range));
+  async remittanceAndSpend(x: Executor, familyId: string, viewer: Viewer, range: { start: Date; end: Date }) {
+    const visible = and(visibleTo(familyId, viewer), inRange(range));
     const ym = sql<string>`to_char(${transactions.occurredAt} at time zone 'Asia/Dhaka', 'YYYY-MM')`;
     const remitted = await x
       .select({ month: ym, total: sql<string>`sum(${transactions.amountPaisa})` })

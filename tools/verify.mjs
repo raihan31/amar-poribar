@@ -42,10 +42,10 @@ function ac(from, to) {
 const ADDED = {
   m0: M0,
   m1: ["pnpm mobile:analyze", "pnpm mobile:test"],
-  m2: [ac(1, 14)],
+  m2: [ac(1, 14), "pnpm verify:web"],
   m3: [ac(15, 22)],
   m4: [ac(23, 26)],
-  m5: [ac(27, 31)],
+  m5: [ac(27, 31), "pnpm verify:admin"],
   m6: [ac(32, 34)],
   m7: [ac(35, 38)],
   m8: [ac(39, 41)],

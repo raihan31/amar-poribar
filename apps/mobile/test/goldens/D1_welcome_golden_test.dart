@@ -5,7 +5,7 @@ import 'package:amar_poribar/features/onboarding/ui/welcome_screen.dart';
 import 'golden_config.dart';
 
 void main() {
-  goldenScreen('D1_welcome', const WelcomeScreen());
+  goldenScreen('D1_welcome', const WelcomeScreen(), acTag: 'AC-26');
   goldenScreen(
     'D1_welcome_simple',
     const WelcomeScreen(),

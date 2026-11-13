@@ -33,7 +33,7 @@ void main() {
     );
     await tester.pumpWidget(app(store!));
     await tester.pumpAndSettle();
-    expect(find.text('সেটিংস'), findsOneWidget);
+    expect(find.text('সেটিং'), findsOneWidget);
 
     final container = ProviderScope.containerOf(
       tester.element(find.byType(_Probe)),

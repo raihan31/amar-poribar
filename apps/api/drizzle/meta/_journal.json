@@ -99,6 +99,69 @@
       "when": 1794383465315,
       "tag": "0013_small_shard",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794386197130,
+      "tag": "0014_ledger_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1794387299528,
+      "tag": "0015_billing_plans",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1794388415479,
+      "tag": "0016_billing_family_overrides",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1794393526601,
+      "tag": "0017_thin_jetstream",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794562935047,
+      "tag": "0018_ai_usage_features",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794567571758,
+      "tag": "0019_handy_praxagora",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794570109864,
+      "tag": "0020_category_icon_ids",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1794570630465,
+      "tag": "0021_budget_source",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1794572377655,
+      "tag": "0022_account_transfers",
+      "breakpoints": true
     }
   ]
 }

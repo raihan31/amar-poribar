@@ -13,15 +13,16 @@
     "test:watch": "vitest --watch",
     "gen:api": "openapi-typescript ../api/openapi.json -o lib/api/schema.d.ts",
     "gen:api:check": "openapi-typescript ../api/openapi.json -o node_modules/.cache/schema.check.d.ts && diff node_modules/.cache/schema.check.d.ts lib/api/schema.d.ts",
-    "e2e": "playwright test",
-    "e2e:mock": "MOCK=1 playwright test"
+    "e2e": "playwright test -c e2e/playwright.config.ts",
+    "e2e:mock": "AP_MOCK=1 playwright test -c e2e/playwright.config.ts --grep @mock",
+    "e2e:snapshots:update": "playwright test -c e2e/playwright.config.ts --update-snapshots"
   },
   "dependencies": {
     "@amar-poribar/shared": "workspace:*",
     "@hookform/resolvers": "^3.10.0",
     "@tanstack/react-query": "^5.107.1",
     "firebase": "^11.10.0",
-    "next": "^16.4.0",
+    "next": "~16.4.6",
     "openapi-fetch": "^0.13.8",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
@@ -29,6 +30,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@amar-poribar/fixtures": "workspace:*",
     "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "^1.65.0",
     "@testing-library/jest-dom": "^6.9.1",

@@ -150,3 +150,13 @@ String draftToSpeech({
   }
   return '$categoryName খাতে $amount $verb। ঠিক আছে?';
 }
+
+String _plain(String w) => w.replaceAll('ঁ', '');
+
+final Map<String, int> _wordValues = {
+  for (var i = 0; i < _under100.length; i++) _plain(_under100[i]): i,
+};
+
+/// Value of a single Bangla number word from 0 to 99 (e.g. "পঞ্চাশ" -> 50), or null.
+/// Spelling with or without the chandrabindu is accepted, because recognisers differ.
+int? banglaWordValue(String word) => _wordValues[_plain(word)];

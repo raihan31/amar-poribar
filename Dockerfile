@@ -17,12 +17,14 @@ COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
 COPY apps/admin/package.json apps/admin/
 COPY tools/fakes/package.json tools/fakes/
+COPY tools/fixtures/package.json tools/fixtures/
 RUN --mount=type=cache,target=/pnpm/store pnpm install --frozen-lockfile
 COPY packages packages
 COPY apps/api apps/api
 COPY apps/web apps/web
 COPY apps/admin apps/admin
 COPY tools/fakes tools/fakes
+COPY tools/fixtures tools/fixtures
 RUN pnpm build
 
 FROM build AS api
@@ -44,12 +46,11 @@ WORKDIR /repo/apps/web
 EXPOSE 3000
 CMD ["pnpm", "start"]
 
-# Placeholder server until T-ADMUI-01 replaces apps/admin with the Next standalone build.
 FROM build AS admin
-ENV NODE_ENV=production PORT=3100
+ENV NODE_ENV=production
 WORKDIR /repo/apps/admin
 EXPOSE 3100
-CMD ["node", "server.mjs"]
+CMD ["pnpm", "start"]
 
 FROM build AS fakes
 ENV NODE_ENV=production

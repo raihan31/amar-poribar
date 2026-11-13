@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../features/transactions/domain/txn_query.dart';
 import '../sync/hlc.dart';
 import 'database.dart';
+import 'tables.dart' show Transactions;
 
 const _uuid = Uuid();
 const _nodeKey = 'node_id';
@@ -13,6 +15,22 @@ const _seqKey = 'seq';
 
 /// A transaction as exchanged with peers and the server (JSON field names match the API).
 typedef SyncRow = Map<String, dynamic>;
+
+/// A page of the transaction list; [nextCursor] is null on the last page.
+class TxnPage {
+  final List<Transaction> items;
+  final String? nextCursor;
+  const TxnPage(this.items, this.nextCursor);
+}
+
+/// Thrown when a deleted entry is 30 days old or more and can no longer be restored.
+class RestoreWindowClosed implements Exception {
+  const RestoreWindowClosed();
+  @override
+  String toString() => 'RestoreWindowClosed';
+}
+
+const tombstoneWindow = Duration(days: 30);
 
 /// A page of local changes. [lastSeq] is the position to continue from.
 class ChangeBatch {
@@ -116,8 +134,14 @@ class LocalStore {
     String? trxId,
     String source = 'manual',
     bool isPrivate = false,
+    String? familyId,
+    String? splitGroupId,
+    String? attachmentKey,
+    String? paidByUserId,
+    String? createdBy,
   }) async {
     final hlc = await _tick();
+    final family = familyId ?? await getMeta('active_family') ?? '';
     final seq = await _nextSeq();
     final rowId = id ?? _uuid.v4();
     await db.into(db.transactions).insert(
@@ -134,6 +158,11 @@ class LocalStore {
             trxId: Value(trxId),
             source: Value(source),
             isPrivate: Value(isPrivate),
+            familyId: Value(family),
+            splitGroupId: Value(splitGroupId),
+            attachmentKey: Value(attachmentKey),
+            paidByUserId: Value(paidByUserId),
+            createdBy: Value(createdBy),
             hlc: hlc.toString(),
             localSeq: Value(seq),
           ),
@@ -146,6 +175,12 @@ class LocalStore {
     int? amountPaisa,
     String? categoryId,
     String? note,
+    String? type,
+    int? feePaisa,
+    String? accountId,
+    DateTime? occurredAt,
+    bool? isPrivate,
+    String? paidByUserId,
   }) async {
     final hlc = await _tick();
     final seq = await _nextSeq();
@@ -157,6 +192,15 @@ class LocalStore {
         categoryId:
             categoryId == null ? const Value.absent() : Value(categoryId),
         note: note == null ? const Value.absent() : Value(note),
+        type: type == null ? const Value.absent() : Value(type),
+        feePaisa: feePaisa == null ? const Value.absent() : Value(feePaisa),
+        accountId: accountId == null ? const Value.absent() : Value(accountId),
+        occurredAt: occurredAt == null
+            ? const Value.absent()
+            : Value(occurredAt.toUtc().toIso8601String()),
+        isPrivate: isPrivate == null ? const Value.absent() : Value(isPrivate),
+        paidByUserId:
+            paidByUserId == null ? const Value.absent() : Value(paidByUserId),
         hlc: Value(hlc.toString()),
       ),
     );
@@ -165,12 +209,49 @@ class LocalStore {
   /// Soft delete: the row stays as a tombstone so the delete reaches other devices.
   Future<void> deleteTransaction(String id) async {
     final hlc = await _tick();
+    final seq = await _nextSeq();
     await (db.update(db.transactions)..where((t) => t.id.equals(id))).write(
       TransactionsCompanion(
         deletedAt: Value(_now().toUtc().toIso8601String()),
         hlc: Value(hlc.toString()),
+        localSeq: Value(seq),
       ),
     );
+  }
+
+  /// Undo a delete: clears the tombstone with a new HLC and sequence number. Only possible for
+  /// [tombstoneWindow] after the delete; otherwise throws [RestoreWindowClosed].
+  Future<void> restoreTransaction(String id) async {
+    final row = await (db.select(db.transactions)
+          ..where((t) => t.id.equals(id)))
+        .getSingleOrNull();
+    if (row == null || row.deletedAt == null) return;
+    final age = _now().difference(DateTime.parse(row.deletedAt!));
+    if (age >= tombstoneWindow) throw const RestoreWindowClosed();
+    final hlc = await _tick();
+    final seq = await _nextSeq();
+    await (db.update(db.transactions)..where((t) => t.id.equals(id))).write(
+      TransactionsCompanion(
+        deletedAt: const Value(null),
+        hlc: Value(hlc.toString()),
+        localSeq: Value(seq),
+      ),
+    );
+  }
+
+  /// Removes tombstones deleted more than 30 days ago that the server already has (pushed).
+  /// A tombstone not yet pushed is never removed. Returns how many rows went.
+  Future<int> purgeOldTombstones() async {
+    final pushed = int.parse(await getMeta('server_pushed_seq') ?? '0');
+    final cutoff = _now().subtract(tombstoneWindow).toUtc().toIso8601String();
+    return (db.delete(db.transactions)
+          ..where(
+            (t) =>
+                t.deletedAt.isNotNull() &
+                t.deletedAt.isSmallerThanValue(cutoff) &
+                t.localSeq.isSmallerOrEqualValue(pushed),
+          ))
+        .go();
   }
 
   // ---- reads --------------------------------------------------------------------------------
@@ -181,6 +262,75 @@ class LocalStore {
             ..orderBy([(t) => OrderingTerm.desc(t.occurredAt)])
             ..limit(limit))
           .get();
+
+  Future<Transaction?> byId(String id) => (db.select(db.transactions)
+        ..where((t) => t.id.equals(id) & t.deletedAt.isNull()))
+      .getSingleOrNull();
+
+  Expression<bool> _filter(Transactions t, TxnQuery q) {
+    Expression<bool> w = t.deletedAt.isNull() & t.familyId.equals(q.familyId);
+    final r = q.monthRange;
+    if (r != null) {
+      w = w &
+          t.occurredAt.isBiggerOrEqualValue(r.start.toIso8601String()) &
+          t.occurredAt.isSmallerThanValue(r.end.toIso8601String());
+    }
+    if (q.categoryId != null) w = w & t.categoryId.equals(q.categoryId!);
+    if (q.paidByUserId != null) w = w & t.paidByUserId.equals(q.paidByUserId!);
+    if (q.accountId != null) w = w & t.accountId.equals(q.accountId!);
+    if (q.type != null) w = w & t.type.equals(q.type!);
+    if (q.source != null) w = w & t.source.equals(q.source!);
+    final text = q.text?.trim();
+    if (text != null && text.isNotEmpty) {
+      final like = '%$text%';
+      w = w & (t.note.like(like) | t.counterparty.like(like));
+    }
+    final me = q.viewerUserId;
+    w = w &
+        (me == null
+            ? t.isPrivate.equals(false)
+            : t.isPrivate.equals(false) | t.createdBy.equals(me));
+    return w;
+  }
+
+  /// One page of the list, newest first (`occurredAt DESC, id DESC`). The cursor is base64 of `occurredAt|id`.
+  Future<TxnPage> page(TxnQuery q, {String? cursor, int limit = 50}) async {
+    final sel = db.select(db.transactions)
+      ..orderBy([
+        (t) => OrderingTerm.desc(t.occurredAt),
+        (t) => OrderingTerm.desc(t.id),
+      ])
+      ..limit(limit + 1);
+    sel.where((t) {
+      var w = _filter(t, q);
+      if (cursor != null) {
+        final raw = utf8.decode(base64Url.decode(cursor));
+        final i = raw.lastIndexOf('|');
+        final at = raw.substring(0, i);
+        final id = raw.substring(i + 1);
+        w = w &
+            (t.occurredAt.isSmallerThanValue(at) |
+                (t.occurredAt.equals(at) & t.id.isSmallerThanValue(id)));
+      }
+      return w;
+    });
+    final rows = await sel.get();
+    final more = rows.length > limit;
+    final items = more ? rows.sublist(0, limit) : rows;
+    final next = more
+        ? base64Url
+            .encode(utf8.encode('${items.last.occurredAt}|${items.last.id}'))
+        : null;
+    return TxnPage(items, next);
+  }
+
+  Stream<List<Transaction>> watch(TxnQuery q) => (db.select(db.transactions)
+        ..where((t) => _filter(t, q))
+        ..orderBy([
+          (t) => OrderingTerm.desc(t.occurredAt),
+          (t) => OrderingTerm.desc(t.id),
+        ]))
+      .watch();
 
   /// Income and expense totals in paisa for a UTC month range [start, end).
   Future<({int incomePaisa, int expensePaisa})> totals(
@@ -473,6 +623,20 @@ class LocalStore {
     return rows.isEmpty ? null : rows.first.id;
   }
 
+  /// True when a live (not deleted) entry of [familyId] already carries this MFS TrxID (AC-04).
+  Future<bool> existsTrxId(String familyId, String trxId) async {
+    final rows = await (db.select(db.transactions)
+          ..where(
+            (t) =>
+                t.familyId.equals(familyId) &
+                t.trxId.equals(trxId) &
+                t.deletedAt.isNull(),
+          )
+          ..limit(1))
+        .get();
+    return rows.isNotEmpty;
+  }
+
   Future<List<CachedCategory>> categories() =>
       db.select(db.cachedCategories).get();
   Future<List<CachedAccount>> accounts() => db.select(db.cachedAccounts).get();
@@ -493,6 +657,10 @@ SyncRow rowToJson(Transaction t) => {
       'isPrivate': t.isPrivate,
       'deletedAt': t.deletedAt,
       'hlc': t.hlc,
+      'splitGroupId': t.splitGroupId,
+      'attachmentKey': t.attachmentKey,
+      'paidByUserId': t.paidByUserId,
+      'createdBy': t.createdBy,
     };
 
 TransactionsCompanion jsonToCompanion(SyncRow j, int seq) =>
@@ -512,4 +680,8 @@ TransactionsCompanion jsonToCompanion(SyncRow j, int seq) =>
       isPrivate: Value((j['isPrivate'] ?? false) as bool),
       deletedAt: Value(j['deletedAt'] as String?),
       hlc: Value(j['hlc'] as String),
+      splitGroupId: Value(j['splitGroupId'] as String?),
+      attachmentKey: Value(j['attachmentKey'] as String?),
+      paidByUserId: Value(j['paidByUserId'] as String?),
+      createdBy: Value(j['createdBy'] as String?),
     );

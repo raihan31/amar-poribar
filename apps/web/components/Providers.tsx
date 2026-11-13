@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
+import { OfflineBanner } from "@/components/shell/OfflineBanner";
+import { registerServiceWorker } from "@/lib/pwa/register";
 import { ApiProblem, notifySessionExpired, onSessionExpired } from "@/lib/api/errors";
 
 export function makeQueryClient(): QueryClient {
@@ -23,9 +25,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(makeQueryClient);
   const router = useRouter();
   const pathname = usePathname();
+  useEffect(() => registerServiceWorker(), []);
   useEffect(() => {
     onSessionExpired(() => router.replace(`/session-expired?next=${encodeURIComponent(pathname ?? "/")}`));
     return () => onSessionExpired(null);
   }, [router, pathname]);
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <OfflineBanner />
+      {children}
+    </QueryClientProvider>
+  );
 }
