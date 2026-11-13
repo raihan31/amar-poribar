@@ -206,7 +206,10 @@ describe("ledger routes (db)", () => {
         db,
         bus,
         facades: {
-          families: { requireRole: async () => ({ role: "owner", family: { id: "f", name: "f", role: "owner" } }) },
+          families: {
+            requireRole: async () => ({ role: "owner", family: { id: "f", name: "f", role: "owner" } }),
+            bindActivityPort: () => undefined,
+          },
         },
       } as unknown as ModuleContext;
       await ledgerModule.register(app, ctx);
