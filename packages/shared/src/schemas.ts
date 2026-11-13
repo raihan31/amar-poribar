@@ -100,6 +100,68 @@ export const UpdateTransactionSchema = z
   .refine((v) => Object.keys(v).length > 0, "Nothing to update");
 export type UpdateTransactionInput = z.infer<typeof UpdateTransactionSchema>;
 
+/** Longest range a list may cover, in calendar months (FR-TXN-02). */
+export const MAX_LIST_RANGE_MONTHS = 24;
+const DaySchema = z.iso.date();
+
+/** Query of `GET /v1/families/:id/transactions` (T-LED-05). `from`/`to` are Asia/Dhaka days, both inclusive. */
+export const ListTransactionsQuerySchema = z
+  .object({
+    month: MonthSchema.optional(),
+    from: DaySchema.optional(),
+    to: DaySchema.optional(),
+    categoryId: z.uuid().optional(),
+    memberId: z.uuid().optional(),
+    accountId: z.uuid().optional(),
+    type: TransactionTypeSchema.optional(),
+    source: TransactionSourceSchema.optional(),
+    q: z.string().trim().max(50).optional(),
+    limit: z.coerce.number().int().min(1).max(100).default(50),
+    cursor: z.string().min(1).max(300).optional(),
+  })
+  .superRefine((v, ctx) => {
+    if (v.month && (v.from || v.to)) ctx.addIssue({ code: "custom", message: "Use month or from/to, not both" });
+    if (v.from && v.to) {
+      if (v.to < v.from) ctx.addIssue({ code: "custom", message: "to is before from", path: ["to"] });
+      const limit = new Date(`${v.from}T00:00:00Z`);
+      limit.setUTCMonth(limit.getUTCMonth() + MAX_LIST_RANGE_MONTHS);
+      if (new Date(`${v.to}T00:00:00Z`) >= limit)
+        ctx.addIssue({ code: "custom", message: `Range is longer than ${MAX_LIST_RANGE_MONTHS} months`, path: ["to"] });
+    }
+  });
+export type ListTransactionsQuery = z.infer<typeof ListTransactionsQuerySchema>;
+
+export const TransactionListItemSchema = z.object({
+  id: z.uuid(),
+  type: TransactionTypeSchema,
+  amountPaisa: z.number().int(),
+  feePaisa: z.number().int(),
+  occurredAt: z.string(),
+  /** `YYYY-MM-DD` in Asia/Dhaka, for grouping by day. */
+  dayKey: z.string(),
+  categoryId: z.uuid().nullable(),
+  categoryNameBn: z.string().nullable(),
+  categoryNameEn: z.string().nullable(),
+  accountId: z.uuid().nullable(),
+  accountName: z.string().nullable(),
+  paidByUserId: z.uuid().nullable(),
+  paidByName: z.string().nullable(),
+  createdBy: z.uuid(),
+  note: z.string().nullable(),
+  counterparty: z.string().nullable(),
+  source: TransactionSourceSchema,
+  isPrivate: z.boolean(),
+  isMine: z.boolean(),
+  hasAttachment: z.boolean(),
+});
+export type TransactionListItem = z.infer<typeof TransactionListItemSchema>;
+
+export const TransactionPageSchema = z.object({
+  items: z.array(TransactionListItemSchema),
+  nextCursor: z.string().nullable(),
+});
+export type TransactionPage = z.infer<typeof TransactionPageSchema>;
+
 /** A transaction proposed by the SMS parser or the AI, awaiting user confirmation (SRS FR-AI-05). */
 export const TransactionDraftSchema = z.object({
   type: TransactionTypeSchema,

@@ -111,7 +111,7 @@ describe("sync (e2e)", () => {
         (t) => t.id === s2 && t.deletedAt,
       ),
     ).toBe(true);
-    const list = (await e.call("GET", `/v1/families/${s.F}/transactions`, { token: s.A })).json;
+    const list = (await e.call("GET", `/v1/families/${s.F}/transactions`, { token: s.A })).json.items;
     expect(list.some((t: { id: string }) => t.id === s2)).toBe(false);
   });
 

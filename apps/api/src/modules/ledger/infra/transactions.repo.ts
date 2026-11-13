@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, gte, lt } from "drizzle-orm";
+import { and, asc, eq, gt } from "drizzle-orm";
 import type { PgInsertValue, PgUpdateSetSource } from "drizzle-orm/pg-core";
 import { transactions } from "../schema.js";
 import type { Executor } from "./catalog.repo.js";
@@ -10,18 +10,6 @@ export type NewTransaction = PgInsertValue<typeof transactions>;
 export type TransactionChanges = PgUpdateSetSource<typeof transactions>;
 
 export const transactionsRepo = {
-  /** Newest first, at most 200. TODO(P1): cursor pagination (FR-TXN-02, T-LED-01). */
-  list(x: Executor, familyId: string, userId: string, range?: { start: Date; end: Date }): Promise<Transaction[]> {
-    const conditions = [visibleTo(familyId, { userId })];
-    if (range) conditions.push(gte(transactions.occurredAt, range.start), lt(transactions.occurredAt, range.end));
-    return x
-      .select()
-      .from(transactions)
-      .where(and(...conditions))
-      .orderBy(desc(transactions.occurredAt))
-      .limit(200);
-  },
-
   async findVisible(x: Executor, familyId: string, userId: string, txnId: string): Promise<Transaction | null> {
     const [row] = await x
       .select()

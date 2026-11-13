@@ -137,8 +137,10 @@ describe("ledger routes (db)", () => {
       });
       const id = create.json<{ id: string }>().id;
       const url = `/v1/families/${familyId}/transactions`;
-      expect((await t.app.inject({ method: "GET", url, headers: t.as(owner) })).json<unknown[]>()).toHaveLength(1);
-      expect((await t.app.inject({ method: "GET", url, headers: t.as(member) })).json<unknown[]>()).toHaveLength(0);
+      const items = async (who: Tokens) =>
+        (await t.app.inject({ method: "GET", url, headers: t.as(who) })).json<{ items: unknown[] }>().items;
+      expect(await items(owner)).toHaveLength(1);
+      expect(await items(member)).toHaveLength(0);
       const edit = await t.app.inject({
         method: "PATCH",
         url: `${url}/${id}`,
