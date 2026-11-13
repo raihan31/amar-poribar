@@ -1,4 +1,5 @@
 import { http, HttpResponse, type HttpHandler } from "msw";
+import { familyFixture } from "../components/family/types";
 import { overviewFixture } from "../components/overview/types";
 import { demoStaff, privacyFixture } from "./fixtures";
 
@@ -34,6 +35,11 @@ export const handlers: HttpHandler[] = [
       chain: { ok: true, verifiedThrough: 214 },
     }),
   ),
+  http.get("*/admin/v1/families/:id", () => HttpResponse.json(familyFixture())),
+  http.post("*/admin/v1/families/:id/delete", () =>
+    HttpResponse.json({ ok: true, scheduledFor: "2026-12-13T00:00:00Z" }),
+  ),
+  http.post("*/admin/v1/families/:id/:action", () => HttpResponse.json({ ok: true })),
   http.get("*/admin/v1/me", () => HttpResponse.json(demoStaff())),
   http.get("*/admin/v1/overview", () => HttpResponse.json(overviewFixture)),
   http.get("*/admin/v1/privacy-requests", ({ request }) => {
