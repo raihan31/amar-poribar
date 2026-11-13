@@ -228,6 +228,17 @@ export const webBn = {
   "entry.form.keep": "রাখুন",
   "entry.form.queued": "জমা থাকল, ইন্টারনেট এলে যাবে",
   "entry.form.noAccount": "অ্যাকাউন্ট নেই",
+  "bud.title": "মাসের বাজেট",
+  "bud.carried": "{month} · গত মাসের বাজেট নিজে থেকেই চলে এসেছে",
+  "bud.ok": "ঠিক আছে",
+  "bud.warn": "{pct}% পার হয়েছে · সাবধান",
+  "bud.over": "বাজেট শেষ · {amount} বেশি",
+  "bud.buzz": "{name}কে কম্পন দিন",
+  "bud.festival": "{name} (উৎসবের বাজেট)",
+  "bud.add": "+ বাজেট দিন",
+  "bud.amountLabel": "{name}-এর সীমা (টাকা)",
+  "bud.say": "{name}, {spent} খরচ, সীমা {limit}। {status}।",
+  "bud.saveFailed": "সেভ হয়নি। আবার চেষ্টা করুন।",
 } as const;
 
 export type WebKey = keyof typeof webBn;
@@ -462,4 +473,15 @@ export const webEn: Record<WebKey, string> = {
   "entry.form.keep": "Save",
   "entry.form.queued": "Saved for later, it will go when the internet is back",
   "entry.form.noAccount": "No accounts yet",
+  "bud.title": "This month's budget",
+  "bud.carried": "{month} · last month's budget carried over automatically",
+  "bud.ok": "On track",
+  "bud.warn": "{pct}% used · be careful",
+  "bud.over": "Budget used up · {amount} over",
+  "bud.buzz": "Buzz {name}",
+  "bud.festival": "{name} (festival budget)",
+  "bud.add": "+ Set a budget",
+  "bud.amountLabel": "Limit for {name} (taka)",
+  "bud.say": "{name}, spent {spent}, limit {limit}. {status}.",
+  "bud.saveFailed": "Could not save. Please try again.",
 };

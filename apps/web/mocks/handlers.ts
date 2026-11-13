@@ -46,6 +46,7 @@ export const handlers: HttpHandler[] = [
   http.get(`${F}/accounts`, () => HttpResponse.json(demo.accounts)),
   http.get(`${F}/members`, () => HttpResponse.json(demo.members)),
   http.get(`${F}/budgets`, () => HttpResponse.json({ budgets: demo.budgets })),
+  http.get(`${F}/festival-budgets`, () => HttpResponse.json([])),
   http.get(`${F}/transactions`, () => HttpResponse.json({ items: demo.transactions.slice(0, 50), nextCursor: null })),
   http.get(`${F}/reports/summary`, ({ request }) => {
     const month = new URL(request.url).searchParams.get("month") ?? "2026-01";

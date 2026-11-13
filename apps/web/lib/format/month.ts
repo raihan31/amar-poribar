@@ -15,3 +15,11 @@ export function delta(now: number, before: number): { pct: number; dir: "up" | "
 export function monthLabel(month: string, locale: string): string {
   return new Date(`${month}-01T00:00:00+06:00`).toLocaleDateString(locale, { month: "long", year: "numeric" });
 }
+
+/** The current "YYYY-MM" in Asia/Dhaka. */
+export function currentMonth(now: number = Date.now()): string {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka", year: "numeric", month: "2-digit" })
+    .formatToParts(new Date(now))
+    .reduce<Record<string, string>>((acc, p) => ({ ...acc, [p.type]: p.value }), {});
+  return `${parts.year}-${parts.month}`;
+}
