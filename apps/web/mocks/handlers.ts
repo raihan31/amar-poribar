@@ -8,6 +8,9 @@ export function bindServer(s: { use: (...h: HttpHandler[]) => void }) {
 }
 
 const demo = demoFamily();
+/** Mock-mode state for delete / restore (txn id -> deleted at ms) and learned merchant rules. */
+const deletedTxns = new Map<string, number>();
+const rules = new Map<string, { id: string; pattern: string; categoryId: string }>();
 const F = `*/api/proxy/v1/families/:familyId`;
 
 /** One handler per route a screen uses; all answer from the deterministic demo family. */
@@ -48,6 +51,71 @@ export const handlers: HttpHandler[] = [
   http.get(`${F}/budgets`, () => HttpResponse.json({ budgets: demo.budgets })),
   http.get(`${F}/festival-budgets`, () => HttpResponse.json([])),
   http.get(`${F}/transactions`, () => HttpResponse.json({ items: demo.transactions.slice(0, 50), nextCursor: null })),
+  http.get(`${F}/transactions/:txnId`, ({ params }) => {
+    const id = String(params.txnId);
+    const x = demo.transactions.find((r) => r.id === id);
+    if (!x) return HttpResponse.json({ error: { code: "not_found", message: "Not found" } }, { status: 404 });
+    if (deletedTxns.has(id)) {
+      const restorableUntil = new Date(deletedTxns.get(id)! + 30 * 86_400_000).toISOString();
+      return HttpResponse.json(
+        { error: { code: "transaction_deleted", message: "Deleted", details: { restorableUntil } } },
+        { status: 410 },
+      );
+    }
+    const cat = demo.categories.find((c) => c.id === x.categoryId);
+    const acct = demo.accounts.find((a) => a.id === x.accountId);
+    const who = demo.members.find((m) => m.userId === x.paidByUserId);
+    return HttpResponse.json({
+      id,
+      type: x.kind,
+      amountPaisa: x.amountPaisa,
+      feePaisa: 0,
+      occurredAt: x.occurredAt,
+      dayKey: x.occurredAt.slice(0, 10),
+      categoryId: x.categoryId,
+      categoryNameBn: cat?.nameBn ?? null,
+      categoryNameEn: cat?.nameEn ?? null,
+      accountId: x.accountId,
+      accountName: acct?.name ?? null,
+      paidByUserId: x.paidByUserId,
+      paidByName: who?.name ?? null,
+      createdBy: x.paidByUserId,
+      note: x.note,
+      counterparty: null,
+      source: "manual",
+      isPrivate: false,
+      isMine: true,
+      hasAttachment: false,
+      trxId: null,
+      aiConfidence: null,
+      splitGroupId: null,
+      toAccountId: null,
+      attachmentUrl: null,
+      canEdit: true,
+      canDelete: true,
+      createdAt: x.occurredAt,
+      updatedAt: x.occurredAt,
+    });
+  }),
+  http.delete(`${F}/transactions/:txnId`, ({ params }) => {
+    deletedTxns.set(String(params.txnId), Date.now());
+    return new HttpResponse(null, { status: 204 });
+  }),
+  http.post(`${F}/transactions/:txnId/restore`, ({ params }) => {
+    deletedTxns.delete(String(params.txnId));
+    return HttpResponse.json({ id: params.txnId });
+  }),
+  http.get(`${F}/merchant-rules`, () => HttpResponse.json([...rules.values()])),
+  http.post(`${F}/merchant-rules`, async ({ request }) => {
+    const body = (await request.json()) as { pattern: string; categoryId: string };
+    const rule = { id: crypto.randomUUID(), ...body };
+    rules.set(rule.id, rule);
+    return HttpResponse.json(rule, { status: 201 });
+  }),
+  http.delete(`${F}/merchant-rules/:ruleId`, ({ params }) => {
+    rules.delete(String(params.ruleId));
+    return new HttpResponse(null, { status: 204 });
+  }),
   http.get(`${F}/reports/summary`, ({ request }) => {
     const month = new URL(request.url).searchParams.get("month") ?? "2026-01";
     const expense = demo.transactions.filter((t) => t.kind === "expense");
