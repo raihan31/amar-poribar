@@ -12,7 +12,9 @@ const root = fileURLToPath(new URL("./fixtures", import.meta.url));
 const tester = new RuleTester({
   languageOptions: {
     parser: tseslint.parser,
-    parserOptions: { project: "./tsconfig.json", tsconfigRootDir: root },
+    // CI=true makes typescript-estree use single-run mode, which builds a program without the
+    // default libs (Promise, Array unresolved). Opt out so the tests behave the same everywhere.
+    parserOptions: { project: "./tsconfig.json", tsconfigRootDir: root, disallowAutomaticSingleRunInference: true },
   },
 });
 const facade = `${root}/modules/billing/index.ts`;
