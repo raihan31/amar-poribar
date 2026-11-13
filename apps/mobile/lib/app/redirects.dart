@@ -56,7 +56,6 @@ class Routes {
 
   /// Temporary: the old screens, kept reachable until their own tasks land.
   static const transactions = '/transactions';
-  static const pendingSms = '/pending-sms';
 }
 
 /// `Meta('welcome_done')` is set. `main.dart` overrides this with the stored value.

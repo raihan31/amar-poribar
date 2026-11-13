@@ -27,6 +27,7 @@ import 'package:amar_poribar/features/onboarding/ui/consent_screen.dart';
 import 'package:amar_poribar/features/onboarding/ui/tutorial_screen.dart';
 import 'package:amar_poribar/features/onboarding/ui/welcome_screen.dart';
 import 'package:amar_poribar/features/settings/state/preferences_controller.dart';
+import 'package:amar_poribar/features/settings/ui/settings_screen.dart';
 import 'package:amar_poribar/features/summary/data/fake_summary_repository.dart';
 import 'package:amar_poribar/features/summary/state/summary_providers.dart';
 import 'package:amar_poribar/features/summary/ui/summary_screen.dart';
@@ -192,6 +193,16 @@ void registerAllScreens() {
       homeRepositoryProvider.overrideWithValue(FakeHomeRepository()),
     ],
   );
+  registerScreen(
+    'B6',
+    Routes.settings,
+    (c) => const SettingsScreen(),
+    needs: [
+      preferencesProvider.overrideWith(
+        (ref) => PreferencesController(ref, autoLoad: false),
+      ),
+    ],
+  );
 }
 
 /// Routes that exist in the app. Until the `Routes` table of T-MOB-13 lands
@@ -200,8 +211,6 @@ const List<String> kAllRoutes = [
   Routes.welcome,
   Routes.home,
   Routes.transactions,
-  Routes.pendingSms,
-  Routes.settings,
   Routes.login,
   Routes.consent,
   Routes.sessionExpired,
@@ -219,6 +228,4 @@ const List<String> kAllRoutes = [
 /// shrink: `registry_complete_test.dart` fails if a route is in neither place.
 const Set<String> kRoutesAwaitingRegistration = {
   Routes.transactions,
-  Routes.pendingSms,
-  Routes.settings,
 };

@@ -13,28 +13,30 @@ import '../state/preferences_controller.dart';
 
 const _nameMetaKey = 'profile_name';
 
+/// The part of the day for hour [h] (0-23): "ভোর", "সকাল", "রাত"...
+String dayPeriod(AppLocalizations l10n, int h) => h < 4
+    ? l10n.profile_periodSmallHours
+    : h < 6
+        ? l10n.profile_periodDawn
+        : h < 12
+            ? l10n.profile_periodMorning
+            : h < 15
+                ? l10n.profile_periodNoon
+                : h < 18
+                    ? l10n.profile_periodAfternoon
+                    : h < 20
+                        ? l10n.profile_periodEvening
+                        : l10n.profile_periodNight;
+
 /// `21:00` as words: "রাত ৯:০০" in the chosen numeral style (FR-NOT-02).
 String reminderWords(AppLocalizations l10n, String hhmm, NumeralStyle style) {
   final parts = hhmm.split(':');
   final h = int.tryParse(parts.first) ?? 21;
   final m = int.tryParse(parts.length > 1 ? parts[1] : '0') ?? 0;
   final h12 = h % 12 == 0 ? 12 : h % 12;
-  final period = h < 4
-      ? l10n.profile_periodSmallHours
-      : h < 6
-          ? l10n.profile_periodDawn
-          : h < 12
-              ? l10n.profile_periodMorning
-              : h < 15
-                  ? l10n.profile_periodNoon
-                  : h < 18
-                      ? l10n.profile_periodAfternoon
-                      : h < 20
-                          ? l10n.profile_periodEvening
-                          : l10n.profile_periodNight;
   var time = '$h12:${m.toString().padLeft(2, '0')}';
   if (style == NumeralStyle.bangla) time = toBanglaDigits(time);
-  return l10n.profile_time(period, time);
+  return l10n.profile_time(dayPeriod(l10n, h), time);
 }
 
 /// F8: name, language, numerals, Simple mode, reminder time and presence (FR-AUTH-04,

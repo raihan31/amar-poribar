@@ -29,21 +29,49 @@
   "auth_otp_rateLimited": "Too many tries. Try again after {time}.",
   "auth_otp_serverDown": "Cannot connect right now. Please try again in a little while.",
   "auth_otp_networkDown": "No internet. Check your connection and try again.",
-  "settings_title": "Settings",
-  "settings_role_title": "Current role",
-  "settings_pair_title": "Pair a new phone",
-  "settings_pair_subtitle": "Generate a QR code to add a child or partner",
   "settings_tutorial_title": "How to use (listen)",
-  "settings_language_title": "Language",
-  "settings_language_switch": "Switch to Bangla",
-  "settings_bankApprovals_title": "Bank approvals",
-  "settings_bankApprovals_empty": "No pending bank transactions detected today.",
-  "sync_server_title": "Sync with server",
-  "sync_server_subtitle": "Tap when you are online",
-  "sync_server_needLogin": "Sign in to sync.",
-  "sync_server_done": "Synced with the server: {pushed} sent, {pulled} received",
+  "settings_title": "Settings",
+  "settings_simple": "Simple mode",
+  "settings_simpleBody": "Big text, pictures only, everything read aloud",
+  "settings_language": "Language",
+  "settings_numbers": "Numbers",
+  "settings_langEnglishLabel": "English language",
+  "settings_numLatinLabel": "English digits",
+  "settings_remind": "Daily reminder",
+  "settings_vibration": "Buzz and sound",
+  "settings_quietSubtitle": "Quiet from {start} to {end}",
+  "@settings_quietSubtitle": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_hourSharp": "{hour} {period}",
+  "@settings_hourSharp": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      },
+      "hour": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_quietTitle": "Quiet hours",
+  "settings_quietFrom": "From",
+  "settings_quietTo": "To",
+  "settings_quietSave": "Save",
+  "settings_csv": "Download expense list (CSV)",
+  "settings_catalog": "Categories and accounts",
+  "settings_privacy": "Privacy policy",
+  "settings_delete": "Delete my data",
+  "settings_deleteBody": "You can download it first",
+  "settings_saveFailed": "Could not save. Try again.",
   "sync_nearby_title": "Sync with nearby phone",
-  "sync_nearby_subtitle": "Without internet, phones of the same family",
   "sync_nearby_needLogin": "Sign in once and join your family first (needs internet).",
   "sync_nearby_failed": "Could not start nearby sync: allow permissions (Bluetooth, location).",
   "sync_nearby_askTitle": "Sync with nearby phone?",

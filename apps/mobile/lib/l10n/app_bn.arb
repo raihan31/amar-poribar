@@ -41,24 +41,49 @@
   },
   "auth_otp_serverDown": "এখন সংযোগ হচ্ছে না। একটু পরে আবার চেষ্টা করুন।",
   "auth_otp_networkDown": "ইন্টারনেট নেই। সংযোগ দেখে আবার চেষ্টা করুন।",
-  "settings_title": "সেটিংস",
-  "settings_role_title": "বর্তমান ভূমিকা",
-  "settings_pair_title": "নতুন ফোন যোগ করুন",
-  "settings_pair_subtitle": "সন্তান বা সঙ্গীকে যোগ করতে QR কোড বানান",
   "settings_tutorial_title": "কীভাবে ব্যবহার করবেন (শুনুন)",
-  "settings_language_title": "ভাষা",
-  "settings_language_switch": "ইংরেজিতে বদলান",
-  "settings_bankApprovals_title": "ব্যাংকের লেনদেন অনুমোদন",
-  "settings_bankApprovals_empty": "আজ কোনো ব্যাংকের লেনদেন অনুমোদনের অপেক্ষায় নেই।",
-  "sync_server_title": "সার্ভারের সাথে সিঙ্ক",
-  "sync_server_subtitle": "ইন্টারনেট থাকলে চাপুন",
-  "sync_server_needLogin": "সিঙ্ক করতে লগইন করুন।",
-  "sync_server_done": "সার্ভারের সাথে সিঙ্ক হয়েছে: {pushed} পাঠানো, {pulled} পাওয়া",
-  "@sync_server_done": {
-    "placeholders": {"pushed": {"type": "int"}, "pulled": {"type": "int"}}
+  "settings_title": "সেটিং",
+  "settings_simple": "সহজ মোড",
+  "settings_simpleBody": "বড় লেখা, শুধু ছবি, সব কিছু শুনিয়ে দেবে",
+  "settings_language": "ভাষা",
+  "settings_numbers": "সংখ্যা",
+  "settings_langEnglishLabel": "ইংরেজি ভাষা",
+  "settings_numLatinLabel": "ইংরেজি সংখ্যা",
+  "settings_remind": "রোজ মনে করান",
+  "settings_vibration": "কম্পন ও আওয়াজ",
+  "settings_quietSubtitle": "{start} থেকে {end} চুপ",
+  "@settings_quietSubtitle": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
   },
+  "settings_hourSharp": "{period} {hour}টা",
+  "@settings_hourSharp": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      },
+      "hour": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_quietTitle": "চুপ থাকার সময়",
+  "settings_quietFrom": "শুরু",
+  "settings_quietTo": "শেষ",
+  "settings_quietSave": "রাখুন",
+  "settings_csv": "খরচের তালিকা নামান (CSV)",
+  "settings_catalog": "খাত ও অ্যাকাউন্ট",
+  "settings_privacy": "গোপনীয়তা নীতি",
+  "settings_delete": "আমার তথ্য মুছে দিন",
+  "settings_deleteBody": "আগে ডাউনলোড করে নিতে পারবেন",
+  "settings_saveFailed": "বদলানো যায়নি। আবার চেষ্টা করুন।",
   "sync_nearby_title": "কাছের ফোনের সাথে সিঙ্ক",
-  "sync_nearby_subtitle": "ইন্টারনেট ছাড়াই, একই পরিবারের ফোন",
   "sync_nearby_needLogin": "প্রথমে একবার লগইন করে পরিবারে যোগ দিন (ইন্টারনেট লাগবে)।",
   "sync_nearby_failed": "কাছের সিঙ্ক চালু করা যায়নি: অনুমতি দিন (ব্লুটুথ, লোকেশন)।",
   "sync_nearby_askTitle": "কাছের ফোনের সাথে সিঙ্ক?",
