@@ -296,5 +296,35 @@
   "entry_acct_bkash": "bKash",
   "entry_acct_nagad": "Nagad",
   "entry_acct_rocket": "Rocket",
-  "entry_acct_bank": "Bank"
+  "entry_acct_bank": "Bank",
+  "notif_title": "News",
+  "notif_listenAll": "Listen to all",
+  "notif_stop": "Stop",
+  "notif_empty": "No news yet",
+  "notif_quietNote": "Quiet hours are on. Vibration and sound are off; news will wait here.",
+  "notif_reminderTime": "Daily reminder time: {time}",
+  "@notif_reminderTime": {
+    "placeholders": {"time": {"type": "String"}}
+  },
+  "notif_changeSettings": "Settings",
+  "notif_bell": "News, {count} new",
+  "@notif_bell": {
+    "placeholders": {"count": {"type": "String"}}
+  },
+  "notif_timeToday": "Today {period}",
+  "@notif_timeToday": {
+    "placeholders": {"period": {"type": "String"}}
+  },
+  "notif_timeYesterday": "Yesterday",
+  "notif_timeDaysAgo": "{days} days ago",
+  "@notif_timeDaysAgo": {
+    "placeholders": {"days": {"type": "String"}}
+  },
+  "notif_periodMorning": "morning",
+  "notif_periodNoon": "noon",
+  "notif_periodAfternoon": "afternoon",
+  "notif_periodEvening": "evening",
+  "notif_periodNight": "night",
+  "notif_reminderTitle": "Daily reminder",
+  "notif_reminderBody": "Did you note today's spending?"
 }

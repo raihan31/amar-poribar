@@ -19,6 +19,7 @@ part 'database.g.dart';
     CachedEntitlements,
     Meta,
     PendingEntries,
+    InboxItems,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -38,7 +39,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -69,6 +70,7 @@ class AppDatabase extends _$AppDatabase {
               "UPDATE transactions SET family_id = COALESCE((SELECT value FROM meta WHERE key='active_family'), '') WHERE family_id=''",
             );
           }
+          if (from < 6) await m.createTable(inboxItems);
         },
       );
 }

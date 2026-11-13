@@ -138,3 +138,19 @@ class PendingEntries extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// Notification inbox cache (FR-NOTIF-04): everything the app told the user, kept for 90 days.
+@DataClassName('InboxRow')
+class InboxItems extends Table {
+  TextColumn get id => text()();
+  TextColumn get kind => text()();
+  TextColumn get title => text()();
+  TextColumn get body => text()();
+  TextColumn get speechText => text().nullable()();
+  TextColumn get dataJson => text().withDefault(const Constant('{}'))();
+  TextColumn get createdAt => text()();
+  TextColumn get readAt => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

@@ -18,6 +18,7 @@ import '../../../ui/big_button.dart';
 import '../../../ui/listen_button.dart';
 import '../../../ui/member_avatar.dart';
 import '../../family/state/family_providers.dart';
+import '../../notifications/state/inbox_providers.dart';
 import '../data/home_repository.dart';
 import '../state/home_providers.dart';
 import 'simple_home_screen.dart';
@@ -241,15 +242,16 @@ String _callPicker([String? to]) => Uri(
       queryParameters: to == null ? null : {'to': to},
     ).toString();
 
-class _Header extends StatelessWidget {
+class _Header extends ConsumerWidget {
   const _Header({required this.greeting, required this.pal});
 
   final String greeting;
   final _Palette pal;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
+    final unread = ref.watch(unreadCountProvider).valueOrNull ?? 0;
     return Row(
       children: [
         Expanded(
@@ -271,6 +273,63 @@ class _Header extends StatelessWidget {
             ],
           ),
         ),
+        Semantics(
+          button: true,
+          label: unread > 0
+              ? context.l10n.notif_bell(toBanglaDigits('$unread'))
+              : context.l10n.notif_title,
+          excludeSemantics: true,
+          child: Material(
+            color: pal.surface,
+            shape: const CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: () => context.push(Routes.notifications),
+              child: SizedBox(
+                width: 48,
+                height: 48,
+                child: Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(
+                      Icons.notifications_none,
+                      size: 26,
+                      color: scheme.onSurface,
+                    ),
+                    if (unread > 0)
+                      PositionedDirectional(
+                        top: 2,
+                        end: 0,
+                        child: Container(
+                          key: const ValueKey('bell-count'),
+                          constraints: const BoxConstraints(
+                            minWidth: 20,
+                            minHeight: 20,
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: pal.danger,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            toBanglaDigits('$unread'),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 4),
         Semantics(
           button: true,
           label: context.l10n.home_settings,
