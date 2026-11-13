@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CATEGORY_ICON_IDS } from "./icons.js";
 
 export const ACCOUNT_TYPES = ["cash", "bkash", "nagad", "rocket", "upay", "bank", "card", "other"] as const;
 export const AccountTypeSchema = z.enum(ACCOUNT_TYPES);
@@ -222,7 +223,7 @@ export const CreateCategorySchema = z.object({
   kind: z.enum(["expense", "income"]),
   nameEn: z.string().min(1).max(60),
   nameBn: z.string().min(1).max(60),
-  icon: z.string().max(16).optional(),
+  icon: z.enum(CATEGORY_ICON_IDS).optional(),
 });
 export type CreateCategoryInput = z.infer<typeof CreateCategorySchema>;
 
@@ -230,7 +231,7 @@ export const UpdateCategorySchema = z
   .object({
     nameEn: z.string().min(1).max(60),
     nameBn: z.string().min(1).max(60),
-    icon: z.string().max(16).nullable(),
+    icon: z.enum(CATEGORY_ICON_IDS).nullable(),
     isHidden: z.boolean(),
   })
   .partial()

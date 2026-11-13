@@ -34,17 +34,21 @@ export const accounts = ledgerSchema.table("accounts", {
   ...timestamps,
 });
 
-export const categories = ledgerSchema.table("categories", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  // families.families.id
-  familyId: uuid("family_id").notNull(),
-  key: text("key").notNull(),
-  kind: categoryKindEnum("kind").notNull(),
-  nameEn: text("name_en").notNull(),
-  nameBn: text("name_bn").notNull(),
-  icon: text("icon"),
-  isHidden: boolean("is_hidden").notNull().default(false),
-});
+export const categories = ledgerSchema.table(
+  "categories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    // families.families.id
+    familyId: uuid("family_id").notNull(),
+    key: text("key").notNull(),
+    kind: categoryKindEnum("kind").notNull(),
+    nameEn: text("name_en").notNull(),
+    nameBn: text("name_bn").notNull(),
+    icon: text("icon"),
+    isHidden: boolean("is_hidden").notNull().default(false),
+  },
+  (t) => [uniqueIndex("categories_family_key_uidx").on(t.familyId, t.key)],
+);
 
 export const transactions = ledgerSchema.table(
   "transactions",

@@ -106,7 +106,15 @@ export const catalogRepo = {
   },
 
   async seedDefaults(x: Executor, familyId: string, ownerUserId: string | null): Promise<void> {
-    await x.insert(categories).values(defaultCategoryRows(familyId));
-    await x.insert(accounts).values(defaultAccountRows(familyId, ownerUserId));
+    await x
+      .insert(categories)
+      .values(defaultCategoryRows(familyId))
+      .onConflictDoNothing({ target: [categories.familyId, categories.key] });
+    const [existing] = await x
+      .select({ id: accounts.id })
+      .from(accounts)
+      .where(eq(accounts.familyId, familyId))
+      .limit(1);
+    if (!existing) await x.insert(accounts).values(defaultAccountRows(familyId, ownerUserId));
   },
 };
