@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { bigint, boolean, index, pgSchema, real, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { bigint, boolean, check, index, pgSchema, real, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import { ACCOUNT_TYPES } from "@amar-poribar/shared";
 
 export const ledgerSchema = pgSchema("ledger");
@@ -62,6 +62,8 @@ export const transactions = ledgerSchema.table(
     occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull(),
     categoryId: uuid("category_id").references(() => categories.id),
     accountId: uuid("account_id").references(() => accounts.id),
+    /** Destination of a transfer; null for every other type (T-LED-08). */
+    toAccountId: uuid("to_account_id").references(() => accounts.id),
     // identity.users.id
     paidByUserId: uuid("paid_by_user_id"),
     note: text("note"),
@@ -82,6 +84,7 @@ export const transactions = ledgerSchema.table(
     ...timestamps,
   },
   (t) => [
+    check("transfer_needs_destination", sql`(${t.type} = 'transfer') = (${t.toAccountId} is not null)`),
     index("txn_family_seq_idx").on(t.familyId, t.syncSeq),
     index("txn_family_time_idx")
       .on(t.familyId, t.occurredAt.desc(), t.id.desc())

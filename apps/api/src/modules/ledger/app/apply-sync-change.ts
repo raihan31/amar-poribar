@@ -28,8 +28,14 @@ export async function applyChange(
   // References must belong to this family (tenant isolation, NFR-06).
   if (
     (r.categoryId && !(await catalogRepo.categoryExists(deps.db, familyId, r.categoryId))) ||
-    (r.accountId && !(await catalogRepo.accountExists(deps.db, familyId, r.accountId)))
+    (r.accountId && !(await catalogRepo.accountExists(deps.db, familyId, r.accountId))) ||
+    (r.toAccountId && !(await catalogRepo.accountExists(deps.db, familyId, r.toAccountId)))
   ) {
+    return { status: "rejected", reason: "unknown_reference" };
+  }
+  // Older builds send no destination; a transfer without one cannot be stored (T-LED-08).
+  const toAccountId = r.type === "transfer" ? (r.toAccountId ?? null) : null;
+  if (r.type === "transfer" && (!toAccountId || toAccountId === r.accountId)) {
     return { status: "rejected", reason: "unknown_reference" };
   }
   try {
@@ -48,6 +54,7 @@ export async function applyChange(
         occurredAt: new Date(r.occurredAt),
         categoryId: r.categoryId ?? null,
         accountId: r.accountId ?? null,
+        toAccountId,
         note: r.note ?? null,
         counterparty: r.counterparty ?? null,
         trxId: r.trxId ?? null,
