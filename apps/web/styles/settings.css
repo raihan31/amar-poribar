@@ -1,0 +1,136 @@
+/* Settings (B6) and Profile (F8), T-WEB-23. */
+.set {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 20px 24px;
+}
+.set-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.set-row {
+  min-height: 68px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink);
+  text-align: start;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+.set-card > :last-child {
+  border-bottom: 0;
+}
+.set-row--green {
+  background: var(--green-100);
+}
+.set-row--stack {
+  flex-wrap: wrap;
+}
+.set-row__text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.set-row__title {
+  font-size: 18px;
+  font-weight: 600;
+}
+.set-row__title--big {
+  font-size: 19px;
+  font-weight: 700;
+}
+.set-row__sub {
+  font-size: 14px;
+  color: var(--muted);
+}
+.set-row--danger .set-row__title {
+  color: var(--danger);
+  font-weight: 700;
+}
+.set-row--danger svg {
+  color: var(--danger);
+}
+.set-row__chev {
+  transform: scaleX(-1);
+}
+.set-switch {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 56px;
+  height: 32px;
+  margin: 0;
+  border-radius: 16px;
+  background: var(--border);
+  cursor: pointer;
+}
+.set-switch::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--card);
+}
+.set-switch:checked {
+  background: var(--green-700);
+}
+.set-switch:checked::after {
+  left: 28px;
+}
+.set-switch:focus-visible,
+.set-time:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 2px;
+}
+.set-time {
+  min-height: 44px;
+  padding: 4px 10px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+}
+.set-quiet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  font-size: 14px;
+}
+.set-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.set-name__text {
+  flex: 1;
+  font-size: 22px;
+  font-weight: 700;
+}
+.set-name__form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.set-name__actions {
+  display: flex;
+  gap: 8px;
+}
