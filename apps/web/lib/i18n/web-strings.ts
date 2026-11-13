@@ -197,6 +197,13 @@ export const webBn = {
   "entry.fb.sms": "এসএমএস পেস্ট",
   "entry.fb.receipt": "মেমোর ছবি",
   "entry.fb.noSynth": "উত্তর পড়ে শোনানোও এই ফোনে বন্ধ। লেখা দেখে নিন।",
+  "net.offline": "ইন্টারনেট নেই। আপনার লেখা জমা থাকবে।",
+  "net.queued": "জমা আছে: {n}টি",
+  "net.serverError": "একটু সমস্যা হয়েছে। আবার চেষ্টা করুন।",
+  "net.retry": "আবার চেষ্টা",
+  "net.notFound": "পাতাটি পাওয়া যায়নি।",
+  "net.goHome": "হোমে যান",
+  "net.offlinePage": "ইন্টারনেট নেই। সংযোগ ফিরলে আবার খুলুন।",
 } as const;
 
 export type WebKey = keyof typeof webBn;
@@ -400,4 +407,11 @@ export const webEn: Record<WebKey, string> = {
   "entry.fb.sms": "Paste an SMS",
   "entry.fb.receipt": "Photo of a receipt",
   "entry.fb.noSynth": "Reading answers aloud is also off on this phone. Read the screen.",
+  "net.offline": "No internet. What you write will be saved.",
+  "net.queued": "Waiting to send: {n}",
+  "net.serverError": "Something went wrong. Please try again.",
+  "net.retry": "Try again",
+  "net.notFound": "We could not find that page.",
+  "net.goHome": "Go home",
+  "net.offlinePage": "No internet. Open this again when you are back online.",
 };
