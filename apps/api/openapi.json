@@ -1752,6 +1752,47 @@
         ]
       }
     },
+    "/v1/families/{familyId}/transactions/{txnId}/restore": {
+      "post": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "familyId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "txnId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "2XX": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {},
+                  "properties": {},
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Default Response"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/v1/families/{familyId}/transfer-ownership": {
       "post": {
         "parameters": [

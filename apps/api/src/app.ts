@@ -117,7 +117,11 @@ export async function buildApp({ config, db, deps = {} }: BuildAppOptions) {
 
   const ctx: ModuleContext = {
     db,
-    config: { ...config, ai: { client: deps.anthropic ?? aiClientFor(config), model: config.aiModel } },
+    config: {
+      ...config,
+      metrics: { ledgerPurged: (n: number) => metrics.ledgerPurged.inc(n) },
+      ai: { client: deps.anthropic ?? aiClientFor(config), model: config.aiModel },
+    },
     logger,
     bus,
     jobs,

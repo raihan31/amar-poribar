@@ -85,6 +85,11 @@ export function createMetrics() {
     labelNames: ["provider", "outcome"] as const,
     registers: [registry],
   });
+  const ledgerPurged = new Counter({
+    name: "ledger_purged_total",
+    help: "Soft-deleted transactions removed by the purge job",
+    registers: [registry],
+  });
   const otpSent = new Counter({
     name: "otp_sent_total",
     help: "OTP messages sent",
@@ -125,6 +130,7 @@ export function createMetrics() {
     aiRequests,
     pushSent,
     otpSent,
+    ledgerPurged,
     sources,
     httpBuckets,
     counterTotals,

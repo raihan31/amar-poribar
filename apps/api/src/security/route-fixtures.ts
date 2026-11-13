@@ -129,6 +129,9 @@ export const ROUTE_FIXTURES: Record<string, RouteFixture> = {
     },
   }),
   "DELETE /v1/families/{familyId}/transactions/{txnId}": (c) => ({ params: { ...fam(c), txnId: c.txnId } }),
+  "POST /v1/families/{familyId}/transactions/{txnId}/restore": (c) => ({
+    params: { ...fam(c), txnId: c.txnId },
+  }),
   "PATCH /v1/families/{familyId}/transactions/{txnId}": (c) => ({
     params: { ...fam(c), txnId: c.txnId },
     body: { note: "Hijacked" },
