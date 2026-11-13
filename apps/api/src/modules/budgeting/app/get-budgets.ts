@@ -16,6 +16,8 @@ export interface BudgetSummaryItem {
   level: BudgetLevel;
   status: StatusWords;
   inherited: boolean;
+  /** True when the job stored this month's row from last month, so the UI can say "গত মাসের বাজেট". */
+  carried: boolean;
 }
 
 export interface BudgetSummary {
@@ -35,8 +37,22 @@ export async function getEffectiveBudgets(
   familyId: string,
   month: string,
 ): Promise<EffectiveBudget[]> {
-  const rows = effectiveBudgets(await budgetsRepo.listUpTo(deps.db, familyId, month), month);
+  const rows = await effectiveWithCarried(deps, familyId, month);
   return rows.map(({ categoryId, limitPaisa, inherited }) => ({ categoryId, limitPaisa, inherited }));
+}
+
+async function effectiveWithCarried(
+  deps: BudgetingDeps,
+  familyId: string,
+  month: string,
+): Promise<(EffectiveBudget & { carried: boolean })[]> {
+  const rows = effectiveBudgets(await budgetsRepo.listUpTo(deps.db, familyId, month), month);
+  return rows.map(({ categoryId, limitPaisa, inherited, source }) => ({
+    categoryId,
+    limitPaisa,
+    inherited,
+    carried: source === "carried",
+  }));
 }
 
 // FR-BUD-01, FR-BUD-02, FR-BUD-03, FR-BUD-07
@@ -46,7 +62,7 @@ export async function getBudgetStatus(
   viewer: Viewer,
   month: string,
 ): Promise<BudgetSummary> {
-  const effective = await getEffectiveBudgets(deps, familyId, month);
+  const effective = await effectiveWithCarried(deps, familyId, month);
   const totals = await deps.ledger.getMonthTotals(familyId, viewer, month);
   const spentBy = new Map(totals.byCategory.map((c) => [c.categoryId, c.totalPaisa]));
   const catById = new Map((await deps.ledger.listCategories(familyId, { includeHidden: true })).map((c) => [c.id, c]));
@@ -67,6 +83,7 @@ export async function getBudgetStatus(
         level,
         status: statusWords(level, { categoryNameBn: nameBn, overPaisa: Math.max(0, spentPaisa - b.limitPaisa) }),
         inherited: b.inherited,
+        carried: b.carried,
       };
     }),
   };
