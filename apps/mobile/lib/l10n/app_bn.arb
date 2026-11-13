@@ -326,5 +326,35 @@
   "entry_acct_bkash": "বিকাশ",
   "entry_acct_nagad": "নগদ",
   "entry_acct_rocket": "রকেট",
-  "entry_acct_bank": "ব্যাংক"
+  "entry_acct_bank": "ব্যাংক",
+  "notif_title": "খবর",
+  "notif_listenAll": "সব শুনুন",
+  "notif_stop": "থামুন",
+  "notif_empty": "এখনো কোনো খবর নেই",
+  "notif_quietNote": "এখন চুপ সময়। কম্পন আর শব্দ বন্ধ, খবর এখানে জমা থাকবে।",
+  "notif_reminderTime": "রোজকার মনে করানোর সময়: {time}",
+  "@notif_reminderTime": {
+    "placeholders": {"time": {"type": "String"}}
+  },
+  "notif_changeSettings": "সেটিং",
+  "notif_bell": "খবর, {count}টি নতুন",
+  "@notif_bell": {
+    "placeholders": {"count": {"type": "String"}}
+  },
+  "notif_timeToday": "আজ {period}",
+  "@notif_timeToday": {
+    "placeholders": {"period": {"type": "String"}}
+  },
+  "notif_timeYesterday": "গতকাল",
+  "notif_timeDaysAgo": "{days} দিন আগে",
+  "@notif_timeDaysAgo": {
+    "placeholders": {"days": {"type": "String"}}
+  },
+  "notif_periodMorning": "সকালে",
+  "notif_periodNoon": "দুপুরে",
+  "notif_periodAfternoon": "বিকেলে",
+  "notif_periodEvening": "সন্ধ্যায়",
+  "notif_periodNight": "রাতে",
+  "notif_reminderTitle": "রোজকার মনে করানো",
+  "notif_reminderBody": "আজকের খরচ লিখেছেন?"
 }

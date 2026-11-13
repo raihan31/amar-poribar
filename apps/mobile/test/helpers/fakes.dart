@@ -5,6 +5,8 @@ import 'package:amar_poribar/features/family/data/invite_repository.dart';
 import 'package:amar_poribar/features/family/state/family_providers.dart';
 import 'package:amar_poribar/features/home/data/home_repository.dart';
 import 'package:amar_poribar/features/home/state/home_providers.dart';
+import 'package:amar_poribar/features/notifications/data/inbox_repository.dart';
+import 'package:amar_poribar/features/notifications/state/inbox_providers.dart';
 import 'package:amar_poribar/presentation/providers/auth_provider.dart';
 import 'package:amar_poribar/presentation/providers/providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,5 +43,6 @@ List<Override> defaultFakes({
       // with `topBudgetWarningProvider.overrideWith(realTopBudgetWarning)`.
       homeRepositoryProvider.overrideWithValue(FakeHomeRepository()),
       topBudgetWarningProvider.overrideWithValue(null),
+      inboxRepositoryProvider.overrideWithValue(FakeInboxRepository()),
       // <feature fakes go here>
     ];

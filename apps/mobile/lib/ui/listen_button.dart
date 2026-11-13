@@ -6,13 +6,16 @@ import '../presentation/providers/auth_provider.dart';
 
 /// "শুনুন" button that reads [text] aloud. Board: Ask.dc.html (answer card).
 class ListenButton extends ConsumerStatefulWidget {
-  const ListenButton({super.key, required this.text});
+  const ListenButton({super.key, required this.text, this.compact = false});
 
   static const double minHeight = 56;
   static const String listenLabel = 'শুনুন';
   static const String stopLabel = 'থামুন';
 
   final String text;
+
+  /// Round 48 dp icon-only button for list rows (the label is still read by screen readers).
+  final bool compact;
 
   @override
   ConsumerState<ListenButton> createState() => _ListenButtonState();
@@ -47,17 +50,19 @@ class _ListenButtonState extends ConsumerState<ListenButton> {
       onTap: _toggle,
       child: Material(
         color: AppTokens.greenTint,
-        shape: const StadiumBorder(),
+        shape: widget.compact ? const CircleBorder() : const StadiumBorder(),
         child: InkWell(
-          customBorder: const StadiumBorder(),
+          customBorder:
+              widget.compact ? const CircleBorder() : const StadiumBorder(),
           onTap: _toggle,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              minHeight: ListenButton.minHeight,
-              minWidth: ListenButton.minHeight,
+            constraints: BoxConstraints(
+              minHeight: widget.compact ? 48 : ListenButton.minHeight,
+              minWidth: widget.compact ? 48 : ListenButton.minHeight,
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding:
+                  EdgeInsets.symmetric(horizontal: widget.compact ? 0 : 20),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -67,15 +72,17 @@ class _ListenButtonState extends ConsumerState<ListenButton> {
                     size: 26,
                     color: AppTokens.deepGreen,
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppTokens.deepGreen,
+                  if (!widget.compact) ...[
+                    const SizedBox(width: 8),
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppTokens.deepGreen,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),

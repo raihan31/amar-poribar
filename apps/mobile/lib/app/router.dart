@@ -8,6 +8,7 @@ import '../features/entry/ui/category_picker_screen.dart';
 import '../features/entry/ui/voice_entry_screen.dart';
 import '../features/family/ui/join_screen.dart';
 import '../features/home/ui/home_screen.dart';
+import '../features/notifications/ui/notifications_screen.dart';
 import '../features/onboarding/ui/consent_screen.dart';
 import '../features/onboarding/ui/policy_screen.dart';
 import '../features/onboarding/ui/tutorial_screen.dart';
@@ -142,7 +143,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       stub(Routes.plans),
       stub(Routes.dhar),
       stub(Routes.families),
-      stub(Routes.notifications),
+      simple(Routes.notifications, (_) => const NotificationsScreen()),
       stub(Routes.sync),
       stub(Routes.bazaar),
       stub(Routes.deleteAccount),
