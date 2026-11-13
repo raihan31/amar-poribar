@@ -175,6 +175,12 @@ class LocalStore {
     int? amountPaisa,
     String? categoryId,
     String? note,
+    String? type,
+    int? feePaisa,
+    String? accountId,
+    DateTime? occurredAt,
+    bool? isPrivate,
+    String? paidByUserId,
   }) async {
     final hlc = await _tick();
     final seq = await _nextSeq();
@@ -186,6 +192,16 @@ class LocalStore {
         categoryId:
             categoryId == null ? const Value.absent() : Value(categoryId),
         note: note == null ? const Value.absent() : Value(note),
+        type: type == null ? const Value.absent() : Value(type),
+        feePaisa: feePaisa == null ? const Value.absent() : Value(feePaisa),
+        accountId: accountId == null ? const Value.absent() : Value(accountId),
+        occurredAt: occurredAt == null
+            ? const Value.absent()
+            : Value(occurredAt.toUtc().toIso8601String()),
+        isPrivate: isPrivate == null ? const Value.absent() : Value(isPrivate),
+        paidByUserId: paidByUserId == null
+            ? const Value.absent()
+            : Value(paidByUserId),
         hlc: Value(hlc.toString()),
       ),
     );

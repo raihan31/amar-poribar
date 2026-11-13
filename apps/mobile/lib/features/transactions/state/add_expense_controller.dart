@@ -51,7 +51,15 @@ class AddExpenseState {
     this.isPrivate = false,
     this.saving = false,
     this.error,
+    this.editing,
+    this.dateTouched = false,
   });
+
+  /// The entry being edited (D5 edit mode), or `null` when adding.
+  final Transaction? editing;
+
+  /// Edit mode keeps the original date-time until the person picks a date pill.
+  final bool dateTouched;
 
   /// `expense`, `income` or `transfer`.
   final String type;
@@ -90,6 +98,8 @@ class AddExpenseState {
     bool? isPrivate,
     bool? saving,
     Object? error = _keep,
+    Transaction? editing,
+    bool? dateTouched,
   }) =>
       AddExpenseState(
         type: type ?? this.type,
@@ -108,6 +118,8 @@ class AddExpenseState {
         isPrivate: isPrivate ?? this.isPrivate,
         saving: saving ?? this.saving,
         error: identical(error, _keep) ? this.error : error as AddExpenseError?,
+        editing: editing ?? this.editing,
+        dateTouched: dateTouched ?? this.dateTouched,
       );
 }
 
@@ -153,7 +165,25 @@ class AddExpenseController extends StateNotifier<AddExpenseState> {
   void setPaidBy(String? userId) =>
       state = state.copyWith(paidByUserId: userId);
 
-  void setDaysAgo(int days) => state = state.copyWith(daysAgo: days);
+  void setDaysAgo(int days) =>
+      state = state.copyWith(daysAgo: days, dateTouched: true);
+
+  /// Fills the form from [t] and switches to edit mode: [save] then updates [t] in place.
+  void loadForEdit(Transaction t) {
+    state = AddExpenseState(
+      type: t.type,
+      digits: '${t.amountPaisa ~/ 100}',
+      categoryId: t.categoryId,
+      accountId: t.accountId,
+      paidByUserId: t.paidByUserId,
+      daysAgo: -1,
+      note: t.note ?? '',
+      feeDigits: t.feePaisa == 0 ? '' : '${t.feePaisa ~/ 100}',
+      showFee: t.feePaisa != 0,
+      isPrivate: t.isPrivate,
+      editing: t,
+    );
+  }
   void setNote(String note) => state = state.copyWith(note: note);
 
   void setFee(String digits) => state = state.copyWith(
@@ -186,6 +216,8 @@ class AddExpenseController extends StateNotifier<AddExpenseState> {
     }
     state = state.copyWith(saving: true, error: null);
     try {
+      final old = state.editing;
+      if (old != null) return await _update(old);
       final family = await _ref.read(currentFamilyProvider.future);
       final me = await _ref.read(myUserIdProvider.future);
       final now = _ref.read(addExpenseClockProvider)();
@@ -206,6 +238,28 @@ class AddExpenseController extends StateNotifier<AddExpenseState> {
     } finally {
       if (mounted) state = state.copyWith(saving: false);
     }
+  }
+
+  Future<String> _update(Transaction old) async {
+    final me = await _ref.read(myUserIdProvider.future);
+    final now = _ref.read(addExpenseClockProvider)();
+    // The keypad edits whole taka; keep a paisa amount untouched unless the person changed it.
+    final sameAmount = state.amountPaisa == (old.amountPaisa ~/ 100) * 100;
+    await _ref.read(transactionRepositoryProvider).update(
+          old.id,
+          type: state.type,
+          amountPaisa: sameAmount ? null : state.amountPaisa,
+          feePaisa: state.feePaisa,
+          occurredAt: state.dateTouched
+              ? now.subtract(Duration(days: state.daysAgo))
+              : null,
+          categoryId: state.needsCategory ? state.categoryId : null,
+          accountId: state.accountId,
+          note: state.note.trim(),
+          isPrivate: state.isPrivate,
+          paidByUserId: state.paidByUserId ?? me,
+        );
+    return old.id;
   }
 }
 

@@ -35,9 +35,12 @@ class AddExpensePrefill {
 
 /// D4 · add an entry by hand (route `/add`). Board: AddExpense.dc.html.
 class AddExpenseScreen extends ConsumerStatefulWidget {
-  const AddExpenseScreen({super.key, this.prefill});
+  const AddExpenseScreen({super.key, this.prefill, this.editId});
 
   final AddExpensePrefill? prefill;
+
+  /// Edit mode (route `/txn/:id/edit`): the form starts from this entry and saving updates it.
+  final String? editId;
 
   @override
   ConsumerState<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -73,6 +76,16 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
     );
     final prefill = widget.prefill;
     if (prefill != null) Future.microtask(() => _applyPrefill(prefill));
+    final editId = widget.editId;
+    if (editId != null) Future.microtask(() => _loadForEdit(editId));
+  }
+
+  Future<void> _loadForEdit(String id) async {
+    final t = await ref.read(transactionRepositoryProvider).byId(id);
+    if (t == null || !mounted) return;
+    ref.read(addExpenseControllerProvider.notifier).loadForEdit(t);
+    _note.text = t.note ?? '';
+    _fee.text = t.feePaisa == 0 ? '' : '${t.feePaisa ~/ 100}';
   }
 
   Future<void> _applyPrefill(AddExpensePrefill p) async {
@@ -114,6 +127,10 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
     final controller = ref.read(addExpenseControllerProvider.notifier);
     final id = await controller.save();
     if (id == null || !mounted) return;
+    if (widget.editId != null) {
+      _leave();
+      return;
+    }
     final messenger = ScaffoldMessenger.of(context);
     final repo = ref.read(transactionRepositoryProvider);
     final l10n = context.l10n;
@@ -204,7 +221,9 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    l10n.txn_add_title,
+                    widget.editId != null
+                        ? l10n.txn_detail_editTitle
+                        : l10n.txn_add_title,
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w700,

@@ -32,6 +32,7 @@ class Routes {
   static const addVoice = '/add/voice';
   static const addCategory = '/add/category';
   static const txn = '/txn/:id';
+  static const txnEdit = '/txn/:id/edit';
   static const receipt = '/receipt';
   static const ruleLearn = '/rule-learn';
   static const voiceFallback = '/voice-fallback';
