@@ -1,0 +1,48 @@
+{
+  "_comment": "Table-driven cases for the Dart SMS engine (SmsParserEngine.parseMfs). `expected` is an exact match on the listed fields; null means the field must be null.",
+  "provider": "nagad",
+  "cases": [
+    {
+      "name": "send money",
+      "text": "Send Money Successful. Amount: Tk 500.00 Receiver: 01898765432 Ref: N/A Fee: Tk 5.00 TxnID: 71A2B3C4 Balance: Tk 7,010.00 04/10/2026 20:15",
+      "expected": {
+        "kind": "send",
+        "amountPaisa": 50000,
+        "feePaisa": 500,
+        "counterpartyMasked": "01XXXXXX432",
+        "trxId": "71A2B3C4",
+        "balancePaisa": 701000,
+        "occurredAt": "2026-10-04T20:15:00+06:00",
+        "provider": "nagad"
+      }
+    },
+    {
+      "name": "payment",
+      "text": "Payment Successful. Amount: Tk 1,200.00 Merchant: Agora Fee: Tk 0.00 TxnID: 72B3C4D5 Balance: Tk 3,000.00 05/10/2026 12:00",
+      "expected": {
+        "kind": "payment",
+        "amountPaisa": 120000,
+        "feePaisa": 0,
+        "counterpartyMasked": "Agora",
+        "trxId": "72B3C4D5",
+        "balancePaisa": 300000,
+        "occurredAt": "2026-10-05T12:00:00+06:00",
+        "provider": "nagad"
+      }
+    },
+    {
+      "name": "received",
+      "text": "Money Received. Amount: Tk 5000.00 Sender: 01898765432 Ref: N/A TxnID: 71A2B3C4 Balance: Tk 7,010.00 04/10/2026 20:15",
+      "expected": {
+        "kind": "received",
+        "amountPaisa": 500000,
+        "feePaisa": 0,
+        "counterpartyMasked": "01XXXXXX432",
+        "trxId": "71A2B3C4",
+        "balancePaisa": 701000,
+        "occurredAt": "2026-10-04T20:15:00+06:00",
+        "provider": "nagad"
+      }
+    }
+  ]
+}

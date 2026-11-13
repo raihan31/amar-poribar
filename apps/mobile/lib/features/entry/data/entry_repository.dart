@@ -6,7 +6,7 @@ import '../domain/quick_parser.dart';
 enum EntrySource {
   voice('voice'),
   text('ai_text'),
-  sms('sms_paste');
+  sms('sms');
 
   const EntrySource(this.wire);
   final String wire;
@@ -87,7 +87,8 @@ class ApiEntryRepository implements EntryRepository {
       ];
     } on ApiException catch (e) {
       if (e.status == 0) {
-        await queue(text, source.wire);
+        // A pasted SMS is never kept (T-MOB-30): the person pastes it again later.
+        if (source != EntrySource.sms) await queue(text, source.wire);
         throw const QueuedOffline();
       }
       if (e.code == 'ai_quota') throw const QuotaExceeded();

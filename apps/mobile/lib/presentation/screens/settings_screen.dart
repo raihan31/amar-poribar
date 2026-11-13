@@ -165,15 +165,3 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 }
-
-class PendingSmsScreen extends StatelessWidget {
-  const PendingSmsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.settings_bankApprovals_title)),
-      body: Center(child: Text(context.l10n.settings_bankApprovals_empty)),
-    );
-  }
-}

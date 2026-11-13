@@ -6,6 +6,7 @@ import '../features/auth/ui/login_screen.dart';
 import '../features/auth/ui/session_expired_screen.dart';
 import '../features/budgets/ui/budgets_screen.dart';
 import '../features/entry/ui/category_picker_screen.dart';
+import '../features/entry/ui/sms_paste_screen.dart';
 import '../features/entry/ui/voice_entry_screen.dart';
 import '../features/family/ui/join_screen.dart';
 import '../features/home/ui/home_screen.dart';
@@ -122,6 +123,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       simple(Routes.addVoice, (_) => const VoiceEntryScreen()),
       simple(
+        Routes.addSms,
+        (s) => SmsPasteScreen(initialText: s.uri.queryParameters['text']),
+      ),
+      simple(
         Routes.addCategory,
         (s) => s.extra is CategoryPickerArgs
             ? CategoryPickerScreen(args: s.extra! as CategoryPickerArgs)
@@ -151,7 +156,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       stub(Routes.deleteAccount),
       stub(Routes.simple),
       simple(Routes.transactions, (_) => const TransactionScreen()),
-      simple(Routes.pendingSms, (_) => const PendingSmsScreen()),
     ],
   );
   ref.onDispose(() {
