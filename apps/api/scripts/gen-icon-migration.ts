@@ -1,6 +1,6 @@
 // Prints the SQL that rewrites old emoji category icons to icon ids, generated from EMOJI_TO_ICON so the SQL and
 // the TypeScript never drift. Usage: `tsx scripts/gen-icon-migration.ts` (paste into the migration) or
-// `tsx scripts/gen-icon-migration.ts --check drizzle/0019_*.sql` to fail when the file lacks the exact statement.
+// `tsx scripts/gen-icon-migration.ts --check drizzle/0020_*.sql` to fail when the file lacks the exact statement.
 import { readFileSync } from "node:fs";
 import { EMOJI_TO_ICON } from "@amar-poribar/shared";
 
