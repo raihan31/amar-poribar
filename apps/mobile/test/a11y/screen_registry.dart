@@ -32,11 +32,13 @@ import 'package:amar_poribar/features/summary/state/summary_providers.dart';
 import 'package:amar_poribar/features/summary/ui/summary_screen.dart';
 import 'package:amar_poribar/features/transactions/data/fake_transaction_repository.dart';
 import 'package:amar_poribar/features/transactions/ui/add_expense_screen.dart';
+import 'package:amar_poribar/features/transactions/ui/transactions_screen.dart';
 import 'package:amar_poribar/presentation/providers/auth_provider.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/transactions/add_expense_fixtures.dart';
+import '../features/transactions/transactions_fixtures.dart';
 import '../helpers/fake_auth.dart';
 
 typedef ScreenFactory = Widget Function(BuildContext context);
@@ -79,7 +81,12 @@ bool _registered = false;
 void registerAllScreens() {
   if (_registered) return;
   _registered = true;
-  // registerScreen('B1', Routes.list, (c) => TransactionsScreen(), needs: [...]);
+  registerScreen(
+    'B1',
+    Routes.list,
+    (c) => const TransactionsScreen(),
+    needs: listOverrides(FakeTransactionRepository(boardRows())),
+  );
   registerScreen(
     'A1',
     Routes.login,
@@ -199,7 +206,6 @@ void registerAllScreens() {
 const List<String> kAllRoutes = [
   Routes.welcome,
   Routes.home,
-  Routes.transactions,
   Routes.pendingSms,
   Routes.settings,
   Routes.login,
@@ -212,13 +218,13 @@ const List<String> kAllRoutes = [
   Routes.tutorial,
   Routes.summary,
   Routes.budget,
+  Routes.list,
 ];
 
 /// Pre-existing screens not yet in the audit. Each screen task removes its
 /// route from this list when it registers the screen. The list may only
 /// shrink: `registry_complete_test.dart` fails if a route is in neither place.
 const Set<String> kRoutesAwaitingRegistration = {
-  Routes.transactions,
   Routes.pendingSms,
   Routes.settings,
 };

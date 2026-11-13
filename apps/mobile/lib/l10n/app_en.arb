@@ -356,5 +356,22 @@
   "budget_pickCategory": "Budget for which category?",
   "budget_save": "Save",
   "budget_queued": "The budget will be saved when the internet is back",
-  "budget_saveFailed": "Could not save the budget"
+  "budget_saveFailed": "Could not save the budget",
+  "txn_list_title": "Expense list",
+  "txn_list_csv": "Get CSV",
+  "txn_list_prevMonth": "Previous month",
+  "txn_list_nextMonth": "Next month",
+  "txn_list_all": "Everyone",
+  "txn_list_private": "Private expense",
+  "txn_list_privateSub": "Only you can see this",
+  "txn_list_new": "+ Add an expense",
+  "txn_list_empty": "No expenses this month",
+  "txn_list_emptyAction": "Say an expense",
+  "txn_list_srcVoice": "by voice",
+  "txn_list_srcSms": "from SMS",
+  "txn_list_srcPhoto": "from photo",
+  "txn_list_srcManual": "by hand",
+  "txn_list_transfer": "Transfer",
+  "txn_list_other": "Other",
+  "txn_list_csvFailed": "Could not make the CSV"
 }
