@@ -95,3 +95,99 @@
   gap: 8px;
   flex-wrap: wrap;
 }
+
+/* B1 transactions list (T-WEB-19) */
+.txn-page {
+  padding-bottom: 96px;
+}
+.txn-csv {
+  justify-self: end;
+}
+.txn-month {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.25rem;
+}
+.txn-month__btn {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 1.5rem;
+}
+.txn-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.txn-day {
+  margin: 8px 0;
+  font-size: 1rem;
+}
+.txn-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.txn-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.txn-row__tile {
+  width: 48px;
+  height: 48px;
+  flex: none;
+  border-radius: 16px;
+  background: var(--green-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+.txn-row__body {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+.txn-row__meta,
+.txn-row__private {
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+.txn-row__amt {
+  font-weight: 700;
+  white-space: nowrap;
+}
+.txn-row__amt--expense {
+  color: var(--danger);
+}
+.txn-row__amt--income {
+  color: var(--green-700);
+}
+.txn-sticky {
+  position: fixed;
+  inset: auto 0 72px 0;
+  padding: 8px 16px;
+  background: var(--bg);
+}
+.txn-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  text-decoration: none;
+}
+.txn-readonly {
+  margin: 0;
+  text-align: center;
+}
