@@ -1,6 +1,8 @@
 import type { ModuleDefinition } from "../../platform/module.js";
 import type { Viewer } from "../ledger/index.js";
-import type { BudgetingDeps } from "./app/deps.js";
+import type { AlertDeps, BudgetingDeps } from "./app/deps.js";
+import { onTransactionChanged } from "./app/on-transaction-changed.js";
+import { purgeAlertsJob } from "./jobs.js";
 import { listFestivalBudgets, type FestivalBudgetWithSpend } from "./app/festival-usecases.js";
 import { getBudgetStatus, getEffectiveBudgets, type BudgetSummary, type EffectiveBudget } from "./app/get-budgets.js";
 import { budgetsRoutes } from "./http/budget-routes.js";
@@ -33,6 +35,15 @@ export const budgetingModule: ModuleDefinition<BudgetingFacade> = {
     const { families, ledger } = ctx.facades;
     if (!families || !ledger) throw new Error("budgeting: families and ledger must be registered first");
     const deps: BudgetingDeps = { db: ctx.db, families, ledger };
+    const alertDeps: AlertDeps = { ...deps, bus: ctx.bus, clock: ctx.clock };
+    for (const name of [
+      "ledger.TransactionCreated.v1",
+      "ledger.TransactionUpdated.v1",
+      "ledger.TransactionDeleted.v1",
+    ] as const) {
+      ctx.bus.on(name, "budgeting.evaluate", (event) => onTransactionChanged(alertDeps, event.payload));
+    }
+    ctx.jobs.register(purgeAlertsJob({ db: ctx.db, clock: ctx.clock, logger: ctx.logger }));
     budgetsRoutes(app, deps);
     festivalsRoutes(app, deps);
     return {
