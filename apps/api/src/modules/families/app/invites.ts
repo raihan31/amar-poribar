@@ -5,11 +5,22 @@ import { HttpError } from "../../../platform/errors.js";
 import { INVITE_RETENTION_MS, INVITE_TTL_MS, inviteState } from "../domain/invite.js";
 import { canAssignRole } from "../domain/roles.js";
 import { familiesRepo } from "../infra/families.repo.js";
-import { memberRepo } from "../infra/member-repo.js";
+import { memberRepo, type Executor } from "../infra/member-repo.js";
 import type { FamiliesDeps } from "./deps.js";
 import { requireRole } from "./require-role.js";
 
 const notFound = () => new HttpError(404, "invite_not_found", "Invite not found");
+
+/** FR-FAM-10: the limit comes from the plan (kept current by billing events). Removing members never blocks. */
+async function assertCapacity(x: Executor, familyId: string) {
+  const family = await familiesRepo.familyById(x, familyId);
+  if (!family) throw notFound();
+  if ((await memberRepo.countMembers(x, familyId)) >= family.memberLimit) {
+    throw new HttpError(409, "plan_member_limit", "This family has reached its member limit", {
+      limit: family.memberLimit,
+    });
+  }
+}
 
 // FR-FAM-02: Owner/Admin invites by phone number or shareable link.
 export async function createInvite(
@@ -19,6 +30,7 @@ export async function createInvite(
   const { role: actor } = await requireRole(deps.db, input.familyId, input.actorId, "admin", { write: true });
   if (!canAssignRole(actor, input.role)) throw new HttpError(403, "forbidden", "Cannot invite with this role");
   const invite = await deps.db.transaction(async (tx) => {
+    await assertCapacity(tx, input.familyId);
     const row = await familiesRepo.insertInvite(tx, {
       familyId: input.familyId,
       token: randomBytes(24).toString("base64url"),
@@ -101,11 +113,7 @@ export async function acceptInvite(deps: FamiliesDeps, input: { token: string; u
   if (!family) throw notFound();
 
   await deps.db.transaction(async (tx) => {
-    if ((await memberRepo.countMembers(tx, invite.familyId)) >= family.memberLimit) {
-      throw new HttpError(409, "member_limit", "This family has reached its member limit", {
-        limit: family.memberLimit,
-      });
-    }
+    await assertCapacity(tx, invite.familyId);
     // The conditional update makes an invite single use even under concurrent accepts.
     if (!(await familiesRepo.markInviteAccepted(tx, invite.id, input.userId, now))) {
       throw new HttpError(409, "invite_used", "This invite was already used");

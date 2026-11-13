@@ -1,6 +1,14 @@
 import type { Role } from "@amar-poribar/shared";
 import { HttpError } from "../../platform/errors.js";
 import type { ModuleDefinition } from "../../platform/module.js";
+import { createAggregates } from "./app/aggregates.js";
+import type {
+  FamilyAggregate,
+  FamilySummaryPage,
+  FamilySummaryRow,
+  ListFamilySummariesInput,
+} from "./app/aggregates.js";
+import { onSubscriptionChanged } from "./app/on-subscription-changed.js";
 import { onInviteCreated } from "./app/on-invite-created.js";
 import type { InvitePorts } from "./app/ports.js";
 import { requireRole } from "./app/require-role.js";
@@ -16,6 +24,7 @@ import { familiesRepo } from "./infra/families.repo.js";
 import { memberRepo, type FamilySummary, type MembershipSummary } from "./infra/member-repo.js";
 export * from "./events.js";
 
+export type { FamilyAggregate, FamilySummaryPage, FamilySummaryRow, ListFamilySummariesInput };
 export type { FamilySummary, MembershipSummary, InvitePorts, TransferActor };
 export { canAssignRole, canEditAll, canManageMember };
 
@@ -51,6 +60,16 @@ export interface FamiliesFacade {
   suspendFamily(familyId: string, reason: string, actor: TransferActor): Promise<void>;
   /** Lifts the suspension and publishes `families.FamilyUnsuspended.v1`. @staff-safe */
   unsuspendFamily(familyId: string, actor: TransferActor): Promise<void>;
+  /** FR-ADM-02. Newest first; `cursor` is the `nextCursor` of the previous page. @staff-safe */
+  listFamilySummaries(input: ListFamilySummariesInput): Promise<FamilySummaryPage>;
+  /** FR-ADM-03. Members with masked phones only; null when the family does not exist. @staff-safe */
+  getFamilyAggregate(familyId: string): Promise<FamilyAggregate | null>;
+  /** @staff-safe */
+  countFamilies(): Promise<number>;
+  /** FR-ADM-04. Families with no member holding the owner role. @staff-safe */
+  listFamiliesWithoutOwner(): Promise<FamilySummaryRow[]>;
+  /** Called by ledger at registration to supply `ledger.getLastActivity` (families does not import ledger). */
+  bindActivityPort(port: { getLastActivity(familyId: string): Promise<Date | null> }): void;
   /** Called by notifications at registration to supply `notify` for invite delivery (families imports neither). */
   bindInvitePorts(ports: Pick<InvitePorts, "notify">): void;
 }
@@ -70,6 +89,15 @@ export const familiesModule: ModuleDefinition<FamiliesFacade> = {
     const bus = ctx.bus;
     const publicWebUrl = (ctx.config as { publicWebUrl?: string } | undefined)?.publicWebUrl ?? "http://localhost:3000";
     const deps = { db: ctx.db, bus, identity, clock: ctx.clock, publicWebUrl };
+    let activity: ((familyId: string) => Promise<Date | null>) | undefined;
+    const aggregates = createAggregates({
+      db: ctx.db,
+      identity,
+      lastActivity: async (familyId) => (activity ? activity(familyId) : null),
+    });
+    ctx.bus.on("billing.SubscriptionChanged.v1", "families.apply-plan", (e) =>
+      onSubscriptionChanged({ db: ctx.db, clock: ctx.clock }, e.payload),
+    );
     let notify: InvitePorts["notify"] | undefined;
     const invitePorts = (): InvitePorts | undefined =>
       notify
@@ -118,6 +146,13 @@ export const familiesModule: ModuleDefinition<FamiliesFacade> = {
       transferOwnership: (familyId, toUserId, actor) => transferOwnership(deps, { familyId, toUserId, actor }),
       suspendFamily: (familyId, reason, actor) => suspendFamily(deps, familyId, reason, actor),
       unsuspendFamily: (familyId, actor) => unsuspendFamily(deps, familyId, actor),
+      listFamilySummaries: (input) => aggregates.listFamilySummaries(input),
+      getFamilyAggregate: (familyId) => aggregates.getFamilyAggregate(familyId),
+      countFamilies: () => aggregates.countFamilies(),
+      listFamiliesWithoutOwner: () => aggregates.listFamiliesWithoutOwner(),
+      bindActivityPort: (port) => {
+        activity = (familyId) => port.getLastActivity(familyId);
+      },
       canEditAll,
       canAssignRole,
       canManageMember,

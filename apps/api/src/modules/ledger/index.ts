@@ -101,6 +101,7 @@ export const ledgerModule: ModuleDefinition<LedgerFacade> = {
     const families = ctx.facades.families;
     if (!families) throw new Error("ledger: families must be registered first");
     const deps: LedgerDeps = { db: ctx.db, bus: ctx.bus, families };
+    families.bindActivityPort({ getLastActivity: (familyId) => getLastActivity(deps, familyId) });
     accountsRoutes(app, deps);
     categoriesRoutes(app, deps);
     transactionsRoutes(app, deps);
