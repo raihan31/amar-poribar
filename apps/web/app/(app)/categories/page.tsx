@@ -4,6 +4,7 @@ import "@/styles/ledger.css";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { CategoryEditSheet, type CategoryChange } from "@/components/features/ledger/CategoryEditSheet";
+import { RuleList } from "@/components/features/ledger/RuleList";
 import { CategoryTile } from "@/components/features/ledger/CategoryTile";
 import { PageHeader } from "@/components/shell/PageHeader";
 import { ROLE_RANK, useFamily } from "@/components/shell/useFamily";
@@ -93,6 +94,7 @@ export default function CategoriesPage() {
             </Button>
           </div>
         )}
+        <RuleList familyId={family.id} categories={all} canEdit={canEdit} />
       </main>
       {sheet && (
         <CategoryEditSheet open category={sheet.category} kind={kind} onSave={save} onClose={() => setSheet(null)} />

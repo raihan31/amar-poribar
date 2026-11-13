@@ -95,3 +95,38 @@
   gap: 8px;
   flex-wrap: wrap;
 }
+
+.txn-card {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.txn-rows {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+.txn-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.txn-row dd {
+  margin: 0;
+  font-weight: 600;
+}
+.txn-undo {
+  display: grid;
+  gap: 12px;
+}
+.txn-rules__delete {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  border: 2px solid var(--danger);
+  color: var(--danger);
+  background: transparent;
+}
