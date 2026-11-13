@@ -59,6 +59,32 @@ class LocalTransactionRepository implements TransactionRepository {
       );
 
   @override
+  Future<void> update(
+    String id, {
+    String? type,
+    int? amountPaisa,
+    int? feePaisa,
+    DateTime? occurredAt,
+    String? categoryId,
+    String? accountId,
+    String? note,
+    bool? isPrivate,
+    String? paidByUserId,
+  }) =>
+      store.updateTransaction(
+        id,
+        type: type,
+        amountPaisa: amountPaisa,
+        feePaisa: feePaisa,
+        occurredAt: occurredAt,
+        categoryId: categoryId,
+        accountId: accountId,
+        note: note,
+        isPrivate: isPrivate,
+        paidByUserId: paidByUserId,
+      );
+
+  @override
   Future<void> delete(String id) => store.deleteTransaction(id);
 
   @override

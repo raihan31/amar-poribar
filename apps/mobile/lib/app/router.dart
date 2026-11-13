@@ -17,6 +17,7 @@ import '../features/onboarding/ui/welcome_screen.dart';
 import '../features/settings/ui/profile_screen.dart';
 import '../features/summary/ui/summary_screen.dart';
 import '../features/transactions/ui/add_expense_screen.dart';
+import '../features/transactions/ui/transaction_detail_screen.dart';
 import '../features/transactions/ui/transactions_screen.dart';
 import '../features/voice/ui/voice_fallback_screen.dart';
 import '../presentation/providers/auth_provider.dart';
@@ -127,7 +128,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             ? CategoryPickerScreen(args: s.extra! as CategoryPickerArgs)
             : const ErrorScreen(),
       ),
-      stub(Routes.txn),
+      simple(
+        Routes.txn,
+        (s) => TransactionDetailScreen(id: s.pathParameters['id']!),
+      ),
+      simple(
+        Routes.txnEdit,
+        (s) => AddExpenseScreen(editId: s.pathParameters['id']!),
+      ),
       stub(Routes.receipt),
       stub(Routes.ruleLearn),
       simple(Routes.voiceFallback, (_) => const VoiceFallbackScreen()),

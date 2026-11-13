@@ -1,11 +1,14 @@
+import 'package:drift/drift.dart' show Value;
+
 import '../../../data/database/database.dart';
 import '../domain/txn_query.dart';
 import 'transaction_repository.dart';
 
-/// In-memory repository for widget tests. Ordering and the private-row rule match the real one;
-/// tombstones are not modelled (delete removes the row, restore is a no-op).
+/// In-memory repository for widget tests. Ordering and the private-row rule match the real one.
+/// A deleted row moves to [deleted] (a tombstone) and `restore` moves it back.
 class FakeTransactionRepository implements TransactionRepository {
   final List<Transaction> rows;
+  final List<Transaction> deleted = [];
   var _n = 0;
 
   FakeTransactionRepository([List<Transaction>? seed]) : rows = [...?seed];
@@ -111,10 +114,49 @@ class FakeTransactionRepository implements TransactionRepository {
   }
 
   @override
-  Future<void> delete(String id) async => rows.removeWhere((t) => t.id == id);
+  Future<void> update(
+    String id, {
+    String? type,
+    int? amountPaisa,
+    int? feePaisa,
+    DateTime? occurredAt,
+    String? categoryId,
+    String? accountId,
+    String? note,
+    bool? isPrivate,
+    String? paidByUserId,
+  }) async {
+    final i = rows.indexWhere((t) => t.id == id);
+    if (i < 0) return;
+    rows[i] = rows[i].copyWith(
+      type: type,
+      amountPaisa: amountPaisa,
+      feePaisa: feePaisa,
+      occurredAt: occurredAt?.toUtc().toIso8601String(),
+      categoryId:
+          categoryId == null ? const Value.absent() : Value(categoryId),
+      accountId: accountId == null ? const Value.absent() : Value(accountId),
+      note: note == null ? const Value.absent() : Value(note),
+      isPrivate: isPrivate,
+      paidByUserId:
+          paidByUserId == null ? const Value.absent() : Value(paidByUserId),
+      hlc: 'fake-${++_n}',
+    );
+  }
 
   @override
-  Future<void> restore(String id) async {}
+  Future<void> delete(String id) async {
+    final i = rows.indexWhere((t) => t.id == id);
+    if (i < 0) return;
+    deleted.add(rows.removeAt(i));
+  }
+
+  @override
+  Future<void> restore(String id) async {
+    final i = deleted.indexWhere((t) => t.id == id);
+    if (i < 0) return;
+    rows.add(deleted.removeAt(i));
+  }
 
   @override
   Future<int> purgeOldTombstones() async => 0;

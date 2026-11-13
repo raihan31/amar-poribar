@@ -27,6 +27,21 @@ abstract class TransactionRepository {
     String? paidByUserId,
     String? createdBy,
   });
+
+  /// Edits an entry in place with a new HLC (null arguments leave a field unchanged; an empty
+  /// [note] clears the note).
+  Future<void> update(
+    String id, {
+    String? type,
+    int? amountPaisa,
+    int? feePaisa,
+    DateTime? occurredAt,
+    String? categoryId,
+    String? accountId,
+    String? note,
+    bool? isPrivate,
+    String? paidByUserId,
+  });
   Future<void> delete(String id);
 
   /// Throws [RestoreWindowClosed] when the entry was deleted 30 days ago or more.
