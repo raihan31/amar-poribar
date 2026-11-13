@@ -1,10 +1,11 @@
 import "@fastify/jwt";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
-/** Payload of the access and refresh tokens issued by the identity module. */
+/** Payload of the access tokens issued by the identity module; `sid` is the session id (T-ID-05). */
 export interface TokenPayload {
   sub: string;
-  typ: "access" | "refresh";
+  sid?: string;
+  typ: "access";
 }
 
 declare module "@fastify/jwt" {

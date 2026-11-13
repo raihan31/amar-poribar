@@ -29,7 +29,17 @@ function monthOf(d: Date, back: number): string {
  * Creates the demo family through the API. Idempotent: does nothing when the owner phone
  * already belongs to a family with the demo name.
  */
-export async function seedDemoFamily(api: ApiClient, opts: { now?: Date } = {}): Promise<SeedResult> {
+export async function seedDemoFamily(
+  api: ApiClient,
+  opts: {
+    now?: Date;
+    /**
+     * Called after the family exists and before members are invited. The demo family has five members, above the
+     * Free plan limit of three (FR-FAM-10), and no API changes plans yet, so the caller lifts the limit here.
+     */
+    prepareFamily?: (familyId: string) => Promise<void>;
+  } = {},
+): Promise<SeedResult> {
   const now = opts.now ?? new Date();
   const owner = await makeUser(api, { phone: FIXTURE_PHONES.abbu });
   const me = ok(
@@ -40,6 +50,7 @@ export async function seedDemoFamily(api: ApiClient, opts: { now?: Date } = {}):
   if (existing) return { created: false, family: existing, owner };
 
   const family = await makeFamily(api, owner, { name: DEMO_FAMILY_NAME });
+  await opts.prepareFamily?.(family.id);
   for (const m of DEMO_MEMBERS) {
     if (m.role === "owner") continue;
     await inviteAndJoin(api, owner, await makeUser(api, { phone: m.phone }), m.role, family.id);

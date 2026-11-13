@@ -15,6 +15,90 @@
       "when": 1794350671979,
       "tag": "0001_baseline",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794354217688,
+      "tag": "0002_identity_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794354933004,
+      "tag": "0003_privacy_requests",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794374156906,
+      "tag": "0004_notifications_init",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794376524403,
+      "tag": "0005_families_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794378206842,
+      "tag": "0006_great_silvermane",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794378300000,
+      "tag": "0007_families_invite_revoked",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794378371480,
+      "tag": "0008_otp_challenges",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794380479208,
+      "tag": "0009_identity_sessions",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794381467727,
+      "tag": "0010_sms_deliveries",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794381522732,
+      "tag": "0011_families_invite_delivered",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794382006271,
+      "tag": "0012_optimal_randall",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794383465315,
+      "tag": "0013_small_shard",
+      "breakpoints": true
     }
   ]
 }

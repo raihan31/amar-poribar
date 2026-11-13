@@ -1,0 +1,78 @@
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
+import type { Db } from "../../../platform/db.js";
+import type { UserRepo } from "../app/ports.js";
+import { users } from "../schema.js";
+
+const basicsColumns = {
+  id: users.id,
+  name: users.name,
+  phone: users.phone,
+  locale: users.locale,
+  bnDigits: users.bnDigits,
+  createdAt: users.createdAt,
+  updatedAt: users.updatedAt,
+  simpleMode: users.simpleMode,
+  erasedAt: users.erasedAt,
+};
+
+export function createUserRepo(db: Db): UserRepo {
+  return {
+    async upsertByPhone(phone) {
+      const [row] = await db
+        .insert(users)
+        .values({ phone })
+        .onConflictDoUpdate({ target: users.phone, set: { updatedAt: new Date() } })
+        .returning({ id: users.id });
+      return { id: row!.id };
+    },
+    async signInByPhone(phone) {
+      const [row] = await db
+        .insert(users)
+        .values({ phone })
+        .onConflictDoUpdate({ target: users.phone, set: { updatedAt: new Date() } })
+        .returning({
+          id: users.id,
+          erasedAt: users.erasedAt,
+          erasureRequestedAt: users.erasureRequestedAt,
+          isNew: sql<boolean>`(xmax = 0)`,
+        });
+      return {
+        id: row!.id,
+        isNew: row!.isNew,
+        erasedAt: row!.erasedAt,
+        erasurePending: row!.erasureRequestedAt !== null,
+      };
+    },
+    async findByPhone(phone) {
+      const [row] = await db.select({ id: users.id }).from(users).where(eq(users.phone, phone));
+      return row ?? null;
+    },
+    async getBasics(userId) {
+      const [row] = await db.select(basicsColumns).from(users).where(eq(users.id, userId));
+      return row ?? null;
+    },
+    async updateProfile(userId, patch) {
+      const [row] = await db
+        .update(users)
+        .set({ ...patch, updatedAt: new Date() })
+        .where(and(eq(users.id, userId), isNull(users.erasedAt)))
+        .returning(basicsColumns);
+      return row ?? null;
+    },
+    async getManyBasics(ids) {
+      if (ids.length === 0) return [];
+      return db
+        .select(basicsColumns)
+        .from(users)
+        .where(inArray(users.id, [...ids]));
+    },
+    async getManyNames(ids) {
+      if (ids.length === 0) return new Map();
+      const rows = await db
+        .select({ id: users.id, name: users.name })
+        .from(users)
+        .where(inArray(users.id, [...ids]));
+      return new Map(rows.map((r) => [r.id, r]));
+    },
+  };
+}

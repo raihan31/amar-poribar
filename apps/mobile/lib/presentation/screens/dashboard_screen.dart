@@ -7,6 +7,7 @@ import '../../app/redirects.dart';
 import '../../core/l10n/l10n_x.dart';
 import '../../core/money/money.dart';
 import '../../core/money/money_format.dart';
+import '../../features/family/state/family_providers.dart';
 import '../providers/providers.dart';
 import '../widgets/glassmorphism_card.dart';
 
@@ -17,10 +18,7 @@ class DashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final appState = ref.watch(appStateProvider);
     final recentTransactions = ref.watch(recentTransactionsProvider);
-
-    // Derived state for the UI
-    final budgetUsedPercent =
-        appState.totalExpense.paisa / appState.monthlyBudget.paisa;
+    final name = ref.watch(meProvider).valueOrNull?.user.name ?? '';
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -61,9 +59,7 @@ class DashboardScreen extends ConsumerWidget {
                     children: [
                       const SizedBox(height: 10),
                       Text(
-                        context.l10n.home_welcome(
-                          appState.activeRole.name.toUpperCase(),
-                        ),
+                        context.l10n.home_welcome(name),
                         style: Theme.of(context)
                             .textTheme
                             .titleMedium
@@ -72,11 +68,7 @@ class DashboardScreen extends ConsumerWidget {
                       const SizedBox(height: 20),
 
                       // Hero Budget Card
-                      _buildHeroBudgetCard(
-                        context,
-                        appState,
-                        budgetUsedPercent,
-                      ),
+                      _buildHeroBudgetCard(context, appState),
 
                       const SizedBox(height: 30),
                       Text(
@@ -170,11 +162,7 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeroBudgetCard(
-    BuildContext context,
-    AppState state,
-    double percentUsed,
-  ) {
+  Widget _buildHeroBudgetCard(BuildContext context, AppState state) {
     return GlassmorphismCard(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -202,36 +190,7 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: percentUsed > 0.85
-                      ? Colors.red.withValues(alpha: 0.2)
-                      : Colors.green.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  context.l10n.home_dashboard_percentUsed(
-                    (percentUsed * 100).toStringAsFixed(0),
-                  ),
-                  style: TextStyle(
-                    color: percentUsed > 0.85 ? Colors.red : Colors.green,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
             ],
-          ),
-          const SizedBox(height: 20),
-          LinearProgressIndicator(
-            value: percentUsed,
-            backgroundColor: Colors.grey.withValues(alpha: 0.2),
-            color: percentUsed > 0.85
-                ? Colors.red
-                : Theme.of(context).colorScheme.primary,
-            minHeight: 8,
-            borderRadius: BorderRadius.circular(4),
           ),
           const SizedBox(height: 10),
           Row(
@@ -240,12 +199,6 @@ class DashboardScreen extends ConsumerWidget {
               Text(
                 context.l10n.home_dashboard_spent(
                   formatMoney(state.totalExpense, style: NumeralStyle.bangla),
-                ),
-                style: const TextStyle(fontSize: 12),
-              ),
-              Text(
-                context.l10n.home_dashboard_budget(
-                  formatMoney(state.monthlyBudget, style: NumeralStyle.bangla),
                 ),
                 style: const TextStyle(fontSize: 12),
               ),

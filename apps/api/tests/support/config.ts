@@ -6,8 +6,10 @@ export function testConfig(over: Record<string, string | undefined> = {}): Confi
   return loadConfig({
     NODE_ENV: "test",
     JWT_SECRET: production ? "p".repeat(40) : "test-secret",
+    ...(production ? { OTP_PEPPER: "o".repeat(40) } : {}),
     LOG_LEVEL: "silent",
-    ...(production ? { SMS_GATEWAY: "alphasms" } : {}),
+    SMS_WEBHOOK_SECRET: "test-sms-secret",
+    ...(production ? { SMS_GATEWAY: "alphasms", ALPHA_SMS_API_KEY: "test-alpha-key" } : {}),
     ...over,
   });
 }

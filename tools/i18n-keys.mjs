@@ -56,6 +56,17 @@ export function check(rootDir = root) {
   if (exists(arbBn) && exists(arbEn))
     diff("app_bn.arb", arbKeys(read(arbBn)), "app_en.arb", arbKeys(read(arbEn)), errors);
 
+  // Web-only strings (apps/web/lib/i18n/web-strings.ts) are valid keys for web code, and must exist in both languages.
+  const webKeys = new Set();
+  const webBnPath = "apps/web/lib/i18n/web-strings.ts";
+  if (exists(webBnPath)) {
+    const text = read(webBnPath);
+    const [bnPart = "", enPart = ""] = text.split(/export const webEn\b/);
+    const wb = tsKeys(bnPart);
+    diff("webBn", wb, "webEn", tsKeys(enPart), errors);
+    for (const k of wb) webKeys.add(k);
+  }
+
   const used = new Set();
   for (const app of ["apps/web", "apps/admin"]) {
     const dir = join(rootDir, app);
@@ -64,7 +75,8 @@ export function check(rootDir = root) {
       const text = readFileSync(file, "utf8");
       for (const m of text.matchAll(/(?<![\w$.])t\(\s*["']([^"']+)["']/g)) {
         used.add(m[1]);
-        if (!bn.has(m[1])) errors.push(`${m[1]}: used in ${file.slice(rootDir.length + 1)} but not in bn.ts`);
+        if (!bn.has(m[1]) && !webKeys.has(m[1]))
+          errors.push(`${m[1]}: used in ${file.slice(rootDir.length + 1)} but not in bn.ts`);
       }
     }
   }

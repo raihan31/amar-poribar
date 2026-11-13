@@ -10,6 +10,12 @@ String toBanglaDigits(String s) => s.replaceAllMapped(
       (m) => _bnDigits[int.parse(m[0]!)],
     );
 
+/// Replaces Bangla digits with ASCII digits; other characters are kept.
+String toLatinDigits(String s) => s.replaceAllMapped(
+      RegExp('[০-৯]'),
+      (m) => _bnDigits.indexOf(m[0]!).toString(),
+    );
+
 /// South Asian grouping: last three digits, then pairs.
 String _group(String digits) {
   if (digits.length <= 3) return digits;

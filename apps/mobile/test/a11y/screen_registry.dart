@@ -1,6 +1,22 @@
 import 'package:amar_poribar/app/redirects.dart';
+import 'package:amar_poribar/features/auth/data/auth_repository.dart';
+import 'package:amar_poribar/features/auth/data/fake_auth_repository.dart';
+import 'package:amar_poribar/features/auth/ui/login_screen.dart';
+import 'package:amar_poribar/features/auth/ui/session_expired_screen.dart';
+import 'package:amar_poribar/features/family/data/invite_repository.dart';
+import 'package:amar_poribar/features/family/state/family_providers.dart';
+import 'package:amar_poribar/features/family/ui/join_screen.dart';
+import 'package:amar_poribar/features/onboarding/data/fake_onboarding_repository.dart';
+import 'package:amar_poribar/features/onboarding/data/onboarding_repository.dart';
+import 'package:amar_poribar/features/onboarding/ui/consent_screen.dart';
+import 'package:amar_poribar/features/onboarding/ui/tutorial_screen.dart';
+import 'package:amar_poribar/features/onboarding/ui/welcome_screen.dart';
+import 'package:amar_poribar/features/settings/state/preferences_controller.dart';
+import 'package:amar_poribar/presentation/providers/auth_provider.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../helpers/fake_auth.dart';
 
 typedef ScreenFactory = Widget Function(BuildContext context);
 
@@ -43,6 +59,50 @@ void registerAllScreens() {
   if (_registered) return;
   _registered = true;
   // registerScreen('B1', Routes.list, (c) => TransactionsScreen(), needs: [...]);
+  registerScreen(
+    'A1',
+    Routes.login,
+    (c) => const LoginScreen(),
+    needs: [authRepositoryProvider.overrideWithValue(FakeAuthRepository())],
+  );
+  registerScreen(
+    'F6',
+    Routes.sessionExpired,
+    (c) => const SessionExpiredScreen(),
+  );
+  registerScreen(
+    'A2',
+    Routes.consent,
+    (c) => const ConsentScreen(),
+    needs: [
+      onboardingRepositoryProvider.overrideWithValue(
+        FakeOnboardingRepository(),
+      ),
+    ],
+  );
+  registerScreen(
+    'A6',
+    Routes.join,
+    (c) => const JoinScreen(token: 'abc'),
+    needs: [
+      authProvider.overrideWith(
+        (ref) => FakeAuthNotifier(const AuthState(loaded: true, token: 't')),
+      ),
+      inviteRepositoryProvider.overrideWithValue(FakeInviteRepository()),
+      inviteClockProvider.overrideWithValue(() => DateTime.utc(2026, 11, 9, 4)),
+    ],
+  );
+  registerScreen(
+    'D1',
+    Routes.welcome,
+    (c) => const WelcomeScreen(),
+    needs: [
+      preferencesProvider.overrideWith(
+        (ref) => PreferencesController(ref, autoLoad: false),
+      ),
+    ],
+  );
+  registerScreen('D2', Routes.tutorial, (c) => const TutorialScreen());
 }
 
 /// Routes that exist in the app. Until the `Routes` table of T-MOB-13 lands
@@ -54,6 +114,9 @@ const List<String> kAllRoutes = [
   Routes.pendingSms,
   Routes.settings,
   Routes.login,
+  Routes.consent,
+  Routes.sessionExpired,
+  Routes.join,
   Routes.add,
   Routes.tutorial,
 ];
@@ -62,12 +125,9 @@ const List<String> kAllRoutes = [
 /// route from this list when it registers the screen. The list may only
 /// shrink: `registry_complete_test.dart` fails if a route is in neither place.
 const Set<String> kRoutesAwaitingRegistration = {
-  Routes.welcome,
   Routes.home,
   Routes.transactions,
   Routes.pendingSms,
   Routes.settings,
-  Routes.login,
   Routes.add,
-  Routes.tutorial,
 };

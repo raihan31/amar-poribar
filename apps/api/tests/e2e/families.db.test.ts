@@ -35,7 +35,7 @@ describe("families, invites, accounts and categories (e2e)", () => {
     expect(inv.json.token).toBeTruthy();
     inviteToken = inv.json.token;
     expect((await e.call("POST", `/v1/invites/${inviteToken}/accept`, { token: B, body: {} })).status).toBe(200);
-    expect((await e.call("POST", `/v1/invites/${inviteToken}/accept`, { token: C, body: {} })).status).toBe(404);
+    expect((await e.call("POST", `/v1/invites/${inviteToken}/accept`, { token: C, body: {} })).status).toBe(409);
   });
 
   it("viewer joins and the family has 3 members", async () => {

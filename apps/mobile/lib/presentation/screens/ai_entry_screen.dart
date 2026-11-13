@@ -9,6 +9,9 @@ import '../../core/speech/budget_alerts.dart';
 import '../../core/speech/categories.dart';
 import '../../data/api/api_client.dart';
 import '../../data/database/database.dart';
+import '../../features/family/state/active_family.dart';
+import '../../features/voice/state/voice_capability_provider.dart';
+import '../../features/voice/ui/voice_fallback_screen.dart';
 import '../providers/auth_provider.dart';
 import '../providers/providers.dart';
 
@@ -109,7 +112,7 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
 
   /// When online, understand what was typed offline. Quiet if there is no connection.
   Future<void> _processQueue() async {
-    final family = ref.read(authProvider).family;
+    final family = ref.read(activeFamilyProvider);
     try {
       if (family != null) {
         await ref.read(pendingQueueProvider).process(family.id);
@@ -136,7 +139,7 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
 
   /// Best-effort background sync after saving; offline is fine, the next manual sync catches up.
   void _syncQuietly() {
-    final family = ref.read(authProvider).family;
+    final family = ref.read(activeFamilyProvider);
     if (family == null) return;
     ref
         .read(syncServiceProvider)
@@ -199,7 +202,10 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
         );
       });
 
-  Future<void> _readBack(TransactionDraft? d) {
+  Future<void> _readBack(TransactionDraft? d) async {
+    // No Bangla voice: show the text only, no auto read-aloud (FR-VOICE-07).
+    final caps = ref.read(voiceCapabilityProvider).value;
+    if (caps != null && caps.ttsMissingBangla) return;
     final voice = ref.read(voiceServiceProvider);
     if (d == null) return voice.speak('কিছু বোঝা যায়নি। আবার বলুন।');
     return voice.speak(
@@ -212,6 +218,7 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
   }
 
   Future<void> _listen(String familyId) async {
+    if (!await micMayListen(context, ref)) return;
     final voice = ref.read(voiceServiceProvider);
     await voice.stopSpeaking();
     setState(() {
@@ -277,15 +284,16 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
+    final family = ref.watch(activeFamilyProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('এআই এন্ট্রি / AI entry'),
         actions: [
-          if (auth.family != null)
+          if (family != null)
             IconButton(
               icon: const Icon(Icons.sync),
               tooltip: 'সিঙ্ক',
-              onPressed: _busy ? null : () => _syncNow(auth.family!),
+              onPressed: _busy ? null : () => _syncNow(family),
             ),
           IconButton(
             icon: const Icon(Icons.logout),
@@ -306,9 +314,9 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
                   child: const Text('লগইন করুন'),
                 ),
               )
-            : auth.family == null
+            : family == null
                 ? _createFamily()
-                : _entry(auth.family!),
+                : _entry(family),
       ),
     );
   }
@@ -327,9 +335,14 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
             onPressed: _busy
                 ? null
                 : () => _guard(
-                      () => ref
-                          .read(authProvider.notifier)
-                          .createFamily(_familyName.text.trim()),
+                      () async {
+                        final fam = await ref
+                            .read(authProvider.notifier)
+                            .createFamily(_familyName.text.trim());
+                        await ref
+                            .read(activeFamilyIdProvider.notifier)
+                            .select(fam.id);
+                      },
                     ),
             child: const Text('তৈরি করুন'),
           ),
@@ -343,6 +356,7 @@ class _AiEntryScreenState extends ConsumerState<AiEntryScreen> {
 
   Widget _entry(FamilyInfo family) => ListView(
         children: [
+          const VoiceTtsBanner(),
           SizedBox(
             height: 72,
             child: ElevatedButton.icon(

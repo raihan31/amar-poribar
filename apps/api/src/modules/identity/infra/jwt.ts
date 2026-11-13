@@ -1,27 +1,12 @@
 import fastifyJwt from "@fastify/jwt";
-import type { FastifyInstance, FastifyRequest } from "fastify";
-import { HttpError } from "../../../platform/errors.js";
-import type { TokenService, TokenType } from "../app/ports.js";
+import type { FastifyInstance } from "fastify";
+import type { TokenService } from "../app/ports.js";
 
-const EXPIRES_IN: Record<TokenType, string> = { access: "15m", refresh: "30d" };
-
-/**
- * Registers `@fastify/jwt` and decorates `app.authenticate`: 401 `unauthorized` for a missing or
- * invalid token, and for anything that is not an access token. Returns the token service.
- */
+/** Registers `@fastify/jwt` and returns the token service. `authenticate` is registered separately (needs sessions). */
 export async function registerJwt(app: FastifyInstance, secret: string): Promise<TokenService> {
   await app.register(fastifyJwt, { secret });
-  app.decorate("authenticate", async (req: FastifyRequest) => {
-    try {
-      await req.jwtVerify();
-    } catch {
-      throw new HttpError(401, "unauthorized", "Missing or invalid token");
-    }
-    if (req.user.typ !== "access") throw new HttpError(401, "unauthorized", "Access token required");
-  });
   return {
-    // TODO(P1): store refresh tokens so they can be rotated and revoked (FR-AUTH-03).
-    sign: (userId, typ) => app.jwt.sign({ sub: userId, typ }, { expiresIn: EXPIRES_IN[typ] }),
-    verify: (token) => app.jwt.verify<{ sub: string; typ: string }>(token),
+    sign: (userId, sid) => app.jwt.sign({ sub: userId, sid, typ: "access" }, { expiresIn: "15m" }),
+    verify: (token) => app.jwt.verify<{ sub: string; typ: string; sid?: string }>(token),
   };
 }

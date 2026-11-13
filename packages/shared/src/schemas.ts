@@ -23,6 +23,40 @@ export function normalizeBdPhone(phone: string): string {
   return `+88${digits.slice(-11)}`;
 }
 
+/** `POST /v1/auth/otp/request` (T-ID-04). */
+export const OtpRequestSchema = z.object({ phone: BdPhoneSchema });
+export type OtpRequestInput = z.infer<typeof OtpRequestSchema>;
+
+/** `POST /v1/auth/otp/verify` (T-ID-04). */
+export const OtpVerifySchema = z.object({
+  phone: BdPhoneSchema,
+  code: z.string().regex(/^\d{6}$/),
+  deviceId: z.string().min(1).max(200).optional(),
+});
+export type OtpVerifyInput = z.infer<typeof OtpVerifySchema>;
+
+export const OtpRequestResponseSchema = z.object({
+  sent: z.literal(true),
+  resendInSeconds: z.number().int(),
+  /** Only outside production with the fake SMS gateway. */
+  devCode: z.string().optional(),
+});
+
+export const OtpVerifyResponseSchema = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+  user: z.object({
+    id: z.string(),
+    name: z.string().nullable(),
+    locale: z.string(),
+    numeralStyle: z.enum(["bn", "latin"]),
+    simpleMode: z.boolean(),
+  }),
+  isNewUser: z.boolean(),
+  /** Present (true) when the user asked for erasure and may still cancel it. */
+  erasurePending: z.literal(true).optional(),
+});
+
 /** Upper bound per transaction: ৳1 crore, in paisa. */
 export const MAX_AMOUNT_PAISA = 1_00_00_000 * 100;
 
@@ -94,7 +128,7 @@ export const ParseResponseSchema = z.object({
 export type ParseResponse = z.infer<typeof ParseResponseSchema>;
 
 export const CreateFamilySchema = z.object({
-  name: z.string().min(1).max(80),
+  name: z.string().trim().min(1).max(80),
 });
 export type CreateFamilyInput = z.infer<typeof CreateFamilySchema>;
 
@@ -297,6 +331,31 @@ export const MonthSummarySchema = z.object({
 export type MonthSummary = z.infer<typeof MonthSummarySchema>;
 
 export const LocaleSchema = z.enum(["bn", "en"]);
+
+export const NumeralStyleSchema = z.enum(["bn", "latin"]);
+
+/** `PATCH /v1/me`: any subset of the identity-owned profile fields (FR-AUTH-04). */
+export const UpdateProfileSchema = z
+  .object({
+    name: z.string().trim().min(1).max(60).nullable(),
+    locale: LocaleSchema,
+    numeralStyle: NumeralStyleSchema,
+    simpleMode: z.boolean(),
+  })
+  .partial()
+  .refine((v) => Object.keys(v).length > 0, "Nothing to update");
+export type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;
+
+export const UserProfileSchema = z.object({
+  id: z.uuid(),
+  phone: z.string(),
+  name: z.string().nullable(),
+  locale: LocaleSchema,
+  numeralStyle: NumeralStyleSchema,
+  simpleMode: z.boolean(),
+  createdAt: z.string(),
+});
+export type UserProfile = z.infer<typeof UserProfileSchema>;
 
 export const SummaryQuerySchema = z.object({
   month: MonthSchema.optional(),

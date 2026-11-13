@@ -77,7 +77,7 @@ void main() {
         (_) async => http.Response(
           jsonEncode({
             'error': {
-              'code': 'invalid_otp',
+              'code': 'otp_invalid',
               'message': 'Invalid or expired code',
             },
           }),

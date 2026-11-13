@@ -3,31 +3,51 @@
   "common_appName": "আমার পরিবার",
   "common_yes": "হ্যাঁ",
   "common_no": "না",
-  "auth_login_title": "লগইন",
-  "auth_login_phoneLabel": "মোবাইল নম্বর",
-  "auth_login_phoneHint": "০১৭১২৩৪৫৬৭৮৯",
-  "auth_login_codeLabel": "৬ সংখ্যার কোড",
-  "auth_login_sendOtp": "OTP পাঠান",
-  "auth_login_submit": "লগইন",
-  "auth_login_devOtp": "ডেভ OTP: {code}",
-  "@auth_login_devOtp": {
-    "placeholders": {"code": {"type": "String"}}
+  "auth_login_title": "আমার পরিবার",
+  "auth_login_phoneLabel": "আপনার মোবাইল নম্বর দিন",
+  "auth_login_phoneHint": "আমরা একটি ৬ সংখ্যার কোড এসএমএসে পাঠাব।",
+  "auth_login_codeLabel": "কোডটি লিখুন",
+  "auth_login_submit": "ঢুকুন",
+  "auth_login_tagline": "পরিবারের সব হিসাব, এক জায়গায়",
+  "auth_login_resend": "আবার পাঠান ({time})",
+  "@auth_login_resend": {
+    "placeholders": {"time": {"type": "String"}}
   },
+  "auth_login_resendNow": "আবার পাঠান",
+  "auth_login_resendQuestion": "কোড আসেনি?",
+  "auth_login_helpFooter": "সাহায্য লাগলে বাড়ির কাউকে ফোন দিন।",
+  "auth_login_phoneInvalid": "নম্বরটি ঠিক নয়। ০১ দিয়ে শুরু করে ১১ সংখ্যা লিখুন।",
+  "auth_login_phoneSemantics": "মোবাইল নম্বর",
+  "auth_login_codeSemantics": "৬ সংখ্যার কোড",
+  "auth_login_changeNumber": "নম্বর বদলান",
+  "auth_otp_wrongTitle": "কোডটি মেলেনি",
+  "auth_otp_wrongBody": "আবার দেখে লিখুন। আর {count} বার চেষ্টা করতে পারবেন।",
+  "@auth_otp_wrongBody": {
+    "placeholders": {"count": {"type": "String"}}
+  },
+  "auth_otp_newCode": "নতুন কোড পাঠান",
+  "auth_otp_wrongNumber": "নম্বর ভুল? বদলান",
+  "auth_otp_helpTitle": "কোড না এলে:",
+  "auth_otp_helpBody": "একটু অপেক্ষা করুন। এরপরও না এলে বাড়ির কাউকে ফোন দিন। কোড কাউকে বলবেন না।",
+  "auth_otp_limitNote": "এক ঘণ্টায় সর্বোচ্চ ৫ বার কোড চাওয়া যায়। এ নম্বরে {count} বার চাওয়া হয়েছে।",
+  "@auth_otp_limitNote": {
+    "placeholders": {"count": {"type": "String"}}
+  },
+  "auth_otp_expiredTitle": "কোডের সময় শেষ",
+  "auth_otp_expiredBody": "নতুন কোড নিন।",
+  "auth_otp_rateLimited": "অনেকবার চেষ্টা হয়েছে। {time} পরে আবার চেষ্টা করুন।",
+  "@auth_otp_rateLimited": {
+    "placeholders": {"time": {"type": "String"}}
+  },
+  "auth_otp_serverDown": "এখন সংযোগ হচ্ছে না। একটু পরে আবার চেষ্টা করুন।",
+  "auth_otp_networkDown": "ইন্টারনেট নেই। সংযোগ দেখে আবার চেষ্টা করুন।",
   "home_welcome": "স্বাগতম, {role}",
   "@home_welcome": {
     "placeholders": {"role": {"type": "String"}}
   },
   "home_dashboard_totalBalance": "মোট ব্যালেন্স",
-  "home_dashboard_percentUsed": "{percent}% ব্যবহৃত",
-  "@home_dashboard_percentUsed": {
-    "placeholders": {"percent": {"type": "String"}}
-  },
   "home_dashboard_spent": "খরচ: ৳{amount}",
   "@home_dashboard_spent": {
-    "placeholders": {"amount": {"type": "String"}}
-  },
-  "home_dashboard_budget": "বাজেট: ৳{amount}",
-  "@home_dashboard_budget": {
     "placeholders": {"amount": {"type": "String"}}
   },
   "home_dashboard_analytics": "মাসের হিসাব",
@@ -61,5 +81,139 @@
   "txn_dashboard_count": "{count, plural, =0{কোনো লেনদেন নেই} =1{১টি লেনদেন} other{{count}টি লেনদেন}}",
   "@txn_dashboard_count": {
     "placeholders": {"count": {"type": "int"}}
-  }
+  },
+  "voice_fallback_title": "কথা বলা যাচ্ছে না",
+  "voice_fallback_heading": "এই ফোনে বাংলা ভয়েস নেই",
+  "voice_fallback_body": "চিন্তা নেই। আপনি লিখেও খরচ রাখতে পারবেন। চাইলে বাংলা ভয়েস নামিয়ে নিন।",
+  "voice_fallback_install": "বাংলা ভয়েস ইনস্টল করুন",
+  "voice_fallback_installNote": "গুগলের পেজ খুলবে। ইনস্টল শেষে ফিরে আসুন।",
+  "voice_fallback_typeTitle": "এখন লিখে রাখুন",
+  "voice_fallback_typeHint": "লিখুন: \"বাজার ৮৫০ ক্যাশ\"",
+  "voice_fallback_send": "পাঠান",
+  "voice_fallback_save": "সংরক্ষণ",
+  "voice_fallback_noTts": "উত্তর পড়ে শোনানোও এই ফোনে বন্ধ। লেখা দেখে নিন।",
+  "voice_fallback_noTtsAction": "ইনস্টল",
+  "voice_fallback_hint": "লিখে দিন",
+  "voice_fallback_back": "পেছনে",
+  "voice_fallback_nothing": "কিছু বোঝা যায়নি",
+  "onb_welcome_semBangla": "বাংলা ভাষা",
+  "onb_welcome_semEnglish": "ইংরেজি ভাষা",
+  "onb_welcome_semBanglaNum": "বাংলা সংখ্যা",
+  "onb_welcome_semLatinNum": "ইংরেজি সংখ্যা",
+  "onb_welcome_title": "স্বাগতম",
+  "onb_welcome_langTitle": "ভাষা",
+  "onb_welcome_numTitle": "সংখ্যা",
+  "onb_welcome_simpleTitle": "সহজ মোড",
+  "onb_welcome_simpleBody": "বড় লেখা, ছবি আর কথা। সব কিছু শুনিয়ে দেবে।",
+  "onb_welcome_on": "চালু",
+  "onb_welcome_off": "বন্ধ",
+  "onb_welcome_later": "পরে সেটিং থেকে বদলাতে পারবেন।",
+  "onb_welcome_continue": "এগিয়ে চলুন",
+  "profile_title": "আমার প্রোফাইল",
+  "profile_back": "পেছনে",
+  "profile_edit": "বদলান",
+  "profile_nameLabel": "আপনার নাম",
+  "profile_language": "ভাষা",
+  "profile_numbers": "সংখ্যা",
+  "profile_simple": "সহজ মোড",
+  "profile_simpleBody": "বড় লেখা, ছবি, সব শুনিয়ে দেবে",
+  "profile_remind": "রোজ মনে করান",
+  "profile_changeTime": "সময় বদলান",
+  "profile_hide": "আমার অবস্থা লুকাই",
+  "profile_hideBody": "অন্যরা আমাকে সবসময় অফলাইন দেখবে।",
+  "profile_privacy": "গোপনীয়তা নীতি",
+  "profile_delete": "আমার তথ্য মুছুন",
+  "profile_saveFailed": "বদলানো যায়নি। আবার চেষ্টা করুন।",
+  "profile_periodDawn": "ভোর",
+  "profile_periodSmallHours": "রাত",
+  "profile_periodMorning": "সকাল",
+  "profile_periodNoon": "দুপুর",
+  "profile_periodAfternoon": "বিকাল",
+  "profile_periodEvening": "সন্ধ্যা",
+  "profile_periodNight": "রাত",
+  "profile_reminderAt": "{time} টায়",
+  "@profile_reminderAt": {
+    "placeholders": {"time": {"type": "String"}}
+  },
+  "profile_time": "{period} {time}",
+  "@profile_time": {
+    "placeholders": {"period": {"type": "String"}, "time": {"type": "String"}}
+  },
+  "auth_expired_title": "আবার ঢুকুন",
+  "auth_expired_body": "আপনার নিরাপত্তার জন্য কিছুদিন পর আবার ঢুকতে হয়। আপনার হিসাব ঠিকই আছে।",
+  "auth_expired_button": "নম্বর দিয়ে ঢুকুন",
+  "auth_expired_footer": "সাহায্য লাগলে বাড়ির কাউকে ফোন দিন।",
+  "auth_expired_otherUser": "এটি অন্য নম্বর। এই ফোনের আগের তথ্য মুছে ফেলব?",
+  "auth_expired_otherUserWipe": "হ্যাঁ, মুছে ফেলুন",
+  "auth_expired_otherUserKeep": "না",
+  "auth_inviteExpired_title": "আমন্ত্রণের মেয়াদ শেষ",
+  "auth_inviteExpired_body": "কোনো সমস্যা নেই। যিনি ডেকেছিলেন, তাঁকে নতুন লিংক পাঠাতে বলুন।",
+  "auth_inviteExpired_nudge": "{inviter}কে কম্পন দিন",
+  "@auth_inviteExpired_nudge": {
+    "placeholders": {"inviter": {"type": "String"}}
+  },
+  "onb_consent_title": "আপনার পরিবার তৈরি করুন",
+  "onb_consent_step": "ধাপ {n} / {total}",
+  "@onb_consent_step": {
+    "placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}
+  },
+  "onb_consent_nameLabel": "পরিবারের নাম",
+  "onb_consent_nameHint": "রহিম পরিবার",
+  "onb_consent_currencyLabel": "টাকার ধরন",
+  "onb_consent_currencyValue": "৳ বাংলাদেশি টাকা ({code})",
+  "@onb_consent_currencyValue": {
+    "placeholders": {"code": {"type": "String"}}
+  },
+  "onb_consent_useTitle": "আপনার তথ্য কীভাবে ব্যবহার হবে",
+  "onb_consent_use1": "শুধু আপনার পরিবারের সদস্যরা হিসাব দেখবে।",
+  "onb_consent_use2": "কথা আপনার ফোনেই লেখা হয়। রেকর্ড সার্ভারে যায় না।",
+  "onb_consent_use3": "এআই-এর জন্য ফোন নম্বর ও অ্যাকাউন্ট নম্বর পাঠানো হয় না। যেকোনো সময় তথ্য মুছে দিতে পারবেন।",
+  "onb_consent_agree": "আমি রাজি আছি",
+  "onb_consent_policy": "গোপনীয়তা নীতি",
+  "onb_consent_submit": "পরিবার তৈরি করুন",
+  "onb_consent_error": "কিছু একটা ভুল হয়েছে। আবার চেষ্টা করুন।",
+  "onb_consent_step2Title": "পরিবার তৈরি হয়েছে",
+  "onb_consent_step2Body": "কীভাবে ব্যবহার করতে হয়, ছোট করে শুনে নিতে পারেন।",
+  "onb_consent_listen": "শুনে নিই",
+  "onb_consent_notNow": "এখন নয়",
+  "onb_consent_policyError": "নীতি আনা যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।",
+  "onb_consent_retry": "আবার চেষ্টা করুন",
+  "fam_join_invitedBy": "{inviter} আপনাকে ডেকেছেন",
+  "@fam_join_invitedBy": {
+    "placeholders": {"inviter": {"type": "String"}}
+  },
+  "fam_join_summary": "{members} জন সদস্য · আপনি হবেন {role}",
+  "@fam_join_summary": {
+    "placeholders": {"members": {"type": "String"}, "role": {"type": "String"}}
+  },
+  "fam_join_canTitle": "যোগ দিলে আপনি পারবেন",
+  "fam_join_bulletLedger": "খরচ লিখতে ও দেখতে",
+  "fam_join_bulletViewer": "পরিবারের হিসাব দেখতে (শুধু সারাংশ)",
+  "fam_join_bulletTalk": "পরিবারের সাথে কথা বলতে",
+  "fam_join_bulletPrivate": "ব্যক্তিগত খরচ শুধু নিজে দেখতে",
+  "fam_join_expiresIn": "আমন্ত্রণের মেয়াদ আছে আর {days} দিন।",
+  "@fam_join_expiresIn": {
+    "placeholders": {"days": {"type": "String"}}
+  },
+  "fam_join_accept": "যোগ দিন",
+  "fam_join_notNow": "এখন নয়",
+  "fam_join_wrongNumber": "এই আমন্ত্রণ অন্য নম্বরের জন্য।",
+  "fam_join_failed": "যোগ দেওয়া গেল না। আবার চেষ্টা করুন।",
+  "fam_join_roleOwner": "মালিক",
+  "fam_join_roleAdmin": "অ্যাডমিন",
+  "fam_join_roleMember": "সদস্য",
+  "fam_join_roleViewer": "দর্শক",
+  "tutorial_title1": "স্বাগতম",
+  "tutorial_title2": "মাইক চেপে বলুন",
+  "tutorial_title3": "সবুজ বোতাম চাপুন",
+  "tutorial_title4": "মাসের কথা শুনুন",
+  "tutorial_counter": "{n} / {total}",
+  "@tutorial_counter": {
+    "placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}
+  },
+  "tutorial_listenAgain": "আবার শুনুন",
+  "tutorial_next": "পরের ধাপ",
+  "tutorial_back": "পেছনে",
+  "tutorial_skip": "বাদ দিন",
+  "tutorial_start": "শুরু করুন"
 }

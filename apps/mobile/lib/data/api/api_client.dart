@@ -122,8 +122,37 @@ class ApiClient {
         for (final a in await ledger.accounts(familyId)) a.toJson(),
       ];
 
-  /// This month's budgets with spend and 80%/100% level.
-  Future<List<Map<String, dynamic>>> budgets(String familyId) async => [
-        for (final b in (await budget.budgets(familyId)).budgets) b.toJson(),
+  /// Budgets with spend and 80%/100% level for [month] (`YYYY-MM`, default this month), each row
+  /// carrying its month and a stable id so it can be cached.
+  Future<List<Map<String, dynamic>>> budgets(
+    String familyId, {
+    String? month,
+  }) async {
+    final list = await budget.budgets(familyId, month: month);
+    return [
+      for (final b in list.budgets)
+        {
+          ...b.toJson(),
+          'month': list.month,
+          'id': '$familyId:${list.month}:${b.categoryId ?? 'overall'}',
+        },
+    ];
+  }
+
+  /// Members as the cache stores them: only the last three digits of the phone are kept.
+  Future<List<Map<String, dynamic>>> members(String familyId) async => [
+        for (final m in await family.members(familyId))
+          {
+            'userId': m.userId,
+            'name': m.name ?? '',
+            'role': m.role,
+            'phoneLast3': m.phone.length > 3
+                ? m.phone.substring(m.phone.length - 3)
+                : m.phone,
+          },
       ];
+
+  /// Plan limits and flags of the family's subscription.
+  Future<Map<String, dynamic>> entitlements(String familyId) async =>
+      (await billing.subscription(familyId)).toJson();
 }

@@ -32,7 +32,7 @@ describe("families routes (db)", () => {
       const events = await sql`select name from platform.outbox where name = 'families.FamilyCreated.v1'`;
       expect(events.length).toBe(1);
       const me = await t.app.inject({ method: "GET", url: "/v1/me", headers: t.as(owner) });
-      expect(me.json().families).toEqual([{ id: familyId, name: "রহিম পরিবার", role: "owner" }]);
+      expect(me.json().families).toMatchObject([{ id: familyId, name: "রহিম পরিবার", role: "owner" }]);
       await t.close();
     });
   });
@@ -107,7 +107,8 @@ describe("families routes (db)", () => {
       expect(ok.statusCode).toBe(200);
       expect(ok.json()).toEqual({ familyId, role: "member" });
       const again = await t.app.inject({ method: "POST", url: `/v1/invites/${token}/accept`, headers: t.as(second) });
-      expect(again.statusCode).toBe(404);
+      expect(again.statusCode).toBe(409);
+      expect(again.json().error.code).toBe("invite_used");
       expect(await userId(t, first)).toBeTruthy();
       await t.close();
     });

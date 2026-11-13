@@ -11,8 +11,24 @@ class FakeVoiceService implements VoiceService {
   /// Whether the pretend device has a speech recogniser.
   final bool available;
 
-  FakeVoiceService({List<String> listen = const [], this.available = true})
-      : scriptedResults = [...listen];
+  /// What [capabilities] reports. Tests change it to script a device (e.g. after an install).
+  VoiceCapabilities caps;
+
+  /// How many times [openVoiceInstall] was called.
+  int installOpens = 0;
+
+  FakeVoiceService({
+    List<String> listen = const [],
+    this.available = true,
+    VoiceCapabilities? capabilities,
+  })  : scriptedResults = [...listen],
+        caps = capabilities ?? VoiceCapabilities.all;
+
+  @override
+  Future<VoiceCapabilities> capabilities() async => caps;
+
+  @override
+  Future<void> openVoiceInstall() async => installOpens++;
 
   @override
   Future<bool> init() async => available;

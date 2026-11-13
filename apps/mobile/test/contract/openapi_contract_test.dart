@@ -35,6 +35,7 @@ final Map<String, _Codec> _models = {
   'category': (b) => _obj(b, ApiCategory.fromJson, (m) => m.toJson()),
   'draft': (b) => _obj(b, TransactionDraft.fromJson, (m) => m.toJson()),
   'error': (b) => _obj(b, ApiErrorBody.fromJson, (m) => m.toJson()),
+  'errors': (b) => _list(b, ApiErrorBody.fromJson, (m) => m.toJson()),
   'family': (b) => _obj(b, Family.fromJson, (m) => m.toJson()),
   'me': (b) => _obj(b, Me.fromJson, (m) => m.toJson()),
   'member': (b) => _list(b, ApiMember.fromJson, (m) => m.toJson()),

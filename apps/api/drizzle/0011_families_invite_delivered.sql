@@ -1,0 +1,1 @@
+ALTER TABLE "families"."family_invites" ADD COLUMN IF NOT EXISTS "delivered_at" timestamp with time zone;

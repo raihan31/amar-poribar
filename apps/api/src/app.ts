@@ -47,6 +47,8 @@ export interface AppDeps {
   clock?: () => Date;
   /** Drain the outbox continuously (ROLE=worker|all in the server). Needs `sql`. */
   outboxLoop?: boolean;
+  /** Share an event bus the caller can drain (tests); the app creates its own when absent. */
+  bus?: EventBus;
 }
 
 export interface BuildAppOptions {
@@ -66,7 +68,7 @@ export async function buildApp({ config, db, deps = {} }: BuildAppOptions) {
 
   // Platform services (SRS §3.4).
   const logger = app.log;
-  const bus = new EventBus();
+  const bus = deps.bus ?? new EventBus();
   const metrics = createMetrics();
   const jobs =
     deps.jobs ??
@@ -138,8 +140,7 @@ export async function buildApp({ config, db, deps = {} }: BuildAppOptions) {
         if (!identity) throw new Error("identity module is not registered");
         return identity.verifyAccessToken(token);
       },
-      isMember: async (userId, familyId) =>
-        (await ctx.facades.families?.getMemberIds(familyId))?.includes(userId) ?? false,
+      isMember: async (userId, familyId) => (await ctx.facades.families?.isMember(familyId, userId)) ?? false,
       fanout,
       bus,
       onError: (err) => logger.error({ err: String(err) }, "realtime error"),

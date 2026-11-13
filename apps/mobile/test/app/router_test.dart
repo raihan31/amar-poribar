@@ -43,7 +43,7 @@ class FakeAuth extends AuthNotifier {
 
 const _family = FamilyInfo('f1', 'রহিম পরিবার', 'owner');
 const _signedOut = AuthState(loaded: true);
-const _signedIn = AuthState(loaded: true, token: 't', family: _family);
+const _signedIn = AuthState(loaded: true, token: 't', families: [_family]);
 
 /// Scrollable stand-in so tab scroll state can be observed.
 Widget _scrolling(String name) => Scaffold(
@@ -66,6 +66,7 @@ Future<(GoRouter, FakeAuth, ProviderContainer)> _pump(
     overrides: [
       localStoreProvider.overrideWithValue(store),
       authProvider.overrideWith((ref) => fake),
+      tokenStoreProvider.overrideWithValue(_MemoryTokens()),
       welcomeDoneProvider.overrideWith((ref) => welcomeDone),
       placeholderBuilderProvider.overrideWithValue(_scrolling),
     ],
@@ -115,19 +116,18 @@ void main() {
     final (router, auth, _) = await _pump(tester, welcomeDone: true);
     router.go('amarporibar://join/abc');
     await tester.pumpAndSettle();
-    expect(_loc(router), '/join/abc');
-
     // The join screen sends a signed-out person to log in and remembers where they were.
-    router.go('/login?from=${Uri.encodeQueryComponent('/join/abc')}');
-    await tester.pumpAndSettle();
-    expect(_loc(router), startsWith('/login'));
+    expect(
+      _loc(router),
+      '/login?from=${Uri.encodeQueryComponent('/join/abc')}',
+    );
     auth.set(_signedIn);
     await tester.pumpAndSettle();
     expect(_loc(router), '/join/abc');
   });
 
   testWidgets('an https invite link is always allowed', (tester) async {
-    final (router, _, _) = await _pump(tester);
+    final (router, _, _) = await _pump(tester, auth: _signedIn);
     router.go('/join/xyz');
     await tester.pumpAndSettle();
     expect(_loc(router), '/join/xyz');
@@ -146,7 +146,7 @@ void main() {
     expect(uri.path, '/session-expired');
     expect(uri.queryParameters['from'], '/budget');
 
-    await tester.tap(find.text('আবার লগইন করুন'));
+    await tester.tap(find.byKey(const Key('session_expired_sign_in')));
     await tester.pumpAndSettle();
     expect(_loc(router), startsWith('/login'));
     auth.set(_signedIn);

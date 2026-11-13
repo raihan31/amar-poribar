@@ -11,6 +11,7 @@ class Routes {
   static const login = '/login';
   static const loginCode = '/login/code';
   static const consent = '/consent';
+  static const consentPolicy = '/consent/policy';
   static const join = '/join/:token';
   static const tutorial = '/tutorial';
   static const sessionExpired = '/session-expired';
@@ -58,8 +59,19 @@ class Routes {
 /// `Meta('welcome_done')` is set. `main.dart` overrides this with the stored value.
 final welcomeDoneProvider = StateProvider<bool>((ref) => false);
 
+/// The invite token waiting for the person to sign in (`Meta('pending_invite')`).
+final pendingInviteProvider = StateProvider<String?>((ref) => null);
+
 /// `Meta('tutorial_done')` is set. Defaults to true so nothing forces the tutorial by accident.
 final tutorialDoneProvider = StateProvider<bool>((ref) => true);
+
+/// `Meta` key holding the privacy policy version the user accepted (FR-AUTH-10).
+const consentVersionKey = 'consent_version';
+
+/// The stored consent matches the current policy version. `bootstrap` sets it from
+/// `Meta('consent_version')` and `checkConsent` compares it with `GET /v1/policy`. Defaults to
+/// true so nothing forces the consent screen by accident (tests, signed-out screens).
+final consentCurrentProvider = StateProvider<bool>((ref) => true);
 
 const _signedOutPages = {Routes.welcome, Routes.login, Routes.loginCode};
 
@@ -112,8 +124,16 @@ String? redirect(Ref ref, GoRouterState state) {
     return Routes.welcome;
   }
 
-  if (auth.family == null) {
-    return path == Routes.consent ? null : Routes.consent;
+  final onConsent = path == Routes.consent || path == Routes.consentPolicy;
+  if (auth.families.isEmpty || !ref.read(consentCurrentProvider)) {
+    if (auth.families.isEmpty) {
+      // A person with an invite joins instead of creating a family (T-MOB-18).
+      final from = _safeFrom(uri.queryParameters['from']);
+      if (from != null && from.startsWith('/join/')) return from;
+      final pending = ref.read(pendingInviteProvider);
+      if (pending != null && pending.isNotEmpty) return '/join/$pending';
+    }
+    return onConsent ? null : Routes.consent;
   }
 
   final onEntryPage = _signedOutPages.contains(path) ||

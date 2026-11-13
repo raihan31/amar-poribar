@@ -14,6 +14,9 @@ part 'database.g.dart';
     Transactions,
     CachedCategories,
     CachedAccounts,
+    CachedBudgets,
+    CachedMembers,
+    CachedEntitlements,
     Meta,
     PendingEntries,
   ],
@@ -35,7 +38,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -43,6 +46,18 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (m, from, to) async {
           if (from < 2) await m.addColumn(transactions, transactions.localSeq);
           if (from < 3) await m.createTable(pendingEntries);
+          if (from < 4) {
+            await m.createTable(cachedBudgets);
+            await m.createTable(cachedMembers);
+            await m.createTable(cachedEntitlements);
+            await m.addColumn(cachedAccounts, cachedAccounts.balancePaisa);
+            await m.addColumn(cachedAccounts, cachedAccounts.ownerUserId);
+            await m.addColumn(cachedAccounts, cachedAccounts.archived);
+            await m.addColumn(
+              cachedAccounts,
+              cachedAccounts.openingBalancePaisa,
+            );
+          }
         },
       );
 }

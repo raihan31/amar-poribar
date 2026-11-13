@@ -40,14 +40,22 @@ export const ConfigSchema = z.object({
   DB_POOL_MAX: z.preprocess(blank, z.coerce.number().int().min(1).max(200).default(10)),
   MIGRATE_ON_START: z.preprocess(blank, z.enum(["true", "false"]).default("true")),
   JWT_SECRET: optStr(),
+  OTP_PEPPER: optStr(),
   CORS_ORIGIN: list(),
+  PUBLIC_WEB_URL: withDefault("http://localhost:3000"),
   ANTHROPIC_API_KEY: optStr(),
   AI_MODEL: optStr(),
-  SMS_GATEWAY: z.preprocess(blank, z.enum(["fake", "sslwireless", "alphasms"]).default("fake")),
+  SMS_GATEWAY: z.preprocess(blank, z.enum(["fake", "sslwireless", "alphasms", "alpha"]).default("fake")),
   SMS_API_KEY: optStr(),
   SMS_SENDER_ID: optStr(),
+  SSLWIRELESS_API_TOKEN: optStr(),
+  SSLWIRELESS_SID: optStr(),
+  ALPHA_SMS_API_KEY: optStr(),
+  SMS_WEBHOOK_SECRET: optStr(),
   FAKES_URL: withDefault("http://localhost:4100"),
   PUSH_PROVIDER: z.preprocess(blank, z.enum(["fake", "fcm"]).default("fake")),
+  PUSH_DRIVER: z.preprocess(blank, z.enum(["fcm", "fake"]).optional()),
+  FCM_CREDENTIALS_JSON: optStr(),
   FCM_PROJECT_ID: optStr(),
   FCM_SERVICE_ACCOUNT_JSON: optStr(),
   STORAGE_ENDPOINT: withDefault("http://localhost:9000"),
@@ -81,10 +89,15 @@ function crossChecks(env: Record<string, string | undefined>): z.core.$ZodIssue[
     if (!s || s.length < 32 || /change-?me/i.test(s)) {
       issue("JWT_SECRET", "JWT_SECRET must be a random value of at least 32 characters in production");
     }
+    if ((get("OTP_PEPPER") ?? "").length < 32) {
+      issue("OTP_PEPPER", "OTP_PEPPER must be a random value of at least 32 characters in production");
+    }
     if ((get("SMS_GATEWAY") ?? "fake") === "fake") issue("SMS_GATEWAY", "SMS_GATEWAY must not be fake in production");
   }
   if (get("PUSH_PROVIDER") === "fcm" && !get("FCM_PROJECT_ID"))
     issue("FCM_PROJECT_ID", "required when PUSH_PROVIDER=fcm");
+  if (get("PUSH_DRIVER") === "fcm" && !get("FCM_CREDENTIALS_JSON"))
+    issue("FCM_CREDENTIALS_JSON", "required (base64 service-account JSON) when PUSH_DRIVER=fcm");
   if (get("PAYMENT_PROVIDER") === "real") {
     for (const k of PAYMENT_KEYS) if (!get(k)) issue(k, "required when PAYMENT_PROVIDER=real");
   }
@@ -115,14 +128,22 @@ function build(c: z.output<typeof ConfigSchema>) {
     dbPoolMax: c.DB_POOL_MAX,
     migrateOnStart: c.MIGRATE_ON_START === "true",
     jwtSecret: c.JWT_SECRET ?? "dev-secret-change-me",
+    otpPepper: c.OTP_PEPPER ?? "dev-otp-pepper-change-me-00000000",
     corsOrigins: c.CORS_ORIGIN,
+    publicWebUrl: c.PUBLIC_WEB_URL.replace(/\/+$/, ""),
     anthropicApiKey: c.ANTHROPIC_API_KEY,
     aiModel: c.AI_MODEL,
-    smsGateway: c.SMS_GATEWAY,
+    smsGateway: c.SMS_GATEWAY === "alpha" ? ("alphasms" as const) : c.SMS_GATEWAY,
     smsApiKey: c.SMS_API_KEY,
     smsSenderId: c.SMS_SENDER_ID,
+    sslwirelessApiToken: c.SSLWIRELESS_API_TOKEN,
+    sslwirelessSid: c.SSLWIRELESS_SID,
+    alphaSmsApiKey: c.ALPHA_SMS_API_KEY,
+    smsWebhookSecret: c.SMS_WEBHOOK_SECRET,
     fakesUrl: c.FAKES_URL,
     pushProvider: c.PUSH_PROVIDER,
+    pushDriver: c.PUSH_DRIVER ?? (c.NODE_ENV === "production" ? "fcm" : "fake"),
+    fcmCredentialsJson: c.FCM_CREDENTIALS_JSON,
     fcmProjectId: c.FCM_PROJECT_ID,
     fcmServiceAccountJson: c.FCM_SERVICE_ACCOUNT_JSON,
     storageEndpoint: c.STORAGE_ENDPOINT,

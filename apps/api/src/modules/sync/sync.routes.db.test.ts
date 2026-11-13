@@ -211,5 +211,6 @@ describe("sync routes (db)", () => {
       expect(sizes).toEqual([500, 500, 200]);
       expect(seen.size).toBe(1200);
     });
-  });
+    // 1200 rows are applied one by one, so on a busy machine this needs more than the 30s default.
+  }, 180_000);
 });

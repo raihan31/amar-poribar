@@ -39,7 +39,7 @@ export function transactionsRoutes(app: FastifyInstance, deps: LedgerDeps) {
 
   app.patch<TxnParams>("/v1/families/:familyId/transactions/:txnId", { ...opts, schema: docs.object }, async (req) => {
     const { familyId, txnId } = req.params;
-    const role = await deps.families.requireRole(familyId, req.user.sub, "member");
+    const { role } = await deps.families.requireRole(familyId, req.user.sub, "member");
     const data = parseOr400(UpdateTransactionSchema, req.body);
     return updateTransaction(deps, { familyId, txnId, actorId: req.user.sub, role, data });
   });
@@ -49,7 +49,7 @@ export function transactionsRoutes(app: FastifyInstance, deps: LedgerDeps) {
     { ...opts, schema: docs.noContent },
     async (req, reply) => {
       const { familyId, txnId } = req.params;
-      const role = await deps.families.requireRole(familyId, req.user.sub, "member");
+      const { role } = await deps.families.requireRole(familyId, req.user.sub, "member");
       await deleteTransaction(deps, { familyId, txnId, actorId: req.user.sub, role });
       return reply.status(204).send();
     },

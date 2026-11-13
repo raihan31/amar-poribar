@@ -1,11 +1,20 @@
 import '../api/api_client.dart';
 import '../database/local_store.dart';
+import 'reference_data_sync.dart';
 
 class SyncSummary {
   final int pushed;
   final int pulled;
   final List<String> rejectedReasons;
-  const SyncSummary(this.pushed, this.pulled, this.rejectedReasons);
+
+  /// Reference data parts (budgets, members, ...) that could not be refreshed; their old cache stays.
+  final List<String> referenceErrors;
+  const SyncSummary(
+    this.pushed,
+    this.pulled,
+    this.rejectedReasons, [
+    this.referenceErrors = const [],
+  ]);
 }
 
 /// Syncs the local database with apps/api (SRS FR-SYNC-05). The server is one more replica: it gets our
@@ -53,6 +62,9 @@ class SyncService {
       await store.setMeta(_cursorKey(familyId), cursor);
       if (!res.more && !batch.more) break;
     }
-    return SyncSummary(pushed, pulled, rejected);
+    // FR-SYNC-08: refresh the cached reference data after every successful ledger sync.
+    final referenceErrors =
+        await ReferenceDataSync(api, store).refresh(familyId);
+    return SyncSummary(pushed, pulled, rejected, referenceErrors);
   }
 }

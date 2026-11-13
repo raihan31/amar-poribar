@@ -36,6 +36,7 @@ class AppTokens {
   static const Color dangerInk = Color(0xFF8A1C14);
   static const Color border = Color(0xFFE8DCC8);
   static const Color inputBorder = Color(0xFFE1D3BC);
+  static const Color switchOff = Color(0xFFC9BBA3);
   static const Color callBg = Color(0xFF14110D);
 
   static const double touchMin = 48;

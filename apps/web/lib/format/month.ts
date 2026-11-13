@@ -1,0 +1,21 @@
+export function shiftMonth(month: string, delta: number): string {
+  const [y, m] = month.split("-").map(Number) as [number, number];
+  const d = new Date(Date.UTC(y, m - 1 + delta, 1));
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+/** Percent change vs last month, or null when there is nothing to compare against. */
+export function delta(now: number, before: number): { pct: number; dir: "up" | "down" | "flat" } | null {
+  if (before <= 0) return null;
+  const pct = Math.round(((now - before) / before) * 100);
+  return { pct: Math.abs(pct), dir: pct > 0 ? "up" : pct < 0 ? "down" : "flat" };
+}
+
+/** "YYYY-MM" as a long month and year, e.g. "জানুয়ারি ২০২৬" for bn-BD. */
+export function monthLabel(month: string, locale: string): string {
+  return new Date(`${month}-01T00:00:00+06:00`).toLocaleDateString(locale, {
+    month: "long",
+    year: "numeric",
+    timeZone: "Asia/Dhaka",
+  });
+}

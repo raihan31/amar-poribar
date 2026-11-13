@@ -1,22 +1,63 @@
+import { isUnavailablePort } from "../../platform/ports/index.js";
+import type { SmsGateway as SmsPort } from "../../platform/ports/sms-gateway.js";
+import type { SmsGateway as ProviderGateway } from "./infra/sms/sms-gateway.js";
+import { randomUUID } from "node:crypto";
 import { HttpError } from "../../platform/errors.js";
 import type { ModuleContext, ModuleDefinition } from "../../platform/module.js";
 import type { UserBasics } from "./app/ports.js";
-import { authRoutes } from "./http/auth.routes.js";
-import { MemoryOtpStore } from "./infra/otp-store.memory.js";
+import { registerIdentityRoutes } from "./http/routes.js";
+import { devSmsRoutes, smsWebhookRoutes } from "./http/sms-routes.js";
+import { createSmsDeliveryRepo } from "./infra/sms-delivery-repo.js";
+import { FakeSmsGateway } from "./infra/sms/sms-fake.js";
+import { createSmsGateway, type SmsConfig } from "./infra/sms/sms-factory.js";
+import { AlphaSmsGateway } from "./infra/sms/sms-alpha.js";
+import { SslWirelessGateway } from "./infra/sms/sms-sslwireless.js";
+import * as q from "./app/get-user.js";
+import { maskPhone } from "./domain/phone.js";
+import { createOtpService } from "./app/otp-service.js";
+import { createOtpRepo } from "./infra/otp-repo.js";
+import { consentRoutes } from "./http/consent-routes.js";
+import { createConsentRepo } from "./infra/consent-repo.js";
+import { POLICY_VERSION } from "./content/policy.version.js";
+import { deviceRoutes } from "./http/device-routes.js";
+import { createDeviceRemover, createDeviceRepo, type DeviceToken } from "./infra/device-repo.js";
+import { purgeDevicesJob, purgeOtpJob, purgeSessionsJob } from "./jobs.js";
+import { createSessionService } from "./app/session-service.js";
+import { createSessionRepo } from "./infra/session-repo.js";
+import { registerAuthenticate } from "./http/authenticate.js";
 import { registerJwt } from "./infra/jwt.js";
-import { createUserRepo } from "./infra/users.repo.js";
+import { createUserRepo } from "./infra/user-repo.js";
 export * from "./events.js";
 
 export type { UserBasics };
+export type { UserId, UserSummary, UserWithPhone } from "./app/get-user.js";
+export type { DeviceToken };
+export { maskPhone, POLICY_VERSION };
 
 /** Public surface of the identity module. Other modules may import only this file (SRS R1). */
 export interface IdentityFacade {
   readonly name: "identity";
   getUserBasics(userId: string): Promise<UserBasics | null>;
-  findUserByPhone(phone: string): Promise<{ id: string } | null>;
+  getUser(id: q.UserId): Promise<q.UserSummary | null>;
+  getUsers(ids: readonly q.UserId[]): Promise<Map<string, q.UserSummary>>;
+  getUserWithPhone(id: q.UserId): Promise<q.UserWithPhone | null>;
+  findUserByPhone(phone: string): Promise<q.UserWithPhone | null>;
+  /** Throws `HttpError(401, "unauthorized")` when the user is missing or erased. */
+  requireUser(id: q.UserId): Promise<q.UserSummary>;
+  maskPhone(phone: string): string;
+  /** Whether the user accepted `policyVersion` of the privacy policy (identity.consents). */
+  hasAcceptedCurrentPolicy(userId: string, policyVersion: string): Promise<boolean>;
+  /** The current policy version (`POLICY_VERSION`). */
+  getPolicyVersion(): string;
   getUsersBasics(ids: readonly string[]): Promise<Map<string, { id: string; name: string | null }>>;
   /** Throws `HttpError` 401 for an invalid, expired or non-access token (used by the WebSocket hub). */
   verifyAccessToken(token: string): { userId: string };
+  /** Push tokens of the users' devices; rows without a token are skipped (FR-NOTIF-07). */
+  listDeviceTokens(userIds: readonly string[]): Promise<DeviceToken[]>;
+  /** Clears a token FCM reported invalid. */
+  removeToken(token: string): Promise<void>;
+  /** Marks a device as seen now (used by the WebSocket hub). */
+  touchDevice(userId: string, deviceId: string): Promise<void>;
   /** Used only inside identity. */
   createUserIfMissing(phone: string): Promise<{ id: string }>;
 }
@@ -30,13 +71,38 @@ declare module "../../platform/module.js" {
 /** The part of `ModuleContext.config` identity needs, until the typed config lands (T-PLAT-31). */
 export interface IdentityConfig {
   jwtSecret: string;
+  otpPepper: string;
   isProd: boolean;
+}
+
+function smsConfig(ctx: ModuleContext): SmsConfig & { smsWebhookSecret: string | undefined } {
+  const c = (ctx.config ?? {}) as Partial<SmsConfig> & { smsWebhookSecret?: string };
+  return {
+    isProd: c.isProd === true,
+    smsGateway: c.smsGateway ?? "fake",
+    smsSenderId: c.smsSenderId,
+    sslwirelessApiToken: c.sslwirelessApiToken,
+    sslwirelessSid: c.sslwirelessSid,
+    alphaSmsApiKey: c.alphaSmsApiKey,
+    smsWebhookSecret: c.smsWebhookSecret,
+  };
+}
+
+/** Adapts a provider gateway to the platform SMS port. */
+function portFor(gateway: ProviderGateway): SmsPort {
+  return {
+    async send(msg) {
+      const { providerId } = await gateway.send({ to: msg.to, text: msg.text, reference: randomUUID() });
+      return { providerId, status: "sent" };
+    },
+  };
 }
 
 function identityConfig(ctx: ModuleContext): IdentityConfig {
   const c = ctx.config as Partial<IdentityConfig> | undefined;
   if (!c?.jwtSecret) throw new Error("identity: ctx.config.jwtSecret is required");
-  return { jwtSecret: c.jwtSecret, isProd: c.isProd === true };
+  if (!c.otpPepper) throw new Error("identity: ctx.config.otpPepper is required");
+  return { jwtSecret: c.jwtSecret, otpPepper: c.otpPepper, isProd: c.isProd === true };
 }
 
 export const identityModule: ModuleDefinition<IdentityFacade> = {
@@ -46,12 +112,55 @@ export const identityModule: ModuleDefinition<IdentityFacade> = {
     const config = identityConfig(ctx);
     const tokens = await registerJwt(app, config.jwtSecret);
     const users = createUserRepo(ctx.db);
-    // The real DB-backed store arrives in T-ID-01.
-    authRoutes(app, { otp: new MemoryOtpStore(), users, tokens, isProd: config.isProd });
+    const otp = createOtpService({
+      repo: createOtpRepo(ctx.db),
+      limiter: ctx.limiter,
+      clock: ctx.clock,
+      pepper: config.otpPepper,
+    });
+    const sessions = createSessionService({ repo: createSessionRepo(ctx.db), tokens, clock: ctx.clock });
+    registerAuthenticate(app, (sid) => sessions.isSessionRevoked(sid));
+    ctx.jobs.register(purgeOtpJob({ db: ctx.db, clock: ctx.clock }));
+    ctx.jobs.register(purgeSessionsJob({ db: ctx.db, clock: ctx.clock }));
+    const devices = createDeviceRepo(ctx.db);
+    ctx.jobs.register(purgeDevicesJob({ db: ctx.db, clock: ctx.clock }));
+    deviceRoutes(app, { devices, clock: ctx.clock });
+    const consents = createConsentRepo(ctx.db);
+    consentRoutes(app, { consents, clock: ctx.clock });
+    // SMS delivery (T-ID-03). Built here so production refuses to start with the fake or without credentials.
+    const sms = smsConfig(ctx);
+    const gateway = createSmsGateway(sms);
+    // The platform port (memory fake in tests, injectable) unless a real provider is configured without an injected one.
+    const otpSms = isUnavailablePort(ctx.ports.sms) ? portFor(gateway) : ctx.ports.sms;
+    registerIdentityRoutes(app, {
+      otp,
+      users,
+      sessions,
+      devices: createDeviceRemover(ctx.db),
+      sms: otpSms,
+      exposeDevCode: !sms.isProd && sms.smsGateway === "fake",
+    });
+    if (!sms.isProd && gateway instanceof FakeSmsGateway) devSmsRoutes(app, gateway);
+    smsWebhookRoutes(app, {
+      secret: sms.smsWebhookSecret,
+      repo: createSmsDeliveryRepo(ctx.db),
+      gateways: {
+        sslwireless: new SslWirelessGateway({ apiToken: "", sid: "" }),
+        alphasms: new AlphaSmsGateway({ apiKey: "" }),
+        ...(sms.isProd ? {} : { fake: new FakeSmsGateway() }),
+      },
+    });
     return {
       name: "identity",
       getUserBasics: (id) => users.getBasics(id),
-      findUserByPhone: (phone) => users.findByPhone(phone),
+      getUser: (id) => q.getUser(users, id),
+      getUsers: (ids) => q.getUsers(users, ids),
+      getUserWithPhone: (id) => q.getUserWithPhone(users, id),
+      findUserByPhone: (phone) => q.findUserByPhone(users, phone),
+      requireUser: (id) => q.requireUser(users, id),
+      maskPhone,
+      hasAcceptedCurrentPolicy: (userId, version) => consents.hasAccepted(userId, "privacy_policy", version),
+      getPolicyVersion: () => POLICY_VERSION,
       getUsersBasics: (ids) => users.getManyNames(ids),
       verifyAccessToken(token) {
         let payload;
@@ -63,6 +172,9 @@ export const identityModule: ModuleDefinition<IdentityFacade> = {
         if (payload.typ !== "access") throw new HttpError(401, "unauthorized", "Access token required");
         return { userId: payload.sub };
       },
+      listDeviceTokens: (ids) => devices.listTokens(ids),
+      removeToken: (token) => devices.removeToken(token),
+      touchDevice: (userId, deviceId) => devices.touch(userId, deviceId, ctx.clock()),
       createUserIfMissing: (phone) => users.upsertByPhone(phone),
     };
   },

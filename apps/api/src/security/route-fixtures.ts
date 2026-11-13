@@ -39,6 +39,8 @@ const MONTH = "2026-01";
 const TAKA_100 = 10_000; // integer paisa
 
 export const ROUTE_FIXTURES: Record<string, RouteFixture> = {
+  "GET /v1/families/{familyId}": (c) => ({ params: fam(c) }),
+  "PATCH /v1/families/{familyId}": (c) => ({ params: fam(c), body: { name: "Isolation" } }),
   "GET /v1/families/{familyId}/accounts": (c) => ({ params: fam(c) }),
   "POST /v1/families/{familyId}/accounts": (c) => ({ params: fam(c), body: { name: "Isolation", type: "cash" } }),
   "PATCH /v1/families/{familyId}/accounts/{accountId}": (c) => ({
@@ -80,7 +82,12 @@ export const ROUTE_FIXTURES: Record<string, RouteFixture> = {
     body: { name: "Hijacked" },
   }),
   "POST /v1/families/{familyId}/invites": (c) => ({ params: fam(c), body: { role: "member" } }),
+  "GET /v1/families/{familyId}/invites": (c) => ({ params: fam(c) }),
+  "DELETE /v1/families/{familyId}/invites/{inviteId}": (c) => ({
+    params: { ...fam(c), inviteId: "00000000-0000-4000-8000-000000000000" },
+  }),
   "GET /v1/families/{familyId}/members": (c) => ({ params: fam(c) }),
+  "POST /v1/families/{familyId}/transfer-ownership": (c) => ({ params: fam(c), body: { toUserId: c.userId } }),
   "DELETE /v1/families/{familyId}/members/{userId}": (c) => ({ params: { ...fam(c), userId: c.userId } }),
   "PATCH /v1/families/{familyId}/members/{userId}": (c) => ({
     params: { ...fam(c), userId: c.userId },

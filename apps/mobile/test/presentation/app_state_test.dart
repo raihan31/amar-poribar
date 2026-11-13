@@ -9,25 +9,27 @@ import '../helpers/fake_voice_service.dart';
 import '../helpers/fakes.dart';
 
 void main() {
-  test('dashboard state is read from, and saved to, the local database',
-      () async {
-    final store = await LocalStore.open(AppDatabase.memory());
-    final container = ProviderContainer(
-      overrides: defaultFakes(store: store, voice: FakeVoiceService()),
-    );
-    addTearDown(container.dispose);
+  test(
+    'dashboard state is read from, and saved to, the local database',
+    () async {
+      final store = await LocalStore.open(AppDatabase.memory());
+      final container = ProviderContainer(
+        overrides: defaultFakes(store: store, voice: FakeVoiceService()),
+      );
+      addTearDown(container.dispose);
 
-    final notifier = container.read(appStateProvider.notifier);
-    await notifier.addIncome(Money.fromTaka(5000), note: 'বেতন');
-    await notifier.addExpense(const Money(85050), note: 'বাজার');
+      final notifier = container.read(appStateProvider.notifier);
+      await notifier.addIncome(Money.fromTaka(5000), note: 'বেতন');
+      await notifier.addExpense(const Money(85050), note: 'বাজার');
 
-    final s = container.read(appStateProvider);
-    expect(s.totalIncome, Money.fromTaka(5000));
-    expect(s.totalExpense, const Money(85050));
-    expect(s.recent, hasLength(2));
-    expect(s.recent.first['category'], isNotEmpty);
+      final s = container.read(appStateProvider);
+      expect(s.totalIncome, Money.fromTaka(5000));
+      expect(s.totalExpense, const Money(85050));
+      expect(s.recent, hasLength(2));
+      expect(s.recent.first['category'], isNotEmpty);
 
-    // It is really in the database, not just in memory.
-    expect(await store.recent(), hasLength(2));
-  });
+      // It is really in the database, not just in memory.
+      expect(await store.recent(), hasLength(2));
+    },
+  );
 }

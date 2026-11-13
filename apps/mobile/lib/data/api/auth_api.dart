@@ -15,6 +15,15 @@ class AuthApi {
     return r['devCode'] as String?;
   }
 
+  /// Like [requestOtp] but returns the whole `{sent, resendAfterSeconds, devCode?}` body.
+  Future<Map<String, dynamic>> requestOtpRaw(String phone) async {
+    return await _t.send(
+      'POST',
+      '/v1/auth/otp/request',
+      body: {'phone': phone},
+    ) as Map<String, dynamic>;
+  }
+
   /// Verifies the OTP and stores the tokens (in the session when there is one).
   Future<String> verifyOtp(String phone, String code) async {
     final r = await _t.send(
