@@ -148,6 +148,7 @@ export const handlers: HttpHandler[] = [
       usedAi: false,
     });
   }),
+  http.post(`${F}/ai/ask`, () => HttpResponse.json({ answer: "এ মাসে বাজারে খরচ হয়েছে ৳ ১৬,৮০০।", usedAi: true })),
   // Mock-mode sign-in: code 123456 works, anything else is a wrong code (5 tries).
   http.post("*/api/auth/otp/request", () => HttpResponse.json({ sent: true, devCode: "123456" })),
   http.post("*/api/auth/otp/verify", async ({ request }) => {
