@@ -64,7 +64,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-LED-04 | M2 | done | c2b747c95 | 2026-11-11 |  |
 | T-LED-05 | M2 | done | 22a3075 | 2026-11-13 |  |
 | T-LED-06 | M2 | todo |  |  |  |
-| T-LED-07 | M2 | todo |  |  |  |
+| T-LED-07 | M2 | done | 6498258fe | 2026-11-13 |  |
 | T-LED-08 | M2 | todo |  |  |  |
 | T-LED-09 | M7 | todo |  |  |  |
 | T-LED-10 | M7 | todo |  |  |  |
@@ -78,7 +78,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-REC-03 | M7 | todo |  |  |  |
 | T-AI-01 | M2 | done | 00a3169 | 2026-11-11 |  |
 | T-AI-02 | M2 | done | 64aa31f | 2026-11-13 |  |
-| T-AI-03 | M2 | todo |  |  |  |
+| T-AI-03 | M2 | done | 3670bca64 | 2026-11-13 |  |
 | T-AI-04 | M7 | todo |  |  |  |
 | T-AI-05 | M7 | todo |  |  |  |
 | T-AI-06 | M7 | todo |  |  |  |
@@ -184,8 +184,8 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-MOB-28 | M2 | done | 0752af64a | 2026-11-13 |  |
 | T-MOB-29 | M2 | done | b325748 | 2026-11-11 |  |
 | T-MOB-30 | M2 | todo |  |  |  |
-| T-MOB-31 | M2 | todo |  |  |  |
-| T-MOB-32 | M2 | todo |  |  |  |
+| T-MOB-31 | M2 | done | 6c8b66316 | 2026-11-13 |  |
+| T-MOB-32 | M2 | done | a19aef571 | 2026-11-13 |  |
 | T-MOB-33 | M2 | todo |  |  |  |
 | T-MOB-34 | M2 | done | 0bfa437 | 2026-11-11 |  |
 | T-MOB-35 | M2 | done | 00354fb | 2026-11-13 |  |
@@ -274,7 +274,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-WEB-41 | M2 | todo |  |  |  |
 | T-ADMUI-01 | M5 | done | 5893f47 | 2026-11-11 |  |
 | T-ADMUI-02 | M5 | done | e8a055bb4 | 2026-11-11 |  |
-| T-ADMUI-03 | M5 | todo |  |  |  |
+| T-ADMUI-03 | M5 | done | d73b3e6a9 | 2026-11-13 |  |
 | T-ADMUI-04 | M5 | done | 0b9273e | 2026-11-11 |  |
 | T-ADMUI-05 | M5 | done | 73657744d | 2026-11-11 |  |
 | T-ADMUI-06 | M5 | done | c7401056b | 2026-11-11 |  |
@@ -284,6 +284,6 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-ADMUI-10 | M5 | done | 031ecb577 | 2026-11-11 |  |
 | T-ADMUI-11 | M5 | done | 725401b19 | 2026-11-13 |  |
 | T-ADMUI-12 | M5 | done | ef2be3726 | 2026-11-13 |  |
-| T-ADMUI-13 | M5 | todo |  |  |  |
+| T-ADMUI-13 | M5 | done | 3f28655b5 | 2026-11-13 |  |
 | T-ADMUI-14 | M5 | todo |  |  |  |
 | T-WEB-42 | M2 | todo |  |  |  |
