@@ -257,6 +257,8 @@ jobs:
         if: steps.detect.outputs.run == 'true'
       - run: pnpm --filter @amar-poribar/web exec playwright install --with-deps chromium
         if: steps.detect.outputs.run == 'true'
+      # The e2e specs import @amar-poribar/fixtures (and its dependencies) through their built dist.
+      - run: pnpm --filter "@amar-poribar/fixtures..." build
       - run: pnpm e2e:web
         env:
           AP_BASE_URL: http://localhost:3000
@@ -294,6 +296,8 @@ jobs:
         if: steps.detect.outputs.run == 'true'
       - run: pnpm --filter @amar-poribar/admin exec playwright install --with-deps chromium
         if: steps.detect.outputs.run == 'true'
+      # The e2e specs import @amar-poribar/fixtures (and its dependencies) through their built dist.
+      - run: pnpm --filter "@amar-poribar/fixtures..." build
       - run: pnpm e2e:admin
         env:
           ADMIN_E2E_STACK_URL: http://localhost:3100
@@ -374,6 +378,8 @@ jobs:
         if: steps.pw-cache.outputs.cache-hit != 'true'
       - run: pnpm --filter @amar-poribar/web exec playwright install-deps chromium
         if: steps.pw-cache.outputs.cache-hit == 'true'
+      # The e2e specs import @amar-poribar/fixtures (and its dependencies) through their built dist.
+      - run: pnpm --filter "@amar-poribar/fixtures..." build
       - run: pnpm --filter @amar-poribar/web e2e --grep "@stack|comms-" --pass-with-no-tests
         env:
           AP_BASE_URL: http://localhost:3000
