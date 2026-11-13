@@ -62,7 +62,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-LED-02 | M2 | todo |  |  |  |
 | T-LED-03 | M2 | done | 1d9387e17 | 2026-11-11 |  |
 | T-LED-04 | M2 | done | c2b747c95 | 2026-11-11 |  |
-| T-LED-05 | M2 | todo |  |  |  |
+| T-LED-05 | M2 | done | 22a3075 | 2026-11-13 |  |
 | T-LED-06 | M2 | todo |  |  |  |
 | T-LED-07 | M2 | todo |  |  |  |
 | T-LED-08 | M2 | todo |  |  |  |
@@ -77,7 +77,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-REC-02 | M7 | todo |  |  |  |
 | T-REC-03 | M7 | todo |  |  |  |
 | T-AI-01 | M2 | done | 00a3169 | 2026-11-11 |  |
-| T-AI-02 | M2 | todo |  |  |  |
+| T-AI-02 | M2 | done | 64aa31f | 2026-11-13 |  |
 | T-AI-03 | M2 | todo |  |  |  |
 | T-AI-04 | M7 | todo |  |  |  |
 | T-AI-05 | M7 | todo |  |  |  |
@@ -188,7 +188,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-MOB-32 | M2 | todo |  |  |  |
 | T-MOB-33 | M2 | todo |  |  |  |
 | T-MOB-34 | M2 | done | 0bfa437 | 2026-11-11 |  |
-| T-MOB-35 | M2 | todo |  |  |  |
+| T-MOB-35 | M2 | done | 00354fb | 2026-11-13 |  |
 | T-MOB-36 | M3 | todo |  |  |  |
 | T-MOB-37 | M3 | todo |  |  |  |
 | T-MOB-38 | M3 | todo |  |  |  |
@@ -238,7 +238,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-WEB-05 | M2 | done | 4319833f0 | 2026-11-11 |  |
 | T-WEB-06 | M2 | done | 56a94a0fe | 2026-11-11 |  |
 | T-WEB-07 | M2 | done | e1b898ad3 | 2026-11-11 |  |
-| T-WEB-08 | M2 | todo |  |  |  |
+| T-WEB-08 | M2 | done | 989c23e | 2026-11-13 |  |
 | T-WEB-09 | M2 | done | e74a23c | 2026-11-11 |  |
 | T-WEB-10 | M1 | done | b370d3fa4 | 2026-11-11 |  |
 | T-WEB-11 | M1 | done | abf4271 | 2026-11-11 |  |
@@ -246,7 +246,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-WEB-13 | M2 | done | 041f83a80 | 2026-11-11 |  |
 | T-WEB-14 | M2 | done | 08fcae18d | 2026-11-13 |  |
 | T-WEB-15 | M2 | todo |  |  |  |
-| T-WEB-16 | M2 | todo |  |  |  |
+| T-WEB-16 | M2 | done | d58018a | 2026-11-13 |  |
 | T-WEB-17 | M2 | todo |  |  |  |
 | T-WEB-18 | M7 | todo |  |  |  |
 | T-WEB-19 | M2 | todo |  |  |  |
@@ -280,7 +280,7 @@ Maintained by `tools/orchestrate/progress.mjs`. Status: todo, doing, done (accep
 | T-ADMUI-06 | M5 | done | c7401056b | 2026-11-11 |  |
 | T-ADMUI-07 | M5 | done | 4532677e7 | 2026-11-13 |  |
 | T-ADMUI-08 | M5 | done | 78eef68a7 | 2026-11-11 |  |
-| T-ADMUI-09 | M8 | todo |  |  |  |
+| T-ADMUI-09 | M8 | done | 6d26cfd | 2026-11-13 |  |
 | T-ADMUI-10 | M5 | done | 031ecb577 | 2026-11-11 |  |
 | T-ADMUI-11 | M5 | done | 725401b19 | 2026-11-13 |  |
 | T-ADMUI-12 | M5 | done | ef2be3726 | 2026-11-13 |  |
