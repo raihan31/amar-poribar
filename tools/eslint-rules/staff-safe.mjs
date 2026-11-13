@@ -31,7 +31,27 @@ function inspectType(checker, program, type) {
   const seen = new Set();
   const walk = (t, depth) => {
     if (t.flags & (ts.TypeFlags.Any | ts.TypeFlags.Unknown)) {
-      console.error("DBG-ANY", checker.typeToString(t), "libs:", program.getSourceFiles().filter((f) => /lib\.[^/]*\.d\.ts$/.test(f.fileName)).length, "diags:", program.getGlobalDiagnostics().map((d) => ts.flattenDiagnosticMessageText(d.messageText, " ")).slice(0, 3), "files:", program.getSourceFiles().filter((f) => !/lib\./.test(f.fileName)).map((f) => f.fileName).slice(0, 6), "types:", JSON.stringify(program.getCompilerOptions().types), "ts:", ts.version);
+      console.error(
+        "DBG-ANY",
+        checker.typeToString(t),
+        "libs:",
+        program.getSourceFiles().filter((f) => /lib\.[^/]*\.d\.ts$/.test(f.fileName)).length,
+        "diags:",
+        program
+          .getGlobalDiagnostics()
+          .map((d) => ts.flattenDiagnosticMessageText(d.messageText, " "))
+          .slice(0, 3),
+        "files:",
+        program
+          .getSourceFiles()
+          .filter((f) => !/lib\./.test(f.fileName))
+          .map((f) => f.fileName)
+          .slice(0, 6),
+        "types:",
+        JSON.stringify(program.getCompilerOptions().types),
+        "ts:",
+        ts.version,
+      );
       found.push({ kind: "any", name: checker.typeToString(t) });
       return;
     }
