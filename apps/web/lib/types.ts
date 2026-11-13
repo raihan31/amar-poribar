@@ -33,4 +33,9 @@ export interface Account {
   id: string;
   name: string;
   type: string;
+  ownerUserId?: string | null;
+  openingBalancePaisa?: number;
+  /** Running balance from the server (FR-ACC-03); falls back to the opening balance until the API returns it. */
+  balancePaisa?: number;
+  archivedAt?: string | null;
 }

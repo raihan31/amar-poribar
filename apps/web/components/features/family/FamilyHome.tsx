@@ -8,7 +8,6 @@ import { useI18n } from "@/lib/i18n/provider";
 import { ApiProblem } from "@/lib/api/errors";
 import type { Account, Category, Family } from "@/lib/types";
 import { QuickAdd } from "../entry/QuickAdd";
-import { ManageLists } from "../ledger/ManageLists";
 import { MonthSummaryCard } from "../reports/MonthSummaryCard";
 import { SpokenSummary } from "../reports/SpokenSummary";
 import { CreateFamilyForm } from "./CreateFamilyForm";
@@ -91,15 +90,6 @@ export function FamilyHome({ onLogout }: { onLogout: () => void }) {
             monthRef.current = m;
             refresh(family, m).catch(handle);
           }}
-        />
-      )}
-      {(family.role === "owner" || family.role === "admin") && (
-        <ManageLists
-          family={family}
-          categories={categories}
-          accounts={accounts}
-          onChanged={() => refresh(family).catch(handle)}
-          onError={handle}
         />
       )}
       {meId && (
