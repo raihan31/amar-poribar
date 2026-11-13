@@ -9,6 +9,17 @@ async function ok<T>(p: Promise<{ data?: T; error?: unknown; response: Response 
   return data as T;
 }
 
+/**
+ * Members arrive without a phone (the API hides it from people who are not admins) and with a masked
+ * `displayName` instead; screens read `name ?? phone`, so fill both from it rather than crash on null.
+ */
+export function withMemberLabels<T extends object>(rows: T[]): T[] {
+  return rows.map((m) => {
+    const x = m as { name?: string | null; phone?: string | null; displayName?: string | null };
+    return { ...m, name: x.name ?? x.displayName ?? null, phone: x.phone ?? x.displayName ?? "" } as T;
+  });
+}
+
 export function useCategories(familyId: string) {
   return useQuery({
     queryKey: qk.family(familyId).categories(),
@@ -27,5 +38,6 @@ export function useMembers(familyId: string) {
   return useQuery({
     queryKey: qk.family(familyId).members(),
     queryFn: () => ok(client.GET("/v1/families/{familyId}/members", { params: { path: { familyId } } })),
+    select: withMemberLabels,
   });
 }

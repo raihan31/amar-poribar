@@ -11,11 +11,11 @@ const demo = demoFamily();
 /** Mock-mode state for delete / restore (txn id -> deleted at ms) and learned merchant rules. */
 const deletedTxns = new Map<string, number>();
 const rules = new Map<string, { id: string; pattern: string; categoryId: string }>();
-const F = `*/api/proxy/v1/families/:familyId`;
+const F = `*/v1/families/:familyId`;
 
 /** One handler per route a screen uses; all answer from the deterministic demo family. */
 export const handlers: HttpHandler[] = [
-  http.get("*/api/proxy/v1/me", () =>
+  http.get("*/v1/me", () =>
     HttpResponse.json({
       user: {
         id: demo.me.id,
@@ -28,12 +28,12 @@ export const handlers: HttpHandler[] = [
       families: [demo.family],
     }),
   ),
-  http.get("*/api/proxy/v1/policy", ({ request }) => {
+  http.get("*/v1/policy", ({ request }) => {
     const locale = new URL(request.url).searchParams.get("locale") === "en" ? "en" : "bn";
     return HttpResponse.json({ version: "2026-01", text: locale === "en" ? "Privacy policy" : "গোপনীয়তা নীতি" });
   }),
-  http.post("*/api/proxy/v1/me/consents", () => new HttpResponse(null, { status: 204 })),
-  http.get("*/api/proxy/v1/invites/:token", () =>
+  http.post("*/v1/me/consents", () => new HttpResponse(null, { status: 204 })),
+  http.get("*/v1/invites/:token", () =>
     HttpResponse.json({
       familyName: demo.family.name,
       memberCount: demo.members.length,
@@ -42,9 +42,9 @@ export const handlers: HttpHandler[] = [
       expiresAt: new Date(Date.now() + 6 * 86_400_000).toISOString(),
     }),
   ),
-  http.post("*/api/proxy/v1/invites/:token/accept", () => HttpResponse.json({ familyId: demo.family.id })),
-  http.get("*/api/proxy/v1/families", () => HttpResponse.json([demo.family])),
-  http.post("*/api/proxy/v1/families", () => HttpResponse.json(demo.family, { status: 201 })),
+  http.post("*/v1/invites/:token/accept", () => HttpResponse.json({ familyId: demo.family.id })),
+  http.get("*/v1/families", () => HttpResponse.json([demo.family])),
+  http.post("*/v1/families", () => HttpResponse.json(demo.family, { status: 201 })),
   http.get(`${F}/categories`, () => HttpResponse.json(demo.categories)),
   http.get(`${F}/accounts`, () => HttpResponse.json(demo.accounts)),
   http.get(`${F}/members`, () => HttpResponse.json(demo.members)),

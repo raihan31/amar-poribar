@@ -108,4 +108,17 @@ describe("claude fake", () => {
     expect(miss.statusCode).toBe(404);
     expect(miss.json().error.key).toBe(recordingKey("default", "zzz"));
   });
+
+  it("counts calls at /__fake/claude/calls", async () => {
+    const app = Fastify();
+    claudeRoutes(app);
+    cleanup.push(() => app.close());
+    expect((await app.inject({ method: "GET", url: "/__fake/claude/calls" })).json()).toEqual({ count: 0 });
+    await app.inject({
+      method: "POST",
+      url: "/claude/v1/messages",
+      payload: { messages: [{ role: "user", content: "zzz" }] },
+    });
+    expect((await app.inject({ method: "GET", url: "/__fake/claude/calls" })).json()).toEqual({ count: 1 });
+  });
 });
