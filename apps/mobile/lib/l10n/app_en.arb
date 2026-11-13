@@ -30,18 +30,8 @@
   "auth_otp_serverDown": "Cannot connect right now. Please try again in a little while.",
   "auth_otp_networkDown": "No internet. Check your connection and try again.",
   "settings_title": "Settings",
-  "settings_role_title": "Current role",
-  "settings_pair_title": "Pair a new phone",
-  "settings_pair_subtitle": "Generate a QR code to add a child or partner",
   "settings_tutorial_title": "How to use (listen)",
-  "settings_language_title": "Language",
-  "settings_language_switch": "Switch to Bangla",
-  "sync_server_title": "Sync with server",
-  "sync_server_subtitle": "Tap when you are online",
-  "sync_server_needLogin": "Sign in to sync.",
-  "sync_server_done": "Synced with the server: {pushed} sent, {pulled} received",
   "sync_nearby_title": "Sync with nearby phone",
-  "sync_nearby_subtitle": "Without internet, phones of the same family",
   "sync_nearby_needLogin": "Sign in once and join your family first (needs internet).",
   "sync_nearby_failed": "Could not start nearby sync: allow permissions (Bluetooth, location).",
   "sync_nearby_askTitle": "Sync with nearby phone?",
@@ -97,11 +87,22 @@
   "profile_periodNight": "PM",
   "profile_reminderAt": "at {time}",
   "@profile_reminderAt": {
-    "placeholders": {"time": {"type": "String"}}
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "profile_time": "{time} {period}",
   "@profile_time": {
-    "placeholders": {"period": {"type": "String"}, "time": {"type": "String"}}
+    "placeholders": {
+      "period": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "auth_expired_title": "Sign in again",
   "auth_expired_body": "For your safety you sign in again after a while. Your accounts are safe.",
@@ -116,14 +117,25 @@
   "onb_consent_title": "Create your family",
   "onb_consent_step": "Step {n} of {total}",
   "@onb_consent_step": {
-    "placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
   },
   "onb_consent_nameLabel": "Family name",
   "onb_consent_nameHint": "Rahim family",
   "onb_consent_currencyLabel": "Currency",
   "onb_consent_currencyValue": "৳ Bangladeshi taka ({code})",
   "@onb_consent_currencyValue": {
-    "placeholders": {"code": {"type": "String"}}
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
   },
   "onb_consent_useTitle": "How your information is used",
   "onb_consent_use1": "Only the members of your family can see the accounts.",
@@ -161,7 +173,14 @@
   "tutorial_title4": "Hear your month",
   "tutorial_counter": "{n} / {total}",
   "@tutorial_counter": {
-    "placeholders": {"n": {"type": "String"}, "total": {"type": "String"}}
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
   },
   "tutorial_listenAgain": "Listen again",
   "tutorial_next": "Next step",
@@ -207,45 +226,94 @@
   "txn_add_backspace": "Delete last digit",
   "home_greetMorning": "Good morning, {name}",
   "@home_greetMorning": {
-    "placeholders": {"name": {"type": "String"}}
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "home_greetNoon": "Good afternoon, {name}",
   "@home_greetNoon": {
-    "placeholders": {"name": {"type": "String"}}
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "home_greetEvening": "Good evening, {name}",
   "@home_greetEvening": {
-    "placeholders": {"name": {"type": "String"}}
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "home_greetNight": "Good night, {name}",
   "@home_greetNight": {
-    "placeholders": {"name": {"type": "String"}}
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "home_settings": "Settings",
   "home_monthSpent": "Spent in {month}",
   "@home_monthSpent": {
-    "placeholders": {"month": {"type": "String"}}
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
   },
   "home_changeMore": "{amount} more than last month",
   "@home_changeMore": {
-    "placeholders": {"amount": {"type": "String"}}
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "home_changeLess": "{amount} less than last month",
   "@home_changeLess": {
-    "placeholders": {"amount": {"type": "String"}}
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "home_changeSame": "Same as last month",
   "home_summarySpeech": "{month}: {amount} spent. {change}",
   "@home_summarySpeech": {
-    "placeholders": {"month": {"type": "String"}, "amount": {"type": "String"}, "change": {"type": "String"}}
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "change": {
+        "type": "String"
+      }
+    }
   },
   "home_budgetWarning": "{name} budget {percent} used",
   "@home_budgetWarning": {
-    "placeholders": {"name": {"type": "String"}, "percent": {"type": "String"}}
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
   },
   "home_notify": "Tell {name}",
   "@home_notify": {
-    "placeholders": {"name": {"type": "String"}}
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "home_budgetPhrase": "Budget finished",
   "home_speakExpense": "Speak an expense",
@@ -255,11 +323,25 @@
   "home_legend": "Green = online · Grey = offline",
   "home_activityVoice": "{name} sent a voice note · {duration}",
   "@home_activityVoice": {
-    "placeholders": {"name": {"type": "String"}, "duration": {"type": "String"}}
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
   },
   "home_activityExpense": "{name} wrote: {note}",
   "@home_activityExpense": {
-    "placeholders": {"name": {"type": "String"}, "note": {"type": "String"}}
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "note": {
+        "type": "String"
+      }
+    }
   },
   "home_activityEmpty": "Nothing yet",
   "home_remitTitle": "Money sent from abroad",
@@ -270,7 +352,11 @@
   "entry_picker_hint": "Tap a picture to hear its name.",
   "entry_picker_confirm": "Keep in {category}",
   "@entry_picker_confirm": {
-    "placeholders": {"category": {"type": "String"}}
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
   },
   "entry_picker_listen": "Listen",
   "entry_picker_selected": "Selected",
@@ -300,7 +386,9 @@
   "entry_sms_recognized": "{provider} message recognised · no AI used",
   "@entry_sms_recognized": {
     "placeholders": {
-      "provider": {"type": "String"}
+      "provider": {
+        "type": "String"
+      }
     }
   },
   "entry_sms_recognizedAi": "The message was read with AI",
@@ -333,21 +421,37 @@
   "notif_quietNote": "Quiet hours are on. Vibration and sound are off; news will wait here.",
   "notif_reminderTime": "Daily reminder time: {time}",
   "@notif_reminderTime": {
-    "placeholders": {"time": {"type": "String"}}
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   },
   "notif_changeSettings": "Settings",
   "notif_bell": "News, {count} new",
   "@notif_bell": {
-    "placeholders": {"count": {"type": "String"}}
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
   },
   "notif_timeToday": "Today {period}",
   "@notif_timeToday": {
-    "placeholders": {"period": {"type": "String"}}
+    "placeholders": {
+      "period": {
+        "type": "String"
+      }
+    }
   },
   "notif_timeYesterday": "Yesterday",
   "notif_timeDaysAgo": "{days} days ago",
   "@notif_timeDaysAgo": {
-    "placeholders": {"days": {"type": "String"}}
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
   },
   "notif_periodMorning": "morning",
   "notif_periodNoon": "noon",
@@ -363,7 +467,11 @@
   "summary_stop": "Stop",
   "summary_caption": "Amounts are read out in words: \"{example}\"",
   "@summary_caption": {
-    "placeholders": {"example": {"type": "String"}}
+    "placeholders": {
+      "example": {
+        "type": "String"
+      }
+    }
   },
   "summary_captionPlain": "Amounts are read out in words.",
   "summary_tipPrefix": "A tip",
@@ -434,5 +542,45 @@
   "txn_detail_afternoon": "afternoon",
   "txn_detail_evening": "evening",
   "txn_detail_night": "night",
-  "txn_detail_notFound": "This entry was not found"
+  "txn_detail_notFound": "This entry was not found",
+  "settings_simple": "Simple mode",
+  "settings_simpleBody": "Big text, pictures only, everything read aloud",
+  "settings_language": "Language",
+  "settings_numbers": "Numbers",
+  "settings_langEnglishLabel": "English language",
+  "settings_numLatinLabel": "English digits",
+  "settings_remind": "Daily reminder",
+  "settings_vibration": "Buzz and sound",
+  "settings_quietSubtitle": "Quiet from {start} to {end}",
+  "@settings_quietSubtitle": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_hourSharp": "{hour} {period}",
+  "@settings_hourSharp": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      },
+      "hour": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_quietTitle": "Quiet hours",
+  "settings_quietFrom": "From",
+  "settings_quietTo": "To",
+  "settings_quietSave": "Save",
+  "settings_csv": "Download expense list (CSV)",
+  "settings_catalog": "Categories and accounts",
+  "settings_privacy": "Privacy policy",
+  "settings_delete": "Delete my data",
+  "settings_deleteBody": "You can download it first",
+  "settings_saveFailed": "Could not save. Try again."
 }
