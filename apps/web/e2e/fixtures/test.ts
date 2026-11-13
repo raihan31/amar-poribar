@@ -17,6 +17,6 @@ export { checkA11y } from "../helpers/a11y";
 export { snap } from "../helpers/visual";
 export { installFakeSpeech } from "../helpers/fakeSpeech";
 export { installFakeMedia } from "../helpers/fakeMedia";
-export { loginAs, mockSession } from "./auth";
+export { loginAs, loginWithTokens, mockSession } from "./auth";
 export { waitForStack } from "./stack";
 export { waitForText, trackVibrations, eventually } from "./realtime";

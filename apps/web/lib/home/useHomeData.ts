@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { MonthlyAiSummary, MonthSummary } from "@amar-poribar/shared";
 import { api } from "@/lib/api/client";
+import { withMemberLabels } from "@/lib/api/hooks/useFamilyData";
 import { qk } from "@/lib/api/queryKeys";
 import type { BudgetRow, Member } from "@/lib/types";
 
@@ -46,6 +47,7 @@ export function useFamilyMembers(familyId: string) {
   return useQuery({
     queryKey: qk.family(familyId).members(),
     queryFn: () => api<Member[]>(`/v1/families/${familyId}/members`),
+    select: withMemberLabels,
   });
 }
 

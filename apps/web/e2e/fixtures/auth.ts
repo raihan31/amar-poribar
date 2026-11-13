@@ -24,7 +24,7 @@ export async function loginAs(context: BrowserContext, user: E2eUser): Promise<v
     await context.addCookies(cached.cookies);
     return;
   }
-  const headers = { origin: WEB_URL, "content-type": "application/json" };
+  const headers = { origin: WEB_URL, "content-type": "application/json", "x-ap-csrf": "1" };
   const req = await context.request.post(`${WEB_URL}/api/auth/otp/request`, { headers, data: { phone: user.phone } });
   if (!req.ok()) throw new Error(`otp request failed: ${req.status()}`);
   const code = await lastOtp(user.phone);
@@ -42,5 +42,22 @@ export async function mockSession(context: BrowserContext, url: string = WEB_URL
     { name: "ap_loc", value: "bn", url },
     { name: "ap_at", value: "mock-access", url },
     { name: "ap_rt", value: "mock-refresh", url },
+  ]);
+}
+
+/**
+ * Signs in with tokens the API already issued (for users made through `tools/fixtures`), so the same phone does
+ * not ask for a second OTP inside the 60-second resend gap. Cookie names and flags match the BFF (`setSession`).
+ */
+export async function loginWithTokens(
+  context: BrowserContext,
+  tokens: { accessToken: string; refreshToken: string },
+  url: string = WEB_URL,
+): Promise<void> {
+  const base = { url, httpOnly: true, sameSite: "Lax" as const };
+  await context.addCookies([
+    { ...base, name: "ap_at", value: tokens.accessToken },
+    { ...base, name: "ap_rt", value: tokens.refreshToken },
+    { name: "ap_loc", value: "bn", url },
   ]);
 }

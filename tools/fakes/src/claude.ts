@@ -63,7 +63,11 @@ export class ClaudeFake {
 
 /** `POST /claude/v1/messages`: Anthropic Messages shaped. The feature comes from the `x-fake-feature` header. */
 export function claudeRoutes(app: FastifyInstance, fake = new ClaudeFake()): void {
+  // E2E support: how many times the AI service was called, so a test can prove "no AI call" (AC-03).
+  let calls = 0;
+  app.get("/__fake/claude/calls", async () => ({ count: calls }));
   app.post("/claude/v1/messages", async (req, reply) => {
+    calls += 1;
     const b = (req.body ?? {}) as { messages?: { role: string; content: unknown }[] };
     const feature = String(req.headers["x-fake-feature"] ?? "default");
     const last = [...(b.messages ?? [])].reverse().find((m) => m.role === "user");
