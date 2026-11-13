@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>খরচের বিস্তারিত</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:'Hind Siliguri',system-ui,sans-serif}
+.r{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F1E6D3;font-size:17px}
+.r span{color:#5A4B3B;font-size:15px}</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#FFF8EE;color:#2A2118;display:flex;flex-direction:column;overflow:hidden;padding:0 20px">
+  <div style="margin-top:20px;display:flex;align-items:center;gap:4px">
+    <button aria-label="পেছনে" style="width:48px;height:48px;border:0;background:transparent;color:#2A2118;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div style="font-size:24px;font-weight:700">খরচের বিস্তারিত</div>
+  </div>
+
+  <div style="margin-top:8px;padding:12px 14px;border-radius:18px;background:#FDEBCB;color:#6B3F00;display:flex;align-items:center;gap:10px">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
+    <div style="flex:1;font-size:15px;font-weight:600;line-height:1.3">মুছে ফেলা হয়েছে। ৩০ দিন পর্যন্ত ফেরত পাবেন।</div>
+    <button style="min-height:48px;padding:0 14px;border:0;border-radius:24px;background:#6B3F00;color:#fff;font:700 15px 'Hind Siliguri'">ফেরত আনুন</button>
+  </div>
+
+  <div style="margin-top:14px;padding:18px;border-radius:24px;background:#fff;border:1px solid #E8DCC8">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:56px;height:56px;border-radius:18px;background:#FDEBCB;display:flex;align-items:center;justify-content:center"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6B3F00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6zM9 8a3 3 0 0 1 6 0"/></svg></div>
+      <div style="flex:1"><div style="font-size:20px;font-weight:700">বাজার ও মুদি</div><div style="font-size:14px;color:#5A4B3B">আজ, বিকাল ৫:১০</div></div>
+    </div>
+    <div style="margin-top:10px;font-size:48px;font-weight:700;color:#B3261E;line-height:1.1">−৳ ৮৫০</div>
+    <div style="margin-top:4px;font-size:16px;color:#5A4B3B">আটশো পঞ্চাশ টাকা</div>
+  </div>
+
+  <div style="margin-top:6px;padding:0 4px">
+    <div class="r"><span>অ্যাকাউন্ট</span><b>ক্যাশ</b></div>
+    <div class="r"><span>কে দিলেন</span><b>আম্মু</b></div>
+    <div class="r"><span>কীভাবে লেখা</span><b style="display:flex;align-items:center;gap:6px;background:#E6F2E3;color:#14451A;border-radius:14px;padding:4px 12px;font-size:15px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/></svg>কণ্ঠ থেকে</b></div>
+    <div class="r"><span>ট্রানজ্যাকশন নম্বর</span><b style="font-size:15px">নেই (নগদ টাকা)</b></div>
+    <div class="r"><span>লেখা</span><b>ইলিশ, চাল</b></div>
+    <div class="r" style="border-bottom:0"><span>কে দেখবে</span><b style="display:flex;align-items:center;gap:6px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>শুধু আমি</b></div>
+  </div>
+
+  <div style="margin-top:8px;padding:12px 14px;border-radius:16px;background:#E6F2E3;color:#14451A;font-size:15px;line-height:1.4;display:flex;gap:10px;align-items:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></svg>আপনি শুধু নিজের খরচ বদলাতে পারেন।</div>
+
+  <div style="flex:1"></div>
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:24px">
+    <button style="height:64px;border:3px solid #1B5E20;border-radius:32px;background:#fff;color:#1B5E20;font:700 19px 'Hind Siliguri';display:flex;align-items:center;justify-content:center;gap:8px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>বদলান</button>
+    <button style="height:64px;border:3px solid #B3261E;border-radius:32px;background:#fff;color:#B3261E;font:700 19px 'Hind Siliguri';display:flex;align-items:center;justify-content:center;gap:8px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>মুছুন</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

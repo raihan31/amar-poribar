@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>লগইন</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:'Hind Siliguri',system-ui,sans-serif}</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#FFF8EE;color:#2A2118;display:flex;flex-direction:column;overflow:hidden;padding:0 24px">
+  <div style="margin-top:72px;display:flex;flex-direction:column;align-items:center;gap:10px">
+    <div style="width:84px;height:84px;border-radius:28px;background:#1B5E20;color:#fff;display:flex;align-items:center;justify-content:center"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></div>
+    <div style="font-size:34px;font-weight:700;color:#1B5E20">আমার পরিবার</div>
+    <div style="font-size:17px;color:#5A4B3B;text-align:center">পরিবারের সব হিসাব, এক জায়গায়</div>
+  </div>
+
+  <div style="margin-top:44px;font-size:20px;font-weight:600">আপনার মোবাইল নম্বর দিন</div>
+  <div style="margin-top:10px;height:68px;border-radius:20px;border:3px solid #1B5E20;background:#fff;display:flex;align-items:center;padding:0 16px;gap:12px;font-size:26px;font-weight:600">
+    <span style="color:#5A4B3B">+৮৮</span><span>০১৭১২ ৩৪৫ ৬৭৮</span>
+  </div>
+  <div style="margin-top:8px;font-size:14px;color:#5A4B3B">আমরা একটি ৬ সংখ্যার কোড এসএমএসে পাঠাব।</div>
+
+  <div style="margin-top:22px;font-size:20px;font-weight:600">কোডটি লিখুন</div>
+  <div style="margin-top:10px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px">
+    <div style="height:64px;border-radius:16px;border:2px solid #1B5E20;background:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700">৪</div>
+    <div style="height:64px;border-radius:16px;border:2px solid #1B5E20;background:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700">৭</div>
+    <div style="height:64px;border-radius:16px;border:2px solid #1B5E20;background:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700">২</div>
+    <div style="height:64px;border-radius:16px;border:3px solid #F2A33A;background:#fff"></div>
+    <div style="height:64px;border-radius:16px;border:2px solid #E1D3BC;background:#fff"></div>
+    <div style="height:64px;border-radius:16px;border:2px solid #E1D3BC;background:#fff"></div>
+  </div>
+  <div style="margin-top:10px;font-size:15px;color:#5A4B3B">কোড আসেনি? <b style="color:#1B5E20">আবার পাঠান (০:৪২)</b></div>
+
+  <div style="flex:1"></div>
+  <button style="height:72px;border:0;border-radius:36px;background:#1B5E20;color:#fff;font:700 22px 'Hind Siliguri'">ঢুকুন</button>
+  <div style="margin:12px 0 28px;text-align:center;font-size:14px;color:#5A4B3B">সাহায্য লাগলে বাড়ির কাউকে ফোন দিন।</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>আমার প্রোফাইল</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:'Hind Siliguri',system-ui,sans-serif}
+.s{min-height:68px;display:flex;align-items:center;gap:12px;padding:8px 16px;border-bottom:1px solid #F1E6D3}
+.sw{width:56px;height:32px;border-radius:16px;position:relative;flex:none}
+.sw i{position:absolute;top:4px;width:24px;height:24px;border-radius:12px;background:#fff}
+.o{padding:8px 14px;border-radius:16px;background:#F1E6D3;font-weight:600;font-size:16px}
+.on{padding:8px 14px;border-radius:16px;background:#1B5E20;color:#fff;font-weight:700;font-size:16px}</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#FFF8EE;color:#2A2118;display:flex;flex-direction:column;overflow:hidden">
+  <div style="padding:24px 12px 0;display:flex;align-items:center;gap:4px">
+    <button aria-label="পেছনে" style="width:56px;height:56px;border:0;background:transparent;color:#2A2118;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div style="font-size:26px;font-weight:700">আমার প্রোফাইল</div>
+  </div>
+
+  <div style="margin-top:8px;display:flex;flex-direction:column;align-items:center;gap:8px">
+    <div style="width:96px;height:96px;border-radius:48px;background:#BFD8F2;color:#173F6B;font-size:42px;font-weight:700;display:flex;align-items:center;justify-content:center">আ</div>
+    <div style="display:flex;align-items:center;gap:8px;height:56px;padding:0 18px;border-radius:28px;border:2px solid #1B5E20;background:#fff;font-size:22px;font-weight:700">আব্বু <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B5E20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l11-11-4-4L4 16z"/></svg><span style="font-size:14px;color:#1B5E20">বদলান</span></div>
+    <div style="font-size:14px;color:#5A4B3B">০১৭১২ ৩৪৫ ৬৭৮</div>
+  </div>
+
+  <div style="margin:14px 20px 0;border-radius:20px;background:#fff;border:1px solid #E8DCC8;overflow:hidden">
+    <div class="s"><div style="flex:1;font-size:18px;font-weight:600">ভাষা</div><div style="display:flex;gap:6px"><span class="on">বাংলা</span><span class="o">English</span></div></div>
+    <div class="s"><div style="flex:1;font-size:18px;font-weight:600">সংখ্যা</div><div style="display:flex;gap:6px"><span class="on">১২৩</span><span class="o">123</span></div></div>
+    <div class="s" style="background:#E6F2E3"><div style="flex:1"><div style="font-size:18px;font-weight:700;color:#14451A">সহজ মোড</div><div style="font-size:14px;color:#14451A">বড় লেখা, ছবি, সব শুনিয়ে দেবে</div></div><div class="sw" style="background:#1B5E20"><i style="right:4px"></i></div></div>
+    <div class="s" style="border-bottom:0"><div style="flex:1"><div style="font-size:18px;font-weight:600">রোজ মনে করান</div><div style="font-size:14px;color:#5A4B3B">রাত ৯:০০ টায়</div></div><span class="on">সময় বদলান</span></div>
+  </div>
+
+  <div style="margin:12px 20px 0;border-radius:20px;background:#fff;border:1px solid #E8DCC8;overflow:hidden">
+    <div class="s"><div style="flex:1;font-size:18px;font-weight:600">গোপনীয়তা নীতি</div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></div>
+    <div class="s" style="border-bottom:0"><div style="flex:1;font-size:18px;font-weight:700;color:#B3261E">তথ্য মুছুন</div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

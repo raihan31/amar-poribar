@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>বাজেট</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:'Hind Siliguri',system-ui,sans-serif}
+.b{padding:14px 16px;border-radius:20px;background:#fff;border:2px solid #E8DCC8}
+.t{height:14px;border-radius:7px;background:#EADFC9;margin-top:8px}</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#FFF8EE;color:#2A2118;display:flex;flex-direction:column;overflow:hidden">
+  <div style="padding:28px 20px 0;font-size:28px;font-weight:700;color:#1B5E20">মাসের বাজেট</div>
+  <div style="padding:0 20px;font-size:15px;color:#5A4B3B">নভেম্বর ২০২৬ · গত মাসের বাজেট নিজে থেকেই চলে এসেছে</div>
+
+  <div style="margin:14px 20px 0;display:flex;flex-direction:column;gap:10px">
+    <div class="b" style="border-color:#1B5E20">
+      <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:700"><span>পুরো পরিবার</span><span>৳ ৪২,৫০০ / ৫০,০০০</span></div>
+      <div class="t"><div style="width:85%;height:14px;border-radius:7px;background:#F2A33A"></div></div>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700;color:#6B3F00"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2zM12 10v5M12 18v.5"/></svg>৮০% পার হয়েছে · সাবধান</div>
+    </div>
+    <div class="b" style="border-color:#B3261E">
+      <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:700"><span>বাজার ও মুদি</span><span>৳ ১০,৫০০ / ১০,০০০</span></div>
+      <div class="t"><div style="width:100%;height:14px;border-radius:7px;background:#B3261E"></div></div>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700;color:#B3261E"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16v.5"/></svg>বাজেট শেষ · ৳ ৫০০ বেশি<button style="margin-left:auto;height:48px;padding:0 14px;border:0;border-radius:24px;background:#F2A33A;color:#2A2118;font:700 14px 'Hind Siliguri'">আম্মুকে কম্পন দিন</button></div>
+    </div>
+    <div class="b">
+      <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:700"><span>যাতায়াত</span><span>৳ ১,২০০ / ৩,০০০</span></div>
+      <div class="t"><div style="width:40%;height:14px;border-radius:7px;background:#2E9E4F"></div></div>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700;color:#14451A"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>ঠিক আছে</div>
+    </div>
+    <div class="b" style="border-style:dashed;background:#FFF8EE">
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:18px;font-weight:700"><span>ঈদুল আযহা (উৎসবের বাজেট)</span></div>
+      <div style="font-size:15px;color:#5A4B3B;margin-top:4px">১৫ – ২০ জুন · ৳ ২০,০০০</div>
+    </div>
+  </div>
+
+  <div style="flex:1"></div>
+  <div style="padding:0 20px 10px;display:grid;grid-template-columns:minmax(0,1fr) 72px;gap:10px">
+    <button style="height:64px;border:0;border-radius:32px;background:#1B5E20;color:#fff;font:700 20px 'Hind Siliguri'">+ বাজেট দিন</button>
+    <button aria-label="শুনুন" style="height:64px;border:0;border-radius:32px;background:#F2A33A;color:#2A2118;display:flex;align-items:center;justify-content:center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg></button>
+  </div>
+  <div style="height:72px;border-top:1px solid #E8DCC8;background:#fff;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;text-align:center;font-size:12px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px;color:#5A4B3B;font-weight:600"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>হোম</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px;color:#5A4B3B;font-weight:600"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.600 7.100L4 20l1-4.600A8 8 0 1 1 21 12z"/></svg>কথা</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px;color:#5A4B3B;font-weight:600"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>তালিকা</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px;color:#1B5E20;font-weight:700"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9h-9zM15 3.500A9 9 0 0 1 20.500 9H15z"/></svg>বাজেট</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px;color:#5A4B3B;font-weight:600"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20c0-3 3-5 6-5s6 2 6 5M17 11a2.500 2.500 0 1 0 0-5M21 19c0-2-1.500-3.500-4-4"/></svg>পরিবার</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

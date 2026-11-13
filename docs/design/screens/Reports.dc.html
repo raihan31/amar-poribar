@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<title>রিপোর্ট</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:'Hind Siliguri',system-ui,sans-serif}
+.b{display:grid;grid-template-columns:88px minmax(0,1fr) 72px;gap:8px;align-items:center;font-size:15px}
+.bar{height:16px;border-radius:8px;background:#EADFC9}
+.bar i{display:block;height:16px;border-radius:8px;background:#1B5E20}
+.col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;font-size:12px;color:#5A4B3B}
+.col i{display:block;width:100%;border-radius:6px 6px 0 0;background:#7DB383}</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#FFF8EE;color:#2A2118;display:flex;flex-direction:column;overflow:hidden">
+  <div style="padding:24px 12px 0;display:flex;align-items:center;gap:4px">
+    <button aria-label="পেছনে" style="width:56px;height:56px;border:0;background:transparent;color:#2A2118;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div style="font-size:26px;font-weight:700">রিপোর্ট</div>
+  </div>
+
+  <div style="margin:4px 20px 0;display:flex;gap:10px">
+    <div style="flex:1;padding:10px 12px;border-radius:16px;background:#fff;border:1px solid #E8DCC8"><div style="font-size:13px;color:#5A4B3B">আয়</div><div style="font-size:20px;font-weight:700;color:#14451A">৳ ৬৫,০০০</div></div>
+    <div style="flex:1;padding:10px 12px;border-radius:16px;background:#fff;border:1px solid #E8DCC8"><div style="font-size:13px;color:#5A4B3B">খরচ</div><div style="font-size:20px;font-weight:700;color:#B3261E">৳ ৪২,৫০০</div></div>
+    <div style="flex:1;padding:10px 12px;border-radius:16px;background:#fff;border:1px solid #E8DCC8"><div style="font-size:13px;color:#5A4B3B">বাকি</div><div style="font-size:20px;font-weight:700">৳ ২২,৫০০</div></div>
+  </div>
+  <div style="margin:8px 20px 0;display:flex;align-items:center;gap:6px;font-size:15px;font-weight:600;color:#B3261E"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>গত মাসের চেয়ে ৳ ৩,২০০ বেশি খরচ</div>
+
+  <div style="margin:10px 20px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+    <button style="height:48px;border:3px solid #1B5E20;border-radius:24px;background:#E6F2E3;color:#1B5E20;font:700 16px 'Hind Siliguri'">✓ খাত</button>
+    <button style="height:48px;border:2px solid #E1D3BC;border-radius:24px;background:#fff;font:600 16px 'Hind Siliguri'">সদস্য</button>
+    <button style="height:48px;border:2px solid #E1D3BC;border-radius:24px;background:#fff;font:600 16px 'Hind Siliguri'">অ্যাকাউন্ট</button>
+  </div>
+  <div style="margin:12px 20px 0;display:flex;flex-direction:column;gap:9px">
+    <div class="b"><b>বাজার</b><div class="bar"><i style="width:100%"></i></div><b>৳ ১৬,৮০০</b></div>
+    <div class="b"><b>ভাড়া</b><div class="bar"><i style="width:71%"></i></div><b>৳ ১২,০০০</b></div>
+    <div class="b"><b>বিল</b><div class="bar"><i style="width:31%"></i></div><b>৳ ৫,২০০</b></div>
+    <div class="b"><b>যাতায়াত</b><div class="bar"><i style="width:7%"></i></div><b>৳ ১,২০০</b></div>
+  </div>
+
+  <div style="margin:16px 20px 0;display:flex;justify-content:space-between;align-items:center"><div style="font-size:17px;font-weight:700">মাসে মাসে খরচ</div>
+    <div style="display:flex;gap:6px"><button style="height:48px;padding:0 14px;border:3px solid #1B5E20;border-radius:24px;background:#E6F2E3;color:#1B5E20;font:700 15px 'Hind Siliguri'">✓ ৬ মাস</button><button style="height:48px;padding:0 14px;border:2px solid #E1D3BC;border-radius:24px;background:#fff;font:600 15px 'Hind Siliguri'">১২ মাস</button></div></div>
+  <div style="margin:6px 20px 0;height:120px;display:flex;align-items:flex-end;gap:8px;border-bottom:1px solid #D9CDB5">
+    <div class="col"><i style="height:70px"></i></div><div class="col"><i style="height:78px"></i></div><div class="col"><i style="height:74px"></i></div><div class="col"><i style="height:90px"></i></div><div class="col"><i style="height:84px"></i></div><div class="col"><i style="height:104px;background:#1B5E20"></i></div>
+  </div>
+  <div style="margin:4px 20px 0;display:flex;gap:8px;font-size:12px;color:#5A4B3B;text-align:center"><span style="flex:1">জুন</span><span style="flex:1">জুলাই</span><span style="flex:1">আগস্ট</span><span style="flex:1">সেপ্টে</span><span style="flex:1">অক্টো</span><span style="flex:1;font-weight:700;color:#14451A">নভে</span></div>
+
+  <div style="flex:1"></div>
+  <div style="padding:0 20px 24px"><button style="width:100%;height:60px;border:3px solid #1B5E20;border-radius:30px;background:#fff;color:#1B5E20;font:700 19px 'Hind Siliguri';display:flex;align-items:center;justify-content:center;gap:10px"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>CSV নিন</button></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin Family Detail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:Inter,'Hind Siliguri',system-ui,sans-serif}
+.nv{display:block;padding:10px 14px;border-radius:10px;color:#DDEBDD;font-size:15px;font-weight:500;text-decoration:none}
+.k{background:#fff;border:1px solid #E3D9C5;border-radius:16px;padding:18px}
+.k h2{margin:0 0 10px;font-size:17px}
+.r{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #EFE6D3;font-size:15px}
+.p{display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:3px 10px;font-size:13px;font-weight:600;background:#F1E6D3;color:#4A3C2C}
+.b{height:44px;padding:0 16px;border-radius:10px;font:600 15px Inter,'Hind Siliguri',sans-serif;border:1px solid #14451A;background:#fff;color:#14451A}
+.l{font-size:13px;color:#5A4B3B}</style>
+</helmet>
+<div style="min-height:900px;background:#F6F1E7;color:#2A2118;display:flex;flex-wrap:wrap">
+  <nav style="flex:0 0 232px;background:#14451A;padding:24px 14px;display:flex;flex-direction:column;gap:4px;box-sizing:border-box">
+    <div style="color:#fff;font-size:18px;font-weight:700;padding:0 14px 4px">আমার পরিবার</div>
+    <div style="color:#B9D6BC;font-size:12px;padding:0 14px 16px">Admin console</div>
+    <a class="nv" href="AdminOverview.dc.html">Overview</a>
+    <a class="nv" href="AdminFamilies.dc.html" style="background:#fff;color:#14451A;font-weight:700">Families</a>
+    <a class="nv" href="AdminPrivacy.dc.html">Privacy requests <span style="margin-left:6px;background:#F2A33A;color:#2A2118;border-radius:10px;padding:1px 8px;font-size:12px;font-weight:700">3</span></a>
+    <a class="nv" href="AdminPlans.dc.html">Plans &amp; AI quota</a>
+    <a class="nv" href="AdminAudit.dc.html">Audit log</a>
+    <a class="nv" href="AdminStaff.dc.html">Staff accounts</a>
+    <a class="nv" href="AdminHealth.dc.html">System health</a>
+  </nav>
+  <main style="flex:999 1 560px;min-width:0;padding:28px 32px;box-sizing:border-box">
+    <a href="AdminFamilies.dc.html" style="font-size:14px;color:#14451A;font-weight:600">&larr; All families</a>
+    <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+      <div><h1 style="margin:0;font-size:26px">রহিম পরিবার</h1><div class="l">Created 3 Aug 2026 · ID fam_8f2c…41a</div></div>
+      <span class="p" style="background:#E6F2E3;color:#14451A;font-size:14px;padding:6px 14px">&#10003; Active</span>
+    </div>
+
+    <div style="margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;align-items:start">
+      <section class="k">
+        <h2>Members (5)</h2>
+        <div class="r"><b style="flex:1">আব্বু</b><span class="l">••• 678</span><span class="p" style="background:#CDE8C8;color:#14451A">Owner</span></div>
+        <div class="r"><b style="flex:1">আম্মু</b><span class="l">••• 321</span><span class="p">Admin</span></div>
+        <div class="r"><b style="flex:1">দাদি</b><span class="l">••• 457</span><span class="p">Member</span></div>
+        <div class="r"><b style="flex:1">তানভীর</b><span class="l">••• 904</span><span class="p">Viewer</span></div>
+        <div class="r" style="border-bottom:0"><span style="flex:1;color:#5A4B3B">Pending invite</span><span class="l">••• 432 · 6 days left</span></div>
+        <button class="b" style="margin-top:10px;width:100%">Transfer ownership…</button>
+      </section>
+
+      <section class="k">
+        <h2>Plan &amp; AI quota</h2>
+        <div class="r"><span style="flex:1">Plan</span><b>Free</b></div>
+        <div class="r"><span style="flex:1">AI entries this month</span><b>93 / 100</b></div>
+        <div style="height:12px;border-radius:6px;background:#EADFC9;margin:6px 0 4px"><div style="width:93%;height:12px;border-radius:6px;background:#F2A33A"></div></div>
+        <div class="l">Resets on 1 Dec · cost this month: ৳ 9.8</div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="b">Change plan</button><button class="b">Add 50 entries</button></div>
+      </section>
+
+      <section class="k">
+        <h2>Usage (counts only)</h2>
+        <div class="r"><span style="flex:1">Entries this month</span><b>212</b></div>
+        <div class="r"><span style="flex:1">Voice share of entries</span><b>34%</b></div>
+        <div class="r"><span style="flex:1">Devices signed in</span><b>6</b></div>
+        <div class="r" style="border-bottom:0"><span style="flex:1">Last sync</span><b>Today, 09:41</b></div>
+        <div class="l" style="margin-top:8px;display:flex;gap:6px;align-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Transactions, chat and media are hidden from staff.</div>
+      </section>
+
+      <section class="k">
+        <h2>Recent staff actions</h2>
+        <div class="r"><span style="flex:1">Added 50 AI entries · reason: pilot</span><span class="l">Rubel · 2 Nov</span></div>
+        <div class="r"><span style="flex:1">Viewed family page</span><span class="l">Support · 30 Oct</span></div>
+        <div class="r" style="border-bottom:0"><span style="flex:1">Reset member invite link</span><span class="l">Rubel · 12 Oct</span></div>
+        <a href="AdminFamily.dc.html" style="font-size:14px;font-weight:600;color:#14451A;display:inline-block;margin-top:8px">Open full audit log</a>
+      </section>
+    </div>
+
+    <section class="k" style="margin-top:14px;border-color:#E3B1AB;background:#FFF6F4">
+      <h2 style="color:#8A1C14">Risky actions</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between">
+        <div style="flex:1 1 320px;font-size:15px;line-height:1.45">Each action asks for a reason, then you type the family name to confirm. It is written to the audit log with your name.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="b" style="border-color:#8A1C14;color:#8A1C14">Suspend family</button><button class="b" style="background:#8A1C14;border-color:#8A1C14;color:#fff">Delete family and data…</button></div>
+      </div>
+      <div style="margin-top:14px;padding:14px;border-radius:12px;background:#fff;border:1px solid #E3B1AB;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">
+        <div><div class="l">Reason (required)</div><div style="margin-top:4px;height:44px;border:1px solid #CDBFA5;border-radius:10px;padding:0 12px;display:flex;align-items:center;color:#6B5A48">Owner asked in writing, ticket #4821</div></div>
+        <div><div class="l">Type the family name to confirm</div><div style="margin-top:4px;height:44px;border:1px solid #CDBFA5;border-radius:10px;padding:0 12px;display:flex;align-items:center">রহিম পরিবার</div></div>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

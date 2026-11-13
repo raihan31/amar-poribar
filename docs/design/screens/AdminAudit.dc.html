@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin Audit log</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:Inter,'Hind Siliguri',system-ui,sans-serif}
+.nv{display:block;padding:10px 14px;border-radius:10px;color:#DDEBDD;font-size:15px;font-weight:500;text-decoration:none}
+th{text-align:left;font-size:13px;color:#5A4B3B;font-weight:600;padding:10px 12px;border-bottom:1px solid #E3D9C5;white-space:nowrap}
+td{padding:14px 12px;border-bottom:1px solid #EFE6D3;font-size:15px;white-space:nowrap}
+.p{display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:3px 10px;font-size:13px;font-weight:600}
+.f{height:44px;border:1px solid #CDBFA5;border-radius:10px;background:#fff;padding:0 14px;font:500 15px Inter,'Hind Siliguri',sans-serif;color:#2A2118;display:inline-flex;align-items:center}
+.l{font-size:13px;color:#5A4B3B}</style>
+</helmet>
+<div style="min-height:800px;background:#F6F1E7;color:#2A2118;display:flex;flex-wrap:wrap">
+  <nav style="flex:0 0 232px;background:#14451A;padding:24px 14px;display:flex;flex-direction:column;gap:4px;box-sizing:border-box">
+    <div style="color:#fff;font-size:18px;font-weight:700;padding:0 14px 4px">আমার পরিবার</div>
+    <div style="color:#B9D6BC;font-size:12px;padding:0 14px 16px">Admin console</div>
+    <a class="nv" href="AdminOverview.dc.html">Overview</a>
+    <a class="nv" href="AdminFamilies.dc.html">Families</a>
+    <a class="nv" href="AdminPrivacy.dc.html">Privacy requests <span style="margin-left:6px;background:#F2A33A;color:#2A2118;border-radius:10px;padding:1px 8px;font-size:12px;font-weight:700">3</span></a>
+    <a class="nv" href="AdminPlans.dc.html">Plans &amp; AI quota</a>
+    <a class="nv" href="AdminAudit.dc.html" style="background:#fff;color:#14451A;font-weight:700">Audit log</a>
+    <a class="nv" href="AdminStaff.dc.html">Staff accounts</a>
+    <a class="nv" href="AdminHealth.dc.html">System health</a>
+  </nav>
+  <main style="flex:999 1 560px;min-width:0;padding:28px 32px;box-sizing:border-box">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+      <h1 style="margin:0;font-size:26px">Audit log</h1>
+      <button style="height:44px;padding:0 18px;border:1px solid #14451A;border-radius:10px;background:#fff;color:#14451A;font:600 15px Inter,sans-serif">Export (CSV)</button>
+    </div>
+
+    <div style="margin-top:12px;padding:12px 14px;border-radius:10px;background:#E6F2E3;color:#14451A;font-size:14px;line-height:1.45;display:flex;gap:10px;align-items:center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      Entries cannot be edited or deleted by anyone, including the owner. They are kept for 2 years.
+    </div>
+
+    <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+      <div class="f">Staff: All</div><div class="f">Action: All</div><div class="f" style="min-width:200px;color:#6B5A48">Family name</div><div class="f">Date: Last 30 days</div>
+    </div>
+
+    <div style="margin-top:16px;background:#fff;border:1px solid #E3D9C5;border-radius:16px;overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;min-width:900px">
+        <thead><tr><th>When</th><th>Who</th><th>Action</th><th>Family</th><th>Reason</th><th>Kind</th></tr></thead>
+        <tbody>
+          <tr><td>11 Nov, 09:12</td><td><b>Rubel</b></td><td>Suspended family</td><td>মিয়া পরিবার</td><td>Abuse report #4890</td><td><span class="p" style="background:#F8D7D3;color:#8A1C14">&#9632; Risky</span></td></tr>
+          <tr><td>11 Nov, 08:47</td><td><b>Support</b></td><td>Started privacy request #PR-0188</td><td>সরকার পরিবার</td><td>Owner asked by phone</td><td><span class="p" style="background:#FDEBCB;color:#6B3F00">&#9888; Privacy</span></td></tr>
+          <tr><td>10 Nov, 17:30</td><td><b>Support</b></td><td>Viewed family page</td><td>রহিম পরিবার</td><td>Help request #4821</td><td><span class="p" style="background:#F1E6D3;color:#4A3C2C">Read</span></td></tr>
+          <tr><td>2 Nov, 11:05</td><td><b>Rubel</b></td><td>Added 50 AI entries</td><td>রহিম পরিবার</td><td>pilot</td><td><span class="p" style="background:#E6F2E3;color:#14451A">Change</span></td></tr>
+          <tr><td>30 Oct, 15:20</td><td><b>Rubel</b></td><td>Changed plan Free to Plus</td><td>করিম পরিবার</td><td>Paid by bKash, ref in ticket</td><td><span class="p" style="background:#E6F2E3;color:#14451A">Change</span></td></tr>
+          <tr><td>30 Oct, 09:02</td><td><b>Rubel</b></td><td>Signed in (2FA)</td><td>—</td><td>—</td><td><span class="p" style="background:#F1E6D3;color:#4A3C2C">Sign-in</span></td></tr>
+          <tr><td>29 Oct, 14:44</td><td><b>Support</b></td><td>Failed sign-in (3 tries)</td><td>—</td><td>—</td><td><span class="p" style="background:#FDEBCB;color:#6B3F00">&#9888; Security</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#5A4B3B;flex-wrap:wrap;gap:8px"><span>Showing 1–7 of 214 · times in Asia/Dhaka</span><span><b style="color:#14451A">1</b> &nbsp; 2 &nbsp; 3 &nbsp; … &nbsp; Next</span></div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

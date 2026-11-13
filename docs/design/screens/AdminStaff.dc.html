@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin Staff accounts</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>body{margin:0;font-family:Inter,'Hind Siliguri',system-ui,sans-serif}
+.nv{display:block;padding:10px 14px;border-radius:10px;color:#DDEBDD;font-size:15px;font-weight:500;text-decoration:none}
+th{text-align:left;font-size:13px;color:#5A4B3B;font-weight:600;padding:10px 12px;border-bottom:1px solid #E3D9C5;white-space:nowrap}
+td{padding:14px 12px;border-bottom:1px solid #EFE6D3;font-size:15px;white-space:nowrap}
+.p{display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:3px 10px;font-size:13px;font-weight:600}
+.k{background:#fff;border:1px solid #E3D9C5;border-radius:16px;padding:18px}
+.b{height:40px;padding:0 14px;border-radius:10px;font:600 14px Inter,'Hind Siliguri',sans-serif;border:1px solid #14451A;background:#fff;color:#14451A}
+.i{height:44px;border:1px solid #CDBFA5;border-radius:10px;background:#fff;padding:0 12px;display:flex;align-items:center;font-size:15px;box-sizing:border-box}
+.l{font-size:13px;color:#5A4B3B}
+.c{text-align:center}</style>
+</helmet>
+<div style="min-height:800px;background:#F6F1E7;color:#2A2118;display:flex;flex-wrap:wrap">
+  <nav style="flex:0 0 232px;background:#14451A;padding:24px 14px;display:flex;flex-direction:column;gap:4px;box-sizing:border-box">
+    <div style="color:#fff;font-size:18px;font-weight:700;padding:0 14px 4px">আমার পরিবার</div>
+    <div style="color:#B9D6BC;font-size:12px;padding:0 14px 16px">Admin console</div>
+    <a class="nv" href="AdminOverview.dc.html">Overview</a>
+    <a class="nv" href="AdminFamilies.dc.html">Families</a>
+    <a class="nv" href="AdminPrivacy.dc.html">Privacy requests <span style="margin-left:6px;background:#F2A33A;color:#2A2118;border-radius:10px;padding:1px 8px;font-size:12px;font-weight:700">3</span></a>
+    <a class="nv" href="AdminPlans.dc.html">Plans &amp; AI quota</a>
+    <a class="nv" href="AdminAudit.dc.html">Audit log</a>
+    <a class="nv" href="AdminStaff.dc.html" style="background:#fff;color:#14451A;font-weight:700">Staff accounts</a>
+    <a class="nv" href="AdminHealth.dc.html">System health</a>
+  </nav>
+  <main style="flex:999 1 560px;min-width:0;padding:28px 32px;box-sizing:border-box">
+    <h1 style="margin:0;font-size:26px">Staff accounts</h1>
+    <div class="l" style="margin-top:4px;font-size:15px">Staff sign in with email, password and a 2FA code. Every action is written to the audit log.</div>
+
+    <div style="margin-top:18px;background:#fff;border:1px solid #E3D9C5;border-radius:16px;overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;min-width:820px">
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>2FA</th><th>Last sign-in</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><b>Rubel</b></td><td>rubel@amarporibar.example</td><td>Owner</td><td><span class="p" style="background:#E6F2E3;color:#14451A">&#10003; Enabled</span></td><td>Today, 09:02</td><td><span class="p" style="background:#E6F2E3;color:#14451A">&#10003; Active</span></td><td></td></tr>
+          <tr><td><b>Support</b></td><td>support@amarporibar.example</td><td>Support</td><td><span class="p" style="background:#E6F2E3;color:#14451A">&#10003; Enabled</span></td><td>Yesterday, 17:30</td><td><span class="p" style="background:#E6F2E3;color:#14451A">&#10003; Active</span></td><td><button class="b">Change role</button></td></tr>
+          <tr><td><b>Auditor</b></td><td>auditor@amarporibar.example</td><td>Read-only</td><td><span class="p" style="background:#FDEBCB;color:#6B3F00">&#9888; Not set</span></td><td>Never</td><td><span class="p" style="background:#FDEBCB;color:#6B3F00">&#9888; Locked until 2FA</span></td><td><button class="b">Send reminder</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;align-items:start">
+      <section class="k">
+        <h2 style="margin:0 0 10px;font-size:17px">Invite staff</h2>
+        <div class="l" style="margin-bottom:4px">Work email</div><div class="i" style="color:#6B5A48">name@amarporibar.example</div>
+        <div class="l" style="margin:12px 0 4px">Role</div><div class="i" style="justify-content:space-between">Support<span class="l">&#9662;</span></div>
+        <button style="margin-top:16px;width:100%;height:46px;border:0;border-radius:10px;background:#14451A;color:#fff;font:600 15px Inter,sans-serif">Send invite</button>
+        <div class="l" style="margin-top:10px;line-height:1.45">The invite link works for 48 hours. 2FA setup is required at first sign-in.</div>
+      </section>
+
+      <section class="k" style="overflow-x:auto">
+        <h2 style="margin:0 0 10px;font-size:17px">What each role can do</h2>
+        <table style="width:100%;border-collapse:collapse;min-width:420px">
+          <thead><tr><th>Permission</th><th class="c">Owner</th><th class="c">Support</th><th class="c">Read-only</th></tr></thead>
+          <tbody>
+            <tr><td>View families (counts only)</td><td class="c">&#10003; Yes</td><td class="c">&#10003; Yes</td><td class="c">&#10003; Yes</td></tr>
+            <tr><td>Change plan or quota</td><td class="c">&#10003; Yes</td><td class="c">&#10003; Yes</td><td class="c">&#10007; No</td></tr>
+            <tr><td>Suspend a family</td><td class="c">&#10003; Yes</td><td class="c">&#10007; No</td><td class="c">&#10007; No</td></tr>
+            <tr><td>Delete family data</td><td class="c">&#10003; Yes</td><td class="c">&#10007; No</td><td class="c">&#10007; No</td></tr>
+            <tr><td>Handle privacy requests</td><td class="c">&#10003; Yes</td><td class="c">&#10003; Yes</td><td class="c">&#10007; No</td></tr>
+            <tr><td>Manage staff</td><td class="c">&#10003; Yes</td><td class="c">&#10007; No</td><td class="c">&#10007; No</td></tr>
+          </tbody>
+        </table>
+        <div class="l" style="margin-top:10px;display:flex;gap:8px;align-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>No role can see transactions, notes, chat, voice or video.</div>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
