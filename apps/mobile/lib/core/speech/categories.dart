@@ -38,6 +38,30 @@ const List<DefaultCategory> kDefaultCategories = [
   DefaultCategory('other_income', 'income', 'অন্যান্য আয়', '💰'),
 ];
 
+/// Words a person says for a category, used by the offline quick parser (FR-AI-13).
+/// A spoken word matches when it starts with a keyword ("বাজারে" matches "বাজার"); a keyword
+/// with a space must match that many words in a row.
+const Map<String, List<String>> kCategoryKeywords = {
+  'bazaar': ['বাজার', 'মুদি', 'সবজি', 'মাছ', 'মাংস'],
+  'rent': ['বাসাভাড়া', 'বাসা ভাড়া', 'বাড়ি ভাড়া', 'বাড়ীভাড়া'],
+  'electricity': ['বিদ্যুৎ', 'কারেন্ট', 'বিজলি'],
+  'gas': ['গ্যাস'],
+  'water': ['পানির'],
+  'internet': ['ইন্টারনেট', 'ওয়াইফাই', 'ডিশ'],
+  'mobile_recharge': ['রিচার্জ'],
+  'transport': ['রিকশা', 'সিএনজি', 'যাতায়াত', 'উবার', 'ট্রেন'],
+  'education': ['স্কুল', 'টিউশন', 'কোচিং', 'শিক্ষা', 'পড়ালেখা'],
+  'medical': ['ওষুধ', 'ঔষধ', 'ডাক্তার', 'চিকিৎসা', 'হাসপাতাল'],
+  'domestic_help': ['বুয়া', 'গৃহকর্মী'],
+  'clothing': ['কাপড়', 'জামা', 'পোশাক', 'শাড়ি'],
+  'eating_out': ['রেস্টুরেন্ট', 'বিরিয়ানি'],
+  'charity': ['দান', 'যাকাত', 'সদকা', 'ফিতরা'],
+  'festival': ['ঈদ', 'পূজা', 'উৎসব'],
+  'gifts': ['উপহার', 'দাওয়াত'],
+  'salary': ['বেতন'],
+  'remittance': ['রেমিট্যান্স'],
+};
+
 DefaultCategory? categoryByKey(String? key) {
   for (final c in kDefaultCategories) {
     if (c.key == key) return c;

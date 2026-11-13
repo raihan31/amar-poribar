@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../features/auth/ui/login_screen.dart';
 import '../features/auth/ui/session_expired_screen.dart';
 import '../features/entry/ui/category_picker_screen.dart';
+import '../features/entry/ui/voice_entry_screen.dart';
 import '../features/family/ui/join_screen.dart';
 import '../features/home/ui/home_screen.dart';
 import '../features/onboarding/ui/consent_screen.dart';
@@ -15,7 +16,6 @@ import '../features/settings/ui/profile_screen.dart';
 import '../features/transactions/ui/add_expense_screen.dart';
 import '../features/voice/ui/voice_fallback_screen.dart';
 import '../presentation/providers/auth_provider.dart';
-import '../presentation/screens/ai_entry_screen.dart';
 import '../presentation/screens/settings_screen.dart';
 import '../presentation/screens/transaction_screen.dart';
 import 'redirects.dart';
@@ -109,9 +109,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       stub(Routes.conversation),
       stub(Routes.voiceNote),
       stub(Routes.call),
-      simple(Routes.add, (_) => const AddExpenseScreen()),
-      // Until T-MOB-28 builds the voice screen, the old entry screen stays reachable here.
-      simple(Routes.addVoice, (_) => const AiEntryScreen()),
+      simple(
+        Routes.add,
+        (s) => AddExpenseScreen(
+          prefill: s.extra is AddExpensePrefill
+              ? s.extra! as AddExpensePrefill
+              : null,
+        ),
+      ),
+      simple(Routes.addVoice, (_) => const VoiceEntryScreen()),
       simple(
         Routes.addCategory,
         (s) => s.extra is CategoryPickerArgs

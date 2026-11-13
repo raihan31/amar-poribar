@@ -4,7 +4,10 @@ import 'package:amar_poribar/features/auth/data/auth_repository.dart';
 import 'package:amar_poribar/features/auth/data/fake_auth_repository.dart';
 import 'package:amar_poribar/features/auth/ui/login_screen.dart';
 import 'package:amar_poribar/features/auth/ui/session_expired_screen.dart';
+import 'package:amar_poribar/features/entry/data/fake_entry_repository.dart';
+import 'package:amar_poribar/features/entry/state/entry_controller.dart';
 import 'package:amar_poribar/features/entry/ui/category_picker_screen.dart';
+import 'package:amar_poribar/features/entry/ui/voice_entry_screen.dart';
 import 'package:amar_poribar/features/family/data/fake_family_repository.dart';
 import 'package:amar_poribar/features/family/data/invite_repository.dart';
 import 'package:amar_poribar/features/family/state/active_family.dart';
@@ -128,6 +131,17 @@ void registerAllScreens() {
     needs: addExpenseOverrides(FakeTransactionRepository()),
   );
   registerScreen(
+    'A3',
+    Routes.addVoice,
+    (c) => const VoiceEntryScreen(
+      initialText: 'আজ বাজারে আটশো পঞ্চাশ টাকা ক্যাশে',
+    ),
+    needs: [
+      ...addExpenseOverrides(FakeTransactionRepository()),
+      entryRepositoryProvider.overrideWithValue(FakeEntryRepository()),
+    ],
+  );
+  registerScreen(
     'Main',
     Routes.home,
     (c) => const HomeScreen(),
@@ -169,5 +183,4 @@ const Set<String> kRoutesAwaitingRegistration = {
   Routes.transactions,
   Routes.pendingSms,
   Routes.settings,
-  Routes.addVoice,
 };

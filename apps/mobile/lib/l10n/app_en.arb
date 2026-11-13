@@ -275,5 +275,26 @@
     "placeholders": {"category": {"type": "String"}}
   },
   "entry_picker_listen": "Listen",
-  "entry_picker_selected": "Selected"
+  "entry_picker_selected": "Selected",
+  "entry_heard": "You said:",
+  "entry_again": "Listen again",
+  "entry_confirmQ": "Is this right?",
+  "entry_no": "No",
+  "entry_yes": "Yes, keep it",
+  "entry_change": "I want to change the amount or category",
+  "entry_speak": "Tap and speak",
+  "entry_parsing": "Working it out…",
+  "entry_queued": "No internet. Your words are saved and will be understood when the network is back.",
+  "entry_quota": "Today's AI limit is used up. Please type it in.",
+  "entry_quotaAction": "Type it in",
+  "entry_problem": "I did not understand. Please say it again.",
+  "entry_typeExpense": "Expense",
+  "entry_typeIncome": "Income",
+  "entry_typeTransfer": "Transfer",
+  "entry_unknownCategory": "Pick a category",
+  "entry_acct_cash": "Cash",
+  "entry_acct_bkash": "bKash",
+  "entry_acct_nagad": "Nagad",
+  "entry_acct_rocket": "Rocket",
+  "entry_acct_bank": "Bank"
 }
