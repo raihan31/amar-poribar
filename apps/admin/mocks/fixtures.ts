@@ -1,3 +1,5 @@
+import type { StaffMember } from "../components/staff/types";
+
 /** Deterministic demo staff used by mock mode and tests. */
 export interface DemoStaff {
   name: string;
@@ -6,6 +8,40 @@ export interface DemoStaff {
 
 export function demoStaff(): DemoStaff {
   return { name: "Demo Staff", role: "owner" };
+}
+
+/** Design fixture of AdminStaff.dc.html. */
+export function staffFixture(now: Date = new Date()): StaffMember[] {
+  const ago = (ms: number) => new Date(now.getTime() - ms).toISOString();
+  return [
+    {
+      id: "s1",
+      name: "Demo Staff",
+      email: "rubel@amarporibar.example",
+      role: "owner",
+      totpEnabled: true,
+      lastSignInAt: ago(3_600_000),
+      status: "active",
+    },
+    {
+      id: "s2",
+      name: "Support",
+      email: "support@amarporibar.example",
+      role: "support",
+      totpEnabled: true,
+      lastSignInAt: ago(86_400_000),
+      status: "active",
+    },
+    {
+      id: "s3",
+      name: "Auditor",
+      email: "auditor@amarporibar.example",
+      role: "readonly",
+      totpEnabled: false,
+      lastSignInAt: null,
+      status: "locked_2fa",
+    },
+  ];
 }
 
 const day = 86_400_000;
