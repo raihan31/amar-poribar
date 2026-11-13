@@ -20,7 +20,7 @@
     "@amar-poribar/shared": "workspace:*",
     "@hookform/resolvers": "^3.10.0",
     "@tanstack/react-query": "^5.107.1",
-    "next": "^16.4.0",
+    "next": "~16.4.6",
     "openapi-fetch": "^0.13.8",
     "qrcode": "^1.5.4",
     "react": "^19.3.0",
