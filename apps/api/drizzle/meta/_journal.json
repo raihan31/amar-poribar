@@ -134,6 +134,13 @@
       "when": 1794562935047,
       "tag": "0018_ai_usage_features",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794567532525,
+      "tag": "0019_category_icon_ids",
+      "breakpoints": true
     }
   ]
 }
