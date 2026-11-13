@@ -89,10 +89,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
+      - name: Build images
+        run: docker compose build
+      # NFR-20: `docker compose up` reaches healthy in <= 3 minutes; the image build is not part of it.
       - name: Start the stack
         run: |
           echo "STACK_T0=$(date +%s)" >> "$GITHUB_ENV"
-          docker compose up -d --build --wait
+          docker compose up -d --wait
       - name: Smoke test
         run: bash tools/smoke.sh
       - name: Logs on failure
@@ -255,6 +258,8 @@ jobs:
       - run: pnpm --filter @amar-poribar/web exec playwright install --with-deps chromium
         if: steps.detect.outputs.run == 'true'
       - run: pnpm e2e:web
+        env:
+          AP_BASE_URL: http://localhost:3000
         if: steps.detect.outputs.run == 'true'
       - name: Logs on failure
         if: failure() && steps.detect.outputs.run == 'true'
@@ -290,6 +295,8 @@ jobs:
       - run: pnpm --filter @amar-poribar/admin exec playwright install --with-deps chromium
         if: steps.detect.outputs.run == 'true'
       - run: pnpm e2e:admin
+        env:
+          ADMIN_E2E_STACK_URL: http://localhost:3100
         if: steps.detect.outputs.run == 'true'
       - name: Logs on failure
         if: failure() && steps.detect.outputs.run == 'true'
@@ -368,6 +375,8 @@ jobs:
       - run: pnpm --filter @amar-poribar/web exec playwright install-deps chromium
         if: steps.pw-cache.outputs.cache-hit == 'true'
       - run: pnpm --filter @amar-poribar/web e2e --grep "@stack|comms-" --pass-with-no-tests
+        env:
+          AP_BASE_URL: http://localhost:3000
       - name: Upload traces and screenshot diffs
         if: failure()
         uses: actions/upload-artifact@v4
