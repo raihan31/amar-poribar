@@ -104,45 +104,46 @@ class DashboardScreen extends ConsumerWidget {
 
                 // Transactions List
                 SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final item = recentTransactions[index];
-                    final isExpense = item['type'] == 'expense';
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 8.0),
-                      elevation: 0,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .surface
-                          .withValues(alpha: 0.5),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: isExpense
-                              ? Colors.red.withValues(alpha: 0.1)
-                              : Colors.green.withValues(alpha: 0.1),
-                          child: Icon(
-                            isExpense
-                                ? Icons.arrow_outward
-                                : Icons.arrow_downward,
-                            color: isExpense ? Colors.red : Colors.green,
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final item = recentTransactions[index];
+                      final isExpense = item['type'] == 'expense';
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 8.0),
+                        elevation: 0,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surface
+                            .withValues(alpha: 0.5),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: isExpense
+                                ? Colors.red.withValues(alpha: 0.1)
+                                : Colors.green.withValues(alpha: 0.1),
+                            child: Icon(
+                              isExpense
+                                  ? Icons.arrow_outward
+                                  : Icons.arrow_downward,
+                              color: isExpense ? Colors.red : Colors.green,
+                            ),
+                          ),
+                          title: Text(
+                            item['category'] as String,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(item['date'] as String),
+                          trailing: Text(
+                            '${isExpense ? '−' : '+'}${formatMoney(item['amount'] as Money, style: NumeralStyle.bangla)}',
+                            style: TextStyle(
+                              color: isExpense ? Colors.red : Colors.green,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
-                        title: Text(
-                          item['category'] as String,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(item['date'] as String),
-                        trailing: Text(
-                          '${isExpense ? '−' : '+'}${formatMoney(item['amount'] as Money, style: NumeralStyle.bangla)}',
-                          style: TextStyle(
-                            color: isExpense ? Colors.red : Colors.green,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  childCount: recentTransactions.length,
+                      );
+                    },
+                    childCount: recentTransactions.length,
                   ),
                 ),
                 const SliverToBoxAdapter(

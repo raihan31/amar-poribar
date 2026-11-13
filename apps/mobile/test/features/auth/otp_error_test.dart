@@ -72,11 +72,11 @@ void main() {
     expect(find.text('নতুন কোড পাঠান'), findsOneWidget);
     expect(find.text('নম্বর ভুল? বদলান'), findsOneWidget);
     expect(
-        find.textContaining(
-          'কোড না এলে:',
-          findRichText: true,
-        ),
-        findsOneWidget,
+      find.textContaining(
+        'কোড না এলে:',
+        findRichText: true,
+      ),
+      findsOneWidget,
     );
     expect(
       find.text(
@@ -128,11 +128,11 @@ void main() {
     expect(find.text('নতুন কোড পাঠান'), findsOneWidget);
     expect(find.text('নম্বর ভুল? বদলান'), findsNothing);
     expect(
-        find.textContaining(
-          'কোড না এলে:',
-          findRichText: true,
-        ),
-        findsNothing,
+      find.textContaining(
+        'কোড না এলে:',
+        findRichText: true,
+      ),
+      findsNothing,
     );
     await _end(t);
   });

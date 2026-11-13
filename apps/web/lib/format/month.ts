@@ -13,5 +13,9 @@ export function delta(now: number, before: number): { pct: number; dir: "up" | "
 
 /** "YYYY-MM" as a long month and year, e.g. "জানুয়ারি ২০২৬" for bn-BD. */
 export function monthLabel(month: string, locale: string): string {
-  return new Date(`${month}-01T00:00:00+06:00`).toLocaleDateString(locale, { month: "long", year: "numeric" });
+  return new Date(`${month}-01T00:00:00+06:00`).toLocaleDateString(locale, {
+    month: "long",
+    year: "numeric",
+    timeZone: "Asia/Dhaka",
+  });
 }
