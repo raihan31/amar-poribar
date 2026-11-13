@@ -253,7 +253,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     keyPrefix: 'settings_lang',
                     options: [
                       ('bn', 'বাংলা', 'বাংলা'),
-                      ('en', 'English', l10n.settings_langEnglishLabel)
+                      ('en', 'English', l10n.settings_langEnglishLabel),
                     ],
                     selected: prefs.locale.languageCode,
                     onSelect: (v) => _run(ctl.setLocale(Locale(v))),
@@ -265,7 +265,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     keyPrefix: 'settings_num',
                     options: [
                       ('bangla', '১২৩', '১২৩'),
-                      ('latin', '123', l10n.settings_numLatinLabel)
+                      ('latin', '123', l10n.settings_numLatinLabel),
                     ],
                     selected: prefs.numeralStyle == NumeralStyle.bangla
                         ? 'bangla'

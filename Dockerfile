@@ -17,12 +17,14 @@ COPY apps/api/package.json apps/api/
 COPY apps/web/package.json apps/web/
 COPY apps/admin/package.json apps/admin/
 COPY tools/fakes/package.json tools/fakes/
+COPY tools/fixtures/package.json tools/fixtures/
 RUN --mount=type=cache,target=/pnpm/store pnpm install --frozen-lockfile
 COPY packages packages
 COPY apps/api apps/api
 COPY apps/web apps/web
 COPY apps/admin apps/admin
 COPY tools/fakes tools/fakes
+COPY tools/fixtures tools/fixtures
 RUN pnpm build
 
 FROM build AS api
