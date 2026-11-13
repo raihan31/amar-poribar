@@ -16,6 +16,15 @@ class MemoryStore implements AiStore {
   recordMetering = async (familyId: string, month: string, _feature: string, d: { requests: number }) => {
     this.used.set(`${familyId}:${month}`, (await this.requestsUsed(familyId, month)) + d.requests);
   };
+  reserve = async (familyId: string, month: string, _feature: string, limit: number) => {
+    const used = await this.requestsUsed(familyId, month);
+    if (used >= limit) return false;
+    this.used.set(`${familyId}:${month}`, used + 1);
+    return true;
+  };
+  release = async (familyId: string, month: string) => {
+    this.used.set(`${familyId}:${month}`, Math.max(0, (await this.requestsUsed(familyId, month)) - 1));
+  };
   recordUse = (familyId: string, month: string) => this.recordMetering(familyId, month, "legacy", { requests: 1 });
   findSummary = async (k: SummaryKey) => this.summaries.get(JSON.stringify(k)) ?? null;
   saveSummary = async (k: SummaryKey, v: CachedSummary) => void this.summaries.set(JSON.stringify(k), v);

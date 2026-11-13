@@ -4,7 +4,7 @@ import type { MonthlyAiSummary } from "@amar-poribar/shared";
 import { previousMonth } from "../../ledger/index.js";
 import type { AiDeps } from "./deps.js";
 import { withMetering } from "./metering.js";
-import { hasAiQuota } from "./quota.js";
+import { withReservation } from "./quota.js";
 
 /** Plain-language monthly summary, with a separate version for text-to-speech (FR-AI-11, FR-VOICE-04). */
 export async function summary(
@@ -40,10 +40,18 @@ export async function summary(
   const cached = await deps.store.findSummary(key);
   if (cached) return { month, locale, text: cached.text, speechText: cached.speechText, usedAi: cached.usedAi };
 
-  const useAi = deps.claude.enabled && (await hasAiQuota(deps, familyId));
-  const result = await withMetering(deps, "summary", familyId, (onUsage) =>
-    monthlySummary(facts, { client: useAi ? deps.claude.client : undefined, model: deps.claude.model, onUsage }),
-  );
+  const run = (client: typeof deps.claude.client) =>
+    withMetering(deps, "summary", familyId, (onUsage) =>
+      monthlySummary(facts, { client, model: deps.claude.model, onUsage }),
+    );
+  // Over quota (or no key): the template, which is free and unchanged.
+  const reserved = deps.claude.enabled
+    ? await withReservation(deps, "summary", familyId, async () => {
+        const value = await run(deps.claude.client);
+        return { value, usedAi: value.usedAi };
+      })
+    : null;
+  const result = reserved ? reserved.value : await run(undefined);
   // Only AI summaries are cached; the template is free to rebuild and shouldn't block a later AI version.
   if (result.usedAi) {
     await deps.store.saveSummary(key, { text: result.text, speechText: result.speechText, usedAi: true });

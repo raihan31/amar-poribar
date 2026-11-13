@@ -188,6 +188,8 @@ export type ParseRequest = z.infer<typeof ParseRequestSchema>;
 export const ParseResponseSchema = z.object({
   drafts: z.array(TransactionDraftSchema),
   usedAi: z.boolean(),
+  /** True when AI was skipped only because the family's monthly quota is used up (FR-AI-12). */
+  quotaExhausted: z.boolean().optional(),
 });
 export type ParseResponse = z.infer<typeof ParseResponseSchema>;
 

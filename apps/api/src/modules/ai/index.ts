@@ -1,5 +1,6 @@
 import type { ModuleDefinition } from "../../platform/module.js";
 import type { AiDeps, AiStore } from "./app/deps.js";
+import { createEntitlementsPort } from "./app/entitlements-port.js";
 import { getUsage } from "./app/quota.js";
 import { askRoutes } from "./http/ask-routes.js";
 import { parseRoutes } from "./http/parse-routes.js";
@@ -47,6 +48,7 @@ export function createAiModule(overrides: AiModuleOverrides = {}): ModuleDefinit
       const deps: AiDeps = {
         store: overrides.store ?? createAiStore(ctx.db),
         families,
+        entitlements: createEntitlementsPort({ families, billing: ctx.facades.billing, flags: ctx.flags }),
         ledger,
         claude: claudeClientOf(
           "client" in overrides ? overrides.client : cfg.client,

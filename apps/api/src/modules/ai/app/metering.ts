@@ -22,7 +22,8 @@ export async function withMetering<T>(
   };
   const flush = () => {
     if (total.requests === 0 && total.errors === 0) return Promise.resolve();
-    return deps.store.recordMetering(familyId, currentDhakaMonth(deps.clock()), feature, total);
+    // `requests` is counted by the reservation (quota.ts), not here, so it is never counted twice.
+    return deps.store.recordMetering(familyId, currentDhakaMonth(deps.clock()), feature, { ...total, requests: 0 });
   };
   try {
     const result = await fn(onUsage);
