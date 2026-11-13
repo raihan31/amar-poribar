@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../tool/l10n_check.dart';
 
 void main() {
-  test('the real catalogues have zero differences', () {
+  test('AC-06: the real catalogues have zero differences', () {
     expect(checkL10n(arbDir: 'lib/l10n', libDir: 'lib'), isEmpty);
   });
 

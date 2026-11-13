@@ -98,7 +98,7 @@ void main() {
       }
     }
 
-    test('the bKash send-money example is exact (AC-03)', () {
+    test('AC-03: the bKash send-money example is exact', () {
       final d = engine.parseMfs(
         'You have sent Tk 2,000.00 to 01XXXXX-789. Fee Tk 0.00. Balance Tk 8,450.00. TrxID 9K4L2M7N at 10/11/2026 14:32',
       )!;

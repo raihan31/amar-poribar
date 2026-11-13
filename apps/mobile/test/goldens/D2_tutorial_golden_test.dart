@@ -4,5 +4,5 @@ import 'package:amar_poribar/features/onboarding/ui/tutorial_screen.dart';
 import 'golden_config.dart';
 
 void main() {
-  goldenScreen('D2_tutorial', const TutorialScreen());
+  goldenScreen('D2_tutorial', const TutorialScreen(), acTag: 'AC-26');
 }

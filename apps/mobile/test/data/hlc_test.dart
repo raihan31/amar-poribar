@@ -24,7 +24,7 @@ void main() {
     }
   });
 
-  test('string order is the clock order', () {
+  test('AC-24: string order is the clock order', () {
     for (final c in (v['ordering'] as List).cast<Map<String, dynamic>>()) {
       expect(
         Hlc.parse((c['lower'] as String))

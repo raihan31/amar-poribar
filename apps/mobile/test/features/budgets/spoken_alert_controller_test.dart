@@ -13,12 +13,12 @@ void main() {
   late Map<String, String> meta;
 
   SpokenAlertController make() => SpokenAlertController(
-    watch: repo.watch,
-    voice: voice,
-    getMeta: (k) async => meta[k],
-    setMeta: (k, v) async => meta[k] = v,
-    month: () => '2026-11',
-  );
+        watch: repo.watch,
+        voice: voice,
+        getMeta: (k) async => meta[k],
+        setMeta: (k, v) async => meta[k] = v,
+        month: () => '2026-11',
+      );
 
   setUp(() {
     repo = FakeBudgetRepository();
@@ -44,7 +44,7 @@ void main() {
   });
 
   test(
-    'AC-05 client: crossing 80% then 100% triggers exactly two alerts',
+    'AC-05: crossing 80% then 100% triggers exactly two alerts',
     () async {
       final c = make()..start();
       addTearDown(c.stop);

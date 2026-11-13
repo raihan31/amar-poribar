@@ -142,7 +142,7 @@ void main() {
     );
   });
 
-  _test('sign-in returns to from, local transactions kept', (t) async {
+  _test('AC-13: sign-in returns to from, local transactions kept', (t) async {
     final h = await _pump(t, dbOwner: 'u-me');
     await _expireAndSignIn(t, h);
     expect(h.location, '/budget');
