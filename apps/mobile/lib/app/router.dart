@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/auth/ui/login_screen.dart';
 import '../features/auth/ui/session_expired_screen.dart';
+import '../features/budgets/ui/budgets_screen.dart';
 import '../features/entry/ui/category_picker_screen.dart';
 import '../features/entry/ui/voice_entry_screen.dart';
 import '../features/family/ui/join_screen.dart';
@@ -98,7 +99,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [tab(Routes.list, () => placeholder(Routes.list))],
           ),
           StatefulShellBranch(
-            routes: [tab(Routes.budget, () => placeholder(Routes.budget))],
+            routes: [tab(Routes.budget, () => const BudgetsScreen())],
           ),
           StatefulShellBranch(
             routes: [tab(Routes.family, () => placeholder(Routes.family))],

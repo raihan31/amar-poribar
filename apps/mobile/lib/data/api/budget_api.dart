@@ -16,8 +16,17 @@ class BudgetApi {
         ) as Map<String, dynamic>,
       );
 
-  Future<void> setBudgets(String familyId, Map<String, dynamic> body) async {
-    await _t.send('PUT', '/v1/families/$familyId/budgets', body: body);
+  /// `PUT /budgets?month=` with `{budgets: [{categoryId, limitPaisa}]}` (Owner/Admin only).
+  Future<void> setBudgets(
+    String familyId,
+    Map<String, dynamic> body, {
+    String? month,
+  }) async {
+    await _t.send(
+      'PUT',
+      '/v1/families/$familyId/budgets${month == null ? '' : '?month=$month'}',
+      body: body,
+    );
   }
 
   Future<List<FestivalBudget>> festivalBudgets(String familyId) async =>
