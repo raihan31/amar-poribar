@@ -13,8 +13,8 @@
     "test:watch": "vitest --watch",
     "gen:api": "openapi-typescript ../api/openapi.json -o lib/api/schema.d.ts",
     "gen:api:check": "openapi-typescript ../api/openapi.json -o node_modules/.cache/schema.check.d.ts && diff node_modules/.cache/schema.check.d.ts lib/api/schema.d.ts",
-    "e2e": "playwright test",
-    "e2e:mock": "MOCK=1 playwright test"
+    "e2e": "playwright test -c e2e/playwright.config.ts",
+    "e2e:mock": "MOCK=1 playwright test -c e2e/playwright.config.ts"
   },
   "dependencies": {
     "@amar-poribar/shared": "workspace:*",
